@@ -1,0 +1,27 @@
+# OSX metadata
+.DS_Store
+
+# SVN folders
+.svn
+
+# system files
+*._*
+*.log
+
+# windows thumbnails
+thumbs.db
+
+# local config
+internal/config/cfgLocal.php
+
+# log files
+internal/logs/*
+
+# media files
+internal/media/*
+
+# MODX Page cache
+assets/cache/*.pageCache.php
+
+# admin stats files
+admin/cdws/stats/*
