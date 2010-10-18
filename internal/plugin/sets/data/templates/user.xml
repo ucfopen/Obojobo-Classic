@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<user>
+<username>%%USER%%</username>
+<!-- <set id="%d"></set> -->
+%%SETS%%
+</user>

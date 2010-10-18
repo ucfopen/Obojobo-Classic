@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems>
+	<helpItem field="item1">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item2">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item3">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item4">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item5">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item6">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item7">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+	<helpItem field="item8">
+		<![CDATA[Instance name is a thing, you know?]]>
+	</helpItem>
+</helpItems>	

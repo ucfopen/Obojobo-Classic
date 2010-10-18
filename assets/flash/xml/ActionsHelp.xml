@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems>
+	<section label="My Objects">
+		<subsection label="Drafts">
+			<helpItem label="Preview">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem label="Continue Editing">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem label="Produce Master">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem label="Publish Instance">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem label="Permissions">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem label="Delete">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+		</subsection>
+
+		<subsection label="Masters">
+			<helpItem index="0">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem index="1">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem index="2">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem index="3">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem index="4">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+			<helpItem index="5">
+				<![CDATA[Preview: Open the learning object in a new window using the student view]]>
+			</helpItem>
+		</masters>
+	</helpItems>
+	
+	<helpItems sectionIndex="1">
+		<instanceDetails>
+
+
+
+</helpItems>	
