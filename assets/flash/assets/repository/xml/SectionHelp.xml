@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems>
+	<helpItem id="0">
+		<title>Home</title>
+		<icon>0</icon>
+		<info>
+			<![CDATA[Home]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="1">
+		<title>My Objects</title>
+		<icon>1</icon>
+		<info>
+			<![CDATA[This page contains all of your objects that you have created or are involved in.  Objects come in three flavors - Drafts, Masters, and Favorites.  From this page you can publish instances, define permissions, and produce master objects from which you can publish instances.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="2">
+		<title>My Instances</title>
+		<icon>2</icon>
+		<info>
+			<![CDATA[This page houses all of the instances you have published from your master objects.  From this page you can edit instance metadata and collect scoring and tracking information.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="3">
+		<title>Gradebook</title>
+		<icon>3</icon>
+		<info>
+			<![CDATA[Gradebook]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="4">
+		<title>Media Assets</title>
+		<icon>4</icon>
+		<info>
+			<![CDATA[This page contains all of the media assets you've uploaded for use in your learning objects.  From this page you can upload new media assets or manage the metadata of existing assets.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="5">
+		<title>Object Library</title>
+		<icon>5</icon>
+		<info>
+			<![CDATA[Object Library]]>
+		</info>
+	</helpItem>
+</helpItems>	

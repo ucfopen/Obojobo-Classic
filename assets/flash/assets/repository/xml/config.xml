@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<section_help>
+		<![CDATA[assets/xml/SectionHelp.xml]]>
+	</section_help>
+
+	<instance_help>
+		<![CDATA[assets/xml/InstanceHelp.xml]]>
+	</instance_help>
+
+	<asset_script_url>
+		<![CDATA[../../scripts/getAsset.php?id=]]>
+	</asset_script_url>
+
+	<upload_script_url>
+		<![CDATA[../../scripts/upAsset.php]]>
+	</upload_script_url>
+
+	<creator>
+		<![CDATA[../../creator/]]>
+	</creator>
+
+	<viewer>
+		<![CDATA[../../viewer/]]>
+	</viewer>
+
+	<shared_object_name>
+		<![CDATA[mindshare]]>
+	</shared_object_name>
+
+	<request_timeout_seconds>120</request_timeout_seconds>
+
+	<disable_incomplete_features>true</disable_incomplete_features>
+</config>

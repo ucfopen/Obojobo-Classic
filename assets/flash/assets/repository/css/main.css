@@ -1,0 +1,477 @@
+/* Font embed: */
+
+@font-face {
+	src:url("../swf/flashFonts.swf");
+	fontFamily: "Delicious-Heavy";
+	fontStyle: heavy;
+}
+
+/*@font-face {
+	src:url("flashFonts.swf");
+	fontFamily: "Anivers Regular";
+	fontStyle: normal;
+}*/
+
+/*Component styling:*/
+global {
+	modalTransparencyBlur: 0;
+	modalTransparency: 0.6;
+	modalTransparencyColor: #000000;
+	modalTransparencyDuration: 10;
+}
+
+DataGrid {
+	themeColor: #514e8d;
+}
+
+AdvancedDataGrid {
+	themeColor: #514e8d;
+}
+
+Button {
+	themeColor: #B28798;
+}
+
+ComboBox {
+	themeColor: #B28798;
+}
+
+TextInput {
+	themeColor: #B28798;
+}
+
+Alert {
+	fontFamily: Arial;
+	fontSize: 14;
+	buttonStyleName: "alertButton";
+}
+
+/*Classes:*/
+.repositoryAlert {
+	titleStyleName: 'repositoryAlertTitle';
+	border-color: #7C94B7;
+	border-alpha: 1;
+	font-size: 14;
+	/*close-button-down-skin: "../../assets/shared/images/close-down.png";
+	close-button-up-skin: "../../assets/shared/images/close-up.png";
+	close-button-over-skin: "../../assets/shared/images/close-hover.png";*/
+}
+
+.repositoryAlertSuccess {
+	titleStyleName: 'repositoryAlertTitle';
+	border-color: #7C94B7;
+	border-alpha: 1;
+	font-size: 14;
+	modalTransparencyBlur: 4;
+	modalTransparency: .3;
+	modalTransparencyColor: #FFFFFF;
+	modalTransparencyDuration: 10;
+	/*
+	close-button-down-skin: url("../../assets/shared/images/close-down.png");
+	close-button-up-skin: url("../../assets/shared/images/close-up.png");
+	close-button-over-skin: url("../../assets/shared/images/close-hover.png");*/
+}
+
+.repositoryAlertTitle {
+	fontWeight: normal;
+}
+
+.whiteTextOver {
+	textRollOverColor: #ffffff;
+}
+
+.authorizedButton
+{
+	/**color="#F4EBEE" fontSize="14" fillAlphas="[1.0, 0.6, 0.6, 0.6]" fillColors="[#750F38, #750F38]"**/
+	
+	textRollOverColor: #FFFFFF;
+	fillAlphas: 1, 0.6, 0.6, 0.6;
+	fillColors: #750F38, #750F38;
+	disabledColor: #BE91A3;
+	themeColor: #b28798;
+	color: #f4ebee;
+}
+
+.unauthorizedButton
+{
+	textRollOverColor: #FFFFFF;
+	fillAlphas: 1, 0.47, 0.66, 0.66;
+	fillColors: #365771, #365771;
+	themeColor: #365771;
+	color: #FFFFFF;
+}
+
+.cancelButton {
+	themeColor: #9b1a1a;
+}
+
+.applyButton {
+	themeColor: #1b406a;
+	textRollOverColor: #ffffff;
+}
+
+.alertButton {
+	cornerRadius: 0;
+	color: #343434;
+	fontSize: 16;
+}
+
+.whiteModal {
+	modalTransparencyBlur: 4;
+	modalTransparency: .3;
+	modalTransparencyColor: #FFFFFF;
+	modalTransparencyDuration: 10;
+}
+
+.header {
+	border-style: solid;
+	border-thickness: 0;
+	/*border-skin: ClassReference("border.SimpleGradientBorder");
+	fill-colors: #676767, #8B8B8B;*/
+}
+
+.sideHelp
+{
+	backgroundColor: #DCDCDC;
+	borderStyle: solid;
+	borderSides: left;
+	borderThickness: 1;
+	cornerRadius: 0;
+}
+
+.topBorderOnly
+{
+	borderSides: top;
+}
+
+.bottomBorderOnly
+{
+	borderSides: bottom;
+}
+
+.topAndBottomBorderOnly
+{
+	borderSides: top, bottom;
+}
+
+.instanceHeader
+{
+	borderStyle: solid;
+	borderSides: bottom;
+	borderThickness: 1;
+	cornerRadius: 0;
+}
+
+.draftsToggleButtonBar {
+	buttonStyleName: "draftsToggleButtonBarButtonStyle";
+	selectedButtonTextStyleName: "draftsToggleButtonBarSelectedButtonStyle";
+}
+
+.draftsToggleButtonBarButtonStyle {
+   fillAlphas: 1, 1, 1, 1;
+}
+
+.permissionsWindowButtonBar {
+	buttonStyleName: "permissionsWindowButtonBarButtonStyle";
+}
+
+.permissionsWindowButtonBarButtonStyle {
+   fillAlphas: 1, 1, 1, 1;
+}
+
+/*
+.footer {
+	border-style: solid;
+	border-thickness: 0;
+	border-skin: ClassReference("border.SimpleGradientBorder");
+	fill-colors: #676767, #8B8B8B;
+}
+
+.sidebar {
+	headerHeight: 28;
+	headerStyleName: "sidebarHeader";
+}
+
+.sidebarHeader {
+	fontSize: 16;
+	fontFamily: Delicious-Heavy;
+	fontWeight: normal;
+}
+
+.loTitle {
+	fontFamily: delicious;
+	fontSize: 29;
+	fontWeight: normal;
+	color: white;
+}
+
+.control {
+	buttonStyleName: "controlButtonStyle";
+	selectedButtonTextStyleName: "controlSelectedButtonStyle";
+}
+
+.controlButtonStyle {
+   highlightAlphas: 0.2, 0.2;
+   fillAlphas: 1, 1, 1, 1;
+   fillColors: #333333, #333333, #333333, #999999;
+   color: #ffffff;
+   textRollOverColor: #ffffff;
+   textSelectedColor: #990000;
+   borderColor: #000000;
+   fontFamily: delicious;
+   fontWeight: normal;
+   fontSize: 16;
+}
+
+.controlSelectedButtonStyle {
+   fontSize: 18;
+}
+
+.mybuttonBarFirstButtonStyle {
+}
+
+.mybuttonBarLastButtonStyle {
+}
+
+*/
+
+/* Twitter and login panel */
+.twitterDate {
+color: #222222;
+fontSize: 10;
+zoomProtected: true;
+
+}
+.twitterTextArea {
+fontFamily: Arial;
+color: #222222;
+fontSize: 13;
+borderColor: #BB6666;
+backgroundColor: #FFFFFF;
+backgroundAlpha: .1;
+borderStyle: solid;
+cornerRadius: 5;
+paddingLeft: 10;
+paddingRight: 10;
+zoomProtected: true;
+}
+
+.loginPanel{
+backgroundColor: #fdf2de;
+color: #333333;
+fontSize:12;
+}
+
+.loginPanelText {
+	fontSize: 22;
+	textAlign: center;
+}
+
+.loginPanelContentH1{
+/*fontFamily: Delicious-Heavy;*/
+fontSize: 24;
+color: #383838;
+}
+.loginPanelTitle{
+fontFamily: Delicious-Heavy;
+fontSize: 27;
+color :#990000;
+}
+.loginPanelDate{
+fontWeight: bold;
+}
+.loginPanelHRule{
+strokeWidth:2;
+strokeColor:#383838;
+}
+.loginPanelAppTitle{
+fontSize: 20;
+fontFamily: Anivers Regular;
+}
+.loginPanelTextArea{
+fontFamily: Arial;
+fontSize: 13;
+borderColor: #990000;
+backgroundColor: #FFFFFF;
+backgroundAlpha: .9;
+borderStyle: solid;
+cornerRadius: 5;
+paddingLeft: 10;
+paddingRight: 10;
+}
+.labelBehindInputText{
+borderColor: #1b406a;
+backgroundColor: #FFF;
+borderStyle: solid;
+cornerRadius: 2;
+color: #333333;
+fontFamily: Delicious-Heavy;
+fontWeight: normal;
+fontSize: 17;
+backgroundAlpha: .8;
+}
+.labelBehindInputLabel{
+color: #000000;
+fontFamily: Delicious-Heavy;
+fontWeight: normal;
+fontSize: 22;
+}
+.loginPanelButton {
+fontWeight: bold;
+fontFamily: Arial;
+fontSize: 16;
+borderColor: #1b406a;
+color: #ffffff;
+cornerRadius: 5;
+fillColors: #0d3674, #4d7cf4;
+fillAlphas: .7, .3;
+textRollOverColor: #ffffff;
+}
+.loginPanelLinkButton{
+fontFamily: Delicious-Heavy;
+fontWeight: normal;
+fontSize:16;
+color: #4f688f;
+text-decoration: underline;
+zoomProtected: true;
+padding-top:0;
+padding-right:0;
+padding-left:0;
+padding-bottom:0;
+}
+.loginPanelProgressBar{
+barColor:#526EA1;
+trackHeight:10;
+trackColors: #555555, #DDDDDD;
+fontSize:10;
+zoomProtected: true;
+textAlign:center;
+verticalGap: 0;
+borderColor: #BEBEBE;
+}
+
+.twitterTextArea {
+	color: #FFFFFF;
+}
+
+.objectTitle {
+	fontFamily: Delicious-Heavy;
+	fontSize: 27;
+	color: #FFFFFF;
+	zoomProtected: true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@font-face {
+src:url("/assets/repository/swf/flashFonts.swf");
+fontFamily: "Arial Bold";
+fontStyle: Bold;
+}
+
+@font-face {
+src:url("/assets/repository/swf/flashFonts.swf");
+fontFamily: "Anivers Regular";
+fontStyle: normal;
+}
+
+.trackingLogText{
+fontFamily: "Anivers Regular";
+fontSize: 22;
+fontSizeMin: 13;
+}
+
+.trackingTimeText{
+fontFamily: "Arial Bold";
+fontSize: 22;
+fontSizeMin: 13;
+color:#FFFFFF;
+}
+
+VisitVisualizer{
+trackingTimeTextClass: trackingTimeText;
+trackingLogTextClass: trackingLogText;
+}
+
+.alertWindowStyle
+{
+	/*rounded-bottom-corners: false;
+	border-thickness-left: 0;
+	border-thickness-right: 0;
+	border-thickness-top: 0;
+	border-thickness-bottom: 0;
+	close-button-up-skin: Embed('assets/shared/images/close-up.png');
+	close-button-down-skin: Embed('assets/shared/images/close-down.png');
+	close-button-over-skin: Embed('assets/shared/images/close-hover.png');*/
+}
+
+.mainMenuButton{
+	fontWeight: normal;
+	fontFamily: Arial;
+	fontSize: 14;
+	borderColor: #919191;
+	border-alpha: .5;
+	color: #FFFFFF;
+	cornerRadius: 5;
+	fillColors: #E6E6E6, #AEAEAE;
+	fillAlphas: 1, 1;	
+	zoomProtected: true;
+	textRollOverColor: #FFFFFF;
+	disabledColor: #FFFFFF;
+	themeColor: #FFFFFF;
+}
+
+
+.menuButton{
+	fontWeight: normal;
+	fontFamily: Arial;
+	fontSize: 14;
+	borderColor: #E4BFD4;
+	border-alpha: .5;
+	color: #FFFFFF;
+	cornerRadius: 5;
+	fillColors: #750F38, #750F38;
+	fillAlphas: 1, 1;	
+	zoomProtected: true;
+	textRollOverColor: #FFFFFF;
+	textSelectedColor: #7C5174;
+	disabledColor: #FFFFFF;
+}
+
+.navMenu
+{
+	color: #FFFFFF;
+	fontFamily: Arial;
+	fontSize: 15;
+	fontStyle: normal;
+	fontWeight: bold;
+	textDecoration: normal;
+	themeColor: #9BAAC1;
+	textRollOverColor: #3D455F;
+	textSelectedColor: #3D455F;
+	
+	disabledColor: #C0C5D0;
+}
+
+.helpBubble {
+	borderSkin: Embed(source="/assets/repository/swf/helpBubble.swf", symbol="helpBubble");
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems>
+	<helpItem field="item1">
+		<![CDATA[Your published instance will be displayed to students as the name you input here.  By default this name is the same as the object name.]]>
+	</helpItem>
+	<helpItem field="item2">
+		<![CDATA[This is the course where this instance will be deployed.  This is simply to assist you in the organization of your instances.]]>
+	</helpItem>
+	<helpItem field="item3">
+		<![CDATA[This is the date when this instance will be opened to students.  Before this date, students will not be able to access the instance.  By default it is now.]]>
+	</helpItem>
+	<helpItem field="item4">
+		<![CDATA[The time when this instance will be opened to students.  By default it is the current time.]]>
+	</helpItem>
+	<helpItem field="item5">
+		<![CDATA[This is the date when the assessment will be closed to students.  After this date, students will not be able to take assessment attempts.  They will still have access to the content and practice.]]>
+	</helpItem>
+	<helpItem field="item6">
+		<![CDATA[The time when the assessment will be closed to students.  By default it is the current time.]]>
+	</helpItem>
+	<helpItem field="item7">
+		<![CDATA[This is the number of tries a student will have to take the assessment quiz.  If you provide more than one assessment attempt then the final score is determined by the 'Score Method'.  Students will be able to see how many attempts they have before they begin the assessment quiz.]]>
+	</helpItem>
+	<helpItem field="item8">
+		<![CDATA[This determines how the 'Final Score' will be calculated by Obojobo for instances with more than one attempt.  The student will be able to see how their score will be calculated before they begin the assessment quiz.]]>
+	</helpItem>
+	<helpItem field="item9">
+		<![CDATA[This option allows students who have already taken this learning object to import their past highest attempt score instead of re-taking the object.]]>
+	</helpItem>
+</helpItems>

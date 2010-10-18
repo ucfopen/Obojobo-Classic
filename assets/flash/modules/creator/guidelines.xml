@@ -1,0 +1,253 @@
+<guidelines>
+	<title>
+		<text>
+			<![CDATA[<b>Title guidelines:</b><br /><br />Your title should convey the concept your students will learn in this learning object.  For example:<br /><br /><ul><li><strong>Quadratic Equations</strong> is a good name.</li><li><strong>MAC2312: Quadratics</strong> is too specific to the course - Perhaps this lesson could be used in a different math or science course.</li><li><strong>Math lessons</strong> is too generic - it is not easy to figure out what this learning object really covers at quick glance.</li></ul>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</title>
+
+	<objectiveTaskVerb>
+		<text>
+			<![CDATA[<b>About this field:</b><br><br>Here you will fill out the complete task that you intend for the learner to be able to perform or complete. (This is the heart of your learning objective - <b>what you want your students to learn</b>.)<br /><br />Please note that the task begins with a <I>verb</I>. Your choice of verb has significant implications for the assessment of this learning objective. <BR><BR>To expedite your verb choice, you may use the "Task Verb Chooser." The verb you choose will immediately appear in the "Task" field to the left of any other text you have entered (including any verb you have already entered). You may edit this field as you wish. <br><BR><UL><LI><b>Task Example:</b> <I>Determine</I> the stability features of the equilibrium point...</li><li><b>Task Example:</b> <I>Identify</I> the primary plot details</li><li><b>Task Example:</b> <I>Calculate</I> the standard deviation</li></ul>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</objectiveTaskVerb>
+
+	<objectiveConditions>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />List here any <b>special conditions</b> under which the learner will complete the task.  Please state as specifically as possible what will be provided. This allows the learner to know what exactly will be provided for him or her to be prepared for assessment. (Stating the conditions also <B>guides you in developing an assessment</B> that truly measures whether your learning objective has been met by your learners.)<br><br><UL><LI><b>Condition Example:</b> electric quadrapole diagrams</LI><LI><b>Condition Example:</b> an excerpt from <i>Romeo and Juliet</i></LI><LI><b>Condition Example:</b> a set of values and a spreadsheet</LI></UL>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</objectiveConditions>
+
+	<objectiveExpectations>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />State the <B>level of accuracy</B> that you deem "acceptable." (This portion of the learning objective also has direct implications for the assessment you formulate.)<br><br>The exact score received by a specific student on the assessment will be recorded by Obojobo - the expecation you enter here is dependent on your scoring methods.<br><BR><UL><LI><b>Performance Expectation Example:</b> 80% accuracy.</LI> <LI><b>Performance Expectation Example:</b> 90% accuracy.</LI> <LI><b>Performance Expectation Example:</b> 100% accuracy.</LI></UL>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</objectiveExpectations>
+
+	<objective>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />This is your complete learning objective.  The learning objective should encapsulate the following:<br /><br><ul><li><b>Task</b>: What you want the learner to be able to perform or complete.</li> <li><b>Learning conditions</b>: Any special conditions under which the learner will complete the task.</li> <li><b>Performance Expectations</b>: Criteria for how well the learner will perform or complete the task.</li></ul><br><i>For assistance in writing an effective learning objective containing all three elements, click the blue-bar above to open the "Objective Builder."</i> <br><BR><UL><LI><b>Objective Example:</b> Given electric quadrupole diagrams, the learner will determine the stability features of the equilibrium points on an electric quadrupole for charged particles, with 80% accuracy.</LI> <LI><b>Objective Example:</b> Given an excerpt from <i>Romeo and Juliet</i>, the learner will identify the primary plot details with 90% accuracy.</LI> <LI><b>Objective Example:</b> Given a set of values and a spreadsheet, the learner will calculate the standard deviation with 100% accuracy.</LI></UL>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</objective>
+
+
+
+	<page>
+		<text>
+			<![CDATA[<b>About pages:</b><br />When you add a new page to the page list, the page options pop-up will be shown so that you can edit the page title and change the page layout.  Choose the layout for this page that will best fit the type of content you want to display.  Pages contain text, media, or combinations of both.<br><br><b>Tooltips:</b> Select a portion of your text and click on the 'Tooltip' button to create a tooltip.  Tooltips are underlined sections of text that provide additional information when hovered over.<br><br><b>Page Links:</b> Use the Page Link button to create a page link in the same way as a tooltip.  When clicked on, page links navigate the user to a specific content page in your object.<br><br><b>Advanced Mode:</b> Select 'Advanced' in the upper right of the text entry field to switch to advanced editing mode.  In advanced mode you will input content markup using a subset of HTML tags and Obojobo tooltip and page link tags.  Markup in advanced mode uses tags that are supported in Flash.  Refer to this article for more information on supported tags and syntax:]]>
+		</text>
+		<linkText>
+			<![CDATA[Advanced mode: Information on supported tags.]]>
+		</linkText>
+		<linkURL>
+			<![CDATA[http://livedocs.adobe.com/flash/9.0/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00000922.html]]>
+		</linkURL>
+	</page>
+	
+	
+	
+	<customPage>
+		<text>
+			<![CDATA[<b>About custom layout pages:</b><br>The custom layout template allows you to position text and media boxes to create your own layout.  Pages created with this layout will scale to fit the entire page in the browser window.<br><br><b>Tips:</b><li>Leave some extra room in text boxes for the text to scale up & down as the page resizes.</li><li>For a larger working area, minimize this help or use the 'Popout' button.</li>]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</customPage>
+
+
+	<pQuestionTemplate>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Choose a 'Single' (1 item) or 'Split' (2 item) format for this question.  Items can be a text or media.<br /><br />Choosing the 'Split' format allows you to create questions with text and media.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pQuestionTemplate>
+
+	<pMCQuestion>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Here is where you supply the content for the question, which can either be text or media.  Use the grey icons at the bottom of an item box to switch between using text or media.<br /><br /><b>Examples:</b><br /><br /><ul><li>Use the single format with a text item to ask a question.</li><li>Use the split format with text and media to provide an image on the right with text pertaining to that image on the left.</li></ul><br><b>Media Guidelines:</b><br><br>If you format your question to only use media items it is important that the media piece can stand alone without text.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pMCQuestion>
+
+	<pMCAnswers>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />These fields represent the possible answer choices for this question, with each choice automatically labeled A-Z.<br /><br />Each answer has <b>answer text</b> and <b>answer feedback</b> associated with it.  Feedback is displayed after the student selects an answer.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pMCAnswers>
+
+	<pSAQuestion>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Here is where you supply the content for the question, which can either be text or media.  Use the grey icons at the bottom of an item box to switch between using text or media.<br /><br /><b>Examples:</b><br /><br /><ul><li>Use the single format with a text item to ask a question.</li><li>Use the split format with text and media to provide an image on the right with text pertaining to that image on the left.</li></ul><br><b>Media Guidelines:</b><br><br>If you format your question to only use media items it is important that the media piece can stand alone without text.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pSAQuestion>
+
+	<pSAAnswer>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />This is the answer input field.  Each value you enter here will count as a correct answer.  The student will have to enter one of the possible answer choices as you have typed for them to receive credit.  <b>Answer input is case insensitive</b>, but otherwise student input will need to match exactly.<br><br><b>Answer Guidelines:</b><br><br>Since student input must match one of the correct answer choices exactly it is important that you enter all possible correct answers that a student may enter.  For example, if your answer is "Christopher Columbus", you may want to include "Columbus" as an alternative possible answer.  Note that "columbus", "Columbus" and "COLUMBUS" are equivalent since input is case insensitive.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pSAAnswer>
+
+	<pSAFeedback>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />This is the optional corrective feedback field.  Anything that you enter here will be displayed to the student if they do not input one of the correct answer choices.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</pSAFeedback>
+
+	<pMedia>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Click on 'Select media' to choose the media file you want to use in the practice section.  The use of media for practice/assessment is an advanced feature as you will need to create and select an Adobe Captivate media file that has quiz questions built-in.  (Captivate files will need to be published to Flash 8 format).]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about Captivate requirements]]>
+		</linkText>
+		<linkURL>
+			<![CDATA[/help/create/supported-media.html#Using_Captivate_Quizzes_in_Assessment_5]]>
+		</linkURL>
+	</pMedia>
+
+	<aQuestionTemplate>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Choose a 'Single' (1 item) or 'Split' (2 item) format for this question.  Items can be a text or media.<br /><br />Choosing the 'Split' format allows you to create questions with text and media.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</aQuestionTemplate>
+
+	<aMCQuestion>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Here is where you supply the content for the question, which can either be text or media.  Use the grey icons at the bottom of an item box to switch between using text or media.<br /><br /><b>Examples:</b><br /><br /><ul><li>Use the single format with a text item to ask a question.</li><li>Use the split format with text and media to provide an image on the right with text pertaining to that image on the left.</li></ul><br><b>Media Guidelines:</b><br><br>If you format your question to only use media items it is important that the media piece can stand alone without text.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</aMCQuestion>
+
+	<aMCAnswers>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />These fields represent the possible answer choices for this question, with each choice automatically labeled A-Z.<br /><br />Each answer has <b>answer text</b> only.  In contrast to practice questions, assessment questions do not provide feedback.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</aMCAnswers>
+
+	<aSAQuestion>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Here is where you supply the content for the question, which can either be text or media.  Use the grey icons at the bottom of an item box to switch between using text or media.<br /><br /><b>Examples:</b><br /><br /><ul><li>Use the single format with a text item to ask a question.</li><li>Use the split format with text and media to provide an image on the right with text pertaining to that image on the left.</li></ul><br><b>Media Guidelines:</b><br><br>If you format your question to only use media items it is important that the media piece can stand alone without text.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</aSAQuestion>
+
+	<aSAAnswer>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />This is the answer input field.  Each value you enter here will count as a correct answer.  The student will have to enter one of the possible answer choices as you have typed for them to receive credit.  <b>Answer input is case insensitive</b>, but otherwise student input will need to match exactly.<br><br><b>Answer Guidelines:</b><br><br>Since student input must match one of the correct answer choices exactly it is important that you enter all possible correct answers that a student may enter.  For example, if your answer is "Christopher Columbus", you may want to include "Columbus" as an alternative possible answer.  Note that "columbus", "Columbus" and "COLUMBUS" are equivalent since input is case insensitive.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</aSAAnswer>
+
+	<aMedia>
+		<text>
+			<![CDATA[<b>About this Field:</b><br /><br />Click on 'Select media' to choose the media file you want to use in the practice section.  The use of media for practice/assessment is an advanced feature as you will need to create and select an Adobe Captivate media file that has quiz questions built-in.  (Captivate files will need to be published to Flash 8 format).]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about Captivate requirements]]>
+		</linkText>
+		<linkURL>
+			<![CDATA[/help/create/supported-media.html#Using_Captivate_Quizzes_in_Assessment_5]]>
+		</linkURL>
+	</aMedia>
+
+	<language>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />You will need to specify the language in which this learning object will be written.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</language>
+
+	<description>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />This is the notes field.  This optional field allows you to input any type of additional information you would like to include with this object.  Information you enter here will only be displayed in the Repository and will not be displayed to students.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</description>
+
+	<keywords>
+		<text>
+			<![CDATA[<b>About this Field:</b><br><br>To help identify this learning object, you will need to tag it with various keywords.  This will help you classify this object.<br><br><b>To add a keyword</b>, simply enter data in the field and click <b>Add</b> (or press <b>Enter</b>).  You can also enter a list of keywords seperated by a space to add multiple keywords in one line.  <b>To remove keywords</b>, select any number of keywords in the list and click <b>Remove</b>.<br><br><b>Example:</b> For a learning object that teaches essay techniques, you might want to consider keywords such as "English", "Essay", "Writing", and "Citation".]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</keywords>
+
+	<learnTime>
+		<text>
+			<![CDATA[<b>About this field:</b><br /><br />Every Learning Object needs to have an <b>Estimated Learn Time</b> associated with it.  This represents to total average time it will take students to complete this object.  You need to fill in a number that represents the number of <b>minutes</b> it will take to complete.  If you are unsure, you can return to this section later and fill out this information.<br /><br /><b>Learn Time Guidelines:</b><br /><br />An ideal Learning Object should take at least 7 minutes, and no more then 30 minutes.]]>
+		</text>
+		<linkText>
+			<![CDATA[Read more about thing x]]>
+		</linkText>
+		<linkURL></linkURL>
+	</learnTime>
+
+</guidelines>
