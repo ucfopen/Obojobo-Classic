@@ -1,0 +1,182 @@
+@font-face {
+	src:url("../swf/creator-flashFonts.swf");
+	fontFamily: "Delicious Heavy";
+	fontStyle: heavy;
+}
+
+Application {
+	color: #000000;
+	fontFamily: Arial, Helvetica;
+	fontSize: 14;
+	fontWeight: normal;
+	themeColor: #b28798;
+}
+
+global {
+	modalTransparencyBlur: 0;
+	modalTransparency: 0.6;
+	modalTransparencyColor: #000000;
+	modalTransparencyDuration: 10;
+}
+
+.noBold
+{
+	font-weight: normal;
+}
+
+.lightModal {
+	modalTransparency: 0.1;
+}
+
+.borderLeftRightOnly {
+	borderSides: left, right;
+}
+
+.borderTopOnly {
+	borderSides: top;
+}
+
+.borderBottomOnly {
+	borderSides: bottom;
+}
+
+.borderLeftOnly {
+	borderSides: left;
+}
+
+.borderRightOnly {
+	borderSides: right;
+}
+
+/* Just the font */
+.fontSliderSmallLabel {
+	fontFamily: "Delicious Heavy";
+	color: white;
+	fontSize: 10;
+}
+
+.fontSliderLargeLabel {
+	fontFamily: "Delicious Heavy";
+	color: white;
+	fontSize: 20;
+}
+
+.header {
+	borderSides: bottom;
+	/*border-skin: ClassReference("border.SimpleGradientBorder");
+	fill-colors: #676767, #8B8B8B;*/
+}
+
+.footer {
+	borderSides: top;
+	/*border-skin: ClassReference("border.SimpleGradientBorder");
+	fill-colors: #676767, #8B8B8B;*/
+}
+
+.sidebar {
+	headerHeight: 28;
+	headerStyleName: "sidebarHeader";
+}
+
+.sidebarHeader {
+	fontSize: 11;
+	fontFamily: Arial;
+	fontWeight: bold;
+}
+
+.loTitle {
+	fontFamily: "Delicious Heavy";
+	fontSize: 29;
+	fontWeight: normal;
+	color: white;
+}
+
+.control {
+	buttonStyleName: "controlButtonStyle";
+	firstButtonStyleName: "controlButtonStyle";
+	lastButtonStyleName: "controlButtonStyle";
+	selectedButtonTextStyleName: "controlSelectedButtonStyle";
+}
+
+.controlButtonStyle {
+   highlightAlphas: 0.4, 0.13;
+   fillAlphas: 1, 1, 1, 1;
+   /*fillColors: #750f38, #750f38, #750f38, #750f38;*/
+   textRollOverColor: #494949;
+   fontFamily: Arial;
+   fontSize: 16;
+   borderColor: #ffffff;
+   backgroundColor: #38091C;
+}
+
+.controlSelectedButtonStyle {
+	/*color: #d6cacf;*/
+	/*fillColors: #38091C, #750f38, #750f38, #750f38;*/
+	backgroundColor: #38091C;
+}
+
+.mybuttonBarFirstButtonStyle {
+}
+
+.mybuttonBarLastButtonStyle {
+}
+
+.opaque {
+	fillAlphas: 1, 1, 1, 1;
+}
+
+.bankSizeSliderLabelStyle {
+	fontSize: 11;
+}
+
+/*
+ToolTip{
+	backgroundAlpha: .92;
+	backgroundColor: #f4f1da;
+	fontSize: 13;
+	fontFamily: "Arial Bold";
+	color: #f4f1da;
+	shadowDistance: 20;	
+}
+/*
+info tooltip: 797979 or f4f1da
+ext link: 28578d
+f4f1da
+*/
+
+
+.omlTooltip {
+    color: #FFFFFF;
+    fontSize: 12;
+    shadowColor: #000000;
+    borderColor: #990000;
+    paddingBottom: 2;
+    paddingLeft: 2;
+    paddingRight: 2;
+    paddingTop: 2;
+    font-family: Arial;
+}
+
+.omlPagelink {
+    color: #FFFFFF;
+    fontSize: 12;
+    shadowColor: #000000;
+    borderColor: #669933;
+    paddingBottom: 2;
+    paddingLeft: 2;
+    paddingRight: 2;
+    paddingTop: 2;
+    font-family: Arial;
+}
+
+.omlHref {
+    color: #FFFFFF;
+    fontSize: 12;
+    shadowColor: #000000;
+    borderColor: #28578d;
+    paddingBottom: 2;
+    paddingLeft: 2;
+    paddingRight: 2;
+    paddingTop: 2;
+    font-family: Arial;
+}

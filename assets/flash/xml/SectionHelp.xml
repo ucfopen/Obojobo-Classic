@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems>
+	<helpItem id="0">
+		<title>My Objects</title>
+		<iconImage>0</iconImage>
+		<info>
+			<![CDATA[This page contains all of your objects that you own or are assigned as a collaborator.  Objects come in the form of Drafts and Masters.  Drafts are works in progress - these are objects that students will not have access to.  Masters are completed works which you can distribute by clicking on 'Publishing Instance' or share with other users by clicking on 'Share'.]]>
+		</info>
+	</helpItem>
+
+	<helpItem id="1">
+		<title>My Objects: Masters</title>
+		<iconImage>1</iconImage>
+		<info>
+			<![CDATA[This page contains all of your masters that you own or are assigned as a collaborator.  Master objects can be shared in the public library (click on Share), and with masters you can publish instances for use in your course.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="2">
+		<title>Published Instances</title>
+		<iconImage>2</iconImage>
+		<info>
+			<![CDATA[This page houses all of the instances you have published from your master objects.  From this page you can edit instance metadata and view scoring and tracking information.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="3">
+		<title>Media Assets</title>
+		<iconImage>4</iconImage>
+		<info>
+			<![CDATA[This page contains all of the media assets you've uploaded for use in your learning objects.  From this page you can upload new media assets or manage the metadata of existing assets.]]>
+		</info>
+	</helpItem>
+	
+	<helpItem id="4">
+		<title>Public Library</title>
+		<iconImage>5</iconImage>
+		<info>
+			<![CDATA[This page is the public repository of learning objects.  From this page you can publish instances and begin new drafts if the original authors have allowed derivative works.]]>
+		</info>
+	</helpItem>
+
+	<helpItem id="5">
+		<title>Gradebook</title>
+		<iconImage>3</iconImage>
+		<info>
+			<![CDATA[Gradebook]]>
+		</info>
+	</helpItem>
+</helpItems>	
