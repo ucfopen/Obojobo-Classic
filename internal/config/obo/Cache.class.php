@@ -7,8 +7,6 @@ class cfg_obo_Cache
 	const LO_TIME = 'createTime';
 	const LO_DATA = 'cache';
 	
-	const PAGE_TABLE = 'lo_los_pages_cache';
-	const PAGE_TIME = 'createTime';
 	const PAGE_DATA = 'cache';
 
 	const GROUP_TABLE = 'lo_qgroups_cache';

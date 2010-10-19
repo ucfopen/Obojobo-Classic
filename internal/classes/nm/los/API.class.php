@@ -419,7 +419,8 @@ class nm_los_API extends core_db_dbEnabled
 	 * @return (bool) False if error or no login
 	 * TODO: validate the LO lol
 	 */
-	public function createDraft($loObj){
+	public function createDraft($loObj)
+	{
 
 		if($this->getSessionValid())
 		{
@@ -430,7 +431,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$loObj = new $error(1);
 		}
 		return $loObj;
@@ -451,7 +452,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -1990,7 +1991,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
