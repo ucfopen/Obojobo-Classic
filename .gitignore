@@ -23,5 +23,15 @@ internal/media/*
 # MODX Page cache
 assets/cache/*.pageCache.php
 
+# MODX RSS cache
+assets/cache/rss/*
+
 # admin stats files
 admin/cdws/stats/*
+
+# ignore rss cache
+internal/scripts/rssCache/*
+i
+
+# ignore test files
+internal/DELETEME/tests/*
