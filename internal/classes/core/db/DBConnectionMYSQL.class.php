@@ -37,6 +37,10 @@ class core_db_DBConnectionMYSQL extends core_db_DBConnection
 			trace(mysql_error(), true);
 			trace(array_slice(debug_backtrace(), 0, 3));
 		}
+		// if(preg_match_all("/FROM\W(\w+)/", $query, $matches))
+		// {
+		// 	core_util_Log::profile('db', implode(' ', $matches[1]) . ' ');
+		// }
 		$this->insertID = @mysql_insert_id($this->connData->connID);
 		return $return;
 	}

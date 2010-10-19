@@ -63,11 +63,11 @@ class nm_los_LOSystem extends core_db_dbEnabled
 					case 4:
 						// Removes all pageitem mappings for pageitems mapped to non-existant pages
 						// Removes all pageitems with no mapping
-						$this->cleanContentPageItems();
+//						$this->cleanContentPageItems();
 						break;
 					case 5:					
 						// Finds and removes descriptions with no references from learning objects
-						$this->cleanDescriptions();
+//						$this->cleanDescriptions();
 						break;
 					case 6:				
 						// Removes Learning Object Groups (Agroups and Pgroups) with no LO references
@@ -94,7 +94,7 @@ class nm_los_LOSystem extends core_db_dbEnabled
 						// Removes all QA mappings with no question	
 						// Removes all media mapping with no media items	
 						// Removes all answers not mapped to a question			
-						$this->cleanQuestions();
+						//$this->cleanQuestions();
 						break;
 					case 11:	
 						// Removes all keyword mappings with no lo
@@ -269,87 +269,10 @@ class nm_los_LOSystem extends core_db_dbEnabled
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
-			//exit;
 		}
 		trace('time: ' . (microtime(true) - $t) .' deleted lo_pages :' . $this->DBM->affected_rows(), true);
 		
 	
-	}
-
-	public function cleanContentPageItems()
-	{
-		
-		// Removes all pageitem mappings for pageitems mapped to non-existant pages
-		$t = microtime(true);
-		$qstr = "DELETE I.* FROM
-		lo_map_items AS I
-		LEFT JOIN lo_pages AS P
-		ON P.".cfg_obo_Page::ID." = I.".cfg_obo_Page::ID."
-		WHERE P.".cfg_obo_Page::ID." IS NULL;";		
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;	
-		}	
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_map_items :' . $this->DBM->affected_rows(), true);
-	
-		// Removes all pageitems with no mapping (both content pages and questions)
-		$t = microtime(true);
-		$qstr = "DELETE FROM ".cfg_obo_Page::ITEM_TABLE."
-					WHERE ".cfg_obo_Page::ITEM_ID." IN
-					(
-						SELECT * FROM
-						(
-							SELECT I2.".cfg_obo_Page::ITEM_ID."
-							FROM ".cfg_obo_Page::ITEM_TABLE." AS I2
-							LEFT JOIN ".cfg_obo_Page::MAP_ITEM_TABLE." AS M
-							ON M.".cfg_obo_Page::ITEM_ID." = I2.".cfg_obo_Page::ITEM_ID."
-							LEFT JOIN ".cfg_obo_Question::MAP_ITEM_TABLE." AS Q
-							ON Q.".cfg_obo_Page::ITEM_ID." = I2.".cfg_obo_Page::ITEM_ID."
-							WHERE M.".cfg_obo_Page::ID." IS NULL
-							AND Q.".cfg_obo_Question::ID." IS NULL
-						) AS T1
-					);";
-					// must do second SELECT AS T1 in order to delete from a table used in the inner select
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_page_items :' . $this->DBM->affected_rows(), true);		
-	}
-
-	public function cleanDescriptions()
-	{
-		// Finds and removes descriptions with no references from learning objects
-		$t = microtime(true);
-		$qstr = "SELECT D.".cfg_obo_Text::ID." FROM
-			".cfg_obo_Text::TABLE." AS D
-			LEFT JOIN ".cfg_obo_LO::TABLE." AS L
-			ON L.".cfg_obo_LO::DESC." = D.".cfg_obo_Text::ID."
-			WHERE L.".cfg_obo_LO::ID." IS NULL AND D.".cfg_obo_Text::ID." IN(
-				SELECT D2.".cfg_obo_LO::OBJECTIVE." FROM
-				".cfg_obo_LO::TABLE." AS D2
-				LEFT JOIN ".cfg_obo_LO::TABLE." AS L2
-				ON L2.".cfg_obo_LO::OBJECTIVE." = D2.".cfg_obo_LO::OBJECTIVE."
-				WHERE L2.".cfg_obo_LO::ID." IS NULL
-			)";
-		if(!$q = $this->DBM->query($qstr)) // no need for query safe
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-		}
-		else
-		{
-			while($r = $this->DBM->fetch_obj($q))
-			{
-				$this->DBM->query("DELETE FROM ".cfg_obo_Text::TABLE." WHERE ".cfg_obo_Text::ID."='".$r->{cfg_obo_LO::ID}."'"); // no need for querysafe
-			}
-			trace('time: ' . (microtime(true) - $t) .' deleted lo_desc_obj :' . $this->DBM->fetch_num($q), true);
-		}
 	}
 
 	public function cleanQGroups()
@@ -473,96 +396,6 @@ class nm_los_LOSystem extends core_db_dbEnabled
 			return false;
 		}
 		trace('time: ' . (microtime(true) - $t) .' deleted lo_map_perms :' . $this->DBM->affected_rows(), true);
-	}
-
-	public function cleanQuestions()
-	{
-		// Removes all questions with no qgroup
-		$t = microtime(true);
-		$qstr = "DELETE Q.* FROM
-		".cfg_obo_Question::TABLE." AS Q
-		LEFT JOIN ".cfg_obo_QGroup::MAP_TABLE." AS M
-		ON Q.".cfg_obo_Question::ID." = M.".cfg_obo_QGroup::MAP_CHILD."
-		WHERE M.".cfg_obo_QGroup::ID." IS NULL";		
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-			return false;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_questions :' . $this->DBM->affected_rows(), true);
-	
-		// Removes all media not mapped to a page item
-		$t = microtime(true);
-		
-		$qstr = "DELETE M.*
-		FROM ".cfg_obo_Media::MAP_TABLE." AS M
-		LEFT JOIN ".cfg_obo_Page::ITEM_TABLE." AS I
-		ON M.".cfg_obo_Page::ITEM_ID." = I.".cfg_obo_Page::ITEM_ID."
-		WHERE I.".cfg_obo_Page::ITEM_ID." IS NULL";
-
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-			return false;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_map_media :' . $this->DBM->affected_rows(), true);
-	
-		// Removes all QA mappings with no question
-		$t = microtime(true);
-		$qstr = "DELETE M.* FROM
-		".cfg_obo_Question::MAP_ANS_TABLE." AS M
-		LEFT JOIN ".cfg_obo_Question::TABLE." AS Q
-		ON Q.".cfg_obo_Question::ID." = M.".cfg_obo_Question::ID."
-		WHERE Q.".cfg_obo_Question::ID." IS NULL;";		
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-			return false;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_map_qa :' . $this->DBM->affected_rows(), true);
-	
-		// Removes all media mapping with no media items
-		$t = microtime(true);
-
-		$qstr = "	DELETE M.*
-					FROM ".cfg_obo_Media::MAP_TABLE." AS M
-					LEFT JOIN ".cfg_obo_Page::MAP_ITEM_TABLE." AS I
-					ON M.".cfg_obo_Page::ITEM_ID." = I.".cfg_obo_Page::ITEM_ID."
-					LEFT JOIN ".cfg_obo_Question::MAP_ITEM_TABLE." AS QI
-					ON M.".cfg_obo_Page::ITEM_ID." = QI.".cfg_obo_Page::ITEM_ID."
-					WHERE I.".cfg_obo_Page::ID." IS NULL 
-					AND QI.".cfg_obo_Page::ITEM_ID." IS NULL";
-		
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			exit;
-			return false;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_map_media (2) :' . $this->DBM->affected_rows(), true);
-	
-		// Removes all answers not mapped to a question
-		$t = microtime(true);
-		$qstr = "DELETE A.* FROM
-		".cfg_obo_Answer::TABLE." AS A
-		LEFT JOIN ".cfg_obo_Question::MAP_ANS_TABLE." AS M
-		ON A.".cfg_obo_Answer::ID." = M.".cfg_obo_Answer::ID."
-		WHERE M.".cfg_obo_Answer::ID." IS NULL;";
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-			return false;
-		}	
-		trace('time: ' . (microtime(true) - $t) .' deleted lo_answers :' . $this->DBM->affected_rows(), true);
 	}
 
 	public function cleanKeywords()
@@ -770,7 +603,7 @@ class nm_los_LOSystem extends core_db_dbEnabled
 			// lo_media
 			$success = $success && $this->_mergeUsersUpdate(cfg_obo_Media::TABLE, $q2);
 			// lo_pages
-			$success = $success && $this->_mergeUsersUpdate(cfg_obo_Page::TABLE, $q2);
+			//$success = $success && $this->_mergeUsersUpdate(cfg_obo_Page::TABLE, $q2);
 			// lo_qgroups
 			$success = $success && $this->_mergeUsersUpdate(cfg_obo_QGroup::TABLE, $q2);
 			// lo_questions
