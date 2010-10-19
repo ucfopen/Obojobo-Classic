@@ -94,10 +94,10 @@ $stats = array();
    $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".cfg_obo_Keyword::MAP_ITEM.") as COUNT FROM ".cfg_obo_Keyword::MAP_TABLE." AS M, ".cfg_obo_Keyword::TABLE." AS K WHERE M.".cfg_obo_Keyword::ID." = K.".cfg_obo_Keyword::ID." GROUP BY K.".cfg_obo_Keyword::ID." ORDER BY KEYWORD");
 
    //Page Layouts use in Masters
-   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." AS P, ".cfg_obo_Layout::TABLE." AS L WHERE P.".cfg_obo_Page::ID." IN (SELECT ".cfg_obo_Page::ID." FROM ".cfg_obo_Page::MAP_TABLE." WHERE ".cfg_obo_LO::ID." IN (SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." != '0' AND ".cfg_obo_LO::SUB_VER." ='0')) AND L.".cfg_obo_Layout::ID." = P.".cfg_obo_Layout::ID."  Group By LAYOUT");
+//   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." AS P, ".cfg_obo_Layout::TABLE." AS L WHERE P.".cfg_obo_Page::ID." IN (SELECT ".cfg_obo_Page::ID." FROM ".cfg_obo_Page::MAP_TABLE." WHERE ".cfg_obo_LO::ID." IN (SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." != '0' AND ".cfg_obo_LO::SUB_VER." ='0')) AND L.".cfg_obo_Layout::ID." = P.".cfg_obo_Layout::ID."  Group By LAYOUT");
 
    //Page Layouts use in Masters
-   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".cfg_obo_Layout::ID." AS LAYOUT, count(".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." Group By ".cfg_obo_Layout::ID."");
+//   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".cfg_obo_Layout::ID." AS LAYOUT, count(".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." Group By ".cfg_obo_Layout::ID."");
 
    //Resolution by Views
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".cfg_obo_ComputerData::RES_WIDTH.", ".cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".cfg_obo_ComputerData::TIME.") as COUNT  FROM ".cfg_obo_ComputerData::TABLE." WHERE ".cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".cfg_obo_ComputerData::RES_WIDTH.", ".cfg_obo_ComputerData::RES_HEIGHT);

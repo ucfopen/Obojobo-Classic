@@ -28,124 +28,24 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 	 * @param $quest (Question) The new question object
 	 * @return (Question) question object with new ID
 	 */
-	// TODO: FIX RETURN FOR DB ABSTRACTION
-	public function newQuestion($quest)
+	public function newQuestion($question)
 	{
-		$userID = $_SESSION['userID'];
-        $this->defaultDBM();
-
-        $qstr = "INSERT INTO ".cfg_obo_Question::TABLE." SET 
-			".cfg_core_User::ID."='{$userID}', 
-			`".cfg_obo_Question::TYPE."`='?', 
-			".cfg_obo_Question::DATE."=UNIX_TIMESTAMP()";
-   		//Create line in table
-		if( !($q = $this->DBM->querySafe($qstr, $quest['itemType'])) )
+		if($question->questionID == 0)
 		{
-			$this->DBM->rollback();
-			return false;
-		}
-		$quest['questionID'] = $this->DBM->insertID;
-		$q = $this->DBM->querySafe("SELECT ".cfg_obo_Question::DATE." FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $quest['questionID']); // no need for querySafe
-		$r = $this->DBM->fetch_obj($q);
-		$quest['createTime']  = $r->{cfg_obo_Question::DATE};
-
-		//Add feedback
-		$qstr = "INSERT INTO ".cfg_obo_Question::MAP_FEEDBACK_TABLE." SET ".cfg_obo_Question::ID." = '?', ".cfg_obo_Question::MAP_FEEDBACK_INCORRECT." = '?', ".cfg_obo_Question::MAP_FEEDBACK_CORRECT." = '?'";
-		if(!$this->DBM->querySafe($qstr, $quest['questionID'], $quest['feedback']['incorrect'], $quest['feedback']['correct']))
-		{
-
-			$this->DBM->rollback();
-			return false;
-		}
+			$question->userID = $_SESSION['userID'];
+	        $this->defaultDBM();
 		
-		//Add permissions to this question
-		if($quest['perms'] != 0)
-		{
-			$quest['perms'] = new nm_los_Permissions();
-		}
-		$permman = nm_los_PermissionsManager::getInstance();
-		$permman->setGlobalPerms($quest['questionID'], 'q', $quest['perms']);
-		
-		//Add new page items:
-		$order = 0;
-		foreach($quest['items'] as $pgItem)
-		{
-			if($pgItem['pageItemID'] == 0)
+			$qstr = "INSERT INTO ".cfg_obo_Question::TABLE." SET ".cfg_obo_Question::DATA."='?'";
+			if( !($q = $this->DBM->querySafe($qstr, $this->db_serialize($question)) ) )
 			{
-				//Insert new page item:
-				$qStr = "INSERT INTO ".cfg_obo_Page::ITEM_TABLE." SET ".cfg_obo_Page::ITEM_COMPONENT." = '?', ".cfg_obo_Page::ITEM_DATA." = '?'";
-				if(!($r2 = $this->DBM->querySafe($qStr, $pgItem['component'], $pgItem['data'])))
-				{
-					$this->DBM->rollback();
-					return false;
-				}
-				
-				$pageItemID = $this->DBM->insertID;
-				
-				//Map page item to question:
-				$qStr = "INSERT
-				 		INTO
-				 			".cfg_obo_Question::MAP_ITEM_TABLE."
-				 		SET 
-							".cfg_obo_Question::ID." = '?',
-							".cfg_obo_Question::MAP_ITEM_ORDER." = '?',
-							".cfg_obo_Page::ITEM_ID." = '?'";
-				if(!($r3 = $this->DBM->querySafe($qStr, $quest['questionID'], $order, $pageItemID)))
-				{
-					$this->DBM->rollback();
-					return false;
-				}
-				//If page item was a MediaView, map media to a page_item:
-				if($pgItem["component"] == "MediaView")
-				{
-					$mediaOrder = 0;
-					
-					foreach($pgItem["media"] as $media)
-					{
-						$qStr = "INSERT INTO ".cfg_obo_Media::MAP_TABLE." SET ".cfg_obo_Page::ITEM_ID."='?', ".cfg_obo_Media::MAP_ORDER."='?', ".cfg_obo_Media::ID."='?'";
-						if( !($q = $this->DBM->querySafe($qStr, $pageItemID, $mediaOrder, $media["mediaID"])) )
-						{
-							$this->DBM->rollback();
-							return false;
-						}
-						
-						$mediaOrder++;
-					}
-				}
+				$this->DBM->rollback();
+				return false;
 			}
-			else
-			{
-				$qStr = "INSERT INTO ".cfg_obo_Question::MAP_ITEM_TABLE." SET ".cfg_obo_Question::ID."='?', ".cfg_obo_Question::MAP_ITEM_ORDER."='?', ".cfg_obo_Page::ITEM_ID."='?'";
-				if( !($q = $this->DBM->querySafe($qStr, $quest['questionID'], $order, $pgItem['pageItemID'])) )
-				{
-					$this->DBM->rollback();
-	    			return false;
-				}
-			}
-			
-			$order++;
+			$question->questionID = $this->DBM->insertID;
+			$question->createTime = time();
+			return true;
 		}
-		
-		//Give this author full perms for this question
-		//$permman->setUserPerms();
-		
-		//Add answers to the question, making new ones if needed.
-		$ansman = nm_los_AnswerManager::getInstance();
-		if(isset($quest['answers']))
-		{
-			foreach($quest['answers'] as $key => $ans){
-				//Make new answers if needed
-				if($ans['answerID']== 0)
-				{
-					$newans = $ansman->newAnswer($ans['answer']);
-					$ans['answerID'] = $newans->answerID;
-				}
-				//Update lo_map_qa table
-				$this->addAnswer($quest['questionID'], $ans['answerID'], $key, $ans['weight'], $ans['feedback']);
-			}
-		}
-		
-		return $quest;
+		return false;
 	}
 	
 	/**
@@ -158,130 +58,27 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getQuestion($questionID=0, $inc_weight=true)
 	{
-		$this->defaultDBM();
-		//Check permissions
-		//$permMan = nm_los_PermissionsManager::getInstance();
-		//$perm = $permMan->getPerm($userID, $questionID, 'q');
+		return $this->getQuestionNew($questionID, $inc_weight);
+	}
 
-		//Log the access attempt
-		//$this->logEntry($userID, $questionID, 'q', 'acc', $perm['_read'], '');
-		//if($perm['_read']){
-			//$permman = nm_los_PermissionsManager::getInstance();
-			$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
+
+	protected function getQuestionNew($questionID=0, $inc_weight=true)
+	{
+		$this->defaultDBM();
+
+			$q = $this->DBM->querySafe("SELECT * FROM lo_los_questions WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
 			
 			if( $r = $this->DBM->fetch_obj($q) )
 			{
-				$quest = new nm_los_Question($r->{cfg_obo_Question::ID}, $r->{cfg_core_User::ID}, $r->{cfg_obo_Question::TYPE});
+				$quest = unserialize(base64_decode($r->questionData));
 			}
 			else
 			{
 				$quest = false;
 			}
 			
-			$quest->questionIndex = $r;
-			
-			//Gather question-level feedback:
-			$qStr = "	SELECT *
-						FROM ".cfg_obo_Question::MAP_FEEDBACK_TABLE."
-						WHERE ".cfg_obo_Question::ID." = '?'";
-			
-			$q = $this->DBM->querySafe($qStr, $questionID);
-			
-			if($r = $this->DBM->fetch_obj($q))
-			{
-				$quest->feedback = array('correct' => $r->{cfg_obo_Question::MAP_FEEDBACK_CORRECT}, 'incorrect' => $r->{cfg_obo_Question::MAP_FEEDBACK_INCORRECT});
-			}
-			else
-			{
-				trace('feedback error for questionID = '.$questionID, true);
-				$this->DBM->rollback();
-				return false;
-			}
-			
-			/*
-			//Load layout into LayoutManager
-			$layman = nm_los_LayoutManager::getInstance();
-			$layman->getLayout($r->layoutID);
-			*/
-			//Gather up answers
-			// TODO: use pageItemManager to gather pageitems
-			$q = $this->DBM->querySafe("SELECT ".cfg_obo_Question::MAP_ANS_WEIGHT.", ".cfg_obo_Question::MAP_ANS_FEEDBACK." ,".cfg_obo_Answer::ID." FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::ID."='?' ORDER BY ".cfg_obo_Question::MAP_ANS_ORDER." ASC", $questionID);
-			$ansMan = nm_los_AnswerManager::getInstance();
-			while($r = $this->DBM->fetch_obj($q))
-			{
-				if($inc_weight)
-				{
-					$quest->answers[] = $ansMan->getAnswer($r->{cfg_obo_Answer::ID}, $r->{cfg_obo_Question::MAP_ANS_WEIGHT}, $r->{cfg_obo_Question::MAP_ANS_FEEDBACK});
-				}
-				else		//Don't include the weight of the answer
-				{
-					$quest->answers[] = $ansMan->getAnswer($r->{cfg_obo_Answer::ID}, 0, '');
-				}
-			}
-			//Gather page items:
-			$qStr = "	SELECT I.*
-						FROM ".cfg_obo_Page::ITEM_TABLE." AS I, ".cfg_obo_Question::MAP_ITEM_TABLE." AS M
-						WHERE I.".cfg_obo_Page::ITEM_ID." = M.".cfg_obo_Page::ITEM_ID."
-						AND M.".cfg_obo_Question::ID." = '?'
-						ORDER BY M.".cfg_obo_Question::MAP_ITEM_ORDER."";
-						
-			$q = $this->DBM->querySafe($qStr, $questionID);
-			while($r = $this->DBM->fetch_obj($q))
-			{
-				$quest->items[] = $r;
-				if($r->{cfg_obo_Page::ITEM_COMPONENT} == "MediaView")
-				{
-					//Fetch media into an array:
-					$qStr = "	SELECT MA.".cfg_obo_Media::ID."
-								FROM ".cfg_obo_Media::TABLE." AS M, ".cfg_obo_Media::MAP_TABLE." AS MA
-								WHERE M.".cfg_obo_Media::ID." = MA.".cfg_obo_Media::ID."
-								AND MA.".cfg_obo_Page::ITEM_ID." = '?'
-								ORDER BY MA.".cfg_obo_Media::MAP_ORDER."";
-					
-					$q2 = $this->DBM->querySafe($qStr, $r->{cfg_obo_Page::ITEM_ID});
-					$mediaMan = nm_los_MediaManager::getInstance();
-					while($r2 = $this->DBM->fetch_obj($q2))
-					{
-						$quest->items[ (count($quest->items) - 1) ]->media[] = $mediaMan->getMedia($r2->{cfg_obo_Media::ID});
-					}
-				}
-			}
-			
 			return $quest;
-		//}
-
-		//return false;
 	}
-/*
-	public function saveQuestion($quest){
-		$this->defaultDBM();
-		
-		if($quest->questionID == 0){	//If question doesn't exist, create it
-			return $this->newQuestion($quest);
-		}else{					//If it does exist, update it
-			//Check permissions
-			//$permMan = nm_los_PermissionsManager::getInstance();
-			//$perm = $permMan->getPerm($userID, $ans->answerID, 'a');
-			
-			//$access = $perm['_write'];
-
-			//Log the access attempt
-			//$this->logEntry($userID, $ans->answerID, 'a', 'mod', $access, '');
-			//Save Answer data
-			
-			if( !($q = $this->DBM->query("UPDATE ".self::table." SET
-				type='{$quest->type}', 
-				question_text='{$quest->qtext}', 
-			WHERE id={$quest->questionID} LIMIT 1")) ){
-				$this->DBM->rollback();
-				//die();
-				return false;	
-			}
-		}
-
-		return $quest;
-	}
-*/
 
 	/**
 	 * Adds an existing Answer to a question

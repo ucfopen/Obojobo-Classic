@@ -431,53 +431,8 @@ class nm_los_MediaManager extends core_db_dbEnabled
 	    }
 		// locate items in pages
 		$los = array();
-		$q = $this->DBM->querySafe("SELECT  MP.".cfg_obo_LO::ID."
-			FROM ".cfg_obo_LO::TABLE." AS L, ".cfg_obo_Page::MAP_TABLE." AS MP
-			LEFT JOIN ".cfg_obo_Page::MAP_ITEM_TABLE." AS MI
-			 ON  MI.".cfg_obo_Page::ID." = MP.".cfg_obo_Page::ID."
-			LEFT JOIN ".cfg_obo_Media::MAP_TABLE." AS MM
-			 ON MM.".cfg_obo_Page::ITEM_ID." = MI.".cfg_obo_Page::ITEM_ID."
-			WHERE MM.".cfg_obo_Media::ID." = '?'
-			AND MP.".cfg_obo_LO::ID." = L.".cfg_obo_LO::ID."
-			GROUP BY MP.".cfg_obo_LO::ID, $MID);
-		if(!$q)
-		{
-            trace(mysql_error(), true);
-		    $this->DBM->rollback();
-			return false;			
-		}
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$los[] = $r->{cfg_obo_LO::ID};
-		}
-		// locate items in practice
-		
-		// GET AGropu and PGroup from los table
-		// get kids mapped to those groups
-		// get mapping of media to pageItems in pageItems used in qitems mapped to questions mapped to a qgroups used in los
 
-		
-		$q = $this->DBM->querySafe("SELECT L.".cfg_obo_LO::ID."
-		FROM  ".cfg_obo_LO::TABLE." AS L
-		LEFT JOIN ".cfg_obo_QGroup::MAP_TABLE." AS MQ
-			ON MQ.".cfg_obo_QGroup::ID." = L.".cfg_obo_LO::PGROUP." OR MQ.".cfg_obo_QGroup::ID." = L.".cfg_obo_LO::AGROUP."
-		LEFT JOIN ".cfg_obo_Question::MAP_ITEM_TABLE." AS MQI
-			ON MQI.".cfg_obo_Question::ID." = MQ.".cfg_obo_QGroup::MAP_CHILD."
-		LEFT JOIN ".cfg_obo_Media::MAP_TABLE." AS MM
-			ON MM.".cfg_obo_Page::ITEM_ID." = MQI.".cfg_obo_Page::ITEM_ID."
-		WHERE MM.".cfg_obo_Media::ID." = '?'", $MID);
-		
-		if(!$q)
-		{
-            trace(mysql_error(), true);
-		    $this->DBM->rollback();
-			return false;			
-		}
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$los[] = $r->{cfg_obo_LO::ID};
-		}	
-
+		// TODO: write this
 		return array_unique($los);
 	}
 

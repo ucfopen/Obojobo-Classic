@@ -210,6 +210,11 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		}
 	}
 
+	public function getSessionUserID()
+	{
+		return $_SESSION['userID'];
+	}
+
 	/**
 	 * Logs the user out of the system, completely clearing the session variable and destroying the session.
 	 * @param $userID (number) User ID to log out of the system
