@@ -611,7 +611,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -621,7 +621,6 @@ class nm_los_API extends core_db_dbEnabled
 	{
 		
 		$instman = nm_los_InstanceManager::getInstance();
-		// return 
 		return $instman->getInstanceData($instID);
 
 	}
