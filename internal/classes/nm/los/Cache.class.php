@@ -23,7 +23,12 @@ class nm_los_Cache extends core_util_Memcache
 		parent::__construct();
 		
 		$this->memEnabled = AppCfg::CACHE_MEMCACHE;
-
+		$this->dbCache = AppCfg::DB_CACHE_LO;
+		// only get a db connection if we are caching to the db
+		if($this->dbCache)
+		{
+			$this->DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+		}
 	}
 
 	public function clearAllCache()
@@ -35,6 +40,14 @@ class nm_los_Cache extends core_util_Memcache
 		core_util_Log::dumpProfile('amfphp_Methods');
 		core_util_Log::dumpProfile('memcache_missed');
 		$this->flush();
+		if(!$this->dbCache) // if dbcache is off, we have to get a dbm ref
+		{
+			
+			$this->DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+		}
+		$this->DBM->query("DELETE FROM ".cfg_obo_Cache::LO_TABLE);
+		$this->DBM->query("DELETE FROM ".cfg_obo_Cache::PAGE_TABLE);
+		$this->DBM->query("DELETE FROM ".cfg_obo_Cache::GROUP_TABLE);
 		
 	}
 	
@@ -297,6 +310,10 @@ class nm_los_Cache extends core_util_Memcache
 			}
 			core_util_Log::trace('Memcache Failed to write ');
 		}
+		if($this->dbCache)
+		{
+			$this->DBM->querySafe("INSERT IGNORE INTO ".cfg_obo_Cache::LO_TABLE." SET ".cfg_obo_Cache::LO_ID."='?', ".cfg_obo_Cache::LO_TIME."='?', ".cfg_obo_Cache::LO_DATA."='?'", $loID, time(), base64_encode(serialize($LO)));
+		}
 	}
 	
 	public function getLO($loID)
@@ -304,7 +321,6 @@ class nm_los_Cache extends core_util_Memcache
 		
 		if($this->memEnabled)
 		{
-			
 			// get from memcache
 			if($lo = $this->get($this->ns.'nm_los_LO'.$loID))
 			{
@@ -312,7 +328,41 @@ class nm_los_Cache extends core_util_Memcache
 			}
 			core_util_Log::profile('memcache_missed', 'loID:'.$loID."\n");
 		}
+		if($this->dbCache)
+		{
+			// get from db cache
+			if($q = $this->DBM->querySafe("SELECT ".cfg_obo_Cache::LO_DATA." FROM ".cfg_obo_Cache::LO_TABLE." WHERE ".cfg_obo_Cache::LO_ID."='?'", $loID))
+			{
+				if($r = $this->DBM->fetch_obj($q))
+				{
+					$lo = unserialize(base64_decode($r->{cfg_obo_Cache::LO_DATA}));
 
+					// grab full question groups  (question group manager caches these internally)
+					$pGroup = new nm_los_QuestionGroup();
+					$pGroup->getFromDB($this->DBM, $lo->pGroup->qGroupID, true);
+					$lo->pGroup = $pGroup;
+
+					$aGroup = new nm_los_QuestionGroup();
+					$aGroup->getFromDb($this->DBM, $lo->aGroup->qGroupID, true);
+					$lo->aGroup = $aGroup;
+
+					// Get Pages (page manager caches these internally, temp var needed to prevent caching it here)
+					$pgman = nm_los_PageManager::getInstance();
+					$lo->pages = $pgman->getPagesForLOID($loID);
+
+					// always get perms for the current user
+					$permman = nm_los_PermissionsManager::getInstance();
+
+					$lo->perms = $permman->getMergedPerms((int)$lo->rootID, cfg_obo_Perm::TYPE_LO, $_SESSION['userID']);
+					
+					if($this->memEnabled) // if memcache is enabled, but didnt have this lo, put it in now
+					{
+						$this->setLO($loID, $lo);
+					}
+					return $lo;
+				}
+			}
+		}
 		return false;
 	}
 	
@@ -323,7 +373,11 @@ class nm_los_Cache extends core_util_Memcache
 			$this->clearLOMeta($loID);
 			return $this->delete($this->ns.'nm_los_LO'.$loID);
 		}
-
+		if($this->dbCache)
+		{
+			// get from db cache
+			$this->DBM->querySafe("DELETE FROM ".cfg_obo_Cache::LO_TABLE." WHERE ".cfg_obo_Cache::LO_ID."='?'", $loID);
+		}
 	}
 
 	public function setLOMeta($loID, $LO)
@@ -455,7 +509,21 @@ class nm_los_Cache extends core_util_Memcache
 			}
 			core_util_Log::profile('memcache_missed', 'qGroupID:'.$qGroupID."\n");
 		}
-
+		if($this->dbCache)
+		{
+			if($q = $this->DBM->querySafe("SELECT ".cfg_obo_Cache::GROUP_DATA." FROM ".cfg_obo_Cache::GROUP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?'", $qGroupID))
+			{
+				if($r = $this->DBM->fetch_obj($q))
+				{
+					$qgroup = unserialize(base64_decode($r->{cfg_obo_Cache::GROUP_DATA}));
+					if($this->memEnabled) // if memcache is enabled, but didnt have this lo, put it in now
+					{
+						$this->setQGroup($qGroupID, $qgroup);
+					}
+					return $qgroup;
+				}
+			}
+		}
 		return false;
 	}
 	
@@ -469,6 +537,10 @@ class nm_los_Cache extends core_util_Memcache
 			}
 			core_util_Log::trace('failure writing memcache', true);
 		}
+		if($this->dbCache)
+		{
+			$this->DBM->querySafe("INSERT IGNORE INTO ".cfg_obo_Cache::GROUP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_Cache::GROUP_TIME."='?', ".cfg_obo_Cache::GROUP_DATA."='?'", $qGroupID, time(), base64_encode(serialize($qGroup)));
+		}
 	}
 	
 	public function clearQGroup($qGroupID)
@@ -477,6 +549,10 @@ class nm_los_Cache extends core_util_Memcache
 		{
 			$this->delete($this->ns.'nm_los_QuestionGroup:getFromDB:'.$qGroupID);
 		}
+		if($this->dbCache)
+		{
+			$this->DBM->querySafe("DELETE FROM ".cfg_obo_Cache::GROUP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?'", $qGroupID);
+		}		
 	}
 	
 	public function setPagesForLOID($loID, $pages)
@@ -488,6 +564,10 @@ class nm_los_Cache extends core_util_Memcache
 				return; // if memcache works, return, if it fails, failover to db caching
 			}
 			core_util_Log::trace('failure writing memcache', true);
+		}
+		if($this->dbCache)
+		{
+			$this->DBM->querySafe("INSERT IGNORE INTO ".cfg_obo_Cache::PAGE_TABLE." SET ".cfg_obo_Page::ID."='?', ".cfg_obo_Cache::PAGE_TIME."='?', ".cfg_obo_Cache::PAGE_DATA."='?'", $loID, time(), base64_encode(serialize($pages)));
 		}
 	}
 	
@@ -501,7 +581,22 @@ class nm_los_Cache extends core_util_Memcache
 			}
 			core_util_Log::profile('memcache_missed', 'pagesForLOID:'.$loID."\n");
 		}		
-
+		if($this->dbCache)
+		{		
+			// TODO:  use where time < 30 days in all the selects
+			if($q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Cache::PAGE_TABLE." WHERE ".cfg_obo_Page::ID." = '?'", $loID))
+			{
+				if($r = $this->DBM->fetch_obj($q))
+				{
+					$pages = unserialize(base64_decode($r->{cfg_obo_Cache::PAGE_DATA}));
+					if($this->memEnabled) // if memcache is enabled, but didnt have this lo, put it in now
+					{
+						$this->setPagesForLOID($loID, $pages);
+					}
+					return $pages;
+				}
+			}
+		}
 		return false;
 	}
 	

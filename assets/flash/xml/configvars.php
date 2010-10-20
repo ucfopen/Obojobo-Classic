@@ -88,7 +88,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	</twitter_proxy_url>
 	
 	<pro_account_form_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_ACCOUNT_FORM; ?>]]>
+		<![CDATA[<?php echo AppCfg::URL_ACCOUNT_FORM; ?>]]>
 	</pro_account_form_url>
 
 	<pro_account_formID>

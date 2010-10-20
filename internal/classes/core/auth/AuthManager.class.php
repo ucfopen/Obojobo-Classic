@@ -218,7 +218,6 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	{
 		if(!headers_sent() && !isset($_SESSION))
 		{
-			session_name(AppCfg::SESSION_NAME);
 			session_start();
 		}
 		// TODO: add tracking back in
