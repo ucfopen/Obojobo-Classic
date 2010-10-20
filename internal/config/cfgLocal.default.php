@@ -12,8 +12,8 @@ class AppCfg extends AppCfgDefault
 	//const UCF_AUTH_BYPASS_PASSWORDS = false; // Never set true in production, [true, false]
 	
 	//--------------------   CACHE   -----------------------//	
-	//const CACHE_DB = true; // cache to the db talbes? [true, false]
-	//const CACHE_MEMCACHE = true; // cache to memcache? [true, false]
+	const CACHE_DB = false; // cache to the db talbes? [true, false]
+	const CACHE_MEMCACHE = false; // cache to memcache? [true, false]
 	
 	//--------------------   DATABASE   -----------------------//
 	// Main App DB Connection
@@ -39,13 +39,19 @@ class AppCfg extends AppCfgDefault
 	
 	//--------------------   AUTHENTICATION   -----------------------//
 	
-	//const UCF_USE_WS_AUTH = false;  // use the ucf web service to check for reasons of password failure
+	const UCF_USE_WS_AUTH = false;  // use the ucf web service to check for reasons of password failure
 	const UCF_WSDL = ''; // the web service wsdl needed for the ws query
-	const UCF_APP_ID = ''; // the app id needed to connect to the web service
+	const UCF_APP_ID = ""; // the app id needed to connect to the web service
 		
-	const LDAP = ''; // The LDAP URL for accessing UCF Authentication
+	const LDAP = "ldaps://net.ucf.edu"; // The LDAP URL for accessing UCF Authentication
 	
 	const SSO_SECRET = ""; // SSO Secret key used for the single sign on script
+	
+	const KOGNEATO_SSO_SECRET = '';
+	const KOGNEATO_SSO_URL = 'https://kogneato.ucf.edu/embededCore/';
+	
+	
+	const CORE_PLUGINS = 'sets,Kogneato';
 	
 
 }

@@ -7,41 +7,29 @@ class core_util_Log
 		
 		if($force || AppCfg::DEBUG_MODE)
 		{
-			@$dt = debug_backtrace();			
-			// if traceText is an object, print_r it
-			if(is_object($traceText) || is_array($traceText))
+			@$dt = debug_backtrace();
+			if(count($dt) > 1)
 			{
-				$traceText = print_r($traceText, true);
-			}
-			
-			if(is_array($dt))
-			{
-				$len = count($dt);
-				if($len > 1)
+				if(is_object($traceText) || is_array($traceText))
 				{
-					// called using global trace function from app.php
-					if(basename($dt[0]['file']) == 'app.php')
-					{
-						if($len > 2) // called from a class file
-						{
-							self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[0+$increaseBackTraceIndex]['line'].': '.$traceText, false);
-						}
-						else // called from a script
-						{
-							self::writeLog(basename($dt[1]['file']).'#'.$dt[1]['line'].': '.$traceText, false);
-						}
-						return; // exit here if either of these methods wrote to the log
-					}
+					self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[$increaseBackTraceIndex]['line'].' printr: '. print_r($traceText, true));
 				}
-			}
-			// couldnt get backtrace, just export what we have
-			if(is_object($traceText) || is_array($traceText))
-			{
-				self::writeLog('printr: ' .print_r($traceText, true));
+				else
+				{
+					self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[$increaseBackTraceIndex]['line'].': '.$traceText);
+				}
 			}
 			else
 			{
-				self::writeLog('trace: ' .$traceText);
+				if(is_object($traceText) || is_array($traceText))
+				{
+					self::writeLog('printr: ' .print_r($traceText, true));
+				}
+				else
+				{
+					self::writeLog('trace: ' .$traceText);
+				}
+				
 			}
 		}
 	}

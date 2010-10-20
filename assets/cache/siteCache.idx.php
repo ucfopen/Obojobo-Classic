@@ -3,10 +3,10 @@ $c=&$this->config;
 $c['manager_theme'] = "MODxCarbon";
 $c['settings_version'] = "1.0.4";
 $c['server_offset_time'] = "18000";
-$c['server_protocol'] = "http";
+$c['server_protocol'] = "https";
 $c['manager_language'] = "english";
 $c['modx_charset'] = "UTF-8";
-$c['site_name'] = "DEVEL Obojobo";
+$c['site_name'] = "Obojobo - UCF Learning Objects ";
 $c['site_start'] = "1";
 $c['error_page'] = "37";
 $c['unauthorized_page'] = "54";
@@ -26,9 +26,9 @@ $c['friendly_url_suffix'] = ".html";
 $c['friendly_alias_urls'] = "1";
 $c['use_alias_path'] = "1";
 $c['use_udperms'] = "1";
-$c['udperms_allowroot'] = "0";
+$c['udperms_allowroot'] = "1";
 $c['failed_login_attempts'] = "20";
-$c['blocked_minutes'] = "5";
+$c['blocked_minutes'] = "1";
 $c['use_captcha'] = "0";
 $c['captcha_words'] = "MODx,Access,Better,BitCode,Cache,Desc,Design,Excell,Enjoy,URLs,TechView,Gerald,Griff,Humphrey,Holiday,Intel,Integration,Joystick,Join(),Tattoo,Genetic,Light,Likeness,Marit,Maaike,Niche,Netherlands,Ordinance,Oscillo,Parser,Phusion,Query,Question,Regalia,Righteous,Snippet,Sentinel,Template,Thespian,Unity,Enterprise,Verily,Veri,Website,WideWeb,Yap,Yellow,Zebra,Zygote";
 $c['emailsender'] = "noReply@obojobo.ucf.edu";
@@ -41,8 +41,8 @@ $c['number_of_messages'] = "30";
 $c['number_of_results'] = "20";
 $c['use_editor'] = "1";
 $c['use_browser'] = "1";
-$c['rb_base_dir'] = "/srv/web/vhosts/obojobo.ucf.devel/assets/";
-$c['rb_base_url'] = "/assets/modx/";
+$c['rb_base_dir'] = "/local/web/vhosts/obojobo.ucf.edu/assets/";
+$c['rb_base_url'] = "assets/modx/";
 $c['which_editor'] = "none";
 $c['fe_editor_lang'] = "english";
 $c['fck_editor_toolbar'] = "standard";
@@ -58,7 +58,7 @@ $c['upload_maxsize'] = "1048576";
 $c['new_file_permissions'] = "0644";
 $c['new_folder_permissions'] = "0755";
 $c['show_preview'] = "0";
-$c['filemanager_path'] = "/srv/web/vhosts/obojobo.ucf.devel/";
+$c['filemanager_path'] = "/local/web/vhosts/obojobo.ucf.edu/";
 $c['theme_refresher'] = "";
 $c['manager_layout'] = "4";
 $c['custom_contenttype'] = "text/css,text/html,text/javascript,text/plain,text/xml";
@@ -73,7 +73,7 @@ $c['tinymce_custom_buttons1'] = "undo,redo,selectall,separator,pastetext,pastewo
 $c['tinymce_custom_buttons2'] = "bold,italic,underline,strikethrough,sub,sup,separator,bullist,numlist,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,styleselect,formatselect,separator,styleprops";
 $c['tree_show_protected'] = "0";
 $c['validate_referer'] = "0";
-$c['site_id'] = "4c3f1a704b8b9";
+$c['site_id'] = "4c699d4380e7b";
 $c['xhtml_urls'] = "1";
 $c['site_unavailable_page'] = "38";
 $c['allow_duplicate_alias'] = "0";
@@ -101,7 +101,7 @@ $c['reload_websignupemail_message'] = "";
 $c['system_email_websignup_default'] = "Hello [+uid+]\r\n\r\nHere are your login details for [+sname+]:\r\n\r\nUsername: [+uid+]\r\nPassword: [+pwd+]\r\n\r\nOnce you log into [+sname+] ([+surl+]), you can change your password.\r\n\r\nRegards,\r\nSite Administrator";
 $c['reload_system_email_webreminder_message'] = "";
 $c['system_email_webreminder_default'] = "Hello [+uid+]\r\n\r\nTo activate your new password click the following link:\r\n\r\n[+surl+]\r\n\r\nIf successful you can use the following password to login:\r\n\r\nPassword:[+pwd+]\r\n\r\nIf you did not request this email then please ignore it.\r\n\r\nRegards,\r\nSite Administrator";
-$c['tree_page_click'] = "3";
+$c['tree_page_click'] = "27";
 $this->aliasListing = array();
 $a = &$this->aliasListing;
 $d = &$this->documentListing;
@@ -118,12 +118,12 @@ $m[] = array('0' => '3');
 $d['viewer'] = 4;
 $a[4] = array('id' => 4, 'alias' => 'viewer', 'path' => '');
 $m[] = array('0' => '4');
-$d['sitemap.xml'] = 40;
-$a[40] = array('id' => 40, 'alias' => 'sitemap.xml', 'path' => '');
-$m[] = array('0' => '40');
 $d['flash-player-required'] = 51;
 $a[51] = array('id' => 51, 'alias' => 'flash-player-required', 'path' => '');
 $m[] = array('0' => '51');
+$d['sitemap.xml'] = 40;
+$a[40] = array('id' => 40, 'alias' => 'sitemap.xml', 'path' => '');
+$m[] = array('0' => '40');
 $d['repository'] = 5;
 $a[5] = array('id' => 5, 'alias' => 'repository', 'path' => '');
 $m[] = array('0' => '5');
@@ -151,15 +151,21 @@ $m[] = array('3' => '7');
 $d['about/aboutObojobo'] = 8;
 $a[8] = array('id' => 8, 'alias' => 'aboutObojobo', 'path' => 'about');
 $m[] = array('3' => '8');
-$d['about/changelog'] = 9;
-$a[9] = array('id' => 9, 'alias' => 'changelog', 'path' => 'about');
+$d['about/updatesandfeatures'] = 9;
+$a[9] = array('id' => 9, 'alias' => 'updatesandfeatures', 'path' => 'about');
 $m[] = array('3' => '9');
-$d['about/suggest-features'] = 59;
-$a[59] = array('id' => 59, 'alias' => 'suggest-features', 'path' => 'about');
+$d['about/suggestfeatures'] = 59;
+$a[59] = array('id' => 59, 'alias' => 'suggestfeatures', 'path' => 'about');
 $m[] = array('3' => '59');
+$d['viewer/index'] = 33;
+$a[33] = array('id' => 33, 'alias' => 'index', 'path' => 'viewer');
+$m[] = array('4' => '33');
 $d['viewer/sso'] = 56;
 $a[56] = array('id' => 56, 'alias' => 'sso', 'path' => 'viewer');
 $m[] = array('4' => '56');
+$d['repository/test-obojobo-repository-test'] = 61;
+$a[61] = array('id' => 61, 'alias' => 'test-obojobo-repository-test', 'path' => 'repository');
+$m[] = array('5' => '61');
 $d['repository/index'] = 34;
 $a[34] = array('id' => 34, 'alias' => 'index', 'path' => 'repository');
 $m[] = array('5' => '34');
@@ -169,15 +175,15 @@ $m[] = array('10' => '19');
 $d['help/view/viewingALearningObject'] = 35;
 $a[35] = array('id' => 35, 'alias' => 'viewingALearningObject', 'path' => 'help/view');
 $m[] = array('10' => '35');
-$d['help/create/creator-quick-start-guide'] = 20;
-$a[20] = array('id' => 20, 'alias' => 'creator-quick-start-guide', 'path' => 'help/create');
-$m[] = array('11' => '20');
-$d['help/create/basic-account-quick-start-guide'] = 46;
-$a[46] = array('id' => 46, 'alias' => 'basic-account-quick-start-guide', 'path' => 'help/create');
-$m[] = array('11' => '46');
 $d['help/create/pro-account-quick-start-guide'] = 49;
 $a[49] = array('id' => 49, 'alias' => 'pro-account-quick-start-guide', 'path' => 'help/create');
 $m[] = array('11' => '49');
+$d['help/create/basic-account-quick-start-guide'] = 46;
+$a[46] = array('id' => 46, 'alias' => 'basic-account-quick-start-guide', 'path' => 'help/create');
+$m[] = array('11' => '46');
+$d['help/create/creator-quick-start-guide'] = 20;
+$a[20] = array('id' => 20, 'alias' => 'creator-quick-start-guide', 'path' => 'help/create');
+$m[] = array('11' => '20');
 $d['help/create/assessment'] = 21;
 $a[21] = array('id' => 21, 'alias' => 'assessment', 'path' => 'help/create');
 $m[] = array('11' => '21');
@@ -196,18 +202,18 @@ $m[] = array('11' => '25');
 $d['help/create/permissions'] = 26;
 $a[26] = array('id' => 26, 'alias' => 'permissions', 'path' => 'help/create');
 $m[] = array('11' => '26');
-$d['help/create/creating-derivative-works'] = 48;
-$a[48] = array('id' => 48, 'alias' => 'creating-derivative-works', 'path' => 'help/create');
-$m[] = array('11' => '48');
 $d['help/create/practice-section'] = 27;
 $a[27] = array('id' => 27, 'alias' => 'practice-section', 'path' => 'help/create');
 $m[] = array('11' => '27');
-$d['help/create/public-library'] = 28;
-$a[28] = array('id' => 28, 'alias' => 'public-library', 'path' => 'help/create');
-$m[] = array('11' => '28');
+$d['help/create/creating-derivative-works'] = 48;
+$a[48] = array('id' => 48, 'alias' => 'creating-derivative-works', 'path' => 'help/create');
+$m[] = array('11' => '48');
 $d['help/create/importing-obojobo-scores-into-webcourses'] = 52;
 $a[52] = array('id' => 52, 'alias' => 'importing-obojobo-scores-into-webcourses', 'path' => 'help/create');
 $m[] = array('11' => '52');
+$d['help/create/public-library'] = 28;
+$a[28] = array('id' => 28, 'alias' => 'public-library', 'path' => 'help/create');
+$m[] = array('11' => '28');
 $d['help/create/basic-and-pro-accounts'] = 47;
 $a[47] = array('id' => 47, 'alias' => 'basic-and-pro-accounts', 'path' => 'help/create');
 $m[] = array('11' => '47');
@@ -244,15 +250,15 @@ $m[] = array('12' => '17');
 $d['help/general/requestPassword'] = 18;
 $a[18] = array('id' => 18, 'alias' => 'requestPassword', 'path' => 'help/general');
 $m[] = array('12' => '18');
+$d['help/general/requestContentCreator'] = 42;
+$a[42] = array('id' => 42, 'alias' => 'requestContentCreator', 'path' => 'help/general');
+$m[] = array('12' => '42');
 $d['help/general/technical-support'] = 50;
 $a[50] = array('id' => 50, 'alias' => 'technical-support', 'path' => 'help/general');
 $m[] = array('12' => '50');
 $d['help/general/loginHelp'] = 43;
 $a[43] = array('id' => 43, 'alias' => 'loginHelp', 'path' => 'help/general');
 $m[] = array('12' => '43');
-$d['help/general/requestContentCreator'] = 42;
-$a[42] = array('id' => 42, 'alias' => 'requestContentCreator', 'path' => 'help/general');
-$m[] = array('12' => '42');
 $d['help/general/video-tutorials'] = 53;
 $a[53] = array('id' => 53, 'alias' => 'video-tutorials', 'path' => 'help/general');
 $m[] = array('12' => '53');
@@ -271,8 +277,8 @@ $m[] = array('36' => '39');
 $d['misc/unauthorized-page'] = 54;
 $a[54] = array('id' => 54, 'alias' => 'unauthorized-page', 'path' => 'misc');
 $m[] = array('36' => '54');
-$d['about/suggest-features/ajax'] = 60;
-$a[60] = array('id' => 60, 'alias' => 'ajax', 'path' => 'about/suggest-features');
+$d['about/suggestfeatures/feature-ajax-gateway'] = 60;
+$a[60] = array('id' => 60, 'alias' => 'feature-ajax-gateway', 'path' => 'about/suggestfeatures');
 $m[] = array('59' => '60');
 $c = &$this->contentTypes;
 $c[40] = 'text/xml';
@@ -337,6 +343,16 @@ Password<br/>
 <a href=\'[+action+]\'>[+logouttext+] [+username+]</a>
 
 ';
+$c['googleanalytics'] = '<script type="text/javascript"> 
+  var _gaq = _gaq || [];
+  _gaq.push([\'_setAccount\', \'UA-3665955-1\']);
+  _gaq.push([\'_trackPageview\']);
+  (function() {
+    var ga = document.createElement(\'script\'); ga.type = \'text/javascript\'; ga.async = true;
+    ga.src = (\'https:\' == document.location.protocol ? \'https://ssl\' : \'http://www\') + \'.google-analytics.com/ga.js\';
+    var s = document.getElementsByTagName(\'script\')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>';
 $c['mm_demo_rules'] = '// PHP *is* allowed
 // $news_role and $news_tpl will not apply to demo content but are left as a demonstration of what can be done
 
@@ -426,7 +442,6 @@ $c['WebLoginSidebar'] = '<!-- #declare:separator <hr> -->
 	</tr>
   </table>
 </form>
-
 ';
 $s = &$this->snippetCache;
 $s['AjaxSearch'] = '/**
@@ -4378,51 +4393,6 @@ include_once $snipPath."weblogin/weblogin.inc.php";
 return $output;
 ';
 $s['WebLoginProps'] = '&loginhomeid=Login Home Id;string; &logouthomeid=Logout Home Id;string; &logintext=Login Button Text;string; &logouttext=Logout Button Text;string; &tpl=Template;string;  ';
-$s['getFlashvars'] = '
-$output = \'\';
-
-if(isset($getVars))
-{
-	$v = explode(\',\', $getVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		if(isset($_GET[$varName]))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. $_GET[$varName] . \'"; \';
-		}
-	}
-}
-
-if(isset($postVars))
-{
-	$v = explode(\',\', $postVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		if(isset($_POST[$varName]))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. $_POST[$varName] . \'"; \';
-		}
-	}
-}
-
-if(isset($cfgVars))
-{
-	$v = explode(\',\', $cfgVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		
-		if(substr($varName, 0,2) != \'DB\' &&  defined(\'AppCfg::\'.$varName))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. constant(\'AppCfg::\'.$varName). \'"; \';
-		}
-	}
-}
-
-return $output;
-';
 $s['WebSignup'] = '# Created By Raymond Irving April, 2005
 #::::::::::::::::::::::::::::::::::::::::
 # Usage:     
@@ -4967,11 +4937,56 @@ if(nm_los_Validator::isPosInt($_REQUEST[\'view\']))
 }
 return "Invalid arguments";
 ';
-$s['FeatureSuggestions'] = '
-require($modx->config[\'base_path\'] . \'assets/snippets/suggestions/suggestions.php\');
+$s['getFlashvars'] = '
+$output = \'\';
+
+if(isset($getVars))
+{
+	$v = explode(\',\', $getVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		if(isset($_GET[$varName]))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. $_GET[$varName] . \'"; \';
+		}
+	}
+}
+
+if(isset($postVars))
+{
+	$v = explode(\',\', $postVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		if(isset($_POST[$varName]))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. $_POST[$varName] . \'"; \';
+		}
+	}
+}
+
+if(isset($cfgVars))
+{
+	$v = explode(\',\', $cfgVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		
+		if(substr($varName, 0,2) != \'DB\' &&  defined(\'AppCfg::\'.$varName))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. constant(\'AppCfg::\'.$varName). \'"; \';
+		}
+	}
+}
+
+return $output;
 ';
 $s['FeatureSuggestionAjax'] = '
 require($modx->config[\'base_path\'] . \'assets/snippets/suggestions/ajax.php\');
+';
+$s['FeatureSuggestions'] = '
+require($modx->config[\'base_path\'] . \'assets/snippets/suggestions/suggestions.php\');
 ';
 $p = &$this->pluginCache;
 $p['Markdown 1.1.7'] = '/**
@@ -5008,8 +5023,8 @@ switch ($e->name) {
 }
 
 return $markdown;';
-$p['Page TOC Generator'] = '
-/**********************************************************************************************************************
+$p['DuckPackAuthentication'] = 'include($modx->config[\'base_path\'] . \'assets/plugins/duckpack/authModX.php\');';
+$p['Page TOC Generator'] = '/**********************************************************************************************************************
 Plugin Name: TOC Generator
 Plugin URI:
 Description: This plugin is used to automatically generate a table of contents from HTML headings on that page.
@@ -5293,228 +5308,6 @@ $source = preg_replace("/<!--#toc_plugin#_END_CONFIGURATION-->/", "", $source);
 $source = preg_replace("/<!--#toc_plugin#_START_TOC_INDEXING-->/", " ", $source);
 $source = preg_replace("/<!--#toc_plugin#_END_TOC_INDEXING-->/", " ", $source);
 ';
-$p['DuckPackAuthentication'] = 'include($modx->config[\'base_path\'] . \'assets/plugins/duckpack/authModX.php\');';
-$p['ManagerManager'] = '// You can put your ManagerManager rules EITHER in a chunk OR in an external file - whichever suits your development style the best
-
-// To use an external file, put your rules in /assets/plugins/managermanager/mm_rules.inc.php 
-// (you can rename default.mm_rules.inc.php and use it as an example)
-// The chunk SHOULD have php opening tags at the beginning and end
-
-// If you want to put your rules in a chunk (so you can edit them through the Manager),
-// create the chunk, and enter its name in the configuration tab.
-// The chunk should NOT have php tags at the beginning or end
-
-// ManagerManager requires jQuery 1.3+
-// The URL to the jQuery library. Choose from the configuration tab whether you want to use 
-// a local copy (which defaults to the jQuery library distributed with ModX 1.0.1)
-// a remote copy (which defaults to the Google Code hosted version)
-// or specify a URL to a custom location.
-// Here we set some default values, because this is a convenient place to change them if we need to,
-// but you should configure your preference via the Configuration tab.
-$js_default_url_local = $modx->config[\'site_url\']. \'/assets/js/jquery-1.3.2.min.js\';
-$js_default_url_remote = \'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js\';
-
-// You don\'t need to change anything else from here onwards
-//-------------------------------------------------------
-
-// Run the main code
-$asset_path = $modx->config[\'base_path\'] . \'assets/plugins/managermanager/mm.inc.php\';
-include($asset_path);';
-$p['ManagerManagerProps'] = '&config_chunk=Configuration Chunk;text;mm_demo_rules; &remove_deprecated_tv_types_pref=Remove deprecated TV types;list;yes,no;yes &which_jquery=jQuery source;list;local (assets/js),remote (google code),manual url (specify below);local (assets/js) &js_src_type=jQuery URL override;text;  ';
-$p['Quick Manager+'] = '$show = TRUE;
-
-if ($disabled  != \'\') {
-    $arr = explode(",", $disabled );
-    if (in_array($modx->documentIdentifier, $arr)) {
-        $show = FALSE;
-    }
-}
-
-if ($show) {
-    include_once($modx->config[\'base_path\'].\'assets/plugins/qm/qm.inc.php\');
-    $qm = new Qm($modx, $jqpath, $loadmanagerjq, $loadfrontendjq, $noconflictjq, $loadtb, $tbwidth, $tbheight, $hidefields, $hidetabs, $hidesections, $addbutton, $tpltype, $tplid, $custombutton, $managerbutton, $logout, $autohide);
-}';
-$p['Quick Manager+Props'] = '&jqpath=Path to jQuery;text;assets/js/jquery-1.3.2.min.js &loadmanagerjq=Load jQuery in manager;list;true,false;true &loadfrontendjq=Load jQuery in front-end;list;true,false;true &noconflictjq=jQuery noConflict mode in front-end;list;true,false;true &loadtb=Load modal box in front-end;list;true,false;true &tbwidth=Modal box window width;text;80% &tbheight=Modal box window height;text;90% &hidefields=Hide document fields from front-end editors;text;parent &hidetabs=Hide document tabs from front-end editors;text; &hidesections=Hide document sections from front-end editors;text; &addbutton=Show add document here button;list;true,false;true &tpltype=New document template type;list;parent,id,selected;parent &tplid=New document template id;int;3 &custombutton=Custom buttons;textarea; &managerbutton=Show go to manager button;list;true,false;true &logout=Logout to;list;manager,front-end;manager &disabled=Plugin disabled on documents;text; &autohide=Autohide toolbar;list;true,false;true  ';
-$p['Search Highlight'] = '/*
-  ------------------------------------------------------------------------
-  Plugin: Search_Highlight v1.5
-  ------------------------------------------------------------------------
-  Changes:
-  18/03/10 - Remove possibility of XSS attempts being passed in the URL
-           - look-behind assertion improved
-  29/03/09 - Removed urldecode calls;
-           - Added check for magic quotes - if set, remove slashes
-           - Highlights terms searched for when target is a HTML entity
-  18/07/08 - advSearch parameter and pcre modifier added
-  10/02/08 - Strip_tags added to avoid sql injection and XSS. Use of $_REQUEST
-  01/03/07 - Added fies/updates from forum from users mikkelwe/identity
-  (better highlight replacement, additional div around term/removal message)
-  ------------------------------------------------------------------------
-  Description: When a user clicks on the link from the AjaxSearch results
-    the target page will have the terms highlighted.
-  ------------------------------------------------------------------------
-  Created By:  Susan Ottwell (sottwell@sottwell.com)
-               Kyle Jaebker (kjaebker@muddydogpaws.com)
-
-  Refactored by Coroico (www.modx.wangba.fr) and TS
-  ------------------------------------------------------------------------
-  Based off the the code by Susan Ottwell (www.sottwell.com)
-    http://modxcms.com/forums/index.php/topic,1237.0.html
-  ------------------------------------------------------------------------
-  CSS:
-    The classes used for the highlighting are the same as the AjaxSearch
-  ------------------------------------------------------------------------
-  Notes:
-    To add a link to remove the highlighting and to show the searchterms
-    put the following on your page where you would like this to appear:
-
-      <!--search_terms-->
-
-    Example output for this:
-
-      Search Terms: the, template
-      Remove Highlighting
-
-    Set the following variables to change the text:
-
-      $termText - the text before the search terms
-      $removeText - the text for the remove link
-  ------------------------------------------------------------------------
-*/
-global $database_connection_charset;
-// Conversion code name between html page character encoding and Mysql character encoding
-// Some others conversions should be added if needed. Otherwise Page charset = Database charset
-$pageCharset = array(
-  \'utf8\' => \'UTF-8\',
-  \'latin1\' => \'ISO-8859-1\',
-  \'latin2\' => \'ISO-8859-2\'
-);
-
-if (isset($_REQUEST[\'searched\']) && isset($_REQUEST[\'highlight\'])) {
-
-  // Set these to customize the text for the highlighting key
-  // --------------------------------------------------------
-     $termText = \'<div class="searchTerms">Search Terms: \';
-     $removeText = \'Remove Highlighting\';
-  // --------------------------------------------------------
-
-  $highlightText = $termText;
-  $advsearch = \'oneword\';
-
-  $dbCharset = $database_connection_charset;
-  $pgCharset = array_key_exists($dbCharset,$pageCharset) ? $pageCharset[$dbCharset] : $dbCharset;
-
-  // magic quotes check
-  if (get_magic_quotes_gpc()){
-    $searched = strip_tags(stripslashes($_REQUEST[\'searched\']));
-    $highlight = strip_tags(stripslashes($_REQUEST[\'highlight\']));
-    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags(stripslashes($_REQUEST[\'advsearch\']));
-  }
-  else {
-    $searched = strip_tags($_REQUEST[\'searched\']);
-    $highlight = strip_tags($_REQUEST[\'highlight\']);
-    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags($_REQUEST[\'advsearch\']);
-  }
-
-  if ($advsearch != \'nowords\') {
-
-    $searchArray = array();
-    if ($advsearch == \'exactphrase\') $searchArray[0] = $searched;
-    else $searchArray = explode(\' \', $searched);
-
-    $searchArray = array_unique($searchArray);
-    $nbterms = count($searchArray);
-    $searchTerms = array();
-    for($i=0;$i<$nbterms;$i++){
-      // Consider all possible combinations
-      $word_ents = array();
-      $word_ents[] = $searchArray[$i];
-      $word_ents[] = htmlentities($searchArray[$i], ENT_NOQUOTES, $pgCharset);
-      $word_ents[] = htmlentities($searchArray[$i], ENT_COMPAT, $pgCharset);
-      $word_ents[] = htmlentities($searchArray[$i], ENT_QUOTES, $pgCharset);
-      // Avoid duplication
-      $word_ents = array_unique($word_ents);
-      foreach($word_ents as $word) $searchTerms[]= array(\'term\' => $word, \'class\' => $i+1);
-    }
-
-    $output = $modx->documentOutput; // get the parsed document
-    $body = explode("<body", $output); // break out the head
-
-    $highlightClass = explode(\' \',$highlight); // break out the highlight classes
-    /* remove possibility of XSS attempts being passed in URL */
-    foreach ($highlightClass as $key => $value) {
-       $highlightClass[$key] = preg_match(\'/[^A-Za-z0-9_-]/ms\', $value) == 1 ? \'\' : $value;
-    }
-
-    $pcreModifier = ($pgCharset == \'UTF-8\') ? \'iu\' : \'i\';
-    $lookBehind = \'/(?<!&|&[\\w#]|&[\\w#]\\w|&[\\w#]\\w\\w|&[\\w#]\\w\\w\\w|&[\\w#]\\w\\w\\w\\w|&[\\w#]\\w\\w\\w\\w\\w)\';  // avoid a match with a html entity
-    $lookAhead = \'(?=[^>]*<)/\'; // avoid a match with a html tag
-
-    $nbterms = count($searchTerms);
-    for($i=0;$i<$nbterms;$i++){
-      $word = $searchTerms[$i][\'term\'];
-      $class = $highlightClass[0].\' \'.$highlightClass[$searchTerms[$i][\'class\']];
-
-      $highlightText .= ($i > 0) ? \', \' : \'\';
-      $highlightText .= \'<span class="\'.$class.\'">\'.$word.\'</span>\';
-
-      $pattern = $lookBehind . preg_quote($word, \'/\') . $lookAhead . $pcreModifier;
-      $replacement = \'<span class="\' . $class . \'">${0}</span>\';
-      $body[1] = preg_replace($pattern, $replacement, $body[1]);
-    }
-
-    $output = implode("<body", $body);
-
-    $removeUrl = $modx->makeUrl($modx->documentIdentifier);
-    $highlightText .= \'<br /><a href="\'.$removeUrl.\'" class="ajaxSearch_removeHighlight">\'.$removeText.\'</a></div>\';
-
-    $output = str_replace(\'<!--search_terms-->\',$highlightText,$output);
-    $modx->documentOutput = $output;
-  }
-}';
-$p['TransAlias'] = '/*
- * Initialize parameters
- */
-if (!isset ($alias)) { return ; }
-if (!isset ($plugin_dir) ) { $plugin_dir = \'transalias\'; }
-if (!isset ($plugin_path) ) { $plugin_path = $modx->config[\'base_path\'].\'assets/plugins/\'.$plugin_dir; }
-if (!isset ($table_name)) { $table_name = \'common\'; }
-if (!isset ($char_restrict)) { $char_restrict = \'lowercase alphanumeric\'; }
-if (!isset ($remove_periods)) { $remove_periods = \'No\'; }
-if (!isset ($word_separator)) { $word_separator = \'dash\'; }
-if (!isset ($override_tv)) { $override_tv = \'\'; }
-
-if (!class_exists(\'TransAlias\')) {
-    require_once $plugin_path.\'/transalias.class.php\';
-}
-$trans = new TransAlias($modx);
-
-/*
- * see if TV overrides the table name
- */
-if(!empty($override_tv)) {
-    $tvval = $trans->getTVValue($override_tv);
-    if(!empty($tvval)) {
-        $table_name = $tvval;
-    }
-}
-
-/*
- * Handle events
- */
-$e =& $modx->event;
-switch ($e->name ) {
-    case \'OnStripAlias\':
-        if ($trans->loadTable($table_name, $remove_periods)) {
-            $output = $trans->stripAlias($alias,$char_restrict,$word_separator);
-            $e->output($output);
-            $e->stopPropagation();
-        }
-        break ;
-    default:
-        return ;
-}';
-$p['TransAliasProps'] = '&table_name=Trans table;list;common,russian,utf8,utf8lowercase;utf8lowercase &char_restrict=Restrict alias to;list;lowercase alphanumeric,alphanumeric,legal characters;legal characters &remove_periods=Remove Periods;list;Yes,No;No &word_separator=Word Separator;list;dash,underscore,none;dash &override_tv=Override TV name;string;  ';
 $p['Forgot Manager Login'] = 'if(!class_exists(\'ForgotManagerPassword\')) {
     class ForgotManagerPassword{
         function ForgotManagerPassword(){
@@ -5737,7 +5530,185 @@ switch($e->name) {
     default:
         break;
 }';
-$p['Inherit Parent TemplateProps'] = '&inheritTemplate=Inherit Template;list;From Parent,From First Sibling;From Parent  ';
+$p['Inherit Parent TemplateProps'] = '&inheritTemplate=Inherit Template;list;From Parent,From First Sibling;From Parent ';
+$p['ManagerManager'] = '// You can put your ManagerManager rules EITHER in a chunk OR in an external file - whichever suits your development style the best
+
+// To use an external file, put your rules in /assets/plugins/managermanager/mm_rules.inc.php 
+// (you can rename default.mm_rules.inc.php and use it as an example)
+// The chunk SHOULD have php opening tags at the beginning and end
+
+// If you want to put your rules in a chunk (so you can edit them through the Manager),
+// create the chunk, and enter its name in the configuration tab.
+// The chunk should NOT have php tags at the beginning or end
+
+// ManagerManager requires jQuery 1.3+
+// The URL to the jQuery library. Choose from the configuration tab whether you want to use 
+// a local copy (which defaults to the jQuery library distributed with ModX 1.0.1)
+// a remote copy (which defaults to the Google Code hosted version)
+// or specify a URL to a custom location.
+// Here we set some default values, because this is a convenient place to change them if we need to,
+// but you should configure your preference via the Configuration tab.
+$js_default_url_local = $modx->config[\'site_url\']. \'/assets/js/jquery-1.3.2.min.js\';
+$js_default_url_remote = \'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js\';
+
+// You don\'t need to change anything else from here onwards
+//-------------------------------------------------------
+
+// Run the main code
+$asset_path = $modx->config[\'base_path\'] . \'assets/plugins/managermanager/mm.inc.php\';
+include($asset_path);';
+$p['ManagerManagerProps'] = '&config_chunk=Configuration Chunk;text;mm_demo_rules; &remove_deprecated_tv_types_pref=Remove deprecated TV types;list;yes,no;yes &which_jquery=jQuery source;list;local (assets/js),remote (google code),manual url (specify below);local (assets/js) &js_src_type=jQuery URL override;text; ';
+$p['Quick Manager+'] = '$show = TRUE;
+
+if ($disabled  != \'\') {
+    $arr = explode(",", $disabled );
+    if (in_array($modx->documentIdentifier, $arr)) {
+        $show = FALSE;
+    }
+}
+
+if ($show) {
+    include_once($modx->config[\'base_path\'].\'assets/plugins/qm/qm.inc.php\');
+    $qm = new Qm($modx, $jqpath, $loadmanagerjq, $loadfrontendjq, $noconflictjq, $loadtb, $tbwidth, $tbheight, $hidefields, $hidetabs, $hidesections, $addbutton, $tpltype, $tplid, $custombutton, $managerbutton, $logout, $autohide);
+}';
+$p['Quick Manager+Props'] = '&jqpath=Path to jQuery;text;assets/js/jquery-1.3.2.min.js &loadmanagerjq=Load jQuery in manager;list;true,false;true &loadfrontendjq=Load jQuery in front-end;list;true,false;true &noconflictjq=jQuery noConflict mode in front-end;list;true,false;true &loadtb=Load modal box in front-end;list;true,false;true &tbwidth=Modal box window width;text;80% &tbheight=Modal box window height;text;90% &hidefields=Hide document fields from front-end editors;text;parent &hidetabs=Hide document tabs from front-end editors;text; &hidesections=Hide document sections from front-end editors;text; &addbutton=Show add document here button;list;true,false;true &tpltype=New document template type;list;parent,id,selected;parent &tplid=New document template id;int;3  &custombutton=Custom buttons;textarea; &managerbutton=Show go to manager button;list;true,false;true &logout=Logout to;list;manager,front-end;manager &disabled=Plugin disabled on documents;text; &autohide=Autohide toolbar;list;true,false;true ';
+$p['Search Highlight'] = '/*
+  ------------------------------------------------------------------------
+  Plugin: Search_Highlight v1.5
+  ------------------------------------------------------------------------
+  Changes:
+  18/03/10 - Remove possibility of XSS attempts being passed in the URL
+           - look-behind assertion improved
+  29/03/09 - Removed urldecode calls;
+           - Added check for magic quotes - if set, remove slashes
+           - Highlights terms searched for when target is a HTML entity
+  18/07/08 - advSearch parameter and pcre modifier added
+  10/02/08 - Strip_tags added to avoid sql injection and XSS. Use of $_REQUEST
+  01/03/07 - Added fies/updates from forum from users mikkelwe/identity
+  (better highlight replacement, additional div around term/removal message)
+  ------------------------------------------------------------------------
+  Description: When a user clicks on the link from the AjaxSearch results
+    the target page will have the terms highlighted.
+  ------------------------------------------------------------------------
+  Created By:  Susan Ottwell (sottwell@sottwell.com)
+               Kyle Jaebker (kjaebker@muddydogpaws.com)
+
+  Refactored by Coroico (www.modx.wangba.fr) and TS
+  ------------------------------------------------------------------------
+  Based off the the code by Susan Ottwell (www.sottwell.com)
+    http://modxcms.com/forums/index.php/topic,1237.0.html
+  ------------------------------------------------------------------------
+  CSS:
+    The classes used for the highlighting are the same as the AjaxSearch
+  ------------------------------------------------------------------------
+  Notes:
+    To add a link to remove the highlighting and to show the searchterms
+    put the following on your page where you would like this to appear:
+
+      <!--search_terms-->
+
+    Example output for this:
+
+      Search Terms: the, template
+      Remove Highlighting
+
+    Set the following variables to change the text:
+
+      $termText - the text before the search terms
+      $removeText - the text for the remove link
+  ------------------------------------------------------------------------
+*/
+global $database_connection_charset;
+// Conversion code name between html page character encoding and Mysql character encoding
+// Some others conversions should be added if needed. Otherwise Page charset = Database charset
+$pageCharset = array(
+  \'utf8\' => \'UTF-8\',
+  \'latin1\' => \'ISO-8859-1\',
+  \'latin2\' => \'ISO-8859-2\'
+);
+
+if (isset($_REQUEST[\'searched\']) && isset($_REQUEST[\'highlight\'])) {
+
+  // Set these to customize the text for the highlighting key
+  // --------------------------------------------------------
+     $termText = \'<div class="searchTerms">Search Terms: \';
+     $removeText = \'Remove Highlighting\';
+  // --------------------------------------------------------
+
+  $highlightText = $termText;
+  $advsearch = \'oneword\';
+
+  $dbCharset = $database_connection_charset;
+  $pgCharset = array_key_exists($dbCharset,$pageCharset) ? $pageCharset[$dbCharset] : $dbCharset;
+
+  // magic quotes check
+  if (get_magic_quotes_gpc()){
+    $searched = strip_tags(stripslashes($_REQUEST[\'searched\']));
+    $highlight = strip_tags(stripslashes($_REQUEST[\'highlight\']));
+    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags(stripslashes($_REQUEST[\'advsearch\']));
+  }
+  else {
+    $searched = strip_tags($_REQUEST[\'searched\']);
+    $highlight = strip_tags($_REQUEST[\'highlight\']);
+    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags($_REQUEST[\'advsearch\']);
+  }
+
+  if ($advsearch != \'nowords\') {
+
+    $searchArray = array();
+    if ($advsearch == \'exactphrase\') $searchArray[0] = $searched;
+    else $searchArray = explode(\' \', $searched);
+
+    $searchArray = array_unique($searchArray);
+    $nbterms = count($searchArray);
+    $searchTerms = array();
+    for($i=0;$i<$nbterms;$i++){
+      // Consider all possible combinations
+      $word_ents = array();
+      $word_ents[] = $searchArray[$i];
+      $word_ents[] = htmlentities($searchArray[$i], ENT_NOQUOTES, $pgCharset);
+      $word_ents[] = htmlentities($searchArray[$i], ENT_COMPAT, $pgCharset);
+      $word_ents[] = htmlentities($searchArray[$i], ENT_QUOTES, $pgCharset);
+      // Avoid duplication
+      $word_ents = array_unique($word_ents);
+      foreach($word_ents as $word) $searchTerms[]= array(\'term\' => $word, \'class\' => $i+1);
+    }
+
+    $output = $modx->documentOutput; // get the parsed document
+    $body = explode("<body", $output); // break out the head
+
+    $highlightClass = explode(\' \',$highlight); // break out the highlight classes
+    /* remove possibility of XSS attempts being passed in URL */
+    foreach ($highlightClass as $key => $value) {
+       $highlightClass[$key] = preg_match(\'/[^A-Za-z0-9_-]/ms\', $value) == 1 ? \'\' : $value;
+    }
+
+    $pcreModifier = ($pgCharset == \'UTF-8\') ? \'iu\' : \'i\';
+    $lookBehind = \'/(?<!&|&[\\w#]|&[\\w#]\\w|&[\\w#]\\w\\w|&[\\w#]\\w\\w\\w|&[\\w#]\\w\\w\\w\\w|&[\\w#]\\w\\w\\w\\w\\w)\';  // avoid a match with a html entity
+    $lookAhead = \'(?=[^>]*<)/\'; // avoid a match with a html tag
+
+    $nbterms = count($searchTerms);
+    for($i=0;$i<$nbterms;$i++){
+      $word = $searchTerms[$i][\'term\'];
+      $class = $highlightClass[0].\' \'.$highlightClass[$searchTerms[$i][\'class\']];
+
+      $highlightText .= ($i > 0) ? \', \' : \'\';
+      $highlightText .= \'<span class="\'.$class.\'">\'.$word.\'</span>\';
+
+      $pattern = $lookBehind . preg_quote($word, \'/\') . $lookAhead . $pcreModifier;
+      $replacement = \'<span class="\' . $class . \'">${0}</span>\';
+      $body[1] = preg_replace($pattern, $replacement, $body[1]);
+    }
+
+    $output = implode("<body", $body);
+
+    $removeUrl = $modx->makeUrl($modx->documentIdentifier);
+    $highlightText .= \'<br /><a href="\'.$removeUrl.\'" class="ajaxSearch_removeHighlight">\'.$removeText.\'</a></div>\';
+
+    $output = str_replace(\'<!--search_terms-->\',$highlightText,$output);
+    $modx->documentOutput = $output;
+  }
+}';
 $p['TinyMCE Rich Text Editor'] = '// Set the name of the plugin folder
 $plugin_dir = "tinymce";
 
@@ -5857,11 +5828,54 @@ switch ($e->name)
 		break; 
 }
 ';
-$p['TinyMCE Rich Text EditorProps'] = '&customparams=Custom Parameters;textarea; &mce_formats=Block Formats;text;p,h1,h2,h3,h4,h5,h6,div,blockquote,code,pre &entity_encoding=Entity Encoding;list;named,numeric,raw;named &entities=Entities;text; &mce_path_options=Path Options;list;rootrelative,docrelative,fullpathurl;docrelative &mce_resizing=Advanced Resizing;list;true,false;true &disabledButtons=Disabled Buttons;text; &link_list=Link List;list;enabled,disabled;enabled &webtheme=Web Theme;list;simple,editor,creative,custom;simple &webPlugins=Web Plugins;text;style,advimage,advlink,searchreplace,contextmenu,paste,fullscreen,nonbreaking,xhtmlxtras,visualchars,media &webButtons1=Web Buttons 1;text;undo,redo,selectall,|,pastetext,pasteword,|,search,replace,|,nonbreaking,hr,charmap,|,image,link,unlink,anchor,media,|,cleanup,removeformat,|,fullscreen,code,help &webButtons2=Web Buttons 2;text;bold,italic,underline,strikethrough,sub,sup,|,|,blockquote,bullist,numlist,outdent,indent,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,|,styleprops &webButtons3=Web Buttons 3;text; &webButtons4=Web Buttons 4;text; &webAlign=Web Toolbar Alignment;list;ltr,rtl;ltr &width=Width;text;100% &height=Height;text;400  ';
+$p['TinyMCE Rich Text EditorProps'] = '&customparams=Custom Parameters;textarea; &mce_formats=Block Formats;text;p,h1,h2,h3,h4,h5,h6,div,blockquote,code,pre &entity_encoding=Entity Encoding;list;named,numeric,raw;named &entities=Entities;text; &mce_path_options=Path Options;list;rootrelative,docrelative,fullpathurl;docrelative &mce_resizing=Advanced Resizing;list;true,false;true &disabledButtons=Disabled Buttons;text; &link_list=Link List;list;enabled,disabled;enabled &webtheme=Web Theme;list;simple,editor,creative,custom;simple &webPlugins=Web Plugins;text;style,advimage,advlink,searchreplace,contextmenu,paste,fullscreen,nonbreaking,xhtmlxtras,visualchars,media &webButtons1=Web Buttons 1;text;undo,redo,selectall,|,pastetext,pasteword,|,search,replace,|,nonbreaking,hr,charmap,|,image,link,unlink,anchor,media,|,cleanup,removeformat,|,fullscreen,code,help &webButtons2=Web Buttons 2;text;bold,italic,underline,strikethrough,sub,sup,|,|,blockquote,bullist,numlist,outdent,indent,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,|,styleprops &webButtons3=Web Buttons 3;text; &webButtons4=Web Buttons 4;text; &webAlign=Web Toolbar Alignment;list;ltr,rtl;ltr &width=Width;text;100% &height=Height;text;400 ';
+$p['TransAlias'] = '/*
+ * Initialize parameters
+ */
+if (!isset ($alias)) { return ; }
+if (!isset ($plugin_dir) ) { $plugin_dir = \'transalias\'; }
+if (!isset ($plugin_path) ) { $plugin_path = $modx->config[\'base_path\'].\'assets/plugins/\'.$plugin_dir; }
+if (!isset ($table_name)) { $table_name = \'common\'; }
+if (!isset ($char_restrict)) { $char_restrict = \'lowercase alphanumeric\'; }
+if (!isset ($remove_periods)) { $remove_periods = \'No\'; }
+if (!isset ($word_separator)) { $word_separator = \'dash\'; }
+if (!isset ($override_tv)) { $override_tv = \'\'; }
+
+if (!class_exists(\'TransAlias\')) {
+    require_once $plugin_path.\'/transalias.class.php\';
+}
+$trans = new TransAlias($modx);
+
+/*
+ * see if TV overrides the table name
+ */
+if(!empty($override_tv)) {
+    $tvval = $trans->getTVValue($override_tv);
+    if(!empty($tvval)) {
+        $table_name = $tvval;
+    }
+}
+
+/*
+ * Handle events
+ */
+$e =& $modx->event;
+switch ($e->name ) {
+    case \'OnStripAlias\':
+        if ($trans->loadTable($table_name, $remove_periods)) {
+            $output = $trans->stripAlias($alias,$char_restrict,$word_separator);
+            $e->output($output);
+            $e->stopPropagation();
+        }
+        break ;
+    default:
+        return ;
+}';
+$p['TransAliasProps'] = '&table_name=Trans table;list;common,russian,utf8,utf8lowercase;utf8lowercase &char_restrict=Restrict alias to;list;lowercase alphanumeric,alphanumeric,legal characters;legal characters &remove_periods=Remove Periods;list;Yes,No;No &word_separator=Word Separator;list;dash,underscore,none;dash &override_tv=Override TV name;string; ';
 $e = &$this->pluginEvent;
-$e['OnBeforeManagerLogin'] = array('Forgot Manager Login','DuckPackAuthentication');
+$e['OnBeforeManagerLogin'] = array('DuckPackAuthentication','Forgot Manager Login');
 $e['OnBeforeWebLogin'] = array('DuckPackAuthentication');
-$e['OnDocFormPrerender'] = array('Quick Manager+','ManagerManager','Inherit Parent Template');
+$e['OnDocFormPrerender'] = array('Inherit Parent Template','ManagerManager','Quick Manager+');
 $e['OnDocFormRender'] = array('ManagerManager');
 $e['OnDocFormSave'] = array('Quick Manager+');
 $e['OnInterfaceSettingsRender'] = array('TinyMCE Rich Text Editor');
@@ -5875,5 +5889,5 @@ $e['OnStripAlias'] = array('TransAlias');
 $e['OnTVFormRender'] = array('ManagerManager');
 $e['OnWebAuthentication'] = array('DuckPackAuthentication');
 $e['OnWebLogout'] = array('DuckPackAuthentication');
-$e['OnWebPagePrerender'] = array('Quick Manager+','Search Highlight','DuckPackAuthentication','Markdown 1.1.7','Page TOC Generator');
+$e['OnWebPagePrerender'] = array('DuckPackAuthentication','Quick Manager+','Search Highlight','Markdown 1.1.7','Page TOC Generator');
 ?>

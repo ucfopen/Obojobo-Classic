@@ -427,7 +427,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 			// get perms
 
 			// OBOJOBO OMG FIX
-			if($authMan->verifySession() && $_SESSION['userID'] == 1)
+			if($authMan->verifySession())
 			{
 				$iData->perms = $permman->getMergedPerms($r->{cfg_obo_Instance::ID}, cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
 			}
