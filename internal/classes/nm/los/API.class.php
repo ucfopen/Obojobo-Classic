@@ -23,14 +23,14 @@ class nm_los_API extends core_db_dbEnabled
 		return self::$instance;
 	}
 
-    public function __construct($isRemoting = false)
-    {
-        parent::__construct();
-        if($isRemoting)
-        {
-            //$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
-        }
-    }
+	public function __construct($isRemoting = false)
+	{
+		parent::__construct();
+		if($isRemoting)
+		{
+			//$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
+		}
+	}
 	
 	/**
 	 * Verifies that the user has a current session and generates a new SESSID for them 
