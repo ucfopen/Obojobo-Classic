@@ -34,20 +34,72 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 
 		0, User does not exist in PeopleSoft
 		1, User does not exist in Webcourses
-		CURL Example Command
-
-		curl http://endor:8000/obojobo/v1/client/wink/instructor/sections?app_key=aaa > result.html
 	*/
-	public function getSections($NID)
+	public function getCourses($NID)
 	{
-		
-		// build url
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
 		$request->execute();
-		print_r($request);
+		$result = $this->decodeJSON($request->getResponseBody());
+
+		$courses = array();
+		// reformat the return
+		if(count($result->data->ps_only) > 0)
+		{
+			foreach($result->data->ps_only AS $ps)
+			{
+				$courses[] = $ps;
+				$ps->type = 'ps_only';
+			}
+		}
+		if(count($result->data->wc_only) > 0)
+		{
+			foreach($result->data->wc_only AS $ps)
+			{
+				$courses[] = $ps;
+				$ps->type = 'wc_only';
+			}
+		}
+		if(count($result->data->related) > 0)
+		{
+			foreach($result->data->related AS $ps)
+			{
+				$courses[] = $ps;
+				$ps->type = 'related';
+			}
+		}
+		$errors = $this->parseErrors($result->errors);
+		if($errors && count($courses) == 0)
+		{
+			return $errors;
+		}
 		
+		return $courses;
+	}
+	
+	protected function parseErrors($errors)
+	{
+		// check for errors
+		if(count($errors) > 0)
+		{
+			$returnErrors = array();
+			// log each error
+			foreach($errors AS $rError)
+			{
+				$error = AppCfg::ERROR_TYPE;
+				$returnErrors[] = new $error(1008, $rError);
+			}
+			return $returnErrors;
+		}
+		return false;
+	}
+	
+	protected function decodeJSON($json)
+	{
+		// convert learning_context_id values as a string
+		$pattern = '/"learning_context_id": (\d+)/i';
+		$replacement = '"learning_context_id": "$1"';
+		return json_decode(preg_replace($pattern, $replacement, $json));
 	}
 	
 	/*
@@ -78,14 +130,26 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		6, Unable to fetch gradebook columns
 		4, Gradebook column with specified name already exists
 		7, Unable to create gradebook column
-		CURL Example Command
 
-		curl -d wc_instructor_id=tr_conover -d wc_section_id=6467766151071 -d column_name=test http://endor:8000/obojobo/v1/webcourses/gradebook/column/create?app_key=aaa > result.html
 	*/
 	public function createColumn($NID, $sectionID, $columnName)
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create';
+		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+		$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
+		$request->execute();
+		$result = $this->decodeJSON($request->getResponseBody());
 		
+		$return = array();
+		$return['columnID'] = isset($result->data->column_id) ? $result->data->column_id : 0;
+		$return['msg'] = $result->msgs[0];
+		
+		
+		$errors = $this->parseErrors($result->errors);
+		if($errors && $return['columnID'] == 0)
+		{
+			return $errors;
+		}
 	}
 	
 	
@@ -116,14 +180,19 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		8, Unable to fetch section student IDs
 		9, Unable to fetch member description for specified member
 		11, Specified user is not a member of section gradebook
-		CURL Example Command
 
-		curl -d wc_instructor_id=tr_conover -d wc_student_id=conover -d wc_section_id=6467766151071 -d score=30 http://endor:8000/obojobo/v1/webcourses/gradebook/column/update?app_key=aaa > result.html
 	*/
 	
-	public function sendScore($instructorNID, $studentNID, $sectionID, $score)
+	public function sendScore($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update';
+		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+		$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
+		$request->execute();
+		$result = $this->decodeJSON($request->getResponseBody());
+		
+		print_r($request);
+		
 	}
 }
 ?>

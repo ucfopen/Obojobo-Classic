@@ -117,7 +117,7 @@ class plg_UCFCourses_RestRequest
 		
 		$this->requestLength = strlen($this->requestBody);
 		
-		$fh = fopen('php://memory', 'rw');
+		$fh = fopen('php://temp', 'r+');
 		fwrite($fh, $this->requestBody);
 		rewind($fh);
 		
