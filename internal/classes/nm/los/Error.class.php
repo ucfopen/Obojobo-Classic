@@ -67,6 +67,8 @@ class nm_los_Error extends core_util_Error
 				return "ResetKey Expired";
 			case 1007:
 				return "Auto Login after password reset with key failed";
+			case 1008:
+				return "General Plugin Error";
 				
 			/* AttemptsManager Errors */
 			case 2000:
