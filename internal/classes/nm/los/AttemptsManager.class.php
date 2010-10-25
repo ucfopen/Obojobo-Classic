@@ -672,8 +672,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
@@ -727,8 +725,22 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			$trackingMan->trackEndAttempt();
 		}
 		$this->unRegisterCurrentAttempt();
-		// clear cached scores for this instance
 		
+		// Send the score to webcourses
+		// get the mapping info
+		$qstr = "SELECT * FROM plg_wc_grade_columns WHERE instID = '?'";
+		if($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
+		{
+			$r = $this->DBM->fetch_obj($q);
+			$PM = core_plugin_PluginManager::getInstance();
+			$UCF = $PM->getAPI('UCFCourses');
+			$UM = core_auth_AuthManger::getInstance();
+			$instructor = $UM->fetchUserByID($r->userID);
+			
+			$UCF->sendScore($instructor->login, $_SESSION['userID'], $r->sectionID, $r->columnID, $score);
+		}
+		
+		// clear cached scores for this instance
 		core_util_Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 		// clear equivalent cache
 		if(AppCfg::CACHE_MEMCACHE)

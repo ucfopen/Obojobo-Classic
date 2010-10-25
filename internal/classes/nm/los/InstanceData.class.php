@@ -51,11 +51,6 @@ class nm_los_InstanceData
 		{
 			if($r = $DBM->fetch_obj($q))
 			{
-				//TODO: future course code: 
-				// get the course data
-				//$cm = nm_los_CourseManager::getInstance();
-				//$course = $cm->getCourse($r->{cfg_obo_Course::ID});
-				
 				// get the username
 				$authMan = core_auth_AuthManager::getInstance();
 				$ownerName = $authMan->getName($r->{cfg_core_User::ID});
