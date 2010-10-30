@@ -195,7 +195,7 @@ class DocumentParser {
 			// this creates the cache files if they havn't been created, and reloads them
 			else
 			{
-			    include_once "manager/processors/cache_sync.class.processor.php";
+			    include_once(MODX_BASE_PATH."manager/processors/cache_sync.class.processor.php");
 			    $sync = new synccache();
 			    $sync->setCachepath(MODX_BASE_PATH."assets/cache/");
 			    $sync->emptyCache();
