@@ -24,7 +24,7 @@ internal/logs/*
 internal/media/*
 
 # MODX Page cache
-assets/cache/*.pageCache.php
+assets/cache/*
 
 # MODX RSS cache
 assets/cache/rss/*

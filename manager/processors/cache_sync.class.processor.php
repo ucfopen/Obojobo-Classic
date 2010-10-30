@@ -59,13 +59,18 @@ class synccache{
             $files = glob(realpath($this->cachePath).'/*');
             $filesincache = count($files);
             $deletedfiles = array();
-            while ($file = array_shift($files)) {
-                $name = basename($file);
-                if (preg_match('/\.pageCache/',$name) && !in_array($name, $deletedfiles)) {
-                    $deletedfilesincache++;
-                    $deletedfiles[] = $name;
-                    unlink($file);
-                }
+			// KOGNEATO OBOJOBO NEWMEDIA ROCKETDUCK MOD TO HELP AUTO REBUILD CACHE
+			if(is_array($files) && $filesincache > 0)
+			{
+			// END KOGNEATO OBOJOBO NEWMEDIA ROCKETDUCK MOD TO HELP AUTO REBUILD CACHE
+	            while ($file = array_shift($files)) {
+	                $name = basename($file);
+	                if (preg_match('/\.pageCache/',$name) && !in_array($name, $deletedfiles)) {
+	                    $deletedfilesincache++;
+	                    $deletedfiles[] = $name;
+	                    unlink($file);
+	                }
+	            }
             }
         } else {
             // Old way of doing it (no glob function available)

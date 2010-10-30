@@ -7,7 +7,7 @@ class core_util_Log
 		
 		if($force || AppCfg::DEBUG_MODE)
 		{
-			@$dt = debug_backtrace();			
+			@$dt = debug_backtrace();
 			// if traceText is an object, print_r it
 			if(is_object($traceText) || is_array($traceText))
 			{
@@ -47,7 +47,12 @@ class core_util_Log
 	}
 	
 	private static function writeLog($output, $fileName=false)
-	{		
+	{	
+		// create the log directory if it doesnt exist
+		if(!file_exists(AppCfg::DIR_BASE.AppCfg::DIR_LOGS))
+		{
+			@mkdir(AppCfg::DIR_BASE.AppCfg::DIR_LOGS, 0770, true);
+		}
 		if($fileName)
 		{
 			$f = AppCfg::DIR_BASE.AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';
