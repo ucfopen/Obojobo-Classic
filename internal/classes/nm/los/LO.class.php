@@ -133,7 +133,7 @@ class nm_los_LO
 				'assessmentSize' => $r->{cfg_obo_LO::NUM_ASSESSMENT}
 			);
 
-			// grap keywords
+			// grab keywords
 			$keyman = nm_los_KeywordManager::getInstance();
 			$this->keywords = $keyman->getKeywordsFromItem($loID, 'l');
 
@@ -152,7 +152,7 @@ class nm_los_LO
 			
 			// get perms
 			$permman = nm_los_PermissionsManager::getInstance();
-			$this->perms = $permman->getMergedPerms((int)$r->{cfg_obo_LO::ROOT_LO}, cfg_obo_Perm::TYPE_LO);
+			$this->perms = $permman->getMergedPerms((int)$this->rootID, cfg_obo_Perm::TYPE_LO);
 			return true;
 		}
 		core_util_Log::trace('unable to locate LO: ' . $loID, true);
@@ -227,8 +227,9 @@ class nm_los_LO
 				 * rootID is set to it's own loID
 				 * parentID is set to zero - it has no parent
 				************************************************************/
-				if($lo->loID == 0 && $lo->rootID == 0 && $parentID == 0)
+				if($this->loID == 0 && $this->rootID == 0 && $this->parentID == 0)
 				{
+					trace('saving new draft');
 					if($this->loID != 0) return false;
 					$this->subVersion = 1;
 					$success = $this->dbStore($DBM);
@@ -240,8 +241,9 @@ class nm_los_LO
 				 * rootID is carried over from the item it is a revision of - it should always point to the lowest revision of the current full version, X.1
 				 * parentID is the loID of the previous full version if there is one. 1.0 has none, 1.1 points at 1.0, 2.0 points at 1.0, 2.1 points at 2.0
 				 ***********************************************************/
-				else if($lo->rootID > 0)
+				else if($this->rootID > 0)
 				{
+					trace('saving revision draft');
 					if($this->loID != 0) return false;
 					$this->subVersion++;
 					$this->parentID = 
@@ -413,7 +415,6 @@ class nm_los_LO
 		{
 			
 			/********** CHECK QUESTION GROUPS *********/
-			trace('updating qgroups');
 			// New question groups if needed
 			// qgm will check to see if the qGroupID is dirty and create if needed
 			// we need qGroupID's before inserting into the LO table below
@@ -422,9 +423,8 @@ class nm_los_LO
 			$qgm->newGroup($this->aGroup);
 			
 			/********** UPDATE LO **********************/
-			trace('inserting lo');
 			$qstr = "INSERT INTO ".cfg_obo_LO::TABLE." SET `".cfg_obo_LO::TITLE."` = '?', `".cfg_obo_Language::ID."` = '?',`".cfg_obo_LO::NOTES."` = '?', `".cfg_obo_LO::OBJECTIVE."` = '?', `".cfg_obo_LO::LEARN_TIME."` = '?', `".cfg_obo_LO::PGROUP."` = '?', `".cfg_obo_LO::AGROUP."` = '?', `".cfg_obo_LO::VER."` = '?', `".cfg_obo_LO::SUB_VER."` = '?', `".cfg_obo_LO::ROOT_LO."` = '?', `".cfg_obo_LO::PARENT_LO."` = '?', `".cfg_obo_LO::TIME."` = UNIX_TIMESTAMP(), `".cfg_obo_LO::COPYRIGHT."` = '?'";
-			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->description, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright);
+			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright);
 			if(!$q)
 			{
 			    trace(mysql_error(), true);
@@ -434,7 +434,6 @@ class nm_los_LO
 			$this->loID = $DBM->insertID;
 			
 			/********* CHECK PAGES *************/
-			trace('updating pages');
 			// We Needed the loID before mapping these pages
 			if(is_array($this->pages))
 			{
@@ -472,11 +471,23 @@ class nm_los_LO
 					return false;
 				}
 				$this->perms = new nm_los_Permissions($_SESSION['userID'], 1,1,1,1,1,1,1,1,1);
+				
 			}
-			else
+			
+			/************* ADD KEYWORDS *******************/
+			$KM = nm_los_KeywordManager::getInstance();
+			if(is_array($this->keywords) && count($this->keywords) > 0 )
 			{
-				// TODO: add in stuff here
+				foreach($this->keywords AS $tag)
+				{
+					if($newTag = $KM->newKeyword($tag))
+					{
+						$KM->linkKeyword($newTag->keywordID, $this->loID, 'l');
+					}
+					
+				}
 			}
+
 			return true;
 		}
 	}
