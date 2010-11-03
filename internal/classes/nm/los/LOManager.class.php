@@ -136,6 +136,9 @@ class nm_los_LOManager extends core_db_dbEnabled
 		$roleMan = nm_los_RoleManager::getInstance();
 		if(!$roleMan->isSuperUser()) 
 		{   
+			trace($roleMan->isLibraryUser);
+			trace($roleMan->isContentCreator);
+			trace(!$roleMan->isLibraryUser && !$roleMan->isContentCreator);
 			if(!$roleMan->isLibraryUser && !$roleMan->isContentCreator)
 			{
 				return core_util_Error::getError(4); // inadiquite permsissions
@@ -149,7 +152,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 		
 		//******** Permisssion requirements Passed *************
 		
-		$lo = new nm_los_LO();
+		$lo = new nm_los_LO($loID);
 		if(!$lo->saveAs($this->DBM, 'master'))
 		{
 			return false;
@@ -793,10 +796,11 @@ class nm_los_LOManager extends core_db_dbEnabled
 		// TODO: find a way to do this w/o the sql query
 		$permMan = nm_los_PermissionsManager::getInstance();
 		$loIDArr = $permMan->getItemsWithPerm(cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::READ, true);
+		trace($loIDArr);
 		$loArr = array();
 		foreach($loIDArr as $loID)
 		{
-			$qstr = "SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='".$loID."' AND ".cfg_obo_LO::SUB_VER." = 0 ORDER BY ".cfg_obo_LO::VER." DESC, ".cfg_obo_LO::SUB_VER." DESC LIMIT 1";
+			$qstr = "SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID."='".$loID."' AND ".cfg_obo_LO::SUB_VER." = 0 ORDER BY ".cfg_obo_LO::VER." DESC, ".cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 			if(!($q = $this->DBM->query($qstr)))
 			{
 				return false;   
@@ -806,7 +810,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 				$loArr[] = $this->getLO($r->{cfg_obo_LO::ID}, 'meta');
 			}
 		}
-		
+		trace($loArr);
 		return $loArr;
 	}
 	
