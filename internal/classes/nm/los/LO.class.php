@@ -258,7 +258,7 @@ class nm_los_LO
 				 * parentID is the previous full version, if there is one. 1.0 has none, 2.0 points at 1.0
 				 * drafts for a master are removed  1.1, 1.2, 1.3 are removed leaving only 2.0
 				 ************************************************************/
-				$this->dbGetFull($this->loID);// masters must come from the database
+				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
 				
 				if($this->isValidMaster() !== true) return core_util_Error::getError(2); // Validate
 				
@@ -281,7 +281,7 @@ class nm_los_LO
 				
 				// create the master lo record
 				$qstr ="INSERT INTO ".cfg_obo_LO::TABLE." (".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::SUB_VER.", ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT.")
-											VALUES ( SELECT 1 AS ".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", $this->version AS ".cfg_obo_LO::VER.", $this->subVersion AS ".cfg_obo_LO::SUB_VER.", 0 AS ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".time()." AS ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?')";
+											SELECT 1 AS ".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", $this->version AS ".cfg_obo_LO::VER.", $this->subVersion AS ".cfg_obo_LO::SUB_VER.", 0 AS ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".time()." AS ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?'";
 				if(!($q = $DBM->querySafe($qstr, $this->loID)))
 				{
 					$DBM->rollback();
@@ -329,7 +329,7 @@ class nm_los_LO
 		
 	    $drafts = array();
 		
-		while($r = $this->DBM->fetch_obj($q))
+		while($r = $DBM->fetch_obj($q))
 		{
 			$drafts[] = $r->{cfg_obo_LO::ID};
 			core_util_Cache::getInstance()->clearLO($r->{cfg_obo_LO::ID}); // delete the cache
@@ -344,17 +344,17 @@ class nm_los_LO
 	
 			//Change lo_id of existing author entries to the new master $loID
 			$qstr = "UPDATE IGNORE `".cfg_obo_LO::MAP_AUTH_TABLE."` SET ".cfg_obo_LO::ID."='?' WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
-			if( !($q = $this->DBM->querySafe($qstr, $loID)))
+			if( !($q = $DBM->querySafe($qstr, $loID)))
 			{
-                $this->DBM->rollback();
+                $DBM->rollback();
 				return false;
 			}
 			//Update perms
 			// TODO: move perm query to PermsManager
 			$qstr = "UPDATE `".cfg_obo_Perm::TABLE."` SET ".cfg_obo_Perm::ITEM."='?' WHERE ".cfg_obo_Perm::ITEM."='?' AND `".cfg_obo_Perm::TYPE."`='".cfg_obo_Perm::TYPE_LO."'";
-			if( !($q = $this->DBM->querySafe($qstr, $newLoID, $delRootID)) )
+			if( !($q = $DBM->querySafe($qstr, $newLoID, $delRootID)) )
 			{
-				$this->DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 			
@@ -362,9 +362,9 @@ class nm_los_LO
 			if(count($drafts) > 0)
 			{
 				$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
-				if(!($q = $this->DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
+				if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 				{
-	                $this->DBM->rollback();
+	                $DBM->rollback();
 					return false;
 				}
 				$draftstr .= ","; // the extra comma is for the actual $loID used below.

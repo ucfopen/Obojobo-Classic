@@ -644,7 +644,7 @@ class nm_los_RoleManager extends core_db_dbEnabled
 	{
 		if(!isset($_SESSION['isLibraryUser']))
 		{
-				$_SESSION['isLibraryUser'] = $this->doesUserHaveRole(array(nm_los_Role::LIBRARY_USER, nm_los_Role::CONTENT_CREATOR, nm_los_Role::SUPER_VIEWER, nm_los_Role::ADMINISTRATOR, nm_los_Role::SUPER_USER));
+			$_SESSION['isLibraryUser'] = $this->doesUserHaveRole(array(nm_los_Role::LIBRARY_USER, nm_los_Role::CONTENT_CREATOR, nm_los_Role::SUPER_VIEWER, nm_los_Role::ADMINISTRATOR, nm_los_Role::SUPER_USER));
 		}
 		return $_SESSION['isLibraryUser'];
 	}
