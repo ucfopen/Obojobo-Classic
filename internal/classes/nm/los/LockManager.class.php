@@ -169,7 +169,6 @@ class nm_los_LockManager extends core_db_dbEnabled
 				return core_util_Error::getError(4);
 			}
 			$permMan = nm_los_PermissionsManager::getInstance();
-			trace($permMan->getMergedPerms($loID, cfg_obo_Perm::TYPE_LO));
 			if(!$permMan->getMergedPerm($loID, cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::WRITE, $_SESSION['userID']))
 			{
 				

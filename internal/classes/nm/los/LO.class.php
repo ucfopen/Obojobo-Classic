@@ -231,22 +231,38 @@ class nm_los_LO
 				{
 					trace('saving new draft');
 					if($this->loID != 0) return false;
-					$this->subVersion = 1;
+					$this->version = 0; // force 0.1
+					$this->subVersion = 1; // force 0.1
 					$success = $this->dbStore($DBM);
 					$this->rootID = $this->loID;
 					return $success;
 				}
-
-				/*************************** REVISION DRAFT *****************
+				
+				/*************************** DRAFT REVISION OF MASTER *****************
 				 * rootID is carried over from the item it is a revision of - it should always point to the lowest revision of the current full version, X.1
 				 * parentID is the loID of the previous full version if there is one. 1.0 has none, 1.1 points at 1.0, 2.0 points at 1.0, 2.1 points at 2.0
 				 ***********************************************************/
-				else if($this->rootID > 0)
+				else if($this->loID > 0 && $this->rootID > 0  && $this->subVersion == 0)
+				{
+					trace('saving master revision draft');
+					$this->subVersion = 1;
+					$this->parentID = $this->loID;
+					$this->rootID = 0;
+					$this->loID = 0;
+					$success = $this->dbStore($DBM);
+					return $success;
+				}
+
+				/*************************** DRAFT REVISION OF DRAFT *****************
+				 * rootID is carried over from the item it is a revision of - it should always point to the lowest revision of the current full version, X.1
+				 * parentID is the loID of the previous full version if there is one. 1.0 has none, 1.1 points at 1.0, 2.0 points at 1.0, 2.1 points at 2.0
+				 ***********************************************************/
+				else
 				{
 					trace('saving revision draft');
-					if($this->loID != 0) return false;
-					$this->subVersion++;
-					$this->parentID = 
+					$this->subVersion++; // incriment subVersion
+					//$this->parentID = 0;
+					$this->loID = 0;
 					$success = $this->dbStore($DBM);
 					return $success;
 				}
@@ -267,8 +283,8 @@ class nm_los_LO
 				$draftRootID = $this->rootID; // store the rootID temporarily
 				
 				// make sure the desired X.0 version doesnt already exist by checking for LO's with a parentID of my current rootID
-				$qstr = "SELECT * FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::SUB_VER." = '0' AND ".cfg_obo_LO::PARENT_LO." = '?'";
-				$r = $DBM->querySafe($qstr, $this->loID);
+				$qstr = "SELECT * FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." == '?' AND ".cfg_obo_LO::SUB_VER." = '0' AND ".cfg_obo_LO::PARENT_LO." = '?'";
+				$r = $DBM->querySafe($qstr,  $this->version + 1, $this->loID);
 				if($DBM->fetch_num != 0)
 				{
 					return core_util_Error::getError(6005); // Master version already exists
@@ -279,9 +295,21 @@ class nm_los_LO
 				$this->version = $this->version + 1;
 				$this->subVersion = 0;
 				
+				// 1.0 has no parent !!! UNLESS its a deriviative
+				if($this->version == 1)
+				{
+					$this->parentID = 0;
+				}
+				// 2.0, 3.0 etc parentID points at the previous full version
+				else
+				{
+					// get my rootID's LO, and use it's parentID as my parentID
+					//$this->parentID = ???;
+				}
+				
 				// create the master lo record
 				$qstr ="INSERT INTO ".cfg_obo_LO::TABLE." (".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::SUB_VER.", ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT.")
-											SELECT 1 AS ".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", $this->version AS ".cfg_obo_LO::VER.", $this->subVersion AS ".cfg_obo_LO::SUB_VER.", 0 AS ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".time()." AS ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?'";
+											SELECT 1 AS ".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", $this->version AS ".cfg_obo_LO::VER.", $this->subVersion AS ".cfg_obo_LO::SUB_VER.", 0 AS ".cfg_obo_LO::ROOT_LO.", $this->parentID AS ".cfg_obo_LO::PARENT_LO.", ".time()." AS ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?'";
 				if(!($q = $DBM->querySafe($qstr, $this->loID)))
 				{
 					$DBM->rollback();
@@ -320,8 +348,8 @@ class nm_los_LO
 	 */
 	private function destroyDrafts($DBM, $delRootID, $newLoID)
 	{
-		$qstr = "SELECT ".cfg_obo_LO::ID.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::PGROUP." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO." = '?' AND ".cfg_obo_LO::SUB_VER." > 0 ORDER BY ".cfg_obo_LO::SUB_VER." ASC";
-		if( !($q = $DBM->querySafe($qstr, $delRootID)) )
+		$qstr = "SELECT ".cfg_obo_LO::ID.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::PGROUP." FROM ".cfg_obo_LO::TABLE." WHERE (".cfg_obo_LO::ROOT_LO." = '?' OR ".cfg_obo_LO::ID." = '?' ) AND ".cfg_obo_LO::SUB_VER." > 0 ORDER BY ".cfg_obo_LO::SUB_VER." ASC";
+		if( !($q = $DBM->querySafe($qstr, $delRootID, $delRootID)) )
 		{
 		    trace(mysql_error(), true);
 			return false;
@@ -377,28 +405,68 @@ class nm_los_LO
 	public function isValidMaster()
 	{
 		// id must already exist
-		if( !( nm_los_Validator::isPosInt($this->loID) )) return false;
+		if( !( nm_los_Validator::isPosInt($this->loID) ))
+		{
+			trace('invalid loid');
+			return false;
+		} 
 		// must have a title
-		if(!(nm_los_Validator::isString($this->title))) return false;
+		if(!(nm_los_Validator::isString($this->title)))
+		{
+			trace('invalid title');
+			return false;
+		}
 		// must have an objective string
-		if(!(nm_los_Validator::isString($this->objective))) return false;
+		if(!(nm_los_Validator::isString($this->objective)))
+		{
+			trace('invalid objective');
+			return false;
+		}
 		// dont allow users to create masters from existing masters, no need - its the same object
-		if($this->version > 0 && $this->subVersion == 0) return false;
+		if($this->version > 0 && $this->subVersion == 0)
+		{
+			trace('invalid versions');
+			return false;
+		}
 		// must have at least one page
-		if( !(is_array($this->pages)) || (count($this->pages) == 0) ) return false;	
+		if( !(is_array($this->pages)) || (count($this->pages) == 0) )
+		{
+			trace('invalid pages');
+			return false;
+		}
 		// all pages must have titles
 		foreach($this->pages AS &$page)
 		{
-			if(!(nm_los_Validator::isString($page->title))) return false;
+			if(!(nm_los_Validator::isString($page->title)))
+			{
+				trace('invalid page titles');
+				return false;
+			}
 		}
 		// must have at least one practice question
-		if( !(is_array($this->pGroup->kids)) || (count($this->pGroup->kids) == 0) ) return false;
+		if( !(is_array($this->pGroup->kids)) || (count($this->pGroup->kids) == 0) )
+		{
+			trace('invalid practice group');
+			return false;
+		}
 		// must have at least one assessment question
-		if( !(is_array($this->aGroup->kids)) || (count($this->aGroup->kids) == 0) ) return false;
+		if( !(is_array($this->aGroup->kids)) || (count($this->aGroup->kids) == 0) )
+		{
+			trace('invalid assessment group');
+			return false;
+		}
 		// must have a keyword
-		if( !(is_array($this->keywords)) || (count($this->keywords) == 0) ) return false;
+		if( !(is_array($this->keywords)) || (count($this->keywords) == 0) )
+		{
+			trace('invalid keywords');
+			return false;
+		}
 		// must have an learning time estimate
-		if( !(isset($this->learnTime)) || ($this->learnTime == 0) ) return false;
+		if( !(isset($this->learnTime)) || ($this->learnTime == 0) )
+		{
+			trace('invalid learn time');
+			return false;
+		}
 		return true;
 	}
 	
