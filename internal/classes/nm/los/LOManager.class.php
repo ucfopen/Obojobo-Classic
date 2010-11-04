@@ -134,12 +134,10 @@ class nm_los_LOManager extends core_db_dbEnabled
 		// check permissions
 		// Required: (LibraryUser & write perm, ContentCreator & write perm, or SuperUser)
 		$roleMan = nm_los_RoleManager::getInstance();
-		if(!$roleMan->isSuperUser()) 
+		if($roleMan->isSuperUser() == false) 
 		{   
-			trace($roleMan->isLibraryUser);
-			trace($roleMan->isContentCreator);
-			trace(!$roleMan->isLibraryUser && !$roleMan->isContentCreator);
-			if(!$roleMan->isLibraryUser && !$roleMan->isContentCreator)
+			$permMan = nm_los_PermissionsManager::getInstance();
+			if($roleMan->isLibraryUser() == false && $roleMan->isContentCreator() == false)
 			{
 				return core_util_Error::getError(4); // inadiquite permsissions
 			}
@@ -205,7 +203,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 		if($lo->loID > 0)
 		{
 			$lock = $lockMan->lockExists($lo->loID);
-			if($lock instanceof nm_los_Lock && $lock->userID != $_SESSION['userID'])
+			if($lock instanceof nm_los_Lock && $lock->user->userID != $_SESSION['userID'])
 			{
 				return core_util_Error::getError(3002); // LO is Locked
 			}
@@ -796,7 +794,6 @@ class nm_los_LOManager extends core_db_dbEnabled
 		// TODO: find a way to do this w/o the sql query
 		$permMan = nm_los_PermissionsManager::getInstance();
 		$loIDArr = $permMan->getItemsWithPerm(cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::READ, true);
-		trace($loIDArr);
 		$loArr = array();
 		foreach($loIDArr as $loID)
 		{
@@ -810,7 +807,6 @@ class nm_los_LOManager extends core_db_dbEnabled
 				$loArr[] = $this->getLO($r->{cfg_obo_LO::ID}, 'meta');
 			}
 		}
-		trace($loArr);
 		return $loArr;
 	}
 	
@@ -877,6 +873,10 @@ class nm_los_LOManager extends core_db_dbEnabled
 		$q = $this->DBM->querySafe($qstr, $loID);
 		if($r = $this->DBM->fetch_obj($q))
 		{
+			if($r->{cfg_obo_LO::ROOT_LO} == $r->{cfg_obo_LO::ID} || $r->{cfg_obo_LO::ROOT_LO} == 0)
+			{
+				return $this->getLO($loID, $amount);
+			}
 			$qstr = "SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='{$r->{cfg_obo_LO::ROOT_LO}}' ORDER BY ".cfg_obo_LO::VER." DESC, ".cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 			if($r = $this->DBM->fetch_obj($this->DBM->query($qstr)))
 			{
