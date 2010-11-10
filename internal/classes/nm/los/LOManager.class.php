@@ -186,15 +186,6 @@ class nm_los_LOManager extends core_db_dbEnabled
 					return core_util_Error::getError(4); // insufficient perms
 				}
 			}
-			// editing lo, must be libraryUser AND have write perms
-			else
-			{
-				$permMan = nm_los_PermissionsManager::getInstance();
-				if(!($roleMan->isLibraryUser()) || !($permMan->getMergedPerm($lo->rootID, cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::WRITE, $_SESSION['userID'])) )
-				{
-					return core_util_Error::getError(4); // insufficient perms
-				}
-			}
 		}
 		//******** Permisssion requirements Passed *************
 				
@@ -451,45 +442,41 @@ class nm_los_LOManager extends core_db_dbEnabled
 				}
 			}
 		}
-		
-		$qstr = "SELECT ".cfg_obo_LO::ID.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::SUB_VER.", ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".cfg_obo_LO::TIME."
-					FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $loID)))
+		// if its not already fetched above.. do so now
+		if(!isset($lo))
 		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			return false;
+			$lo = $this->getLO($loID);
 		}
-		$r = $this->DBM->fetch_obj($q);
 		
 		//User is trying to delete a Master (1.0, 2.0 3.0) check for existing instances
-		if($r->{cfg_obo_LO::ROOT_LO} == $r->{cfg_obo_LO::ID} && $r->{cfg_obo_LO::SUB_VER} == 0)
+		
+		if( $lo->rootID == $loID && $lo->subVersion == 0)
 		{
+			trace('deleting master');
 			$instMan = nm_los_InstanceManager::getInstance();
 			if(count($instMan->getInstancesFromLOID($loID)) > 0)
 			{
-				
-				
 				return core_util_Error::getError(6003);
 			}
+			// No Instances found
 			// remove all perms for this MASTER since there are no instances
 			$permMan = nm_los_PermissionsManager::getInstance();
-			if($permMan->removeAllPermsForItem($r->{cfg_obo_LO::ROOT_LO}, cfg_obo_Perm::TYPE_LO))
+			if($permMan->removeAllPermsForItem($loID, cfg_obo_Perm::TYPE_LO))
 			{
-				
-				core_util_Cache::getInstance()->clearLO($r->{cfg_obo_LO::ROOT_LO});
+				core_util_Cache::getInstance()->clearLO($loID);
 				$system = new nm_los_LOSystem();
 				$tracking = nm_los_TrackingManager::getInstance();
-				$tracking->trackDeleteLO($r->{cfg_obo_LO::ROOT_LO}, 1);
+				$tracking->trackDeleteLO($loID, 1);
 			}
 			$system->cleanOrphanData();
 			return true;
 		}
 		else
 		{
+			trace('deleting draft');
 			// delete all draft objects
-			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='?'";
-			if(!($q = $this->DBM->querySafe($qstr, $r->{cfg_obo_LO::ROOT_LO})))
+			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='?' OR ".cfg_obo_LO::ID." = '?' ";
+			if(!($q = $this->DBM->querySafe($qstr, $loID, $loID)))
 			{
 				$this->DBM->rollback();
 				return false;
@@ -498,16 +485,16 @@ class nm_los_LOManager extends core_db_dbEnabled
 			if($losDeleted > 0)
 			{
 				$permMan = nm_los_PermissionsManager::getInstance();
-				if(!$permMan->removeAllPermsForItem($r->{cfg_obo_LO::ROOT_LO}, cfg_obo_Perm::TYPE_LO))
+				if(!$permMan->removeAllPermsForItem($loID, cfg_obo_Perm::TYPE_LO))
 				{
 					$this->DBM->rollback();
 					return false;
 				}
 				
 				
-				core_util_Cache::getInstance()->clearLO($r->{cfg_obo_LO::ROOT_LO});
+				core_util_Cache::getInstance()->clearLO($loID);
 				$tracking = nm_los_TrackingManager::getInstance();
-				$tracking->trackDeleteLO($r->{cfg_obo_LO::ROOT_LO}, $losDeleted);
+				$tracking->trackDeleteLO($loID, $losDeleted);
 			}   
 			return true;
 		}
