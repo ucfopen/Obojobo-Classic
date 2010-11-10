@@ -109,6 +109,84 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 	}
 	
 	/**
+	 * Reuses existing permissions, assigning them to a new item.  The permissions will no longer be associated with the previous item
+	 *
+	 * @param string $oldItemID 
+	 * @param string $newItemID 
+	 * @param string $itemType 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	public function movePermsToItem($oldItemID, $newItemID, $itemType)
+	{
+		if(!nm_los_Validator::isPosInt($oldItemID))
+		{
+			return false;
+		}
+		if(!nm_los_Validator::isPosInt($newItemID))
+		{
+			return false;
+		}
+		$qstr = "UPDATE ".cfg_obo_Perm::TABLE." SET ".cfg_obo_Perm::ITEM." = '?' WHERE ".cfg_obo_Perm::ITEM." = '?' AND ".cfg_obo_Perm::TYPE." = '?' ";
+		return $this->DBM->querySafe($qstr, $newItemID, $oldItemID, $itemType);
+	}
+	
+	/**
+	 * Duplicate permissions from one object to another.  The original item's permissions will be unchanged.
+	 *
+	 * @param string $oldItemID 
+	 * @param string $newItemID 
+	 * @param string $itemType 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	public function copyPermsToItem($oldItemID, $newItemID, $itemType)
+	{
+		if(!nm_los_Validator::isPosInt($oldItemID))
+		{
+			return false;
+		}
+		if(!nm_los_Validator::isPosInt($newItemID))
+		{
+			return false;
+		}
+		$qstr = "INSERT	IGNORE INTO
+					".cfg_obo_Perm::TABLE."
+					(".cfg_core_User::ID.",
+				 		".cfg_obo_Perm::ITEM.",
+						".cfg_obo_Perm::TYPE.",
+						`".cfg_obo_Perm::READ."`,
+						`".cfg_obo_Perm::WRITE."`,
+						`".cfg_obo_Perm::COPY."`,
+						".cfg_obo_Perm::PUBLISH.",
+						".cfg_obo_Perm::G_READ.",
+						".cfg_obo_Perm::G_WRITE.",
+						".cfg_obo_Perm::G_COPY.",
+						".cfg_obo_Perm::G_USE.",
+						".cfg_obo_Perm::G_GLOBAL.")
+					SELECT	".cfg_core_User::ID.",
+				 		'?' AS ".cfg_obo_Perm::ITEM.",
+						".cfg_obo_Perm::TYPE.",
+						`".cfg_obo_Perm::READ."`,
+						`".cfg_obo_Perm::WRITE."`,
+						`".cfg_obo_Perm::COPY."`,
+						".cfg_obo_Perm::PUBLISH.",
+						".cfg_obo_Perm::G_READ.",
+						".cfg_obo_Perm::G_WRITE.",
+						".cfg_obo_Perm::G_COPY.",
+						".cfg_obo_Perm::G_USE.",
+						".cfg_obo_Perm::G_GLOBAL."
+					  FROM ".cfg_obo_Perm::TABLE."
+					  WHERE ".cfg_obo_Perm::ITEM." = '?'
+					  AND ".cfg_obo_Perm::TYPE." = '?'";
+		if(!$q = $this->DBM->querySafe($qstr, $newItemID, $oldItemID, $itemType))
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Gets Global or User permissions for an item (use getUserPerms or getGlobalPerms instead)
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
@@ -521,7 +599,7 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 	 * @param $permObj (Permissions) new user permissions for item
 	 * @return (bool) True if successful, False if not successful or error
 	 */
-	public function setNewUserPerms($itemID=0, $itemType='m', $permObj)
+	public function setFullPermsForItem($itemID, $itemType)
 	{
 		if($itemID==0)
 		{
@@ -594,8 +672,6 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 		//See if the user has ANY permissions to be giving permissions
 		if(!($giveRead || $giveWrite || $giveCopy || $giveUse))
 		{
-			
-			
 			return core_util_Error::getError(4);
 		}
 
