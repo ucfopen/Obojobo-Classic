@@ -211,7 +211,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 		
 	}
 	
-	public function makeDerivative($loID)
+	public function createDerivative($loID)
 	{
 		if(! nm_los_Validator::isPosInt($loID))
 		{
@@ -238,127 +238,13 @@ class nm_los_LOManager extends core_db_dbEnabled
 			}
 		}
 		
-		$lo = new nm_los_LO();
-		$lo->dbGetFull($this->DBM, $loID);
 		
-		//selected object must be a master (1.0, 2.0 3.0)
-		if($lo->rootID == $lo->loID && $lo->subVersion == 0)
+		$lo = new nm_los_LO($loID);
+		if($lo->saveAs($this->DBM, nm_los_LO::DERIVATIVE))
 		{
-			
-			$lo->loID = 0;// force it to save a copy
-			$lo->version = 1; // reset
-			$lo->subVersion = 0; // reset
-			$lo->parentID = $lo->rootID; // link parent to previous root id
-			$lo->rootID = 0; // mark as a new LO
-			
-			
-			// duplicate the lo with a new loID - re-use all the questions and pages when possible
-			$qstr = "INSERT INTO ".cfg_obo_LO::TABLE." 
-					SET
-					`".cfg_obo_LO::TITLE."`='?', 
-					`".cfg_obo_Language::ID."`='?', 
-					`".cfg_obo_LO::DESC."`='?',
-					`".cfg_obo_LO::OBJECTIVE."`='?', 
-					`".cfg_obo_LO::LEARN_TIME."`='?', 
-					`".cfg_obo_LO::PGROUP."` = '?', 
-					`".cfg_obo_LO::AGROUP."` = '?',
-					`".cfg_obo_LO::VER."`='?' ,
-					`".cfg_obo_LO::SUB_VER."`='?' ,
-					`".cfg_obo_LO::ROOT_LO."`='?' ,
-					`".cfg_obo_LO::PARENT_LO."`='?' ,
-					`".cfg_obo_LO::TIME."`=UNIX_TIMESTAMP(), 
-					`".cfg_obo_LO::COPYRIGHT."`='?'";
-			if( !($q = $this->DBM->querySafe($qstr, $r->{cfg_obo_LO::TITLE}, $r->{cfg_obo_Language::ID}, $r->{cfg_obo_LO::DESC},
-						$r->{cfg_obo_LO::OBJECTIVE}, $r->{cfg_obo_LO::LEARN_TIME}, $r->{cfg_obo_LO::PGROUP}, $r->{cfg_obo_LO::AGROUP}, 
-						1, 0, 0, $r->{cfg_obo_LO::ROOT_LO}, $r->{cfg_obo_LO::COPYRIGHT})) )
-			{
-				trace(mysql_error(), true);
-				$this->DBM->rollback();
-				return false;
-			}
-			$newloID = $this->DBM->insertID;
-			//update the root, to be its own root, leave the parent as the old lo id
-			$qstr = "UPDATE ".cfg_obo_LO::TABLE." SET ".cfg_obo_LO::ROOT_LO." = '".$newloID."' WHERE ".cfg_obo_LO::ID." = ".$newloID;
-			if( !($q = $this->DBM->query($qstr)) )
-			{
-				trace(mysql_error(), true);
-				$this->DBM->rollback();
-				return false;
-			}
-			
-			//permissions
-			// TODO: move to permsmanager
-			$qstr = "INSERT INTO `".cfg_obo_Perm::TABLE."` 
-				(
-					`".cfg_core_User::ID."`,
-					`".cfg_obo_Perm::ITEM."`,
-					`".cfg_obo_Perm::TYPE."`,
-					`".cfg_obo_Perm::READ."`,
-					`".cfg_obo_Perm::WRITE."`,
-					`".cfg_obo_Perm::COPY."`,
-					`".cfg_obo_Perm::PUBLISH."`,
-					`".cfg_obo_Perm::G_READ."`,
-					`".cfg_obo_Perm::G_WRITE."`,
-					`".cfg_obo_Perm::G_COPY."`,
-					`".cfg_obo_Perm::G_USE."`,
-					`".cfg_obo_Perm::G_GLOBAL."`
-				)
-				VALUES ('".$_SESSION['userID']."', '".$newloID."', 'l', '1', '1', '1', '1', '1', '1', '1', '1', '1');";
-			if( !($this->DBM->query($qstr)) )
-			{
-				trace(mysql_error(), true);
-				$this->DBM->rollback();
-				//die();
-				return false;
-			}
-			
-			// TODO: move to pagemanager
-			$qstr = "SELECT * FROM ".cfg_obo_Page::MAP_TABLE." WHERE ".cfg_obo_LO::ID."='".$r->{cfg_obo_LO::ID}."'";
-			if(!($q = $this->DBM->query($qstr)))
-			{
-				trace(mysql_error(), true);
-				$this->DBM->rollback();
-				return false;
-			}
-			
-			while($page = $this->DBM->fetch_obj($q))
-			{
-				$qstr = "INSERT INTO ".cfg_obo_Page::MAP_TABLE." (".cfg_obo_LO::ID.",".cfg_obo_Page::MAP_ORDER.",".cfg_obo_Page::ID.")
-				VALUES ('".$newloID."', '".$page->itemOrder."', '".$page->pageID."');";
-				if( !($this->DBM->query($qstr)) )
-				{
-					trace(mysql_error(), true);
-					$this->DBM->rollback();
-					return false;
-				}
-			}
-			// TODO: move this query to KeywordManager
-			$qstr = "SELECT * FROM `".cfg_obo_Keyword::MAP_TABLE."` 
-						WHERE ".cfg_obo_Keyword::MAP_ITEM."='".$r->{cfg_obo_LO::ID}."' AND ".cfg_obo_Keyword::MAP_TYPE."='".cfg_obo_Perm::TYPE_LO."'";
-			if(!($q = $this->DBM->query($qstr)))
-			{
-				trace(mysql_error(), true);
-				$this->DBM->rollback();
-				return false;
-			}
-			
-			while($keyword = $this->DBM->fetch_obj($q))
-			{
-				// TODO: move this sql query to keyword manager
-				$qstr = "INSERT INTO `".cfg_obo_Keyword::MAP_TABLE."` (`".cfg_obo_Keyword::ID."`,`".cfg_obo_Keyword::MAP_TYPE."`,`".cfg_obo_Keyword::MAP_ITEM."`)
-				VALUES ('".$keyword->keywordID."', '".cfg_obo_Perm::TYPE_LO."', '".$newloID."');";
-				if( !($this->DBM->query($qstr)) )
-				{
-					trace(mysql_error(), true);
-					$this->DBM->rollback();
-					return false;
-				}
-			}
-			
-			return $newloID;
+			return $lo->loID;
 		}
-		
-	   
+
 		return core_util_Error::getError(2); // lo must be a master but isnt
 	}
 	
@@ -467,8 +353,8 @@ class nm_los_LOManager extends core_db_dbEnabled
 				$system = new nm_los_LOSystem();
 				$tracking = nm_los_TrackingManager::getInstance();
 				$tracking->trackDeleteLO($loID, 1);
+				$system->cleanOrphanData();
 			}
-			$system->cleanOrphanData();
 			return true;
 		}
 		else
@@ -476,7 +362,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 			trace('deleting draft');
 			// delete all draft objects
 			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='?' OR ".cfg_obo_LO::ID." = '?' ";
-			if(!($q = $this->DBM->querySafe($qstr, $loID, $loID)))
+			if(!($q = $this->DBM->querySafe($qstr, $lo->rootID, $lo->rootID)))
 			{
 				$this->DBM->rollback();
 				return false;

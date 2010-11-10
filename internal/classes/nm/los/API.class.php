@@ -464,7 +464,7 @@ class nm_los_API extends core_db_dbEnabled
 		{
 			$this->DBM->startTransaction();
 			$loman = nm_los_LOManager::getInstance();
-			$result = $loman->makeDerivative($loID);
+			$result = $loman->createDerivative($loID);
 			$this->DBM->commit();
 		}
 		else
