@@ -229,12 +229,11 @@ class nm_los_LO
 				************************************************************/
 				if($this->loID == 0 && $this->rootID == 0 && $this->parentID == 0)
 				{
-					trace('saving new draft');
 					if($this->loID != 0) return false;
 					$this->version = 0; // force 0.1
 					$this->subVersion = 1; // force 0.1
 					$success = $this->dbStore($DBM);
-					$this->rootID = $this->loID;
+//					$this->rootID = $this->loID; // the client needs the rootID not to be 0 (rootID 0 is only on the database side)
 					return $success;
 				}
 				
@@ -244,12 +243,12 @@ class nm_los_LO
 				 ***********************************************************/
 				else if($this->loID > 0 && $this->rootID > 0  && $this->subVersion == 0)
 				{
-					trace('saving master revision draft');
 					$this->subVersion = 1;
 					$this->parentID = $this->loID;
 					$this->rootID = 0;
 					$this->loID = 0;
 					$success = $this->dbStore($DBM);
+//					$this->rootID = $this->loID; // the client needs the rootID not to be 0 (rootID 0 is only on the database side)
 					
 					// copy the permissions from the master object to the new draft
 					$PM = nm_los_PermissionsManager::getInstance();
@@ -263,7 +262,6 @@ class nm_los_LO
 				 ***********************************************************/
 				else
 				{
-					trace('saving revision draft');
 					$this->subVersion++; // incriment subVersion
 					//$this->parentID = 0;
 					$this->loID = 0;
@@ -336,21 +334,11 @@ class nm_los_LO
 					}
 				}
 				
-				
 				/******** MOVE PERMISSIONS **********/
 				$PM = nm_los_PermissionsManager::getInstance();
 				$PM->movePermsToItem($rootDraftLoID, $this->loID, cfg_obo_Perm::TYPE_LO);
-				// 
-				// 
-				// $qstr = "UPDATE `".cfg_obo_Perm::TABLE."` SET ".cfg_obo_Perm::ITEM."='?' WHERE ".cfg_obo_Perm::ITEM."='?' AND `".cfg_obo_Perm::TYPE."` = '".cfg_obo_Perm::TYPE_LO."'";
-				// if( !($q = $DBM->querySafe($qstr, $this->loID, $rootDraftLoID)) )
-				// {
-				// 	$DBM->rollback();
-				// 	return false;
-				// }
 				
 				/********* REMOVE DRAFTS *************/
-				// (this moves permissions and owners to the new item)
 				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID);
 				
 				break;
@@ -360,6 +348,18 @@ class nm_los_LO
 				 * rootID is it's own loID
 				 * parentID is the loID of the item it is a derivative of
 				 ***********************************************************/
+				
+				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
+				if($this->isValidMaster(true) !== true) return core_util_Error::getError(2); // Validate
+
+				$this->parentID = $this->loID; // link parent to previous root id
+				$this->loID = 0;// force it to save a copy
+				$this->version = 1; // reset
+				$this->subVersion = 0; // reset
+				$this->rootID = 0; // mark as a new LO
+				
+				$this->dbStore($DBM);
+				
 				break;
 				
 			default:
@@ -419,7 +419,7 @@ class nm_los_LO
 	}
 	
 	
-	public function isValidMaster()
+	public function isValidMaster($isDerivative=false)
 	{
 		// id must already exist
 		if( !( nm_los_Validator::isPosInt($this->loID) ))
@@ -440,7 +440,7 @@ class nm_los_LO
 			return false;
 		}
 		// dont allow users to create masters from existing masters, no need - its the same object
-		if($this->version > 0 && $this->subVersion == 0)
+		if(!$isDerivative && $this->version > 0 && $this->subVersion == 0)
 		{
 			trace('invalid versions');
 			return false;
@@ -516,7 +516,11 @@ class nm_los_LO
 				$DBM->rollback();
 				return false;
 			}
+			
+			/************ UPDATE OBJECT IN MEMORY **********/
 			$this->loID = $DBM->insertID;
+			if($this->rootID == 0) $this->rootID = $this->loID; // rootID is 0 for masters in the database, but needs to be set for the clients
+			
 			
 			/********* CHECK PAGES *************/
 			// We Needed the loID before mapping these pages
@@ -531,7 +535,7 @@ class nm_los_LO
 			}
 			
 			/******** SET PERMISSIONS ON THE ROOT OBJECT **********/
-			if($this->rootID == 0 || $this->rootID == $this->loID)
+			if($this->rootID == $this->loID)
 			{
 				$PM = nm_los_PermissionsManager::getInstance();
 				$PM->setFullPermsForItem($this->loID, cfg_obo_Perm::TYPE_LO);

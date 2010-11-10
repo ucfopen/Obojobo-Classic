@@ -520,32 +520,32 @@ class nm_los_LOSystem extends core_db_dbEnabled
 	 */
 	public function purgeLOCache($oldestTimestamp=0)
 	{
-		$t = microtime(true);
-		
-		if(!nm_los_Validator::isPosInt($oldestTimestamp))
-		{
-			
-			$oldestTimestamp = time() - AppCfg::CACHE_LIFE;
-		}
-		// delete old cache before $oldestTimestamp
-		$this->DBM->querySafe("DELETE FROM ".cfg_obo_Cache::LO_TABLE." WHERE ".cfg_obo_Cache::LO_TIME." < '?'", $oldestTimestamp);
-		
-		// removes all cache with no learning object
-		// 0.0014 s
-		$t = microtime(true);
-		$qstr = "DELETE C.* FROM
-		".cfg_obo_Cache::LO_TABLE." AS C
-		LEFT JOIN ".cfg_obo_LO::TABLE." AS L
-		ON L.".cfg_obo_LO::ID." = C.".cfg_obo_Cache::LO_ID."
-		WHERE L.".cfg_obo_LO::ID." IS NULL;";
-		if(!$this->DBM->query($qstr))
-		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
-			//exit;
-			return false;
-		}
-		trace('time: ' . (microtime(true) - $t) .' deleted cache :' . $this->DBM->affected_rows(), true);
+		// $t = microtime(true);
+		// 
+		// if(!nm_los_Validator::isPosInt($oldestTimestamp))
+		// {
+		// 	
+		// 	$oldestTimestamp = time() - AppCfg::CACHE_LIFE;
+		// }
+		// // delete old cache before $oldestTimestamp
+		// $this->DBM->querySafe("DELETE FROM ".cfg_obo_Cache::LO_TABLE." WHERE ".cfg_obo_Cache::LO_TIME." < '?'", $oldestTimestamp);
+		// 
+		// // removes all cache with no learning object
+		// // 0.0014 s
+		// $t = microtime(true);
+		// $qstr = "DELETE C.* FROM
+		// ".cfg_obo_Cache::LO_TABLE." AS C
+		// LEFT JOIN ".cfg_obo_LO::TABLE." AS L
+		// ON L.".cfg_obo_LO::ID." = C.".cfg_obo_Cache::LO_ID."
+		// WHERE L.".cfg_obo_LO::ID." IS NULL;";
+		// if(!$this->DBM->query($qstr))
+		// {
+		// 	$this->DBM->rollback();
+		// 	trace(mysql_error(), true);
+		// 	//exit;
+		// 	return false;
+		// }
+		// trace('time: ' . (microtime(true) - $t) .' deleted cache :' . $this->DBM->affected_rows(), true);
 		
 		
 	}
