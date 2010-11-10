@@ -250,6 +250,10 @@ class nm_los_LO
 					$this->rootID = 0;
 					$this->loID = 0;
 					$success = $this->dbStore($DBM);
+					
+					// copy the permissions from the master object to the new draft
+					$PM = nm_los_PermissionsManager::getInstance();
+					$PM->copyPermsToItem($this->parentID, $this->loID, cfg_obo_Perm::TYPE_LO);
 					return $success;
 				}
 
@@ -280,34 +284,29 @@ class nm_los_LO
 				
 				core_util_Cache::getInstance()->clearLO($this->loID); // delete the cache
 				
-				$draftRootID = $this->rootID; // store the rootID temporarily
+				$rootDraftLoID = ($this->rootID == 0 ? $this->loID : $this->rootID); // store the rootID for later use - if root is zero - this is the root
 				
-				// make sure the desired X.0 version doesnt already exist by checking for LO's with a parentID of my current rootID
-				$qstr = "SELECT * FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." == '?' AND ".cfg_obo_LO::SUB_VER." = '0' AND ".cfg_obo_LO::PARENT_LO." = '?'";
+				/********* CHECK FOR PR-EXISTING DESIRED VERSION **********/
+				/* (make sure the desired X.0 version doesnt already exist by checking for LO's with a parentID of my current rootID) */
+				$qstr = "SELECT * FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." = '?' AND ".cfg_obo_LO::SUB_VER." = '0' AND ".cfg_obo_LO::PARENT_LO." = '?'";
 				$r = $DBM->querySafe($qstr,  $this->version + 1, $this->loID);
 				if($DBM->fetch_num != 0)
 				{
 					return core_util_Error::getError(6005); // Master version already exists
 				}
 				
-				// set master requirements
+				//************** SET MASTER REQUIREMENTS ************/
 				$this->isMaster = true;
 				$this->version = $this->version + 1;
 				$this->subVersion = 0;
 				
-				// 1.0 has no parent !!! UNLESS its a deriviative
+				// 1.0 has no parent !!! UNLESS its a deriviative TODO: deal with derivatives here? - may be elsewhere in createDerivative
 				if($this->version == 1)
 				{
 					$this->parentID = 0;
 				}
-				// 2.0, 3.0 etc parentID points at the previous full version
-				else
-				{
-					// get my rootID's LO, and use it's parentID as my parentID
-					//$this->parentID = ???;
-				}
 				
-				// create the master lo record
+				/************** CREATE NEW MASTER LO RECORD ***************/
 				$qstr ="INSERT INTO ".cfg_obo_LO::TABLE." (".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::SUB_VER.", ".cfg_obo_LO::ROOT_LO.", ".cfg_obo_LO::PARENT_LO.", ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT.")
 											SELECT 1 AS ".cfg_obo_LO::MASTER.", ".cfg_obo_LO::TITLE.", ".cfg_obo_Language::ID.", ".cfg_obo_LO::NOTES.", ".cfg_obo_LO::OBJECTIVE.", ".cfg_obo_LO::LEARN_TIME.", ".cfg_obo_LO::PGROUP.", ".cfg_obo_LO::AGROUP.", $this->version AS ".cfg_obo_LO::VER.", $this->subVersion AS ".cfg_obo_LO::SUB_VER.", 0 AS ".cfg_obo_LO::ROOT_LO.", $this->parentID AS ".cfg_obo_LO::PARENT_LO.", ".time()." AS ".cfg_obo_LO::TIME.", ".cfg_obo_LO::COPYRIGHT.", ".cfg_obo_LO::NUM_PAGES.", ".cfg_obo_LO::NUM_PRACTICE.", ".cfg_obo_LO::NUM_ASSESSMENT." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?'";
 				if(!($q = $DBM->querySafe($qstr, $this->loID)))
@@ -318,8 +317,41 @@ class nm_los_LO
 				}
 				$this->loID = $DBM->insertID;
 				
-				// remove all the drafts
-				$this->destroyDrafts($DBM, $draftRootID, $this->loID);
+				/********* ASSOCIATE PAGES *************/
+				if(is_array($this->pages))
+				{
+					$pageman = nm_los_PageManager::getInstance();
+					foreach($this->pages AS $orderIndex => $page)
+					{
+						$pageman->mapPageToLO($this->loID, $page->pageID, $orderIndex); // map this page
+					}
+				}
+				/********* ASSOCIATE KEYWORDS *************/
+				$KM = nm_los_KeywordManager::getInstance();
+				foreach($this->keywords AS $tag)
+				{
+					if($newTag = $KM->newKeyword($tag))
+					{
+						$KM->linkKeyword($newTag->keywordID, $this->loID, cfg_obo_Perm::TYPE_LO);
+					}
+				}
+				
+				
+				/******** MOVE PERMISSIONS **********/
+				$PM = nm_los_PermissionsManager::getInstance();
+				$PM->movePermsToItem($rootDraftLoID, $this->loID, cfg_obo_Perm::TYPE_LO);
+				// 
+				// 
+				// $qstr = "UPDATE `".cfg_obo_Perm::TABLE."` SET ".cfg_obo_Perm::ITEM."='?' WHERE ".cfg_obo_Perm::ITEM."='?' AND `".cfg_obo_Perm::TYPE."` = '".cfg_obo_Perm::TYPE_LO."'";
+				// if( !($q = $DBM->querySafe($qstr, $this->loID, $rootDraftLoID)) )
+				// {
+				// 	$DBM->rollback();
+				// 	return false;
+				// }
+				
+				/********* REMOVE DRAFTS *************/
+				// (this moves permissions and owners to the new item)
+				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID);
 				
 				break;
 				
@@ -348,15 +380,14 @@ class nm_los_LO
 	 */
 	private function destroyDrafts($DBM, $delRootID, $newLoID)
 	{
+		/************ GATHER DRAFTS TO DELETE **************/
 		$qstr = "SELECT ".cfg_obo_LO::ID.", ".cfg_obo_LO::VER.", ".cfg_obo_LO::AGROUP.", ".cfg_obo_LO::PGROUP." FROM ".cfg_obo_LO::TABLE." WHERE (".cfg_obo_LO::ROOT_LO." = '?' OR ".cfg_obo_LO::ID." = '?' ) AND ".cfg_obo_LO::SUB_VER." > 0 ORDER BY ".cfg_obo_LO::SUB_VER." ASC";
 		if( !($q = $DBM->querySafe($qstr, $delRootID, $delRootID)) )
 		{
 		    trace(mysql_error(), true);
 			return false;
 		}
-		
 	    $drafts = array();
-		
 		while($r = $DBM->fetch_obj($q))
 		{
 			$drafts[] = $r->{cfg_obo_LO::ID};
@@ -365,11 +396,9 @@ class nm_los_LO
 
 		if(count($drafts) > 0)
 		{
-			//**************** redirect authors of all the drafts to the new master ***************************
-			
+			//**************** ASSOCIATE ALL DRAFT AUTHORS WITH NEW MASTER ***************************
 			//Generate a string of draft numbers SQL can use
 			$draftstr = implode(',', $drafts);  // 1,3,5,7,9...
-	
 			//Change lo_id of existing author entries to the new master $loID
 			$qstr = "UPDATE IGNORE `".cfg_obo_LO::MAP_AUTH_TABLE."` SET ".cfg_obo_LO::ID."='?' WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
 			if( !($q = $DBM->querySafe($qstr, $loID)))
@@ -377,25 +406,13 @@ class nm_los_LO
                 $DBM->rollback();
 				return false;
 			}
-			//Update perms
-			// TODO: move perm query to PermsManager
-			$qstr = "UPDATE `".cfg_obo_Perm::TABLE."` SET ".cfg_obo_Perm::ITEM."='?' WHERE ".cfg_obo_Perm::ITEM."='?' AND `".cfg_obo_Perm::TYPE."`='".cfg_obo_Perm::TYPE_LO."'";
-			if( !($q = $DBM->querySafe($qstr, $newLoID, $delRootID)) )
-			{
-				$DBM->rollback();
-				return false;
-			}
 			
-			//************** Delete all of the drafts ******************************************
-			if(count($drafts) > 0)
+			//************** DELETE DRAFTS *************************
+			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
+			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-				$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
-				if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
-				{
-	                $DBM->rollback();
-					return false;
-				}
-				$draftstr .= ","; // the extra comma is for the actual $loID used below.
+                $DBM->rollback();
+				return false;
 			}
 		}
 		return true;
@@ -516,28 +533,9 @@ class nm_los_LO
 			/******** SET PERMISSIONS ON THE ROOT OBJECT **********/
 			if($this->rootID == 0 || $this->rootID == $this->loID)
 			{
-				if( !($DBM->querySafe("INSERT INTO `".cfg_obo_Perm::TABLE."` 
-					(
-						`".cfg_core_User::ID."`,
-						`".cfg_obo_Perm::ITEM."`,
-						`".cfg_obo_Perm::TYPE."`,
-						`".cfg_obo_Perm::READ."`,
-						`".cfg_obo_Perm::WRITE."`,
-						`".cfg_obo_Perm::COPY."`,
-						`".cfg_obo_Perm::PUBLISH."`,
-						`".cfg_obo_Perm::G_READ."`,
-						`".cfg_obo_Perm::G_WRITE."`,
-						`".cfg_obo_Perm::G_COPY."`,
-						`".cfg_obo_Perm::G_USE."`,
-						`".cfg_obo_Perm::G_GLOBAL."`
-					)
-					VALUES 
-					('?', '?', 'l', '1', '1', '1', '1', '1', '1', '1', '1', '1');", $_SESSION['userID'], $this->loID )) )
-				{
-					trace(mysql_error(), true);
-					$DBM->rollback();
-					return false;
-				}
+				$PM = nm_los_PermissionsManager::getInstance();
+				$PM->setFullPermsForItem($this->loID, cfg_obo_Perm::TYPE_LO);
+				
 				$this->perms = new nm_los_Permissions($_SESSION['userID'], 1,1,1,1,1,1,1,1,1);
 				
 			}
