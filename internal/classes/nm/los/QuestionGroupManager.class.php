@@ -118,7 +118,7 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 			$questionMan->newQuestion($question); // create the question if the id is 'dirty'
 			
 			// always map the question to the qgroup
-			$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_TYPE."='q', ".cfg_obo_QGroup::MAP_ORDER."='?'";
+			$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
 			if(!($q = $this->DBM->querySafe($qstr, $qgroup->qGroupID, $question->questionID, $key)))
 			{
 				$this->DBM->rollback();
@@ -150,9 +150,10 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 	 */
 	private function mapQuestion($qgid, $cid, $ctype, $corder)
 	{
-		$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_TYPE."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
+		// TODO: remove $ctype - not needed
+		$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
 		
-		if(!($q = $this->DBM->querySafe($qstr, $qgid, $cid, $ctype, $corder)))
+		if(!($q = $this->DBM->querySafe($qstr, $qgid, $cid, $corder)))
 		{
 			$this->DBM->rollback();
 			return false;
@@ -205,7 +206,7 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 			return false;
 		}
 		//Gather up a list of questions to delete
-		$qstr = "SELECT ".cfg_obo_QGroup::MAP_CHILD.", ".cfg_obo_QGroup::MAP_TYPE." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' AND ".cfg_obo_QGroup::MAP_TYPE."='q' AND ".cfg_obo_QGroup::MAP_CHILD." NOT IN (
+		$qstr = "SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' AND ".cfg_obo_QGroup::MAP_CHILD." NOT IN (
 					SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."!='?')";
 		
 		$q = $this->DBM->querySafe($qstr, $qgid, $qgid);

@@ -1,9 +1,9 @@
 <?php
 class cfg_core_Role
 {
-	const TABLE = 'lo_roles';
+	const TABLE = 'obo_user_roles';
 
-	const MAP_USER_TABLE = 'lo_map_roles'; // maps users to roles
+	const MAP_USER_TABLE = 'obo_map_roles_to_user'; // maps users to roles
 	const ID = 'roleID';
 	const ROLE = 'name';
 	//const DESC = 'description';

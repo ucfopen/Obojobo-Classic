@@ -9,12 +9,12 @@ if($_REQUEST['uid'])
 	if($_REQUEST['inst_id'])
 	{
 
-			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM lo_tracking WHERE uid='?' AND inst_id='?' AND `type` NOT LIKE 'nm%%'";
+			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE uid='?' AND inst_id='?' AND `type` NOT LIKE 'nm%%'";
 			$q = $DBM->querySafe($qs, $_REQUEST['uid'],$_REQUEST['inst_id']);			
 
 	}
 	else{
-			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM lo_tracking WHERE uid='?' AND `type` NOT LIKE 'nm%%'";
+			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE uid='?' AND `type` NOT LIKE 'nm%%'";
 			$q = $DBM->querySafe($qs, $_REQUEST['uid']);			
 	}
 }
@@ -22,12 +22,12 @@ else{
 	if($_REQUEST['inst_id'])
 	{
 
-			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM lo_tracking WHERE inst_id='?' AND `type` NOT LIKE 'nm%%'";
+			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE inst_id='?' AND `type` NOT LIKE 'nm%%'";
 			$q = $DBM->querySafe($qs,$_REQUEST['inst_id']);			
 
 	}
 	else{
-			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM lo_tracking WHERE `type` NOT LIKE 'nm%%'";
+			$qs = "SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE `type` NOT LIKE 'nm%%'";
 			$q = $DBM->querySafe($qs);			
 	}	
 }

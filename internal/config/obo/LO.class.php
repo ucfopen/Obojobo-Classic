@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_LO
 {
-	const TABLE = 'lo_los';
+	const TABLE = 'obo_los';
 	const ID = 'loID';
 	const MASTER = 'isMaster';
 	const TITLE = 'title';
@@ -21,9 +21,9 @@ class cfg_obo_LO
 	const NUM_PRACTICE = 'numPQuestions';
 	const NUM_ASSESSMENT = 'numAQuestions';
 	
-	const MAP_AUTH_TABLE = 'lo_map_authors';
+	const MAP_AUTH_TABLE = 'obo_map_authors_to_lo';
 	
-	const DEL_TABLE = 'lo_los_deleted';
+	const DEL_TABLE = 'obo_deleted_los';
 	const DEL_DATA = 'cache';
 	
 }
