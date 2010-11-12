@@ -596,8 +596,8 @@ class core_auth_AuthManager extends core_db_dbEnabled
 					return $authMod;
 				}
 			}
+			trace('couldnt fetch user authmod: ' . $userID, true);
 		}
-		trace('couldnt fetch user authmod: ' . $userID, true);
 		return false;
 	}
 

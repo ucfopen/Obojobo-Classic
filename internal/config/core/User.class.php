@@ -1,7 +1,7 @@
 <?php
 class cfg_core_User
 {
-	const TABLE = 'lo_users';
+	const TABLE = 'obo_users';
 	
 	const ID = 'userID';
 	const FIRST = 'first';

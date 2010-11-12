@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Media
 {
-	const TABLE = 'lo_media';
+	const TABLE = 'obo_lo_media';
 	const ID = 'mediaID';
 	const TITLE = 'title';
 	const TYPE = 'itemType';

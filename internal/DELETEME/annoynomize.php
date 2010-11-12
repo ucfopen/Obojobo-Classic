@@ -22,9 +22,9 @@ while( $r = $DBM->fetch_obj($q))
 $pass = md5(time());
 $salt = md5(microtime(1));
 
-$DBM->query("UPDATE lo_auth_ucf SET login = CONCAT('Anonymous', userID), password = '$pass', salt = '$salt'");
+$DBM->query("UPDATE lo_users_auth_ucf SET login = CONCAT('Anonymous', userID), password = '$pass', salt = '$salt'");
 
 
-$DBM->query("UPDATE lo_auth_internal SET login = CONCAT('~Anonymous', userID), password = '$pass', salt = '$salt' WHERE userID != '3' AND userID != '1'");
+$DBM->query("UPDATE lo_users_auth_internal SET login = CONCAT('~Anonymous', userID), password = '$pass', salt = '$salt' WHERE userID != '3' AND userID != '1'");
 
 ?>

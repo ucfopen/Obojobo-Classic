@@ -402,7 +402,8 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 					AND V.".cfg_core_User::ID." = '?'
 					AND V.".cfg_obo_Instance::ID." = (
 						SELECT V.".cfg_obo_Instance::ID."
-						FROM lo_visits AS V, ".cfg_obo_Attempt::TABLE." AS A
+						FROM ".cfg_obo_Visit::TABLE." AS V,
+							".cfg_obo_Attempt::TABLE." AS A
 						WHERE A.".cfg_obo_Visit::ID." = V.".cfg_obo_Visit::ID."
 						AND A.".cfg_obo_Attempt::ID." = '?'
 					) ORDER BY A.".cfg_obo_Attempt::ID." LIMIT 1";

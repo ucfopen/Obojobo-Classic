@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Question
 {
-	const TABLE = 'lo_los_questions';
+	const TABLE = 'obo_lo_questions';
 	const ID = 'questionID';
 	const TYPE = 'itemType';
 	const DATE = 'createTime';
