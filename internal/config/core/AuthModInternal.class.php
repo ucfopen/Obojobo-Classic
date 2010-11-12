@@ -1,7 +1,7 @@
 <?php
 class cfg_core_AuthModInternal
 {
-	const TABLE = 'lo_auth_internal';
+	const TABLE = 'obo_user_auth_internal';
 	
 	const USER_NAME = 'login';
 	const PASS = 'password';

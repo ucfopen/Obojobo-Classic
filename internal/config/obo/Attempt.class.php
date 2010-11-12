@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Attempt
 {
-	const TABLE = 'lo_attempts';
+	const TABLE = 'obo_log_attempts';
 	const ID = 'attemptID';
 	const SCORE = 'score';
 	const START_TIME = 'startTime';

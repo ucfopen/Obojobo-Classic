@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Instance
 {
-	const TABLE = 'lo_instances';
+	const TABLE = 'obo_lo_instances';
 	
 	const ID = 'instID';
 	const TITLE = 'name';
@@ -16,7 +16,7 @@ class cfg_obo_Instance
 	const SCORE_METHOD_RECENT = 'r';
 	const SCORE_IMPORT = 'allowScoreImport';
 	
-	const DELETED_TABLE = 'lo_instances_deleted';
+	const DELETED_TABLE = 'obo_deleted_instances';
 	const DELETED_SCORE_DATA = 'scoreData';
 
 }

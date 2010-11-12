@@ -100,7 +100,7 @@ class nm_los_QuestionGroup
 		if($includeKids)
 		{
 			//Gather questions/groups into an Array from mapping table
-			$q = $DBM->querySafe("SELECT ".cfg_obo_QGroup::MAP_CHILD.", ".cfg_obo_QGroup::MAP_TYPE." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' ORDER BY ".cfg_obo_QGroup::MAP_ORDER." ASC", $qGroupID);
+			$q = $DBM->querySafe("SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' ORDER BY ".cfg_obo_QGroup::MAP_ORDER." ASC", $qGroupID);
 			$qman = nm_los_QuestionManager::getInstance();
 
 			while($r = $DBM->fetch_obj($q))

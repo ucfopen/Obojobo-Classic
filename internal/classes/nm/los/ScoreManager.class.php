@@ -414,33 +414,7 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 	//@TODO: Note - Function disabled for 1.1 release.
 	public function getQuestionResponses($instID = 0, $questionID = 0)
 	{
-		/*
-		//Get a listing of the attempt ids:
-		$qstr =	"	SELECT A.id as attemptID
-					FROM lo_qscores, ".cfg_obo_Attempt::TABLE." AS A, lo_visits, lo_users
-					WHERE A.".cfg_obo_Attempt::ID." = lo_qscores.attemptID
-					AND lo_visits.id = A.".cfg_obo_Visit::ID."
-					AND lo_users.id = lo_visits.userID
-					AND lo_visits.instID = '?'
-					AND lo_qscores.item_id = '?'
-					GROUP BY attemptID
-					ORDER BY attemptID";
-		
-		if( !($q = $this->DBM->querySafe($qstr, $instID, $questionID)) )
-		{
-			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			//die();
-			return false;
-		}
-		
-		$attempts = array();
-		while( $r = $this->DBM->fetch_obj($q))
-		{
-			$attempts[] = $r->attemptID;
-		}
-		*/
-		//return false;
+
 		$qstr =    "SELECT V.".cfg_core_User::ID.", A.".cfg_obo_Attempt::ID." as attemptID, S.".cfg_obo_Score::SCORE.", A.".cfg_obo_Attempt::SCORE." as attempt_score, S.".cfg_obo_Score::ANSWER." as answer_id
 					FROM ".cfg_obo_Score::TABLE." AS S, ".cfg_obo_Attempt::TABLE." AS A, ".cfg_obo_Visit::TABLE." AS V, ".cfg_core_User::TABLE." AS U
 					WHERE A.".cfg_obo_Attempt::ID." = S.".cfg_obo_Attempt::ID."
@@ -450,13 +424,10 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 					AND S.".cfg_obo_Score::ITEM_ID." = '?'
 					ORDER BY V.".cfg_core_User::ID;
 		
-		//die($qstr);
-//return $qstr;
 		if( !($q = $this->DBM->querySafe($qstr, $instID, $questionID)) )
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 		
@@ -492,95 +463,7 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 			$lastUser = $r->{cfg_core_User::ID};
 		}
 		
-		/*
-		
-		//We need to know users who did not respond to this question.
-		//Therefore we need to add users into the return array who have an attempt score but
-		//do not show up in the sql result for the given question.
-		//For these users, we fill in zeros for everything except userID and user_name.
-		
-		//Get all users who have submitted attempts for this instance:
-		
-		//lo_attempts.id as attemptID, 
-		$qstr =    "SELECT lo_visits.userID
-					FROM ".cfg_obo_Attempt::TABLE.", lo_visits
-					WHERE lo_visits.id = ".cfg_obo_Attempt::TABLE.".visitID
-					AND lo_visits.instID = '?'
-					GROUP BY lo_visits.userID";
-		
-		if( !($q = $this->DBM->querySafe($qstr, $instID)) )
-		{
-			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			//die();
-			return false;
-		}
-		
-		$userID = 0;
-		//print_r($returnArr[0][0]['userID']);
-		
-		while( $r = $this->DBM->fetch_obj($q) )
-		{
-			$userID = $r->userID;
-			$len = count($returnArr);
-			$foundUser = false;
-			for($i = 0; $i < $len; $i++)
-			{
-				
-				if($returnArr[$i]['userID'] == $userID)
-				{
-					$foundUser = true;
-					break;
-				}
-			}
-			
-			if(!$foundUser)
-			{
-				array_push($returnArr, array(
-					'user' => array(
-						'userID' => $r->userID,
-						'user_name' => $userMan->getNameObject($r->userID),
-					),
-					'responses' => array(array(
-						'attemptID' => 0,
-						'score' => 0,
-						'attempt_score' => 0,
-						'answer_id' => 0,
-						'no_response' => true)
-				)));
-			}
-		}
-		*/
 		return $returnArr;
-	}
-
-	public function getInstanceResponsesForUser($instID, $userID)
-	{
-		trace('girfu');
-		
-		$qstr = "	SELECT lo_qscores.*
-					FROM lo_qscores
-					WHERE lo_qscores.attemptID IN
-						(SELECT lo_attempts.attemptID, lo_attempts.score, lo_attempts.startTime, lo_attempts.endTime
-						FROM lo_attempts 
-						WHERE lo_attempts.instID = ?
-						AND lo_attempts.userID = ?)";
-		
-		if( !($q = $this->DBM->querySafe($qstr, $instID, $userID)) )
-		{
-			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			//die();
-			return false;
-		}
-		
-		$return = array();
-		while( $r = $this->DBM->fetch_obj($q) )
-		{
-			$return[] = $r;
-		}
-		
-		return $r;
 	}
 
 	/**
@@ -753,7 +636,6 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 
