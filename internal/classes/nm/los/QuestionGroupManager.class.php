@@ -77,40 +77,7 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 			return false;	
 		}
 		$qgroup->qGroupID = $this->DBM->insertID;
-		//Question alternate mapping:
-		//First, convert each negative questionIndex value into a positive one.
 
-		//Since these questionIndexs are created with each new qgroup we simply convert
-		//each questionIndex to postive sequental (1, 2, ...)
-		/* Question alternate mapping:
-		 * incoming object uses 'questionIndex' to group question alternates
-		 * if its value is 0, question has no alts
-		 * if questionIndex is not 0, all other questions with the matching index are alts
-		 */
-		
-		
-		// TODO: move this to the function that converts remote obects into php objects
-		// $groupQIndex = 0;// must start at 1, 0 assumes no alternates
-		// $lastAlt = 0;
-		// foreach($qgroup->kids as $question)
-		// {
-		// 	// incriment, question has no alternates
-		// 	if($question->questionIndex == 0)
-		// 	{
-		// 		$groupQIndex ++; 
-		// 	}
-		// 	// question is in an alternate group
-		// 	else
-		// 	{
-		// 		// is this a new alternate group?
-		// 		if($question->questionIndex != $lastAlt)
-		// 		{
-		// 			$groupQIndex ++; //  incriment, question is grouped with new alternates - must happen before
-		// 			$lastAlt = $question->questionIndex;
-		// 		}
-		// 		$question->questionIndex = $groupQIndex;
-		// 	}
-		// }
 		//Fill in the mapping table for the questions in the group, creating new questions as needed
 		$questionMan = nm_los_QuestionManager::getInstance();
 		foreach($qgroup->kids as $key => $question)

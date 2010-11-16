@@ -2301,7 +2301,7 @@ Temp remove from 1.0
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;

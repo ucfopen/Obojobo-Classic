@@ -66,7 +66,7 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 	{
 		$this->defaultDBM();
 
-			$q = $this->DBM->querySafe("SELECT * FROM lo_los_questions WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
+			$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
 			
 			if( $r = $this->DBM->fetch_obj($q) )
 			{
@@ -172,31 +172,33 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 	 * @todo Apply partial-credit algorithm for QA question types
 	 * @todo TEST THIS
 	 */
-	public function checkAnswer($questionID, $answer)
+	public function checkAnswer($questionID, $userAnswer)
 	{
 		if($questionID == 0)
 		{
 			return false;
 		}
+		
+		$question = $this->getQuestion($questionID);
+		
 		// if the answer is numeric and the question is a Multiple choice, check using the id
-		$qstr = "SELECT `".cfg_obo_Question::TYPE."` FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?'";
-		$r = $this->DBM->fetch_obj($this->DBM->querySafe($qstr, $questionID));
-		$qType = $r->{cfg_obo_Question::TYPE};
-		switch($qType)
+		switch($question->itemType)
 		{
 			case 'MC':
-				$qstr = "SELECT
-					".cfg_obo_Question::MAP_ANS_WEIGHT.", 
-					".cfg_obo_Answer::ID.", 
-					".cfg_obo_Question::MAP_ANS_FEEDBACK." 
-					FROM 
-					".cfg_obo_Question::MAP_ANS_TABLE."
-					 WHERE ".cfg_obo_Question::ID."='?'
-					 AND ".cfg_obo_Answer::ID." = '?'";
-				if( !($q = $this->DBM->querySafe($qstr, $questionID, $answer)) )
+				trace($question);
+				// search for the answer id and return the weight for that answer
+				foreach($question->answers AS $answer)
 				{
-					return false;
+					if($answer->answerID == $userAnswer)
+					{
+						return array(
+							'weight' => $answer->weight,
+							'answerID' => $answer->answerID,
+							'feedback' => $answer->feedback
+						);
+					}
 				}
+				return false;
 				break;
 			case 'QA':
 				// trim whitespace from the submitted answer

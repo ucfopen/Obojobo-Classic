@@ -30,24 +30,24 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		
 	/**
 	 * Gets the full data for an existing media object
-	 * @param $mid (number) media id
+	 * @param $mediaID (number) media id
 	 * @return (Media) full media object (includes URL)
 	 * @return (bool) False if error or no login
 	 */
-	public function getMedia($mid = 0)
+	public function getMedia($mediaID = 0)
 	{
-	    if(!is_numeric($mid) || $mid < 1)
+	    if(!is_numeric($mediaID) || $mediaID < 1)
 		{
 			return false;
 		}
 		
 		
-		if($media = core_util_Cache::getInstance()->getMedia($mid))
+		if($media = core_util_Cache::getInstance()->getMedia($mediaID))
 		{
 			return $media;
 		}
 
-		if(!($q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::ID."='?' LIMIT 1", $mid)))
+		if(!($q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::ID."='?' LIMIT 1", $mediaID)))
 		{
             $this->DBM->rollback();
 			return false;
@@ -418,39 +418,79 @@ class nm_los_MediaManager extends core_db_dbEnabled
 	/**
 	 * Find any learning objects using a specific media 
 	 *
-	 * @param string $MID 
+	 * @param string $mediaID 
 	 * @return array 	Array of loid's
 	 * @author Ian Turgeon
 	 */
 	// TODO: this probably can be simplified to only use one query, maybe cache for a short time
-	public function locateLOsWithMedia($MID)
+	public function locateLOsWithMedia($mediaID)
 	{
-	    if(!nm_los_Validator::isPosInt($MID))
+	    if(!nm_los_Validator::isPosInt($mediaID))
 		{
             return false;
 	    }
-		// locate items in pages
+	
+		$qstr = "SELECT DISTINCT L.".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." AS L, ".cfg_obo_Media::MAP_TABLE." AS M WHERE L.".cfg_obo_LO::ID." = M.".cfg_obo_LO::ID." AND M.".cfg_obo_Media::ID." = '?'";
+		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
+		{
+		    $this->DBM->rollback();
+        	trace(mysql_error(), true);
+			return false;
+		}
+		
 		$los = array();
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$los[] = $r->{cfg_obo_LO::ID};
+		}
 
-		// TODO: write this
-		return array_unique($los);
+		return $los;
+	}
+
+	/**
+	 * Register a media object to an LO for tracking purposes
+	 *
+	 * @param string $mediaID 
+	 * @param string $loID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	public function associateMediaWithLO($mediaID, $loID)
+	{
+		trace('associating media with lo: ' . $mediaID . ' ' . $loID);
+		if(!nm_los_Validator::isPosInt($mediaID))
+		{
+            return false;
+	    }
+	    if(!nm_los_Validator::isPosInt($loID))
+		{
+            return false;
+	    }
+		if(!$this->DBM->querySafe("INSERT INTO ".cfg_obo_Media::MAP_TABLE." SET ".cfg_obo_Media::ID." = '?', ".cfg_obo_LO::ID." = '?'", $mediaID, $loID))
+		{
+		    $this->DBM->rollback();
+        	trace(mysql_error(), true);
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
 	 * Deletes an existing media object from the database
-	 * @param $mid (number) media ID
+	 * @param $mediaID (number) media ID
 	 * @return (bool) True if delete was successful, False if error
 	 */
-	function deleteMedia($mid = 0) 
+	function deleteMedia($mediaID = 0) 
 	{
-		if(!is_numeric($mid) || $mid < 1)
+		if(!is_numeric($mediaID) || $mediaID < 1)
 		{
 			return false;
 		}
 		
 		//See if a map exists between this media object.
 		$qstr = "SELECT ".cfg_obo_Media::ID." FROM ".cfg_obo_Media::MAP_TABLE." WHERE ".cfg_obo_Media::ID." = '?'";
-		if(!($q = $this->DBM->querySafe($qstr, $mid)))
+		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
         	trace(mysql_error(), true);
@@ -461,7 +501,7 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		if($this->DBM->fetch_num($q) != 0)
 		{
 			//See if we can find the LOs mapped to this media object.  If not, then the LO has been deleted but the orphan map hasn't been cleaned.
-			$los = $this->locateLOsWithMedia($mid);
+			$los = $this->locateLOsWithMedia($mediaID);
 			
 			if($los === false || !(is_array($los) && count($los) == 0))
 			{
@@ -470,7 +510,7 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		}
 		
 		$qstr = "SELECT * FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $mid)))
+		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
         	trace(mysql_error(), true);
@@ -496,19 +536,19 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		}
         
 		$qstr = "DELETE FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $mid)))
+		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
 			return false;	
 		}
 		$permMan = nm_los_PermissionsManager::getInstance();
-		if(!$permMan->removeAllPermsForItem($mid, cfg_obo_Perm::TYPE_MEDIA))
+		if(!$permMan->removeAllPermsForItem($mediaID, cfg_obo_Perm::TYPE_MEDIA))
 		{
 		    $this->DBM->rollback();
 			return false;		
 		}
 		
-		core_util_Cache::getInstance()->clearMedia($mid);
+		core_util_Cache::getInstance()->clearMedia($mediaID);
 		
 		return true;
 	}

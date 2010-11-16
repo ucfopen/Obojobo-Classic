@@ -22,25 +22,12 @@ while($r = $DBM->fetch_obj($q))
 
 	// search for mediaIDs
 
-	// string values
-	if($c += preg_match_all('/s:7:"mediaID";s:\d:"(\d+)"/', $s, $matches))
+	// catches string or int types ----ex:   s:7:"mediaID";s:10:"34"   OR   s:7:"mediaID";i:2129
+	if($c += preg_match_all('/s:7:"mediaID";(?:(?:i:)|(?:s:\d+:"))(\d+)/', $s, $matches))
 	{
 		foreach($matches[1] AS $match)
 		{
-			
 			$los[$r->{cfg_obo_LO::ID}][] = $match;
-		}
-	}
-
-	// int values
-	if($c += preg_match_all('/s:7:"mediaID";i:(\d+)/', $s, $matches))
-	{
-		foreach($matches[1] AS $match)
-		{
-			if($match)
-			{
-				$los[$r->{cfg_obo_LO::ID}][] = $match;
-			}
 		}
 	}
 	
@@ -54,14 +41,12 @@ foreach($los AS $loID => $mediaIDs)
 	// loop through each LO's Media
 	foreach($mediaIDs AS $mediaID)
 	{
-		$DBM->query("INSERT INTO obo_map_media_to_lo SET ")
+		$DBM->querySafe("INSERT INTO ".cfg_obo_Media::MAP_TABLE." SET ".cfg_obo_Media::ID." = '?', ".cfg_obo_LO::ID." = '?'", $mediaID, $loID);
 	}
-	
-	
 }
 
 echo count($los) . " - loIDs \n";
-print_r($los);
+//print_r($los);
 
 
 // echo count($questionIDs) . " - questions \n";

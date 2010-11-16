@@ -338,7 +338,6 @@ class nm_los_LOManager extends core_db_dbEnabled
 		
 		if( $lo->rootID == $loID && $lo->subVersion == 0)
 		{
-			trace('deleting master');
 			$instMan = nm_los_InstanceManager::getInstance();
 			if(count($instMan->getInstancesFromLOID($loID)) > 0)
 			{
@@ -359,7 +358,6 @@ class nm_los_LOManager extends core_db_dbEnabled
 		}
 		else
 		{
-			trace('deleting draft');
 			// delete all draft objects
 			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ROOT_LO."='?' OR ".cfg_obo_LO::ID." = '?' ";
 			if(!($q = $this->DBM->querySafe($qstr, $lo->rootID, $lo->rootID)))
@@ -370,6 +368,7 @@ class nm_los_LOManager extends core_db_dbEnabled
 			$losDeleted = $this->DBM->affected_rows();
 			if($losDeleted > 0)
 			{
+				
 				$permMan = nm_los_PermissionsManager::getInstance();
 				if(!$permMan->removeAllPermsForItem($loID, cfg_obo_Perm::TYPE_LO))
 				{
