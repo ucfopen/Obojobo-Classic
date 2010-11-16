@@ -17,7 +17,6 @@ class cfg_obo_Media
 	const HEIGHT = 'height';
 	const WIDTH = 'width';
 	
-	const MAP_TABLE = 'lo_map_media';
-	const MAP_ORDER = 'itemOrder';
+	const MAP_TABLE = 'obo_map_media_to_lo';
 }
 ?>

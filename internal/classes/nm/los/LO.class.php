@@ -341,6 +341,9 @@ class nm_los_LO
 				/********* REMOVE DRAFTS *************/
 				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID);
 				
+				/************* KEEP TRACK OF MEDIA USED IN LO *******************/
+				$this->associateMediaUsedInLO();
+				
 				break;
 				
 			case self::DERIVATIVE:
@@ -367,6 +370,33 @@ class nm_los_LO
 				break;
 		}
 		return true;
+	}
+	
+	/**
+	 * Internal function that associates all the media used in this LO in the database
+	 *
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	private function associateMediaUsedInLO()
+	{
+		// serialize so we can quickly search for mediaIDs
+		// catches string or int types ----ex:   s:7:"mediaID";s:10:"34"   OR   s:7:"mediaID";i:2129
+		if( preg_match_all('/s:7:"mediaID";(?:(?:i:)|(?:s:\d+:"))(\d+)/', serialize($this), $matches))
+		{
+			$mediaIDs = array();
+			foreach($matches[1] AS $match)
+			{
+				$mediaIDs[] = $match; // place all MediaIDs in an array
+			}
+
+			$mediaIDs = array_unique($mediaIDs);
+			$MM = nm_los_MediaManager::getInstance();
+			foreach($mediaIDs AS $mediaID)
+			{
+				$MM->associateMediaWithLO($mediaID, $this->loID);
+			}
+		}
 	}
 	
 	/**
@@ -409,6 +439,15 @@ class nm_los_LO
 			
 			//************** DELETE DRAFTS *************************
 			$qstr = "DELETE FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
+			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
+			{
+                $DBM->rollback();
+				return false;
+			}
+			
+			
+			//************** DELETE MEDIA ASSOCIATIONS *********************
+			$qstr = "DELETE FROM ".cfg_obo_Media::MAP_TABLE." WHERE ".cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
                 $DBM->rollback();
@@ -557,49 +596,13 @@ class nm_los_LO
 					
 				}
 			}
-
+			
+			/************* KEEP TRACK OF MEDIA USED IN LO *******************/
+			$this->associateMediaUsedInLO();
 			return true;
 		}
 	}
 	
 }
-/*
-	
-	$qstr = "INSERT INTO ".cfg_obo_LO::TABLE." 
-				SET 
-					".cfg_obo_LO::MASTER." = '?',
-					".cfg_obo_LO::TITLE." = '?', 
-					".cfg_obo_Language::ID." = '?', 
-					".cfg_obo_LO::NOTES." = '?', 
-					".cfg_obo_LO::OBJECTIVE." = '?', 
-					".cfg_obo_LO::LEARN_TIME." = '?', 
-					".cfg_obo_LO::PGROUP." = '?', 
-					".cfg_obo_LO::AGROUP." = '?',
-					".cfg_obo_LO::VER." = '?' ,
-					".cfg_obo_LO::SUB_VER." = '?' ,
-					".cfg_obo_LO::ROOT_LO." = '?' ,
-					".cfg_obo_LO::PARENT_LO." = '?' ,
-					".cfg_obo_LO::TIME."` = '?', 
-					".cfg_obo_LO::COPYRIGHT." = '?',
-					".cfg_obo_LO::NUM_PAGES." = '?',
-					".cfg_obo_LO::NUM_PRACTICE." = '?',
-					".cfg_obo_LO::NUM_ASSESSMENT." = '?'";
-	$DBM->querySafe($qstr,
-					$this->isMaster,
-					$this->title,
-					$this->languageID,
-					$this->notes,
-					$this->objective,
-					$this->learnTime,
-					$this->pGroup->qGroupID,
-					$this->aGroup->qGroupID,
-					$this->version,
-					$this->subVersion,
-					$this->rootID,
-					$this->parentID,
-					time(),
-					count($this->pages),
-					count($this->pGroup->kids),
-					count($this->aGroup->kids));
-					*/
+
 ?>
