@@ -397,7 +397,10 @@ class nm_los_TrackingManager extends core_db_dbEnabled
 													if($page->questionIndex) $r->altIndex = $altIndex;
 													$r->normalIndex = $realQNum;
 													$r->qType = $page->itemType;
-													if(!$totalsOnly) $r->qText = substr(($page->{cfg_obo_Question::TYPE} == 'Media' ? preg_replace("/[\n\r]/","", strip_tags($page->items[0]->media[0]->{cfg_obo_Media::TITLE})) : preg_replace("/[\n\r]/","", strip_tags($page->items[0]->{cfg_obo_Page::ITEM_DATA}))), 0, 120);
+													if(!$totalsOnly)
+													{
+														$r->qText = substr(($page->{cfg_obo_Question::TYPE} == 'Media' ? preg_replace("/[\n\r]/","", strip_tags($page->items[0]->media[0]->{cfg_obo_Media::TITLE})) : preg_replace("/[\n\r]/","", strip_tags($page->items[0]->data))), 0, 120);
+													}
 													$pageIndex =  1 + (int)$key;
 													$r->realIndex = 1 + $pageIndex;
 													break;
@@ -696,7 +699,7 @@ class nm_los_TrackingManager extends core_db_dbEnabled
 
 	public function trackSubmitQuestion($qGroupID, $questionID, $answer)
 	{
-		$this->track(new nm_los_tracking_SubmitQuestion(0, 0, 0, (int)$qGroupID, (int)$questionID, $answer));
+		$this->track(new nm_los_tracking_SubmitQuestion(0, 0, 0, (int)$qGroupID, $questionID, $answer));
 	}
 	
 	public function trackMergeUser($userIDFrom, $userIDTo)
@@ -706,7 +709,7 @@ class nm_los_TrackingManager extends core_db_dbEnabled
 	
 	public function trackSubmitMedia($qGroupID, $questionID, $score)
 	{
-		$this->track(new nm_los_tracking_SubmitMedia(0, 0, 0, (int)$qGroupID, (int)$questionID, (int)$score));
+		$this->track(new nm_los_tracking_SubmitMedia(0, 0, 0, (int)$qGroupID, $questionID, (int)$score));
 	}
 	
 	public function trackPageChanged($pageID, $section)

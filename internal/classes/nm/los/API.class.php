@@ -1179,23 +1179,21 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 				$this->DBM->startTransaction();
 				$attemptMan = nm_los_AttemptsManager::getInstance();
 				$ret = $attemptMan->startAttempt($qGroupID);
 				$this->DBM->commit();
+				return $ret;
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$ret = new $error(1);
+				return core_util_Error::getError(1);
 			}
-			return $ret;
+			
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	/**
@@ -1209,7 +1207,7 @@ class nm_los_API extends core_db_dbEnabled
 	public function trackSubmitQuestion($visitKey, $qGroupID, $questionID, $answer)
 	{
 		// register visitKey first
-		if(nm_los_Validator::isPosInt($qGroupID) && nm_los_Validator::isPosInt($questionID))
+		if(nm_los_Validator::isPosInt($qGroupID) && !empty($questionID))
 		{
 			
 			if($this->getSessionValid())
@@ -1217,23 +1215,21 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 				$this->DBM->startTransaction();
 				$scoreman = nm_los_ScoreManager::getInstance();
 				$result = $scoreman->submitQuestion($qGroupID, $questionID, $answer);
 				$this->DBM->commit();
+				return $result;
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				return core_util_Error::getError(1);
 			}
-			return $result;
+			
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 		
 	}
 	
@@ -1259,22 +1255,21 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 				$this->DBM->startTransaction();
 				$scoreman = nm_los_ScoreManager::getInstance();
-				$result = $scoreman->submitMedia($qGroupID, $questionID, $score);
+				$result = $scoreman->submitQuestion($qGroupID, $questionID, $score);
 				$this->DBM->commit();
+				return $result;
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				return core_util_Error::getError(1);
 			}
-			return $result;
+			
 		}
-				$error = AppCfg::ERROR_TYPE;
+		$error = AppCfg::ERROR_TYPE;
 		return new $error(2);
 	}
 
@@ -1593,30 +1588,6 @@ class nm_los_API extends core_db_dbEnabled
 				$error = AppCfg::ERROR_TYPE;
 		return new $error(2);
 	}
-	
-/*
-	
-	 * Gets the current state of a quiz, including all answers given and the final score
-	 * @param $qGroupID (number) question group id
-	 * @return (Array<Array>) An array of state entries, with fields 'questionID', 'qtext', 'answerID', 'user_answer', 'score', 'real_answer'
-	 * @return (bool) false if error or no login
-	 
-	public function getQuizState($qGroupID)
-	{
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$scoreman = nm_los_ScoreManager::getInstance();
-			$result = $scoreman->getQuizState($qGroupID);
-		}
-		else
-			$result = false;
-		$this->DBM->commit();
-		return $result;
-	}
-*/
-
 
 
 	/********* Misc Functions *********/
@@ -1862,7 +1833,7 @@ class nm_los_API extends core_db_dbEnabled
 
 	public function trackPageChanged($visitKey, $pageID, $section)
 	{
-		if(nm_los_Validator::isPosInt($pageID) && nm_los_Validator::isSection($section))
+		if(!empty($pageID) && nm_los_Validator::isSection($section))
 		{
 			
 			if($this->getSessionValid())
@@ -1894,7 +1865,7 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
+		$error = AppCfg::ERROR_TYPE;
 		return new $error(2);
 	}
 

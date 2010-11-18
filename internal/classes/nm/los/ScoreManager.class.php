@@ -29,7 +29,7 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 	}
 	
 	/**
-	 * Submits a question to be graded
+	 * Submits a question to be graded MEDIA uses submit media
 	 * @param $qgroup (number) QuestionGroup ID
 	 * @param $questionID (number) Question ID
 	 * @param $answer (string) Answer text (to provide support for both QA and MC question types.
@@ -64,59 +64,79 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 			trace('qGroupID id invalid', true);
 			return false; // error: invalid qGroupID
 		}
-		if(!is_numeric($questionID) || $questionID < 1)
+		if(empty($questionID))
 		{
 			trace('questionID invalid', true);
 			return false; // error: invalid questionID
 		}
-		//Check to see if question has already been answered
-		$qstr = "SELECT ".cfg_obo_Score::ITEM_ID." FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Score::ITEM_ID."='?' AND `".cfg_obo_Score::TYPE."`='q' AND ".cfg_obo_Attempt::ID." ='?' LIMIT 1";
-		if( !($q = $this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'])) ) //Run the query
-		{
-			$this->DBM->rollback();
-			return false;
-		}
-		//if Question has already been answered
-		if($this->DBM->fetch_num($q) > 0)
-		{
-			//TODO: 
-			// if we are in practice, return false
-			//return false;
-			// if this is an assessment, users can change answers, update it
-			$qstr = "DELETE FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Score::ITEM_ID."='?' AND `".cfg_obo_Score::TYPE."`='q' AND ".cfg_obo_Attempt::ID." ='?'";
-			$this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
-		}
 
+		// Make Sure the question is part of this qGroup
 		$qstr = "SELECT * FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' AND ".cfg_obo_QGroup::MAP_CHILD."='?' LIMIT 1";
-		
 		if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $questionID)))
 		{
 		    $this->DBM->rollback();
-			return false;
+			return false; // query error
 		}
 		
 		if($this->DBM->fetch_num($q) == 0)
 		{
-			trace('error finding db reference', true);
-			return false; // error: 
+			trace('question id not a child of this qgroup', true);
+			return false; // question isnt part of this qgroup
 		}
+		
 			
 		// check answer and save score
 		$qman = nm_los_QuestionManager::getInstance();
 		$checkArr = $qman->checkAnswer($questionID, $answer);
 		if(is_array($checkArr))
 		{
-			$qstr = "INSERT INTO ".cfg_obo_Score::TABLE." SET ".cfg_obo_Attempt::ID."='?', ".cfg_obo_QGroup::ID."='?', ".cfg_obo_Score::ITEM_ID."='?', `".cfg_obo_Score::TYPE."`='q', ".cfg_obo_Answer::ID."='?', ".cfg_obo_Score::ANSWER."='?',	".cfg_obo_Score::SCORE."='?'";
+			// set the db itemType based on what type of question it is
+			switch($checkArr['type'])
+			{
+				case cfg_obo_Question::QTYPE_MULTI_CHOICE: // fall through
+				case cfg_obo_Question::QTYPE_SHORT_ANSWER:
+					$itemType = 'q';
+					break;
+
+				case cfg_obo_Question::QTYPE_MEDIA:
+					$itemType = 'm';
+					break;
+					
+				default:
+					return false;
+					break;
+				
+			}
+			
+			// Delete previous answers from the score table (answer history is kept in the tracking table)
+			$qstr = "DELETE FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Score::ITEM_ID."='?' AND `".cfg_obo_Score::TYPE."`='$itemType' AND ".cfg_obo_Attempt::ID." ='?'";
+			$this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
+			
+			// Store the answer in the score table
+			$qstr = "INSERT INTO ".cfg_obo_Score::TABLE." SET ".cfg_obo_Attempt::ID."='?', ".cfg_obo_QGroup::ID."='?', ".cfg_obo_Score::ITEM_ID."='?', `".cfg_obo_Score::TYPE."`='$itemType', ".cfg_obo_Answer::ID."='?', ".cfg_obo_Score::ANSWER."='?',	".cfg_obo_Score::SCORE."='?'";
 			if( !($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], $qGroupID, $questionID, $checkArr['answerID'], $answer, $checkArr['weight'])) )
 			{
-	            $this->DBM->rollback();
-	            trace(mysql_error(), true);
+ 				$this->DBM->rollback();
+				trace(mysql_error(), true);
 				return false;
 			}
-
+			
+			// store the event in the tracking table
 			$trackingMan = nm_los_TrackingManager::getInstance();
-			$trackingMan->trackSubmitQuestion($qGroupID, $questionID, $answer);
+			switch($checkArr['type'])
+			{
+				case cfg_obo_Question::QTYPE_MULTI_CHOICE: // fall through
+				case cfg_obo_Question::QTYPE_SHORT_ANSWER:
+					$trackingMan->trackSubmitQuestion($qGroupID, $questionID, $answer);
+					break;
 
+				case cfg_obo_Question::QTYPE_MEDIA:
+					$trackingMan->trackSubmitMedia($qGroupID, $questionID, $checkArr['weight']);
+					break;
+			}
+			
+
+			// just return true if this is assessment
 			if(!$this->isPractice($qGroupID))
 			{
 			    return true;
@@ -136,105 +156,22 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 			}
 		}		
 		
-	    $qstr = "SELECT `".cfg_obo_LO::ID."` FROM `".cfg_obo_Instance::TABLE."` WHERE `".cfg_obo_Instance::ID."`='{$GLOBALS['CURRENT_INSTANCE_DATA']["instID"]}' LIMIT 1";
-        $q = $this->DBM->query($qstr);
-        if($r = $this->DBM->fetch_obj($q)) // instance exists
-        {
-	        $qstr = "SELECT `".cfg_obo_LO::PGROUP."` FROM `".cfg_obo_LO::TABLE."` WHERE ".cfg_obo_LO::ID."='{$r->{cfg_obo_LO::ID}}' LIMIT 1";
-	        $q = $this->DBM->query($qstr);
-	        if($r = $this->DBM->fetch_obj($q)) // lo exists
-	        {
-	            if((int)$r->{cfg_obo_LO::PGROUP} == $qGroupID)
-				{
-	                return true;
-				}
-	        }
-        }
-        
-        return false;
-	}
-	
-	/**
-	 * Submits a media score
-	 * @param $qGroupID (number) QuestionGroup ID
-	 * @param $mid (number) Media ID
-	 * @param $score (number) The score of the media
-	 *
-	 * @todo fix the return values
-	 *
-	 * @return (bool) False if question already answered or no open LO instance.
-	 * @return (Array) containing the values in the following table
-	 *
-	 * Values:
-	 * 'weight' = weight (from 0 to 100) of answer (final score for question)
-	 * 'answerID' = answer ID (if found)
-	 * 'feedback' = customized feedback string (ex. Congratulations! You got the wrong answer!)
-	 *
-	 */
-	public function submitMedia($qGroupID, $questionID, $score)
-	{
-		if( $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1 ) //exit if they do not have an open instance
+		$qstr = "SELECT `".cfg_obo_LO::ID."` FROM `".cfg_obo_Instance::TABLE."` WHERE `".cfg_obo_Instance::ID."`='{$GLOBALS['CURRENT_INSTANCE_DATA']["instID"]}' LIMIT 1";
+		$q = $this->DBM->query($qstr);
+		if($r = $this->DBM->fetch_obj($q)) // instance exists
 		{
-			return false;
-		}
-		if($GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'] < 1)
-		{
-			$AM = nm_los_AttemptsManager::getInstance();
-			if(!$AM->getCurrentAttemptID())
+			$qstr = "SELECT `".cfg_obo_LO::PGROUP."` FROM `".cfg_obo_LO::TABLE."` WHERE ".cfg_obo_LO::ID."='{$r->{cfg_obo_LO::ID}}' LIMIT 1";
+			$q = $this->DBM->query($qstr);
+			if($r = $this->DBM->fetch_obj($q)) // lo exists
 			{
-				return false;
+				if((int)$r->{cfg_obo_LO::PGROUP} == $qGroupID)
+				{
+					return true;
+				}
 			}
 		}
-		// TODO: do we need to escape these? shouldnt these be intigers
-		if(is_string($qGroupID))
-		{
-			$qGroupID = mysql_real_escape_string($qGroupID);
-		}
-		if(is_string($questionID))
-		{
-			$questionID = mysql_real_escape_string($questionID);
-		}
-		if(is_string($score))
-		{
-			$score = mysql_real_escape_string($score);
-		}
-		//Check to make sure this question is a media question
-		$QM = nm_los_QuestionManager::getInstance();
-		$question = $QM->getQuestion($questionID);
-		if($question->itemType != cfg_obo_Question::QTYPE_MEDIA)
-		{
-			
-			
-			return core_util_Error::getError(2);
-		}
 		
-		
-		//Check to see if media score has already been input
-		$qstr = "SELECT ".cfg_obo_Score::ITEM_ID." FROM `".cfg_obo_Score::TABLE."` WHERE ".cfg_obo_Score::ITEM_ID."='?' AND `".cfg_obo_Score::TYPE."` = 'm' AND ".cfg_obo_Attempt::ID." ='?' LIMIT 1";
-
-		if( !($q = $this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'])) )// Run the query
-		{ 
-			return false;
-		}
-		// if this is an assessment, users can change answers, update it
-		if($this->DBM->fetch_num($q) > 0)
-		{
-			$qstr = "DELETE FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Score::ITEM_ID."='?' AND `".cfg_obo_Score::TYPE."`='m' AND ".cfg_obo_Attempt::ID." ='?'";
-			$this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
-		}
-
-		$qstr = "INSERT INTO ".cfg_obo_Score::TABLE." SET ".cfg_obo_Attempt::ID."='?', ".cfg_obo_QGroup::ID."='?', ".cfg_obo_Score::ITEM_ID."='?', `".cfg_obo_Score::TYPE."`='m', ".cfg_obo_Score::SCORE."='?'";
-
-		if( !($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], $qGroupID, $questionID, $score)) ) // Run the query
-		{
-			return false;
-		}
-
-		$trackingMan = nm_los_TrackingManager::getInstance();
-		$trackingMan->trackSubmitMedia($qGroupID, $questionID, $score);
-
-		//return array('weight' => $score);
-		return true;
+		return false;
 	}
 	
 	/**
@@ -605,13 +542,9 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 		{
 			return false;
 		}
-		if($GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'] < 1)
+		if($GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'] < 1) // exit if they dont have an open attempt
 		{
-			$AM = nm_los_AnswerManager::getInstance();
-			if(!$AM->getCurrentAttemptID())
-			{
-				return false;
-			}
+			return false;
 		}
 		if(!is_numeric($qGroupID) || $qGroupID == 0)
 		{
@@ -640,12 +573,18 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 		}
 
 		$state = array('questions' => array());
-		$ansman = nm_los_AnswerManager::getInstance();
 		$qman = nm_los_QuestionManager::getInstance();
 		while( $r = $this->DBM->fetch_obj($q) )
 		{
 			$question = $qman->getQuestion($r->{cfg_obo_Score::ITEM_ID});
-			$real_answer = $ansman->getAnswer($r->{cfg_obo_Answer::ID});
+			// use the answer from the question id submitted
+			foreach($question->answers AS $answer)
+			{
+				if($answer->answerID == $r->{cfg_obo_Answer::ID})
+				{
+					$real_answer = $answer;
+				}
+			}
 			array_push($state['questions'], array('questionID' => $r->{cfg_obo_Score::ITEM_ID}, 'qtext' => $question->qtext, 'answerID' => $r->{cfg_obo_Answer::ID}, 'user_answer' => $r->{cfg_obo_Score::ANSWER}, 'score' => '', 'real_answer' => $real_answer->answer));
 		}
 		return $state;

@@ -248,19 +248,15 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	{
 		if( ! nm_los_Validator::isPosInt($instID) )
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		$qstr = "SELECT * FROM ".cfg_obo_Instance::TABLE." WHERE `".cfg_obo_Instance::ID."`='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
-;
+
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			$curtime = time();
