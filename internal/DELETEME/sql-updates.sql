@@ -95,3 +95,5 @@ CREATE TABLE  `los`.`obo_map_media_to_lo` (
 INDEX (  `mediaID` ,  `loID` )
 ) ENGINE = MYISAM ;
 ALTER TABLE  `obo_map_media_to_lo` ENGINE = INNODB
+
+DROP TABLE  `obo_los_answers`;
