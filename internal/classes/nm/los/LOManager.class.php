@@ -716,16 +716,14 @@ class nm_los_LOManager extends core_db_dbEnabled
 		return $loArr;
 	}
 
-	public function getAssessmentID($lo_id)
+	public function getAssessmentID($loID)
 	{
 		$qstr = "SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::ID." = '?'";
 		
-		if(!($q = $this->DBM->querySafe($qstr, $lo_id)))
+		if(!($q = $this->DBM->querySafe($qstr, $loID)))
 		{
 			$this->DBM->rollback();
-			//echo "ERROR: getAssessmentID";
 			trace(mysql_error(), true);
-			//exit;
 			return false;
 		}
 		

@@ -30,8 +30,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	public function getUnfinishedAttempt($qGroupID = 0){
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 

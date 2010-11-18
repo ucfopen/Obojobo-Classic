@@ -33,7 +33,13 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 		if($question->questionID == 0)
 		{
 			$question->userID = $_SESSION['userID'];
-	        $this->defaultDBM();
+			$this->defaultDBM();
+			
+			//*************  assign each answer a unique id *******************//
+			foreach($question->answers AS $answer)
+			{
+				$answer->answerID = core_util_UID::createUID(); // assign the id
+			}
 		
 			$qstr = "INSERT INTO ".cfg_obo_Question::TABLE." SET ".cfg_obo_Question::DATA."='?'";
 			if( !($q = $this->DBM->querySafe($qstr, $this->db_serialize($question)) ) )
@@ -65,12 +71,16 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 	protected function getQuestionNew($questionID=0, $inc_weight=true)
 	{
 		$this->defaultDBM();
-
+		
 			$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
 			
 			if( $r = $this->DBM->fetch_obj($q) )
 			{
 				$quest = unserialize(base64_decode($r->questionData));
+				if($quest instanceof nm_los_Question)
+				{
+					$quest->questionID = $questionID; // the question id isn't set in the serialized data when its inserted into the database
+				}
 			}
 			else
 			{
@@ -101,7 +111,6 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $questionID, $order, $weight, $answerID, $feedback)) )
 		{
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 	}
@@ -118,32 +127,11 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 			return false;
 		}
 		$this->defaultDBM();
-
-		//Gather up a list of answers to delete
-		
-		$qstr = "SELECT ".cfg_obo_Answer::ID." FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::ID."='?' AND ".cfg_obo_Answer::ID." NOT IN (
-					SELECT ".cfg_obo_Answer::ID." FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::ID."!='?')";
-		
-		$q = $this->DBM->querySafe($qstr, $questionID, $questionID);
-
-		$aman = nm_los_AnswerManager::getInstance();
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$aman->delAnswer($r->{cfg_obo_Answer::ID});
-		}
-		//Clean out entries for this question in the mapping table
-		if( !($q = $this->DBM->querySafe("DELETE FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::ID."='?'", $questionID)) )
-		{
-			$this->DBM->rollback();
-			//die();
-			return false;	
-		}
 		
 		//Delete media references
 		if( !($q = $this->DBM->querySafe("DELETE FROM ".cfg_obo_Media::MAP_TABLE." WHERE ".cfg_obo_Page::ITEM_ID."='?' ", $questionID)) )
 		{
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 		
@@ -151,7 +139,6 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 		if( !($q = $this->DBM->querySafe("DELETE FROM ".cfg_obo_Question::TABLE." WHERE ".cfg_obo_Question::ID."='?' LIMIT 1", $questionID)) )
 		{
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 		
@@ -181,91 +168,70 @@ class nm_los_QuestionManager extends core_db_dbEnabled
 		
 		$question = $this->getQuestion($questionID);
 		
+		trace($question->itemType);
+		trace($userAnswer);
 		// if the answer is numeric and the question is a Multiple choice, check using the id
 		switch($question->itemType)
 		{
-			case 'MC':
-				trace($question);
+			/***************** MULTIPLE CHOICE *****************/
+			case cfg_obo_Question::QTYPE_MULTI_CHOICE:
 				// search for the answer id and return the weight for that answer
 				foreach($question->answers AS $answer)
 				{
 					if($answer->answerID == $userAnswer)
 					{
+						// answer found - return the values
 						return array(
 							'weight' => $answer->weight,
 							'answerID' => $answer->answerID,
-							'feedback' => $answer->feedback
+							'feedback' => $answer->feedback,
+							'type' => $question->itemType
 						);
 					}
 				}
-				return false;
+				return false; //  answer not found in question, this shouldnt happen
 				break;
-			case 'QA':
-				// trim whitespace from the submitted answer
-				$answer = trim($answer);
-				// don't bother getting feedback here, not needed if its correct
-				$qstr = "SELECT ".cfg_obo_Question::MAP_ANS_WEIGHT.", ".cfg_obo_Answer::ID.", ".cfg_obo_Question::MAP_ANS_FEEDBACK." FROM ".cfg_obo_Question::MAP_ANS_TABLE." 
-							WHERE ".cfg_obo_Question::ID."='?'
-							AND ".cfg_obo_Answer::ID." IN 
-							(
-								SELECT ".cfg_obo_Answer::ID." FROM  ".cfg_obo_Answer::TABLE."
-								WHERE ".cfg_obo_Answer::TEXT."='?'
-							)
-							LIMIT 1";
-				if( !($q = $this->DBM->querySafe($qstr, $questionID, $answer)) )
+				
+			/***************** FILL IN THE BLANK QUESTION/ANSWER *****************/
+			case cfg_obo_Question::QTYPE_SHORT_ANSWER:
+				$userAnswer = strtolower(trim($userAnswer));// trim whitespace from the submitted answer
+				foreach($question->answers AS $answer)
 				{
-					return false;
+					if(strtolower($answer->answer) == $userAnswer)
+					{
+						// answer found
+						return array(
+							'weight' => $answer->weight,
+							'answerID' => 0,
+							'feedback' => $question->feedback['correct'],
+							'type' => $question->itemType
+						);
+					}
 				}
+				
+				// user's answer is not one of the correct answers
+				return array(
+					'weight' => 0,
+					'answerID' => 0,
+					'feedback' => $question->feedback['incorrect'],
+					'type' => $question->itemType
+				);
 				break;
-			case 'Media':
-				$qstr = "SELECT ".cfg_obo_Question::MAP_ANS_WEIGHT." FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::ID."='?'";
-				//echo $qstr;
-				if( !($q = $this->DBM->querySafe($qstr, $questionID)) )
+				
+			/***************** MEDIA QUESTION *****************/
+			case cfg_obo_Question::QTYPE_MEDIA:
+				if(!nm_los_Validator::isScore($userAnswer))
 				{
-					return false;
+					trace('submitted media question is value ' . $userAnswer, true);
+					return false; // invalid input
 				}
+				return array('weight' => $userAnswer, 'answerID' => 0, 'feedback' => '', 'type' => $question->itemType);
 				break;
 			default:
+				return false;
 				break;
 		}
-
-
-
-		// if match found, return values from match
-		if( $r = $this->DBM->fetch_obj($q) )
-		{
-			return array('weight' => $r->{cfg_obo_Question::MAP_ANS_WEIGHT}, 'answerID' => $r->{cfg_obo_Answer::ID}, 'feedback' => $r->{cfg_obo_Question::MAP_ANS_FEEDBACK});
-		}
-		// no match at all, completely wrong
-		else
-		{
-			switch($qType)
-			{
-				case 'MC':
-					
-					
-					return core_util_Error::getError(2);
-					break;
-				case 'QA':
-					// have to get feedback for QA's as their feedback is based on a wrong answer
-					
-					//Add feedback
-					$qstr = "SELECT ".cfg_obo_Question::MAP_FEEDBACK_INCORRECT." FROM ".cfg_obo_Question::MAP_FEEDBACK_TABLE." WHERE ".cfg_obo_Question::ID." = '?'";
-					if(!($q = $this->DBM->querySafe($qstr, $questionID)))
-					{
-						return false;
-					}
-					
-					$r = $this->DBM->fetch_obj($q);
-					return array('weight' => 0, 'answerID' => 0, 'feedback' => $r->{cfg_obo_Question::MAP_FEEDBACK_INCORRECT});
-					break;
-				case 'Media':
-					return array('weight' => 100, 'answerID' =>0, 'feedback' => '');
-				default:
-					break;
-			}
-			
-		}
+		
 	}
 }
 ?>
