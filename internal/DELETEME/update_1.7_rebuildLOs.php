@@ -9,32 +9,6 @@ $DBM->startTransaction();
 $API = nm_los_API::getInstance();
 
 $numruns = 1;
- 
-
-// $len = $numruns;
-// $times = array();
-// while($len--)
-// {
-// 
-// 	$q = $DBM->query("SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE);
-// 	$t = microtime(1);
-// 
-// 	while($r = $DBM->fetch_obj($q))
-// 	{
-// 		$lo = getNormalLO($r->{cfg_obo_LO::ID}, $DBM);
-// 
-// 	}
-// 	$times[] = microtime(1) - $t;
-// 
-// }
-// 
-// echo 'detail structure: ' . array_sum($times)/count($times) . "s average for $numruns iterations\n";
-// 
-
-// end detailed mode
-
-
-//lets insert our serialized data
 
 
 // Test to make sure we dont have the updated objects
@@ -50,8 +24,43 @@ if($_REQUEST['doit'] != 1)
 	exit("!!! Make sure your server classes are still pulling lo's from the old tables: <a href=\"buildLOs.php?doit=1\">Run Conversion</a>");
 }
 
+// create pages 2
+$DBM->query("CREATE TABLE `obo_lo_pages` (
+  `pageID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
+  `pageData` blob NOT NULL,
+  PRIMARY KEY (`pageID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15148 ");
 
 
+// create questions table
+$DBM->query("CREATE TABLE `obo_lo_questions` (
+  `questionData` blob NOT NULL,
+  `questionID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`questionID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9004 ");
+
+// new los table
+$DBM->query("CREATE TABLE `obo_los` (
+  `loID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
+  `isMaster` enum('0','1') NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `languageID` bigint(255) NOT NULL,
+  `notes` longtext NOT NULL,
+  `objective` longtext NOT NULL,
+  `learnTime` int(11) NOT NULL DEFAULT '0',
+  `pGroupID` bigint(255) unsigned NOT NULL,
+  `aGroupID` bigint(255) unsigned NOT NULL,
+  `version` int(20) unsigned NOT NULL DEFAULT '0',
+  `subVersion` int(20) unsigned NOT NULL DEFAULT '0',
+  `rootLoID` bigint(255) unsigned NOT NULL DEFAULT '0',
+  `parentLoID` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `createTime` int(25) unsigned NOT NULL DEFAULT '0',
+  `copyright` longtext NOT NULL,
+  `numPages` int(10) unsigned NOT NULL,
+  `numPQuestions` int(10) unsigned NOT NULL,
+  `numAQuestions` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`loID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15377 ");
 
 
 $q = $DBM->querySafe("SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE);
@@ -69,14 +78,14 @@ while($r = $DBM->fetch_obj($q))
 	// put each page into the new pages table
 	foreach($lo->pages AS $index => $page)
 	{
-		$DBM->query("INSERT INTO lo_los_pages2 SET pageID ='$page->pageID',  pageData = '".s($page)."'");
+		$DBM->query("INSERT INTO obo_lo_pages SET pageID ='$page->pageID',  pageData = '".s($page)."'");
 	}
 	
 	// put each question into the new questions table
 	foreach($lo->pGroup->kids AS $index => $question)
 	{
 		$s = s($question);
-		$DBM->query("INSERT IGNORE INTO lo_los_questions
+		$DBM->query("INSERT IGNORE INTO obo_lo_questions
 		SET
 		questionID = '$question->questionID',
 		questionData = '$s'");
@@ -86,15 +95,16 @@ while($r = $DBM->fetch_obj($q))
 	foreach($lo->aGroup->kids AS $index => $question)
 	{
 		$s = s($question);
-		$DBM->query("INSERT IGNORE INTO lo_los_questions
+		$DBM->query("INSERT IGNORE INTO obo_lo_questions
 		SET
 		questionID = '$question->questionID',
 		questionData = '$s'");
 		
 	}
+
 	
 	// put the flatter LO's into the new lo table
-	$DBM->query("INSERT INTO lo_los2
+	$DBM->query("INSERT INTO obo_los
 	SET
 	loID = '$lo->loID',
 	isMaster = '$lo->isMaster',
@@ -123,38 +133,11 @@ echo "Now update Server Classes to build LO's from the new tables.\n";
 echo "When your done, test a few LO's using the next script: <a href=\"testBuildLOs.php\">Test LOs</a>";
 
 
-// $len = $numruns;
-// $times = array();
-// while($len--)
-// {
-// 
-// 	$q = $DBM->query("SELECT loID FROM lo_los2");
-// 
-// 	$t = microtime(1);
-// 	while($r = $DBM->fetch_obj($q))
-// 	{
-// 		$lo = getSerializedLO($r->loID, $DBM);
-// 	}
-// 	$times[] = microtime(1) - $t;
-// }
-// echo 'serialized structure: ' . array_sum($times)/count($times) . "s average for $numruns iterations\n";
-
-
 function getNormalLO($loID, $DBM)
 {
 	$lo = new nm_los_LO();
 	$lo->dbGetFull($DBM, $loID);
 	return $lo;
-}
-
-function getSerializedLO($loID, $DBM)
-{
-	$q = $DBM->query("SELECT *,(SELECT data FROM lo_los_questions WHERE loID = L.loID AND type = 'p') AS practiceData, (SELECT data FROM lo_los_questions WHERE loID = L.loID AND type = 'a') AS assessmentData FROM lo_los2 AS L, lo_los_pages AS P WHERE P.loID = L.loID AND L.loID = $loID");
-
-	if($r = $DBM->fetch_obj($q))
-	{
-		return new nm_los_LO($r->loID, $r->title, $r->languageID, 0, 0, $r->learnTime, $r->version, $r->subVersion, $r->rootLoID, $r->parentLoID, $r->createTime, $r->copyright, unserialize(base64_decode($r->pageData)), unserialize(base64_decode($r->practiceData)), unserialize(base64_decode($r->assessmentData)), array(), $perms);
-	}
 }
 
 function s($obj)
