@@ -191,6 +191,21 @@ class DocumentParser {
             if ($included= file_exists(MODX_BASE_PATH . 'assets/cache/siteCache.idx.php')) {
                 $included= include_once (MODX_BASE_PATH . 'assets/cache/siteCache.idx.php');
             }
+			// DUCKPACK KOGNEATO OBOJOBO MOD ***********************************************
+			// this creates the cache files if they havn't been created, and reloads them
+			else
+			{
+			    include_once(MODX_BASE_PATH."manager/processors/cache_sync.class.processor.php");
+			    $sync = new synccache();
+			    $sync->setCachepath(MODX_BASE_PATH."assets/cache/");
+			    $sync->emptyCache();
+				// load the config now that its created
+			    if ($included= file_exists(MODX_BASE_PATH . 'assets/cache/siteCache.idx.php'))
+				{
+	                $included= include_once (MODX_BASE_PATH . 'assets/cache/siteCache.idx.php');
+	            }
+			}
+			// END DUCKPACK KOGNEATO OBOJOBO MOD ***********************************************
             if (!$included) {
                 $result= $this->dbQuery('SELECT setting_name, setting_value FROM ' . $this->getFullTableName('system_settings'));
                 while ($row= $this->fetchRow($result, 'both')) {

@@ -52,7 +52,6 @@ function duckPack_externalUserValidForLocal($username, $email, $password, $isMan
 
 function duckPack_createLocalManager($username, $password, $fullname, $email)
 {
-	return false;
 	global $modx;
 	
 	if(!duckPack_externalUserValidForLocal($username, $email, $password, true)) return false;

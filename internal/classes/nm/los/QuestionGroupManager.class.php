@@ -59,63 +59,44 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 		// TODO: remove this
 	public function newGroup($qgroup = '')
 	{
-	    if($qgroup == '')
+		
+		if(!($qgroup instanceof nm_los_QuestionGroup))
 		{
 	        return false;
 		}
-		if($qgroup['qGroupID'] != 0)
+		// if id isnt 0, no need to make any changes
+		if($qgroup->qGroupID != 0)
 		{
-			return $qgroup;
+			return false;
 		}
-		
-        $userID = $_SESSION['userID'];
-		$qstr = "INSERT INTO ".cfg_obo_QGroup::TABLE." SET ".cfg_core_User::ID."='?', ".cfg_obo_QGroup::TITLE."='?', ".cfg_obo_QGroup::RAND."='?', ".cfg_obo_QGroup::ALTS."='?', ".cfg_obo_QGroup::ALT_TYPE."='?'";
-		if( !($q = $this->DBM->querySafe($qstr, $userID, $qgroup['name'], $qgroup['rand'], $qgroup['allowAlts'], $qgroup['altMethod'])) )
+
+		$qstr = "INSERT INTO ".cfg_obo_QGroup::TABLE." SET ".cfg_core_User::ID."='?', ".cfg_obo_QGroup::RAND."='?', ".cfg_obo_QGroup::ALTS."='?', ".cfg_obo_QGroup::ALT_TYPE."='?'";
+		if( !($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $qgroup->rand, $qgroup->allowAlts, $qgroup->altMethod)) )
 		{
 			$this->DBM->rollback();
 			return false;	
 		}
-		$qgroup['qGroupID'] = $gid = $this->DBM->insertID;
-		//Question alternate mapping:
-		//First, want to convert each negative questionIndex value into a positive one.
-		//These new questionIndex values shouldn't conflict with any positive ones.
-		//Since these questionIndexs are created with each new qgroup we simply convert
-		//each questionIndex to postive sequental (1, 2, ...)
-		$questionIndex = 0; // must start at 1, 0 assumes no alternates
-		$lastAlt = 0;
-		foreach($qgroup['kids'] as &$question)
-		{
-			if($question['questionIndex'] == 0)
-			{
-				$questionIndex ++; // incriment, question had no alternates
-			}
-			else
-			{
-				if($question['questionIndex'] != $lastAlt)
-				{
-					$questionIndex ++; //  incriment, question is grouped with new alternates - must happen before
-					$lastAlt = $question['questionIndex'];
-				}
-				$question['questionIndex'] = $questionIndex;
-			}
-		}
+		$qgroup->qGroupID = $this->DBM->insertID;
+
 		//Fill in the mapping table for the questions in the group, creating new questions as needed
 		$questionMan = nm_los_QuestionManager::getInstance();
-		foreach($qgroup['kids'] as $key => &$question)
+		foreach($qgroup->kids as $key => $question)
 		{
-			if($question['questionID'] == 0) $question = $questionMan->newQuestion($question);
-			$ctype = (isset($question['thumb'])) ? 'm' : 'q';		//Add a question or a media?
-
-			$this->addQuestion($gid, $question['questionID'], $ctype, $key, $question['required']);
+			$questionMan->newQuestion($question); // create the question if the id is 'dirty'
 			
-			//Insert question alternate mapping:
-			if($question['questionIndex'] != 0)
+			// always map the question to the qgroup
+			$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
+			if(!($q = $this->DBM->querySafe($qstr, $qgroup->qGroupID, $question->questionID, $key)))
 			{
-				$qStr = "	INSERT INTO ".cfg_obo_QGroup::MAP_ALT_TABLE."
-							SET ".cfg_obo_QGroup::ID." = '?',
-							".cfg_obo_Question::ID." = '?',
-							".cfg_obo_QGroup::MAP_ALT_INDEX." = '?'";
-				if(!$q = $this->DBM->querySafe($qStr, $qgroup['qGroupID'], $question['questionID'], $question['questionIndex']))
+				$this->DBM->rollback();
+				return false;
+			}
+			
+			// always store alternate mapping if set
+			if($question->questionIndex != 0)
+			{
+				$qStr = " INSERT INTO ".cfg_obo_QGroup::MAP_ALT_TABLE." SET ".cfg_obo_QGroup::ID." = '?', ".cfg_obo_Question::ID." = '?', ".cfg_obo_QGroup::MAP_ALT_INDEX." = '?'";
+				if(!$q = $this->DBM->querySafe($qStr, $qgroup->qGroupID, $question->questionID, $question->questionIndex))
 				{
 					$this->DBM->rollback();
 					return false;
@@ -123,7 +104,7 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 			}
 		}
 
-		return $qgroup;
+		return true;
 	}
 	
 	/**
@@ -134,15 +115,12 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 	 * @param $corder (number) child order (0,1,2...)
 	 * @param @crequire (boolean) True = Force question to appear in a bs/br type assessment quiz.
 	 */
-	private function addQuestion($qgid, $cid, $ctype, $corder, $crequire = false)
+	private function mapQuestion($qgid, $cid, $ctype, $corder)
 	{
-		if(!is_numeric($qgid) || $qgid < 1 || !is_numeric($cid) || $cid < 1)
-		{
-			return false;
-		}
-		$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_TYPE."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
+		// TODO: remove $ctype - not needed
+		$qstr = "INSERT INTO ".cfg_obo_QGroup::MAP_TABLE." SET ".cfg_obo_QGroup::ID."='?', ".cfg_obo_QGroup::MAP_CHILD."='?', ".cfg_obo_QGroup::MAP_ORDER."='?'";
 		
-		if(!($q = $this->DBM->querySafe($qstr, $qgid, $cid, $ctype, $corder)))
+		if(!($q = $this->DBM->querySafe($qstr, $qgid, $cid, $corder)))
 		{
 			$this->DBM->rollback();
 			return false;
@@ -195,7 +173,7 @@ class nm_los_QuestionGroupManager extends core_db_dbEnabled
 			return false;
 		}
 		//Gather up a list of questions to delete
-		$qstr = "SELECT ".cfg_obo_QGroup::MAP_CHILD.", ".cfg_obo_QGroup::MAP_TYPE." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' AND ".cfg_obo_QGroup::MAP_TYPE."='q' AND ".cfg_obo_QGroup::MAP_CHILD." NOT IN (
+		$qstr = "SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' AND ".cfg_obo_QGroup::MAP_CHILD." NOT IN (
 					SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."!='?')";
 		
 		$q = $this->DBM->querySafe($qstr, $qgid, $qgid);

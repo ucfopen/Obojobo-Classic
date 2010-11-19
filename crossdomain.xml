@@ -5,5 +5,5 @@ domain-policy.dtd">
 	<site-control permitted-cross-domain-policies="all"/>
 	<allow-access-from domain="*" to-ports="*"/>
 	<allow-http-request-headers-from domain="*" headers="*"/>
-	<allow-access-from domain="*" secure="false"/>
+	<allow-access-from domain="kogneato" />
 </cross-domain-policy>
