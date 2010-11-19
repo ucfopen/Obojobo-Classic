@@ -20,7 +20,7 @@ $q = $DBM->query("SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE);
 while($r = $DBM->fetch_obj($q))
 {
 	$lo = getNormalLO($r->{cfg_obo_LO::ID}, $DBM);
-	echo $lo->loID . ' pages: ' . count($lo->pages) . ' practice: ' . count($lo->pgroup->kids) . ' assessment ' . count($lo->agroup->kids) . "\n";
+	echo $lo->loID . ' pages: ' . count($lo->pages) . ' practice: ' . count($lo->pGroup->kids) . ' assessment ' . count($lo->aGroup->kids) . "\n";
 //	print out 10% of them
 	if(rand(1,100) > 90)
 	{

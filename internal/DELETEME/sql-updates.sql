@@ -92,8 +92,24 @@ INDEX (  `mediaID` ,  `loID` )
 ) ENGINE = MYISAM ;
 ALTER TABLE  `obo_map_media_to_lo` ENGINE = INNODB
 
-DROP TABLE  `obo_los_answers`;
-DROP TABLE  `lo_pages`;
-DROP TABLE  `lo_questions`;
-DROP TABLE  `lo_los`;
+#Run update_1.7_mediaLinkage.php
 
+#Run update_1.7_removeScorableFromMedia
+
+#Turn off caching, and run testBuildLOs (make sure you don't see 'scorable' and all los have questions, pages)
+
+DROP TABLE  `obo_lo_answers`;
+DROP TABLE  `lo_desc_obj` ,
+`lo_los` ,
+`lo_los_cache` ,
+`lo_los_pages_cache` ,
+`lo_map_feedback` ,
+`lo_map_items` ,
+`lo_map_media` ,
+`lo_map_qa` ,
+`lo_map_qitems` ,
+`lo_pages` ,
+`lo_page_items` ,
+`lo_page_items_new` ,
+`lo_qgroups_cache` ,
+`lo_questions` ;
