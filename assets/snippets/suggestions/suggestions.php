@@ -16,6 +16,7 @@ $qstr  = "
 	ON
 	(
 		s.id = v.suggestion_id
+		AND v.day = CURRENT_DATE
 		AND v.username = '".$modx->getLoginUserName()."'
 	)
 	ORDER BY s.rating DESC, s.id DESC";

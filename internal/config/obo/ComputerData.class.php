@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_ComputerData
 {
-	const TABLE = 'lo_computer_data';
+	const TABLE = 'obo_log_profile';
 	
 	const IP = 'ip';
 	const TIME = 'time';

@@ -117,7 +117,7 @@ form.working #submitSuggestion{
 	cursor:default;
 }
 
-.id {display:none;}
+/*.id {display:none;}*/
 .vote .down	{ background-position:right top;}
 .vote.active .up:hover		{	background-position:left bottom;}
 .vote.active .down:hover	{	background-position:right bottom;}

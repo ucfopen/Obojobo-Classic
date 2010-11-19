@@ -246,14 +246,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 
 	public function verifyPassword($userName, $password)
 	{
-		// ALLOW US TO LOG IN AS A SPECIFIC USER
-		// if($userName == 'id335435' && $password == '87be37bfb02be8d1664ba7aa9ae2351e')
-		// {
-		// 	$code = '';
-		// 	$success = true;
-		// 	core_util_Log::profile('login', "'$userName','func_TEST_USER','"0"','".time().",'".($success?'1':'0')."'\n");
-		// 	return array('success' => true, 'code' => '');
-		// }
+		
 		
 		// for local testing, ldap access may not be possible, if in local test mode just return an ok
 		if(AppCfg::UCF_AUTH_BYPASS_PASSWORDS && $_SERVER['SERVER_ADDR'] != AppCfg::PRODUCTION_IP)

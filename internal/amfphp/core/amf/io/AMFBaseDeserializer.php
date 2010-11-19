@@ -337,8 +337,8 @@ class AMFBaseDeserializer {
 		return $this->charsetHandler->transliterate($val); // return the string
 	} 
     
-    function mapClass($typeIdentifier)
-    {
+	function mapClass($typeIdentifier)
+	{		
 		//Check out if class exists
 		if($typeIdentifier == "")
 		{
@@ -355,6 +355,17 @@ class AMFBaseDeserializer {
 		{
 			return new RemotingMessage();
 		}
+		
+		// AMFPHP CUSTOMIZATION FOR ROCKETDUCK FRAMEWORK INTEGRATION KOGNEATO OBOJOBO
+		/*
+			Allows flash classes to be exact same name as the RocketDuck Classes. ie: 'nm_lo_PageItem'
+		*/
+		if(class_exists($typeIdentifier))
+		{
+			$clazz = new $typeIdentifier;
+			return $clazz;
+		}
+		// END CUSTOMIZATION
 		
 		if(isset($GLOBALS['amfphp']['incomingClassMappings'][$typeIdentifier]))
 		{

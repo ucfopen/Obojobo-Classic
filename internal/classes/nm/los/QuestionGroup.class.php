@@ -75,16 +75,12 @@ class nm_los_QuestionGroup
 		// whitelist input
 		if(!$DBM)
 		{
-			trace('no DBM sent.', true);
 			return false;
 		}
 		if(!is_numeric($qGroupID) || $qGroupID <= 0)
 		{
-			trace('failed input validation', true);
-			trace($qGroupID, true);
 			return false;
 		}
-		
 		
 		if( ($qgroup = core_util_Cache::getInstance()->getQGroup($qGroupID) ) && is_array($qgroup))
 		{
@@ -104,51 +100,38 @@ class nm_los_QuestionGroup
 		if($includeKids)
 		{
 			//Gather questions/groups into an Array from mapping table
-			$q = $DBM->querySafe("SELECT ".cfg_obo_QGroup::MAP_CHILD.", ".cfg_obo_QGroup::MAP_TYPE." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' ORDER BY ".cfg_obo_QGroup::MAP_ORDER." ASC", $qGroupID);
+			$q = $DBM->querySafe("SELECT ".cfg_obo_QGroup::MAP_CHILD." FROM ".cfg_obo_QGroup::MAP_TABLE." WHERE ".cfg_obo_QGroup::ID."='?' ORDER BY ".cfg_obo_QGroup::MAP_ORDER." ASC", $qGroupID);
 			$qman = nm_los_QuestionManager::getInstance();
-			$mman = nm_los_MediaManager::getInstance();
 
 			while($r = $DBM->fetch_obj($q))
 			{
-				if($r->{cfg_obo_QGroup::MAP_TYPE} == 'q')
-				{
-					//We retrieve the question, then add in the 'required' parameter.
-					$question = $qman->getQuestion($r->{cfg_obo_QGroup::MAP_CHILD});
+				$question = $qman->getQuestion($r->{cfg_obo_QGroup::MAP_CHILD});
 
-					//Gather question alternate grouping links for this question
-					$qStr = "	SELECT ".cfg_obo_QGroup::MAP_ALT_INDEX." 
-								FROM ".cfg_obo_QGroup::MAP_ALT_TABLE."
-								WHERE ".cfg_obo_QGroup::ID." = '?'
-								AND ".cfg_obo_Question::ID." = '?'";
+				//Gather question alternate grouping links for this question
+				$qStr = " SELECT ".cfg_obo_QGroup::MAP_ALT_INDEX." FROM ".cfg_obo_QGroup::MAP_ALT_TABLE." WHERE ".cfg_obo_QGroup::ID." = '?' AND ".cfg_obo_Question::ID." = '?'";
+				$q2 = $DBM->querySafe($qStr, $qGroupID, $question->questionID);
 
-					$q2 = $DBM->querySafe($qStr, $qGroupID, $question->questionID);
-					
-					if($DBM->fetch_num($q2) == 1)
-					{
-						if(!$r2 = $DBM->fetch_assoc($q2))
-						{
-							return false;
-						}
-						
-						$question->questionIndex = $r2['questionIndex'];
-					}
-					else
-					{
-						$question->questionIndex = 0;
-					}
-					
-					//Push to group:
-					$this->kids[] = $question;
-				}
-				else if($r->{cfg_obo_QGroup::MAP_CHILD} == 'm')
+				$question->questionIndex = 0;
+				if($DBM->fetch_num($q2) == 1)
 				{
-					$this->kids[] = $mman->getMedia($r->{cfg_obo_QGroup::MAP_CHILD});
+					if(!$r2 = $DBM->fetch_assoc($q2))
+					{
+						return false;
+					}
+					$question->questionIndex = $r2['questionIndex'];
 				}
+				
+				//Push to group:
+				$this->kids[] = $question;
+
 			}
 			$this->quizSize = $this->calculateQuizSize();
 			
 			core_util_Cache::getInstance()->setQGroup($qGroupID, $this);
 		}
+		
+
+		
 		return true;
 	}
 	

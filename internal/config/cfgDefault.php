@@ -103,7 +103,7 @@ class AppCfgDefault
 	const ERROR_TYPE = 'nm_los_Error';
 
 	// Enable/Disable Profiling code [true, false]
-	const PROFILE_MODE = false;
+	const PROFILE_MODE = true;
 	
 	//--------------------   CACHE   -----------------------//	
 
@@ -131,7 +131,7 @@ class AppCfgDefault
 	// Look at the PLUGINS section for auth plugin modules
 
 	// SESSION NAME
-	const SESSION_NAME = 'PHPSESSID';
+	const SESSION_NAME = 'OBOSESSION';
 
 	// Never set true in production, [true, false]
 	const UCF_AUTH_BYPASS_PASSWORDS = false; 
