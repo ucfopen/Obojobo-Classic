@@ -38,16 +38,13 @@ RENAME TABLE  `lo_languages` TO  `lo_los_languages` ;
 RENAME TABLE  `los`.`lo_deleted_instances` TO  `los`.`obo_deleted_instances` ;
 RENAME TABLE  `los`.`lo_deleted_los` TO  `los`.`obo_deleted_los` ;
 RENAME TABLE  `los`.`lo_locks` TO  `los`.`obo_locks` ;
-RENAME TABLE  `los`.`lo_los` TO  `los`.`obo_los` ;
 RENAME TABLE  `los`.`lo_los_answers` TO  `los`.`obo_los_answers` ;
 RENAME TABLE  `los`.`lo_los_instances` TO  `los`.`obo_los_instances` ;
 RENAME TABLE  `los`.`lo_los_keywords` TO  `los`.`obo_los_keywords` ;
 RENAME TABLE  `los`.`lo_los_languages` TO  `los`.`obo_los_languages` ;
 RENAME TABLE  `los`.`lo_los_media` TO  `los`.`obo_los_media` ;
-RENAME TABLE  `los`.`lo_los_pages` TO  `los`.`obo_los_pages` ;
 RENAME TABLE  `los`.`lo_los_qgroups` TO  `los`.`obo_los_qgroups` ;
 RENAME TABLE  `los`.`lo_map_authors_to_lo` TO  `los`.`obo_map_authors_to_lo` ;
-RENAME TABLE  `los`.`lo_los_questions` TO  `los`.`obo_los_questions` ;
 RENAME TABLE  `los`.`lo_map_extra_attempts_to_user` TO  `los`.`obo_map_extra_attempts_to_user` ;
 RENAME TABLE  `los`.`lo_map_keywords_to_lo` TO  `los`.`obo_map_keywords_to_lo` ;
 RENAME TABLE  `los`.`lo_map_pages_to_lo` TO  `los`.`obo_map_pages_to_lo` ;
@@ -72,9 +69,7 @@ RENAME TABLE  `los`.`obo_los_instances` TO  `los`.`obo_lo_instances` ;
 RENAME TABLE  `los`.`obo_los_keywords` TO  `los`.`obo_lo_keywords` ;
 RENAME TABLE  `los`.`obo_los_languages` TO  `los`.`obo_lo_languages` ;
 RENAME TABLE  `los`.`obo_los_media` TO  `los`.`obo_lo_media` ;
-RENAME TABLE  `los`.`obo_los_pages` TO  `los`.`obo_lo_pages` ;
 RENAME TABLE  `los`.`obo_los_qgroups` TO  `los`.`obo_lo_qgroups` ;
-RENAME TABLE  `los`.`obo_los_questions` TO  `los`.`obo_lo_questions` ;
 RENAME TABLE  `los`.`obo_locks` TO  `los`.`obo_lo_locks` ;
 
 RENAME TABLE  `los`.`obo_tracking` TO  `los`.`obo_logs` ;
@@ -98,4 +93,7 @@ INDEX (  `mediaID` ,  `loID` )
 ALTER TABLE  `obo_map_media_to_lo` ENGINE = INNODB
 
 DROP TABLE  `obo_los_answers`;
+DROP TABLE  `lo_pages`;
+DROP TABLE  `lo_questions`;
+DROP TABLE  `lo_los`;
 
