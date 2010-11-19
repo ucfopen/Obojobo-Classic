@@ -112,7 +112,6 @@ class nm_los_Validator extends core_util_Validator
 	{
 		switch($property)
 		{
-			case 'scorable':
 			case 'size':
 			case 'length':
 			case 'height':

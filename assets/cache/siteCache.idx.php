@@ -1,15 +1,15 @@
 <?php
 $c=&$this->config;
 $c['manager_theme'] = "MODxCarbon";
-$c['settings_version'] = "1.0.4";
+$c['settings_version'] = "";
 $c['server_offset_time'] = "18000";
 $c['server_protocol'] = "http";
 $c['manager_language'] = "english";
 $c['modx_charset'] = "UTF-8";
-$c['site_name'] = "DEVEL Obojobo";
+$c['site_name'] = "Obojobo - UCF Learning Objects ";
 $c['site_start'] = "1";
 $c['error_page'] = "37";
-$c['unauthorized_page'] = "54";
+$c['unauthorized_page'] = "1";
 $c['site_status'] = "1";
 $c['site_unavailable_message'] = "The site is currently unavailable";
 $c['track_visitors'] = "0";
@@ -27,7 +27,7 @@ $c['friendly_alias_urls'] = "1";
 $c['use_alias_path'] = "1";
 $c['use_udperms'] = "1";
 $c['udperms_allowroot'] = "0";
-$c['failed_login_attempts'] = "20";
+$c['failed_login_attempts'] = "3";
 $c['blocked_minutes'] = "5";
 $c['use_captcha'] = "0";
 $c['captcha_words'] = "MODx,Access,Better,BitCode,Cache,Desc,Design,Excell,Enjoy,URLs,TechView,Gerald,Griff,Humphrey,Holiday,Intel,Integration,Joystick,Join(),Tattoo,Genetic,Light,Likeness,Marit,Maaike,Niche,Netherlands,Ordinance,Oscillo,Parser,Phusion,Query,Question,Regalia,Righteous,Snippet,Sentinel,Template,Thespian,Unity,Enterprise,Verily,Veri,Website,WideWeb,Yap,Yellow,Zebra,Zygote";
@@ -41,8 +41,8 @@ $c['number_of_messages'] = "30";
 $c['number_of_results'] = "20";
 $c['use_editor'] = "1";
 $c['use_browser'] = "1";
-$c['rb_base_dir'] = "/srv/web/vhosts/obojobo.ucf.devel/assets/";
-$c['rb_base_url'] = "/assets/modx/";
+$c['rb_base_dir'] = "assets/modx/";
+$c['rb_base_url'] = "assets/modx/";
 $c['which_editor'] = "none";
 $c['fe_editor_lang'] = "english";
 $c['fck_editor_toolbar'] = "standard";
@@ -58,7 +58,7 @@ $c['upload_maxsize'] = "1048576";
 $c['new_file_permissions'] = "0644";
 $c['new_folder_permissions'] = "0755";
 $c['show_preview'] = "0";
-$c['filemanager_path'] = "/srv/web/vhosts/obojobo.ucf.devel/";
+$c['filemanager_path'] = "/Applications/MAMP/htdocs/vhosts/mindshare.ucf.edu/assets/modx/";
 $c['theme_refresher'] = "";
 $c['manager_layout'] = "4";
 $c['custom_contenttype'] = "text/css,text/html,text/javascript,text/plain,text/xml";
@@ -73,7 +73,7 @@ $c['tinymce_custom_buttons1'] = "undo,redo,selectall,separator,pastetext,pastewo
 $c['tinymce_custom_buttons2'] = "bold,italic,underline,strikethrough,sub,sup,separator,bullist,numlist,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,styleselect,formatselect,separator,styleprops";
 $c['tree_show_protected'] = "0";
 $c['validate_referer'] = "0";
-$c['site_id'] = "4c3f1a704b8b9";
+$c['site_id'] = "4c3f2a772a5ba";
 $c['xhtml_urls'] = "1";
 $c['site_unavailable_page'] = "38";
 $c['allow_duplicate_alias'] = "0";
@@ -88,20 +88,7 @@ $c['rss_url_security'] = "http://feeds.feedburner.com/modxsecurity";
 $c['datepicker_offset'] = "-10";
 $c['datetime_format'] = "dd-mm-YYYY";
 $c['warning_visibility'] = "1";
-$c['remember_last_tab'] = "1";
-$c['reload_site_unavailable'] = "";
-$c['siteunavailable_message_default'] = "The site is currently unavailable.";
-$c['reload_captcha_words'] = "";
-$c['captcha_words_default'] = "MODx,Access,Better,BitCode,Chunk,Cache,Desc,Design,Excell,Enjoy,URLs,TechView,Gerald,Griff,Humphrey,Holiday,Intel,Integration,Joystick,Join(),Oscope,Genetic,Light,Likeness,Marit,Maaike,Niche,Netherlands,Ordinance,Oscillo,Parser,Phusion,Query,Question,Regalia,Righteous,Snippet,Sentinel,Template,Thespian,Unity,Enterprise,Verily,Tattoo,Veri,Website,WideWeb,Yap,Yellow,Zebra,Zygote";
-$c['reload_emailsubject'] = "";
-$c['emailsubject_default'] = "Your login details";
-$c['reload_signupemail_message'] = "";
-$c['system_email_signup_default'] = "Hello [+uid+] \r\n\r\nHere are your login details for [+sname+] Content Manager:\r\n\r\nUsername: [+uid+]\r\nPassword: [+pwd+]\r\n\r\nOnce you log into the Content Manager ([+surl+]), you can change your password.\r\n\r\nRegards,\r\nSite Administrator";
-$c['reload_websignupemail_message'] = "";
-$c['system_email_websignup_default'] = "Hello [+uid+]\r\n\r\nHere are your login details for [+sname+]:\r\n\r\nUsername: [+uid+]\r\nPassword: [+pwd+]\r\n\r\nOnce you log into [+sname+] ([+surl+]), you can change your password.\r\n\r\nRegards,\r\nSite Administrator";
-$c['reload_system_email_webreminder_message'] = "";
-$c['system_email_webreminder_default'] = "Hello [+uid+]\r\n\r\nTo activate your new password click the following link:\r\n\r\n[+surl+]\r\n\r\nIf successful you can use the following password to login:\r\n\r\nPassword:[+pwd+]\r\n\r\nIf you did not request this email then please ignore it.\r\n\r\nRegards,\r\nSite Administrator";
-$c['tree_page_click'] = "3";
+$c['remember_last_tab'] = "0";
 $this->aliasListing = array();
 $a = &$this->aliasListing;
 $d = &$this->documentListing;
@@ -115,15 +102,15 @@ $m[] = array('0' => '2');
 $d['about'] = 3;
 $a[3] = array('id' => 3, 'alias' => 'about', 'path' => '');
 $m[] = array('0' => '3');
-$d['viewer'] = 4;
-$a[4] = array('id' => 4, 'alias' => 'viewer', 'path' => '');
-$m[] = array('0' => '4');
 $d['sitemap.xml'] = 40;
 $a[40] = array('id' => 40, 'alias' => 'sitemap.xml', 'path' => '');
 $m[] = array('0' => '40');
 $d['flash-player-required'] = 51;
 $a[51] = array('id' => 51, 'alias' => 'flash-player-required', 'path' => '');
 $m[] = array('0' => '51');
+$d['viewer'] = 4;
+$a[4] = array('id' => 4, 'alias' => 'viewer', 'path' => '');
+$m[] = array('0' => '4');
 $d['repository'] = 5;
 $a[5] = array('id' => 5, 'alias' => 'repository', 'path' => '');
 $m[] = array('0' => '5');
@@ -151,18 +138,21 @@ $m[] = array('3' => '7');
 $d['about/aboutObojobo'] = 8;
 $a[8] = array('id' => 8, 'alias' => 'aboutObojobo', 'path' => 'about');
 $m[] = array('3' => '8');
-$d['about/changelog'] = 9;
-$a[9] = array('id' => 9, 'alias' => 'changelog', 'path' => 'about');
+$d['about/updatesAndFeatures'] = 9;
+$a[9] = array('id' => 9, 'alias' => 'updatesAndFeatures', 'path' => 'about');
 $m[] = array('3' => '9');
-$d['about/suggest-features'] = 59;
-$a[59] = array('id' => 59, 'alias' => 'suggest-features', 'path' => 'about');
-$m[] = array('3' => '59');
-$d['viewer/sso'] = 56;
-$a[56] = array('id' => 56, 'alias' => 'sso', 'path' => 'viewer');
-$m[] = array('4' => '56');
+$d['viewer/index'] = 33;
+$a[33] = array('id' => 33, 'alias' => 'index', 'path' => 'viewer');
+$m[] = array('4' => '33');
+$d['viewer/badge'] = 55;
+$a[55] = array('id' => 55, 'alias' => 'badge', 'path' => 'viewer');
+$m[] = array('4' => '55');
 $d['repository/index'] = 34;
 $a[34] = array('id' => 34, 'alias' => 'index', 'path' => 'repository');
 $m[] = array('5' => '34');
+$d['repository/repositoryflex4'] = 56;
+$a[56] = array('id' => 56, 'alias' => 'repositoryflex4', 'path' => 'repository');
+$m[] = array('5' => '56');
 $d['help/view/Student-Quick-Start-Guide'] = 19;
 $a[19] = array('id' => 19, 'alias' => 'Student-Quick-Start-Guide', 'path' => 'help/view');
 $m[] = array('10' => '19');
@@ -226,12 +216,6 @@ $m[] = array('11' => '32');
 $d['help/create/editor'] = 41;
 $a[41] = array('id' => 41, 'alias' => 'editor', 'path' => 'help/create');
 $m[] = array('11' => '41');
-$d['help/create/score-details'] = 57;
-$a[57] = array('id' => 57, 'alias' => 'score-details', 'path' => 'help/create');
-$m[] = array('11' => '57');
-$d['help/create/previous-instance-score-importing'] = 58;
-$a[58] = array('id' => 58, 'alias' => 'previous-instance-score-importing', 'path' => 'help/create');
-$m[] = array('11' => '58');
 $d['help/general/learning-objects'] = 13;
 $a[13] = array('id' => 13, 'alias' => 'learning-objects', 'path' => 'help/general');
 $m[] = array('12' => '13');
@@ -244,21 +228,18 @@ $m[] = array('12' => '17');
 $d['help/general/requestPassword'] = 18;
 $a[18] = array('id' => 18, 'alias' => 'requestPassword', 'path' => 'help/general');
 $m[] = array('12' => '18');
-$d['help/general/technical-support'] = 50;
-$a[50] = array('id' => 50, 'alias' => 'technical-support', 'path' => 'help/general');
-$m[] = array('12' => '50');
-$d['help/general/loginHelp'] = 43;
-$a[43] = array('id' => 43, 'alias' => 'loginHelp', 'path' => 'help/general');
-$m[] = array('12' => '43');
 $d['help/general/requestContentCreator'] = 42;
 $a[42] = array('id' => 42, 'alias' => 'requestContentCreator', 'path' => 'help/general');
 $m[] = array('12' => '42');
+$d['help/general/loginHelp'] = 43;
+$a[43] = array('id' => 43, 'alias' => 'loginHelp', 'path' => 'help/general');
+$m[] = array('12' => '43');
+$d['help/general/technical-support'] = 50;
+$a[50] = array('id' => 50, 'alias' => 'technical-support', 'path' => 'help/general');
+$m[] = array('12' => '50');
 $d['help/general/video-tutorials'] = 53;
 $a[53] = array('id' => 53, 'alias' => 'video-tutorials', 'path' => 'help/general');
 $m[] = array('12' => '53');
-$d['help/general/mac-media-submission-bug'] = 55;
-$a[55] = array('id' => 55, 'alias' => 'mac-media-submission-bug', 'path' => 'help/general');
-$m[] = array('12' => '55');
 $d['misc/404-page'] = 37;
 $a[37] = array('id' => 37, 'alias' => '404-page', 'path' => 'misc');
 $m[] = array('36' => '37');
@@ -271,9 +252,6 @@ $m[] = array('36' => '39');
 $d['misc/unauthorized-page'] = 54;
 $a[54] = array('id' => 54, 'alias' => 'unauthorized-page', 'path' => 'misc');
 $m[] = array('36' => '54');
-$d['about/suggest-features/ajax'] = 60;
-$a[60] = array('id' => 60, 'alias' => 'ajax', 'path' => 'about/suggest-features');
-$m[] = array('59' => '60');
 $c = &$this->contentTypes;
 $c[40] = 'text/xml';
 $c = &$this->chunkCache;
@@ -330,11 +308,23 @@ UCF NID<br/>
 Password<br/>
 <input type="password" name="password" tabindex="2" onkeypress="return webLoginEnter(document.loginfrm.cmdweblogin);" style="width: 100px;"   onfocus="this.value=(this.value==\'password\')? \'\' : this.value ;" /><br/><br/>
 <input type="submit" tabindex="3" value="[+logintext+]" name="cmdweblogin" /><br/>
+<a href="#" onclick="webLoginShowForm(2);return false;">Forget Password?</a>
 </form>
 <hr>
 <!-- log out hyperlink section -->
 <h2>Logged In</h2>
 <a href=\'[+action+]\'>[+logouttext+] [+username+]</a>
+<hr>
+<!-- Password reminder form section -->
+<h2>Password Reset</h2>
+<form name="loginreminder" method="post" action="[+action+]" style="margin: 0px; padding: 0px;">
+<input type="hidden" name="txtpwdrem" value="0" />
+NID<br/>
+<input type="text" name="txtwebusername" style="width: 100px;" /><br/>
+Email<br/>
+<input type="text" name="txtwebemail"  style="width: 100px;" /><br/>
+<input type="submit" value="Submit" name="cmdweblogin" /> <input type="reset" value="Cancel" name="cmdcancel" onclick="webLoginShowForm(1);" />
+</form>
 
 ';
 $c['mm_demo_rules'] = '// PHP *is* allowed
@@ -4378,51 +4368,6 @@ include_once $snipPath."weblogin/weblogin.inc.php";
 return $output;
 ';
 $s['WebLoginProps'] = '&loginhomeid=Login Home Id;string; &logouthomeid=Logout Home Id;string; &logintext=Login Button Text;string; &logouttext=Logout Button Text;string; &tpl=Template;string;  ';
-$s['getFlashvars'] = '
-$output = \'\';
-
-if(isset($getVars))
-{
-	$v = explode(\',\', $getVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		if(isset($_GET[$varName]))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. $_GET[$varName] . \'"; \';
-		}
-	}
-}
-
-if(isset($postVars))
-{
-	$v = explode(\',\', $postVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		if(isset($_POST[$varName]))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. $_POST[$varName] . \'"; \';
-		}
-	}
-}
-
-if(isset($cfgVars))
-{
-	$v = explode(\',\', $cfgVars);
-	if(count($v) > 0)
-	foreach($v AS $varName)
-	{
-		
-		if(substr($varName, 0,2) != \'DB\' &&  defined(\'AppCfg::\'.$varName))
-		{
-			$output .= \'flashvars.\'.$varName.\' = "\'. constant(\'AppCfg::\'.$varName). \'"; \';
-		}
-	}
-}
-
-return $output;
-';
 $s['WebSignup'] = '# Created By Raymond Irving April, 2005
 #::::::::::::::::::::::::::::::::::::::::
 # Usage:     
@@ -4478,6 +4423,51 @@ include_once $snipPath."weblogin/websignup.inc.php";
 # Return
 return $output;';
 $s['WebSignupProps'] = '&tpl=Template;string;  ';
+$s['getFlashvars'] = '
+$output = \'\';
+
+if(isset($getVars))
+{
+	$v = explode(\',\', $getVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		if(isset($_GET[$varName]))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. $_GET[$varName] . \'"; \';
+		}
+	}
+}
+
+if(isset($postVars))
+{
+	$v = explode(\',\', $postVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		if(isset($_POST[$varName]))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. $_POST[$varName] . \'"; \';
+		}
+	}
+}
+
+if(isset($cfgVars))
+{
+	$v = explode(\',\', $cfgVars);
+	if(count($v) > 0)
+	foreach($v AS $varName)
+	{
+		
+		if(substr($varName, 0,2) != \'DB\' &&  defined(\'AppCfg::\'.$varName))
+		{
+			$output .= \'flashvars.\'.$varName.\' = "\'. constant(\'AppCfg::\'.$varName). \'"; \';
+		}
+	}
+}
+
+return $output;
+';
 $s['SiteMap'] = '
 /*
 ==================================================
@@ -4780,8 +4770,7 @@ if(is_array($tv)){
 			$title = $modx->documentObject[\'pagetitle\'];
 		}
 		$content = \'<h1>Index of \' . $title . \'</h1>\';
-		//$content .= $modx->runSnippet(\'Wayfinder\', array(\'startId\' => $modx->documentIdentifier, \'level\' => 99)); 
-                $content .= $modx->runSnippet(\'Wayfinder2.5\', array(\'startId\' => $modx->documentIdentifier, \'level\' => 99, \'ignoreSecurity\' => true, \'secureClass\' => \'protectedLink\')); 
+		$content .= $modx->runSnippet(\'Wayfinder2.5\', array(\'startId\' => $modx->documentIdentifier, \'level\' => 99, \'ignoreSecurity\' => true, \'secureClass\' => \'protectedLink\')); 
 	}
 }
 
@@ -4951,27 +4940,76 @@ if ($wf->config[\'ph\']) {
     return $output;
 }
 ';
-$s['ObojoboSSOLogin'] = '
+$s['badge'] = '
+$instID = $_REQUEST[\'instID\'];
+$tiny = $_REQUEST[\'tiny\'];
+
 require_once($modx->config[\'base_path\'].\'internal/config/config.php\');
-$externalAPI = nm_los_API::getInstance();
-if(nm_los_Validator::isPosInt($_REQUEST[\'view\']))
-{
-	// if they aren\'t already logged in try to log them in using sso
-	if(! $externalAPI->getSessionValid());
-	{
-		$externalAPI->doLogin("", ""); // this will trigger the sso script inside ModUCFAuth
-	}
-	$url = $modx->makeUrl(33); // get a reference to the viewer page
-	$modx->sendRedirect($url.\'?view=\'. $_REQUEST[\'view\']); // redirect to the requested learning object
 	
-}
-return "Invalid arguments";
-';
-$s['FeatureSuggestions'] = '
-require($modx->config[\'base_path\'] . \'assets/snippets/suggestions/suggestions.php\');
-';
-$s['FeatureSuggestionAjax'] = '
-require($modx->config[\'base_path\'] . \'assets/snippets/suggestions/ajax.php\');
+	$lor = nm_los_API::getInstance();
+	
+	if(is_numeric($instID) && $instID > 0)
+	{
+		$inst = $lor->getInstanceData($instID);
+	}
+	
+	if(empty($inst->name) || empty($inst->userName)) return;
+	
+	$instURL = $config->webDir.$config->dirViewer.\'?view=\'.$inst->instID;
+?>
+
+<?php
+	if($tiny != \'1\')
+	{
+?>
+		<div style="font-size: 12pt; background-color: white; font-family: Verdana,sans-serif; border: thin solid #b5b5b5; width: 398px;">
+			<div style="background-color: #fff4e3; margin: 2px;">
+				<img src="<?php echo $modx->config[\'base_url\']; ?>assets/images/badge/obojobo-small-logo.png" style="margin-left: 13px; margin-top: 19px; float: left; width: 57px; height: 33px" />
+				<div style="margin-left: 19px; margin-top: 16px; float: left; display: block;">
+					<div style="padding-bottom: .5em; margin-bottom: .5em; border-bottom: thin dotted #bfb7aa; width: 290px;">
+					
+						<a style="color: #990000;" href="<?php echo $instURL; ?>" target="_blank"><img style="margin-bottom: 2px; margin-right: 2px; border: 0;" src="<?php echo $modx->config[\'base_url\']?>assets/images/badge/external-link-icon.png" /><?php echo $inst->name ?></a>
+						<div style="color: #373737; font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold;"><?php echo $inst->userName; ?> - <?php echo $inst->courseID; ?></div>
+						
+					</div>
+					<div style="width: 290px; font-size: 8pt;">
+						<div style="margin-bottom: 1em;">
+							You have a learning object assigment. Click on the link above to visit the learning object using UCF\'s Obojobo system.
+						</div>
+						<div style="margin-bottom: 1em;">
+							Questions? Visit the <a style="color: #990000;" href="#">Student Quick Start Guide</a>
+							or the <a style="color: #990000;" href="#">Obojobo homepage</a> for more information.
+						</div>
+						<div style="font-family: Arial, Helvetica, sans-serif; font-size: 7pt; color: #c9c0b3; margin-bottom: .5em;">Copyright <?php echo date("Y"); ?> University of Central Florida</div>
+					</div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+<?php
+	}
+	else
+	{
+?>
+		<div style="font-size: 12pt; background-color: white; font-family: Verdana,sans-serif; border: thin solid #b5b5b5; width: 398px;">
+			<div style="background-color: #fff4e3; margin: 2px;">
+				<img src="<?php echo $modx->config[\'base_url\']; ?>assets/images/badge/obojobo-small-logo.png" style="margin-left: 7px; margin-top: 13px; float: left; width: 57px; height: 33px" />
+				<div style="margin-left: 16px; margin-top: 10px; float: left; display: block;">
+					<div style="padding-bottom: .1em; margin-bottom: .5em; width: 290px;">
+					
+						<a style="color: #990000;" href="#" target="_blank"><img style="margin-bottom: 2px; margin-right: 2px; border: 0;" src="<?php echo $modx->config[\'base_url\']?>assets/images/badge/external-link-icon.png" /><?php echo $inst->name; ?></a>
+						<div style="color: #373737; font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold;"><?php echo $inst->userName; ?> - <?php echo $inst->courseID; ?></div>
+						
+					</div>
+					<div style="width: 290px; font-size: 8pt;">
+						<div style="font-family: Arial, Helvetica, sans-serif; font-size: 7pt; color: #c9c0b3; margin-bottom: .5em;">Copyright <?php echo date("Y"); ?> University of Central Florida</div>
+					</div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+<?php
+	}
 ';
 $p = &$this->pluginCache;
 $p['Markdown 1.1.7'] = '/**
@@ -5008,8 +5046,7 @@ switch ($e->name) {
 }
 
 return $markdown;';
-$p['Page TOC Generator'] = '
-/**********************************************************************************************************************
+$p['Page TOC Generator'] = '/**********************************************************************************************************************
 Plugin Name: TOC Generator
 Plugin URI:
 Description: This plugin is used to automatically generate a table of contents from HTML headings on that page.
@@ -5193,7 +5230,7 @@ foreach($header_tags as $tags){
 	$tag = "";
 	$tag_value = 0;
 	$replace_var = "";
-	if (preg_match("/<h1/", $header_tags[$i])){
+	if (ereg("<h1", $header_tags[$i])){
 		//$tag = "<h1>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5201,7 +5238,7 @@ foreach($header_tags as $tags){
 		$tag_value = 1;
 		$current_tag_pointer = &$h1;
 	}
-	elseif (preg_match("/<h2/", $header_tags[$i])) {
+	elseif (ereg("<h2", $header_tags[$i])) {
 		//$tag = "<h2>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5209,7 +5246,7 @@ foreach($header_tags as $tags){
 		$tag_value = 2;
 		$current_tag_pointer = &$h2;
 	}
-	elseif (preg_match("/<h3/", $header_tags[$i])) {
+	elseif (ereg("<h3", $header_tags[$i])) {
 		//$tag = "<h3>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5217,7 +5254,7 @@ foreach($header_tags as $tags){
 		$tag_value = 3;
 		$current_tag_pointer = &$h3;
 	}
-	elseif (preg_match("/<h4/", $header_tags[$i])) {
+	elseif (ereg("<h4", $header_tags[$i])) {
 		//$tag = "<h4>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5225,7 +5262,7 @@ foreach($header_tags as $tags){
 		$tag_value = 4;
 		$current_tag_pointer = &$h4;
 	}
-	elseif (preg_match("/<h5/", $header_tags[$i])){
+	elseif (ereg("<h5", $header_tags[$i])){
 		//$tag = "<h5>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5233,7 +5270,7 @@ foreach($header_tags as $tags){
 		$tag_value = 5;
 		$current_tag_pointer = &$h5;
 	}
-	elseif (preg_match("/<h6/", $header_tags[$i])){
+	elseif (ereg("<h6", $header_tags[$i])){
 		//$tag = "<h6>";
 		preg_match_all($tag_pattern, $header_tags[$i], $tag1, PREG_SET_ORDER);
 		$tag2 = $tag1[0];
@@ -5280,241 +5317,629 @@ if(1 < $prev_tag_value){
 $display_content .= $final_tag;
 
 //Removing content from the scorce.
-$source = preg_replace("/<!--#toc_plugin#_TOC_OUTPUT-->/", $display_content, $source);
-$source = preg_replace("/<!--#toc_plugin#_START_CONFIGURATION-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_list_type=".$setting1."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_start_level=".$setting2."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_end_level=".$setting3."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_header=".$setting4."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_header_tag=".$setting5."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_parent_tag=".$setting6."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_parent_tag_id=".$setting7."-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_END_CONFIGURATION-->/", "", $source);
-$source = preg_replace("/<!--#toc_plugin#_START_TOC_INDEXING-->/", " ", $source);
-$source = preg_replace("/<!--#toc_plugin#_END_TOC_INDEXING-->/", " ", $source);
-';
-$p['DuckPackAuthentication'] = 'include($modx->config[\'base_path\'] . \'assets/plugins/duckpack/authModX.php\');';
-$p['ManagerManager'] = '// You can put your ManagerManager rules EITHER in a chunk OR in an external file - whichever suits your development style the best
-
-// To use an external file, put your rules in /assets/plugins/managermanager/mm_rules.inc.php 
-// (you can rename default.mm_rules.inc.php and use it as an example)
-// The chunk SHOULD have php opening tags at the beginning and end
-
-// If you want to put your rules in a chunk (so you can edit them through the Manager),
-// create the chunk, and enter its name in the configuration tab.
-// The chunk should NOT have php tags at the beginning or end
-
-// ManagerManager requires jQuery 1.3+
-// The URL to the jQuery library. Choose from the configuration tab whether you want to use 
-// a local copy (which defaults to the jQuery library distributed with ModX 1.0.1)
-// a remote copy (which defaults to the Google Code hosted version)
-// or specify a URL to a custom location.
-// Here we set some default values, because this is a convenient place to change them if we need to,
-// but you should configure your preference via the Configuration tab.
-$js_default_url_local = $modx->config[\'site_url\']. \'/assets/js/jquery-1.3.2.min.js\';
-$js_default_url_remote = \'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js\';
-
-// You don\'t need to change anything else from here onwards
-//-------------------------------------------------------
-
-// Run the main code
-$asset_path = $modx->config[\'base_path\'] . \'assets/plugins/managermanager/mm.inc.php\';
-include($asset_path);';
-$p['ManagerManagerProps'] = '&config_chunk=Configuration Chunk;text;mm_demo_rules; &remove_deprecated_tv_types_pref=Remove deprecated TV types;list;yes,no;yes &which_jquery=jQuery source;list;local (assets/js),remote (google code),manual url (specify below);local (assets/js) &js_src_type=jQuery URL override;text;  ';
-$p['Quick Manager+'] = '$show = TRUE;
-
-if ($disabled  != \'\') {
-    $arr = explode(",", $disabled );
-    if (in_array($modx->documentIdentifier, $arr)) {
-        $show = FALSE;
-    }
-}
-
-if ($show) {
-    include_once($modx->config[\'base_path\'].\'assets/plugins/qm/qm.inc.php\');
-    $qm = new Qm($modx, $jqpath, $loadmanagerjq, $loadfrontendjq, $noconflictjq, $loadtb, $tbwidth, $tbheight, $hidefields, $hidetabs, $hidesections, $addbutton, $tpltype, $tplid, $custombutton, $managerbutton, $logout, $autohide);
-}';
-$p['Quick Manager+Props'] = '&jqpath=Path to jQuery;text;assets/js/jquery-1.3.2.min.js &loadmanagerjq=Load jQuery in manager;list;true,false;true &loadfrontendjq=Load jQuery in front-end;list;true,false;true &noconflictjq=jQuery noConflict mode in front-end;list;true,false;true &loadtb=Load modal box in front-end;list;true,false;true &tbwidth=Modal box window width;text;80% &tbheight=Modal box window height;text;90% &hidefields=Hide document fields from front-end editors;text;parent &hidetabs=Hide document tabs from front-end editors;text; &hidesections=Hide document sections from front-end editors;text; &addbutton=Show add document here button;list;true,false;true &tpltype=New document template type;list;parent,id,selected;parent &tplid=New document template id;int;3 &custombutton=Custom buttons;textarea; &managerbutton=Show go to manager button;list;true,false;true &logout=Logout to;list;manager,front-end;manager &disabled=Plugin disabled on documents;text; &autohide=Autohide toolbar;list;true,false;true  ';
-$p['Search Highlight'] = '/*
-  ------------------------------------------------------------------------
-  Plugin: Search_Highlight v1.5
-  ------------------------------------------------------------------------
-  Changes:
-  18/03/10 - Remove possibility of XSS attempts being passed in the URL
-           - look-behind assertion improved
-  29/03/09 - Removed urldecode calls;
-           - Added check for magic quotes - if set, remove slashes
-           - Highlights terms searched for when target is a HTML entity
-  18/07/08 - advSearch parameter and pcre modifier added
-  10/02/08 - Strip_tags added to avoid sql injection and XSS. Use of $_REQUEST
-  01/03/07 - Added fies/updates from forum from users mikkelwe/identity
-  (better highlight replacement, additional div around term/removal message)
-  ------------------------------------------------------------------------
-  Description: When a user clicks on the link from the AjaxSearch results
-    the target page will have the terms highlighted.
-  ------------------------------------------------------------------------
-  Created By:  Susan Ottwell (sottwell@sottwell.com)
-               Kyle Jaebker (kjaebker@muddydogpaws.com)
-
-  Refactored by Coroico (www.modx.wangba.fr) and TS
-  ------------------------------------------------------------------------
-  Based off the the code by Susan Ottwell (www.sottwell.com)
-    http://modxcms.com/forums/index.php/topic,1237.0.html
-  ------------------------------------------------------------------------
-  CSS:
-    The classes used for the highlighting are the same as the AjaxSearch
-  ------------------------------------------------------------------------
-  Notes:
-    To add a link to remove the highlighting and to show the searchterms
-    put the following on your page where you would like this to appear:
-
-      <!--search_terms-->
-
-    Example output for this:
-
-      Search Terms: the, template
-      Remove Highlighting
-
-    Set the following variables to change the text:
-
-      $termText - the text before the search terms
-      $removeText - the text for the remove link
-  ------------------------------------------------------------------------
-*/
-global $database_connection_charset;
-// Conversion code name between html page character encoding and Mysql character encoding
-// Some others conversions should be added if needed. Otherwise Page charset = Database charset
-$pageCharset = array(
-  \'utf8\' => \'UTF-8\',
-  \'latin1\' => \'ISO-8859-1\',
-  \'latin2\' => \'ISO-8859-2\'
-);
-
-if (isset($_REQUEST[\'searched\']) && isset($_REQUEST[\'highlight\'])) {
-
-  // Set these to customize the text for the highlighting key
-  // --------------------------------------------------------
-     $termText = \'<div class="searchTerms">Search Terms: \';
-     $removeText = \'Remove Highlighting\';
-  // --------------------------------------------------------
-
-  $highlightText = $termText;
-  $advsearch = \'oneword\';
-
-  $dbCharset = $database_connection_charset;
-  $pgCharset = array_key_exists($dbCharset,$pageCharset) ? $pageCharset[$dbCharset] : $dbCharset;
-
-  // magic quotes check
-  if (get_magic_quotes_gpc()){
-    $searched = strip_tags(stripslashes($_REQUEST[\'searched\']));
-    $highlight = strip_tags(stripslashes($_REQUEST[\'highlight\']));
-    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags(stripslashes($_REQUEST[\'advsearch\']));
-  }
-  else {
-    $searched = strip_tags($_REQUEST[\'searched\']);
-    $highlight = strip_tags($_REQUEST[\'highlight\']);
-    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags($_REQUEST[\'advsearch\']);
-  }
-
-  if ($advsearch != \'nowords\') {
-
-    $searchArray = array();
-    if ($advsearch == \'exactphrase\') $searchArray[0] = $searched;
-    else $searchArray = explode(\' \', $searched);
-
-    $searchArray = array_unique($searchArray);
-    $nbterms = count($searchArray);
-    $searchTerms = array();
-    for($i=0;$i<$nbterms;$i++){
-      // Consider all possible combinations
-      $word_ents = array();
-      $word_ents[] = $searchArray[$i];
-      $word_ents[] = htmlentities($searchArray[$i], ENT_NOQUOTES, $pgCharset);
-      $word_ents[] = htmlentities($searchArray[$i], ENT_COMPAT, $pgCharset);
-      $word_ents[] = htmlentities($searchArray[$i], ENT_QUOTES, $pgCharset);
-      // Avoid duplication
-      $word_ents = array_unique($word_ents);
-      foreach($word_ents as $word) $searchTerms[]= array(\'term\' => $word, \'class\' => $i+1);
-    }
-
-    $output = $modx->documentOutput; // get the parsed document
-    $body = explode("<body", $output); // break out the head
-
-    $highlightClass = explode(\' \',$highlight); // break out the highlight classes
-    /* remove possibility of XSS attempts being passed in URL */
-    foreach ($highlightClass as $key => $value) {
-       $highlightClass[$key] = preg_match(\'/[^A-Za-z0-9_-]/ms\', $value) == 1 ? \'\' : $value;
-    }
-
-    $pcreModifier = ($pgCharset == \'UTF-8\') ? \'iu\' : \'i\';
-    $lookBehind = \'/(?<!&|&[\\w#]|&[\\w#]\\w|&[\\w#]\\w\\w|&[\\w#]\\w\\w\\w|&[\\w#]\\w\\w\\w\\w|&[\\w#]\\w\\w\\w\\w\\w)\';  // avoid a match with a html entity
-    $lookAhead = \'(?=[^>]*<)/\'; // avoid a match with a html tag
-
-    $nbterms = count($searchTerms);
-    for($i=0;$i<$nbterms;$i++){
-      $word = $searchTerms[$i][\'term\'];
-      $class = $highlightClass[0].\' \'.$highlightClass[$searchTerms[$i][\'class\']];
-
-      $highlightText .= ($i > 0) ? \', \' : \'\';
-      $highlightText .= \'<span class="\'.$class.\'">\'.$word.\'</span>\';
-
-      $pattern = $lookBehind . preg_quote($word, \'/\') . $lookAhead . $pcreModifier;
-      $replacement = \'<span class="\' . $class . \'">${0}</span>\';
-      $body[1] = preg_replace($pattern, $replacement, $body[1]);
-    }
-
-    $output = implode("<body", $body);
-
-    $removeUrl = $modx->makeUrl($modx->documentIdentifier);
-    $highlightText .= \'<br /><a href="\'.$removeUrl.\'" class="ajaxSearch_removeHighlight">\'.$removeText.\'</a></div>\';
-
-    $output = str_replace(\'<!--search_terms-->\',$highlightText,$output);
-    $modx->documentOutput = $output;
-  }
-}';
-$p['TransAlias'] = '/*
- * Initialize parameters
- */
-if (!isset ($alias)) { return ; }
-if (!isset ($plugin_dir) ) { $plugin_dir = \'transalias\'; }
-if (!isset ($plugin_path) ) { $plugin_path = $modx->config[\'base_path\'].\'assets/plugins/\'.$plugin_dir; }
-if (!isset ($table_name)) { $table_name = \'common\'; }
-if (!isset ($char_restrict)) { $char_restrict = \'lowercase alphanumeric\'; }
-if (!isset ($remove_periods)) { $remove_periods = \'No\'; }
-if (!isset ($word_separator)) { $word_separator = \'dash\'; }
-if (!isset ($override_tv)) { $override_tv = \'\'; }
-
-if (!class_exists(\'TransAlias\')) {
-    require_once $plugin_path.\'/transalias.class.php\';
-}
-$trans = new TransAlias($modx);
-
-/*
- * see if TV overrides the table name
- */
-if(!empty($override_tv)) {
-    $tvval = $trans->getTVValue($override_tv);
-    if(!empty($tvval)) {
-        $table_name = $tvval;
-    }
-}
-
-/*
- * Handle events
- */
-$e =& $modx->event;
-switch ($e->name ) {
-    case \'OnStripAlias\':
-        if ($trans->loadTable($table_name, $remove_periods)) {
-            $output = $trans->stripAlias($alias,$char_restrict,$word_separator);
-            $e->output($output);
-            $e->stopPropagation();
+$source = ereg_replace("<!--#toc_plugin#_TOC_OUTPUT-->", $display_content, $source);
+$source = ereg_replace("<!--#toc_plugin#_START_CONFIGURATION-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_list_type=".$setting1."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_start_level=".$setting2."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_end_level=".$setting3."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_header=".$setting4."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_header_tag=".$setting5."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_parent_tag=".$setting6."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_parent_tag_id=".$setting7."-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_END_CONFIGURATION-->", "", $source);
+$source = ereg_replace("<!--#toc_plugin#_START_TOC_INDEXING-->", " ", $source);
+$source = ereg_replace("<!--#toc_plugin#_END_TOC_INDEXING-->", " ", $source);';
+$p['ObojoboAuth'] = 'if(!function_exists(\'externalUserIsLocalManager\'))
+{
+    function externalUserIsLocalManager($username)
+    {
+        global $modx;
+        // check for duplicate user name
+        if($username=="") {
+            //$output = webLoginAlert("Missing username. Please enter a user name.").$tpl;
+            return false;
         }
-        break ;
-    default:
-        return ;
+        else {
+            $sql = "SELECT id FROM ".$modx->getFullTableName("manager_users")." WHERE username=\'$username\'";
+            if(!$rs = $modx->db->query($sql)){
+              //  $output = webLoginAlert("An error occured while attempting to retreive all users with username $username.").$tpl;
+                return false;
+            } 
+            $limit = $modx->db->getRecordCount($rs);
+            if($limit>0) {
+                //$output = webLoginAlert("Username is already in use!").$tpl;
+                return true;
+            }        
+        }
+        
+        return false;        
+    }
+}
+
+if(!function_exists(\'externalUserValidForLocal\'))
+{
+    function externalUserValidForLocal($username, $email, $password, $isManager)
+    {
+        global $modx;
+        // check for duplicate user name
+        if($username=="") {
+            //$output = webLoginAlert("Missing username. Please enter a user name.").$tpl;
+            error_log(\'no username\');
+            return false;
+        }
+        else {
+            $sql = "SELECT id FROM ".$modx->getFullTableName( ($isManager ? \'manager_users\' : \'web_users\'))." WHERE username=\'$username\'";
+            error_log($sql);
+            if(!$rs = $modx->db->query($sql)){
+              //  $output = webLoginAlert("An error occured while attempting to retreive all users with username $username.").$tpl;
+                error_log(\'bad sql\');
+                return false;
+            } 
+            $limit = $modx->db->getRecordCount($rs);
+            if($limit > 0) {
+                error_log(\'no user\');
+                //$output = webLoginAlert("Username is already in use!").$tpl;
+                return false;
+            }        
+        }
+
+        // verify email
+        if($email==\'\' || !ereg("^[-!#$%&\'*+./0-9=?A-Z^_`a-z{|}~]+", $email)){
+           // $output = webLoginAlert("E-mail address doesn\'t seem to be valid!").$tpl;
+            error_log(\'bad email\');
+            return false;
+        }
+
+        return true;
+    }
+}
+
+if(!function_exists(\'createLocalManager\'))
+{
+    function createLocalManager($username, $password, $fullname, $email)
+    {
+        global $modx;
+        
+        if(!externalUserValidForLocal($username, $email, $password, true)) return false;
+        
+        // create the user account
+        $sql = "INSERT INTO ".$modx->getFullTableName("manager_users")." (username, password) 
+                VALUES(\'".$username."\', md5(\'".$password."\'));";
+        $rs = $modx->db->query($sql);
+        if(!$rs){
+           // $output = webLoginAlert("An error occured while attempting to save the user.").$tpl;
+            return false;
+        }         
+        // now get the id
+        $key = $modx->db->getInsertId();
+
+        // save user attributes
+        $sql = "INSERT INTO ".$modx->getFullTableName("user_attributes")." (internalKey, fullname, role, email, comment) 
+                VALUES($key, \'$fullname\', \'1\', \'$email\',\'generated from external user\');";
+        $rs = $modx->db->query($sql);
+        if(!$rs){
+            //$output = webLoginAlert("An error occured while attempting to save the user\'s attributes.").$tpl;
+            return false;
+        }
+
+        // invoke OnWebSaveUser event
+        $modx->invokeEvent("OnWebSaveUser",
+                            array(
+                                "mode"         => "new",
+                                "userid"       => $key,
+                                "username"     => $username,
+                                "userpassword" => $password,
+                                "useremail"    => $email,
+                                "userfullname" => $fullname
+                            ));
+        return true;
+    }
+}
+
+
+if(!function_exists(\'updateLocalManager\'))
+{
+    function updateLocalManager($username, $password, $isBlocked, $fullname, $email)
+    {
+        global $modx;
+        // check for valid user name
+        //if(!externalUserValidForLocal($username, $email, $password, true))
+        //{
+        //    return false;
+        //} 
+        
+        $sql = "SELECT id FROM ". $modx->getFullTableName(\'manager_users\'). " WHERE username=\'$username\'";
+        if(!$rs = $modx->db->query($sql))
+        {
+            return false;
+        }
+        $row = $modx->fetchRow($ds);
+        
+        $sql = "UPDATE ".$modx->getFullTableName(\'user_attributes\')." SET fullname=\'\', email=\'\', blocked=" . ($isBlocked ? 0 : 1) . " WHERE id=\'".$row[\'id\']. "\'";
+        if($modx->db->query($sql))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+}
+
+if(!function_exists(\'externalUserIsLocalWebUser\'))
+{
+    function externalUserIsLocalWebUser($username)
+    {
+        global $modx;
+        // check for duplicate user name
+        if($username=="") {
+            //$output = webLoginAlert("Missing username. Please enter a user name.").$tpl;
+            return false;
+        }
+        else
+        {
+            $sql = "SELECT id FROM ".$modx->getFullTableName("web_users")." WHERE username=\'$username\'";
+            if(!$rs = $modx->db->query($sql))
+            {
+              //  $output = webLoginAlert("An error occured while attempting to retreive all users with username $username.").$tpl;
+                return false;
+            } 
+            $limit = $modx->db->getRecordCount($rs);
+            if($limit>0)
+            {
+                //$output = webLoginAlert("Username is already in use!").$tpl;
+                return true;
+            }        
+        }
+        
+        return false;        
+    }
+}
+
+if(!function_exists(\'createLocalWebUser\'))
+{
+    function createLocalWebUser($username, $password, $fullname, $email)
+    {
+        global $modx;
+        if(!externalUserValidForLocal($username, $email, $password, false)) return false;
+        // create the user account
+        $sql = "INSERT INTO ".$modx->getFullTableName("web_users")." (username, password) 
+                VALUES(\'".$username."\', md5(\'".$password."\'));";
+        $rs = $modx->db->query($sql);
+        if(!$rs)
+        {
+           // $output = webLoginAlert("An error occured while attempting to save the user.").$tpl;
+            return false;
+        }         
+        // now get the id
+        $key = $modx->db->getInsertId();
+        syncGroups($key);
+        // save user attributes
+        $sql = "INSERT INTO ".$modx->getFullTableName("web_user_attributes")." (internalKey, fullname, role, email, comment) 
+                VALUES($key, \'$fullname\', \'1\', \'$email\', \'generated from external user\');";
+        $rs = $modx->db->query($sql);
+        if(!$rs)
+        {
+            //$output = webLoginAlert("An error occured while attempting to save the user\'s attributes.").$tpl;
+            return false;
+        }
+        // invoke OnWebSaveUser event
+        $modx->invokeEvent("OnWebSaveUser",
+                            array(
+                                "mode"         => "new",
+                                "userid"       => $key,
+                                "username"     => $username,
+                                "userpassword" => $password,
+                                "useremail"    => $email,
+                                "userfullname" => $fullname
+                            ));
+        return true;
+    }
+}
+
+if(!function_exists(\'syncGroups\'))
+{
+    function syncGroups($modxUserID)
+    {
+        error_log(\'syncing broups\');
+        global $modx;
+        $externalAPI = nm_los_API::getInstance();
+        $roles = $externalAPI->getUserRoles();
+        $groups = array();
+        foreach($roles as $role)
+        {
+            $groups[] = $role->name;
+        }
+                
+        // get array of the external user\'s groups that match modx user groups
+        if(count($groups)>0)
+        {
+            // get the local roles that match the external by name
+            $ds = $modx->dbQuery("SELECT id FROM ".$modx->getFullTableName("webgroup_names")." WHERE name IN (\'".implode("\',\'",$groups)."\')");
+            $externalMatchingGroups = array();
+            if($ds)
+            {
+                while ($row = $modx->fetchRow($ds))
+                {
+                    $externalMatchingGroups[] = $row[\'id\'];
+                }
+            }
+        }
+                
+        // get user\'s current modx groups
+        $ds = $modx->dbQuery("SELECT * FROM ".$modx->getFullTableName("web_groups")." WHERE webuser=\'$modxUserID\'");
+        $userLocalGroups = array();
+        if($ds)
+        {
+            while ($row = $modx->fetchRow($ds))
+            {
+                $userLocalGroups[] = $row[\'webgroup\'];
+            }
+        }        
+        error_log(print_r($userLocalGroups, true));
+        error_log(print_r($externalMatchingGroups, true));
+        
+        // find local groups to remove
+        if(count($userLocalGroups) > 0)
+        {
+            foreach($userLocalGroups as $curGroup)
+            {
+                if(!in_array($curGroup, $externalMatchingGroups)) // local groups that aren\'t in the external groups list 
+                {
+                    error_log(\'removing group \' . $curGroup);
+                    // remove the record for this group
+                    $sql = "DELETE FROM ".$modx->getFullTableName(\'web_groups\')." WHERE webgroup=\'$curGroup\' AND webuser=\'$modxUserID\'";
+                    $rs = $modx->db->query($sql);
+                }
+            }
+        }
+        
+        // find external groups to add
+        if(count($externalMatchingGroups) > 0)
+        {
+            foreach($externalMatchingGroups as $curGroup)
+            {
+                if(!in_array($curGroup, $userLocalGroups)) // local groups that aren\'t in the external groups list 
+                {
+                    error_log(\'adding group \' . $curGroup);
+                    // remove the record for this group
+                    $sql = "INSERT INTO ".$modx->getFullTableName(\'web_groups\')." SET webgroup=\'".$curGroup."\', webuser=\'".$modxUserID."\'";
+                    error_log($sql);
+                    $rs = $modx->db->query($sql);
+                }
+            }
+        }        
+    }
+}
+
+if(!function_exists(\'updateLocalWebUser\'))
+{
+    function updateLocalWebUser($username, $password, $isBlocked, $fullname, $email)
+    {
+        global $modx;
+        // check for valid user name
+        error_log(\'updating local web user\');
+        //if(!externalUserValidForLocal($username, $email, $password, false)) return false;
+        $sql = "SELECT id FROM ".$modx->getFullTableName("web_users")." WHERE username=\'$username\'";
+        if(!$rs = $modx->db->query($sql))
+        {
+            return false;
+        }
+        $row = $modx->fetchRow($rs);
+        syncGroups($row[\'id\']);
+        
+        $sql = "UPDATE ".$modx->getFullTableName("web_user_attributes")." SET fullname=\'\', email=\'\', blocked=" . ($isBlocked ? 0 : 1) . " WHERE id=\'".$row[\'id\']."\'";
+        if($modx->db->query($sql))
+        {
+            return true;
+        }       
+        return false;        
+    }
+}
+
+
+if(!function_exists(\'logInExternalUserAsWebUser\'))
+{
+    function logInExternalUserAsWebUser($username)
+    {
+        global $modx;
+
+        $table_webUsers = $modx->getFullTableName("web_users");
+        $table_webUserAttrib = $modx->getFullTableName("web_user_attributes");
+        $table_webUserSetting = $modx->getFullTableName("web_user_settings");
+        $table_activeUsers = $modx->getFullTableName("active_users");
+
+        $sql = "SELECT $table_webUsers.*, $table_webUserAttrib.* FROM $table_webUsers, $table_webUserAttrib WHERE BINARY $table_webUsers.username = \'".$username."\' and $table_webUserAttrib.internalKey=$table_webUsers.id;";
+        $ds = $modx->db->query($sql);
+        $limit = $modx->db->getRecordCount($ds);
+
+        if($limit==0 || $limit>1)
+        {
+            return;
+        }
+        $row = $modx->db->getRow($ds);
+
+        $internalKey             = $row[\'internalKey\'];
+        $dbasePassword             = $row[\'password\'];
+        $failedlogins             = $row[\'failedlogincount\'];
+        $blocked                 = $row[\'blocked\'];
+        $blockeduntildate        = $row[\'blockeduntil\'];
+        $blockedafterdate        = $row[\'blockedafter\'];
+        $registeredsessionid    = $row[\'sessionid\'];
+        $role                    = $row[\'role\'];
+        $lastlogin                = $row[\'lastlogin\'];
+        $nrlogins                = $row[\'logincount\'];
+        $fullname                = $row[\'fullname\'];
+        $email                     = $row[\'email\'];
+
+        // load user settings
+        if($internalKey)
+        {
+            $result = $modx->db->query("SELECT setting_name, setting_value FROM $table_webUserSetting WHERE webuser=\'$internalKey\'");
+            while ($row = $modx->fetchRow($result, \'both\')) $modx->config[$row[0]] = $row[1];
+        }
+
+        if(!isset($_SESSION[\'webValidated\']))
+        {
+            $sql = "update $table_webUserAttrib SET failedlogincount=0, logincount=logincount+1, lastlogin=thislogin, thislogin=".time().", sessionid=\'$currentsessionid\' where internalKey=$internalKey";
+            $ds = $modx->db->query($sql);
+        }
+
+        $_SESSION[\'webShortname\']=$username;
+        $_SESSION[\'webFullname\']=$fullname;
+        $_SESSION[\'webEmail\']=$email;
+        $_SESSION[\'webValidated\']=1;
+        $_SESSION[\'webInternalKey\']=$internalKey;
+        $_SESSION[\'webValid\']=base64_encode($givenPassword);
+        $_SESSION[\'webUser\']=base64_encode($username);
+        $_SESSION[\'webFailedlogins\']=$failedlogins;
+        $_SESSION[\'webLastlogin\']=$lastlogin;
+        $_SESSION[\'webnrlogins\']=$nrlogins;
+        $_SESSION[\'webUserGroupNames\'] = \'\'; // reset user group names
+
+        // get user\'s document groups
+        $dg=\'\';
+        $i=0;
+        $table_webGroups = $modx->getFullTableName("web_groups");
+        $table_webGroupA = $modx->getFullTableName("webgroup_access");
+        $sql = "SELECT uga.documentgroup
+                FROM $table_webGroups ug
+                INNER JOIN $table_webGroupA uga ON uga.webgroup=ug.webgroup
+                WHERE ug.webuser =".$internalKey;
+        $ds = $modx->db->query($sql);
+        while ($row = $modx->db->getRow($ds,\'num\')) $dg[$i++]=$row[0];
+        $_SESSION[\'webDocgroups\'] = $dg;
+
+        include_once "log.class.inc.php";
+        $log = new logHandler;
+        $log->initAndWriteLog("Logged in", $_SESSION[\'webInternalKey\'], $_SESSION[\'webShortname\'], "58", "-", "WebLogin");            
+
+        // web users are stored with negative id
+        $sql = "REPLACE INTO $table_activeUsers (internalKey, username, lasthit, action, id, ip) values(-".$_SESSION[\'webInternalKey\'].", \'".$_SESSION[\'webShortname\']."\', \'".time()."\', \'ObojoboLogin\', \'\', \'".$_SERVER[\'REMOTE_ADDR\']."\')";
+        if(!$ds = $modx->db->query($sql))
+        {
+            $output = "error replacing into active users! SQL: ".$sql;
+            return;
+        }        
+
+    }
+}
+
+if(!function_exists(\'logInExternalUserAsManager\'))
+{
+    function logInExternalUserAsManager($username)
+    {
+        global $modx;
+
+        $table_manUsers = $modx->getFullTableName("manager_users");
+        $table_userAttrib = $modx->getFullTableName("user_attributes");
+        $table_userSetting = $modx->getFullTableName("user_settings");
+        $table_activeUsers = $modx->getFullTableName("active_users");
+    
+        $sql = "SELECT $table_manUsers.*, $table_userAttrib.* FROM $table_manUsers, $table_userAttrib WHERE BINARY $table_manUsers.username = \'".$username."\' and $table_userAttrib.internalKey = $table_manUsers.id;";
+        $rs = mysql_query($sql);
+        $limit = mysql_num_rows($rs);
+
+        if($limit==0 || $limit>1) {
+            //jsAlert($e->errors[900]);
+            return;
+        }
+        
+        
+            
+        $row = mysql_fetch_assoc($rs);
+
+        $internalKey             = $row[\'internalKey\'];
+        $dbasePassword             = $row[\'password\'];
+        $failedlogins             = $row[\'failedlogincount\'];
+        $blocked                 = $row[\'blocked\'];
+        $blockeduntildate        = $row[\'blockeduntil\'];
+        $blockedafterdate        = $row[\'blockedafter\'];
+        $registeredsessionid    = $row[\'sessionid\'];
+        $role                    = $row[\'role\'];
+        $lastlogin                = $row[\'lastlogin\'];
+        $nrlogins                = $row[\'logincount\'];
+        $fullname                = $row[\'fullname\'];
+        $email                     = $row[\'email\'];
+
+        // load user settings
+        $sql = "SELECT setting_name, setting_value FROM $table_userSetting WHERE user=\'".$internalKey."\' AND setting_value!=\'\'";
+        $rs = mysql_query($sql);
+        while ($row = mysql_fetch_assoc($rs)) {
+            ${$row[\'setting_name\']} = $row[\'setting_value\'];
+        }
+
+
+        if(!isset($_SESSION[\'mgrValidated\'])) {
+            $sql = "update $dbase.`".$table_prefix."user_attributes` SET failedlogincount=0, logincount=logincount+1, lastlogin=thislogin, thislogin=".time().", sessionid=\'$currentsessionid\' where internalKey=$internalKey";
+            $rs = mysql_query($sql);
+        }
+        # Added by Raymond:
+        $_SESSION[\'usertype\'] = \'manager\'; // user is a backend user
+
+        // get permissions
+        $_SESSION[\'mgrShortname\']=$username;
+        $_SESSION[\'mgrFullname\']=$fullname;
+        $_SESSION[\'mgrEmail\']=$email;
+        $_SESSION[\'mgrValidated\']=1;
+        $_SESSION[\'mgrInternalKey\']=$internalKey;
+        $_SESSION[\'mgrFailedlogins\']=$failedlogins;
+        $_SESSION[\'mgrLastlogin\']=$lastlogin;
+        $_SESSION[\'mgrLogincount\']=$nrlogins; // login count
+        $_SESSION[\'mgrRole\']=$role;
+        
+        $table_userRoles = $modx->getFullTableName("user_roles");
+        
+        $sql="SELECT * FROM $table_userRoles WHERE id=".$role.";";
+        $rs = mysql_query($sql);
+        $row = mysql_fetch_assoc($rs);
+        $_SESSION[\'mgrPermissions\'] = $row;
+
+        // get user\'s document groups
+        $table_memberGroups = $modx->getFullTableName("member_groups");
+        $table_memberGroupAcc = $modx->getFullTableName("membergroup_access");
+        $dg=\'\';
+        $i=0;
+        $sql = "SELECT uga.documentgroup
+                FROM $table_memberGroups ug
+                INNER JOIN $table_memberGroupAcc uga ON uga.membergroup=ug.user_group
+                WHERE ug.member =".$internalKey;
+        $rs = mysql_query($sql);
+        while ($row = mysql_fetch_row($rs)) $dg[$i++]=$row[0];
+        $_SESSION[\'mgrDocgroups\'] = $dg;
+
+        include_once "log.class.inc.php";
+        $log = new logHandler;
+        $log->initAndWriteLog("Logged in", $_SESSION[\'webInternalKey\'], $_SESSION[\'webShortname\'], "58", "-", "WebLogin");
+    }
+}
+// Event switch
+$e = &$modx->Event;
+switch($e->name) {
+    
+    case \'OnWebAuthentication\':
+        require_once($modx->config[\'base_path\'].\'internal/app.php\');
+        $externalAPI = nm_los_API::getInstance();
+        $validSession = $externalAPI->getSessionValid();
+        if($validSession) $e->_output = TRUE;
+        break;
+
+    case \'OnManagerAuthentication\':
+        require_once($modx->config[\'base_path\'].\'internal/app.php\');
+        $externalAPI = nm_los_API::getInstance();
+        $validSession = $externalAPI->getSessionValid(\'SuperUser\');
+        if($validSession) $e->_output = TRUE;
+        break;    
+
+    case \'OnBeforeManagerLogin\':
+        require_once($modx->config[\'base_path\'].\'internal/app.php\');
+        $pass = $e->params[\'userpassword\'];
+        $externalAPI = nm_los_API::getInstance();
+        $validSession = $externalAPI->getSessionValid(\'SuperUser\');
+        if($validSession != true) // no session yet
+        {
+            error_log(1);
+            $loginSuccess = $externalAPI->doLogin($e->params[\'username\'], $pass);
+            if($loginSuccess === true)
+            {
+                error_log(2);
+                $validSession = $externalAPI->getSessionValid(\'SuperUser\'); // switch to true if user is SU
+            }
+            else
+            {
+                error_log(\'external authentication failure\');
+            }
+        }
+        if($validSession == true) // already has a session
+        {
+            error_log(3);
+            $externUser = $externalAPI->getUser();
+            
+            // check for external user group requirements
+            if(    externalUserIsLocalManager($externUser->login) ) // modx user exists, sync local data from external
+            {
+                error_log(5);
+                updateLocalManager($externUser->login, md5(time()), $externUser->first.\' \'.$externUser->last, !$isSU /*block non su users*/, $externUser->email);
+                
+            }
+            else{ // no modx user, make one
+                error_log(7);
+                createLocalManager($externUser->login, md5(time()), $externUser->first.\' \'.$externUser->last, $externUser->email);
+            }
+        }        
+        break;
+
+    case \'OnManageLogout\':
+    case \'OnWebLogout\':
+        require_once($modx->config[\'base_path\'].\'internal/app.php\');
+        $externalAPI = nm_los_API::getInstance();
+        $validSession = $externalAPI->doLogout();
+        break;
+
+    case \'OnBeforeWebLogin\':
+        require_once($modx->config[\'base_path\'].\'internal/app.php\');
+        $pass = $e->params[\'userpassword\'];
+        $externalAPI = nm_los_API::getInstance();
+        $validSession = $externalAPI->getSessionValid();
+        if($validSession != true) // no session yet
+        {
+            $loginSuccess = $externalAPI->doLogin($e->params[\'username\'], $pass);
+            if($loginSuccess === true)
+            {
+                $validSession = true; // switch to true 
+            }
+            else
+            {
+                error_log(\'external authentication failure\');
+            }
+        }
+        if($validSession == true) // already has a session
+        {
+            $externUser = $externalAPI->getUser();
+            
+            if(    externalUserIsLocalWebUser($externUser->login) ) // modx user exists, sync local data from external
+            {
+                updateLocalWebUser($externUser->login, md5(time()), $externUser->first.\' \'.$externUser->last, false, $externUser->email);
+            }
+            else{ // no modx user, make one
+                createLocalWebUser($externUser->login, md5(time()) , $externUser->first.\' \'.$externUser->last, $externUser->email);
+            }
+            
+
+        }
+        break;
+    case \'OnWebPagePrerender\':
+        // check to make sure they are not already logged in
+        if( !isset($_SESSION[\'webValidated\']) || !isset($_SESSION[\'mgrValidated\']) )
+        {
+            require_once($modx->config[\'base_path\'].\'internal/app.php\');
+            $externalAPI = nm_los_API::getInstance();
+            $validSession = $externalAPI->getSessionValid();
+            error_log(\'trying to validate:\' . ($validSession? \'true\' : \'false\'));
+            if($validSession)
+            {
+                // valid session, get user info
+                $externUser = $externalAPI->getUser();
+                // check for SU status
+                $roles = $externalAPI->getUserRoles($externUser->userID);
+                $isSU = false;
+                if(count($roles) > 0)
+                {
+                    foreach($roles AS $role)
+                    {
+                        if($role->name == \'SuperUser\')
+                        {
+                            $isSU = true;
+                            break;
+                        }
+                    }
+                } 
+                //if($isSU) logInExternalUserAsManager($externUser->login); // su
+                //else
+logInExternalUserAsWebUser($externUser->login); // non su
+            }
+        }
+        break;
 }';
-$p['TransAliasProps'] = '&table_name=Trans table;list;common,russian,utf8,utf8lowercase;utf8lowercase &char_restrict=Restrict alias to;list;lowercase alphanumeric,alphanumeric,legal characters;legal characters &remove_periods=Remove Periods;list;Yes,No;No &word_separator=Word Separator;list;dash,underscore,none;dash &override_tv=Override TV name;string;  ';
 $p['Forgot Manager Login'] = 'if(!class_exists(\'ForgotManagerPassword\')) {
     class ForgotManagerPassword{
         function ForgotManagerPassword(){
@@ -5737,7 +6162,185 @@ switch($e->name) {
     default:
         break;
 }';
-$p['Inherit Parent TemplateProps'] = '&inheritTemplate=Inherit Template;list;From Parent,From First Sibling;From Parent  ';
+$p['Inherit Parent TemplateProps'] = '&inheritTemplate=Inherit Template;list;From Parent,From First Sibling;From Parent ';
+$p['ManagerManager'] = '// You can put your ManagerManager rules EITHER in a chunk OR in an external file - whichever suits your development style the best
+
+// To use an external file, put your rules in /assets/plugins/managermanager/mm_rules.inc.php 
+// (you can rename default.mm_rules.inc.php and use it as an example)
+// The chunk SHOULD have php opening tags at the beginning and end
+
+// If you want to put your rules in a chunk (so you can edit them through the Manager),
+// create the chunk, and enter its name in the configuration tab.
+// The chunk should NOT have php tags at the beginning or end
+
+// ManagerManager requires jQuery 1.3+
+// The URL to the jQuery library. Choose from the configuration tab whether you want to use 
+// a local copy (which defaults to the jQuery library distributed with ModX 1.0.1)
+// a remote copy (which defaults to the Google Code hosted version)
+// or specify a URL to a custom location.
+// Here we set some default values, because this is a convenient place to change them if we need to,
+// but you should configure your preference via the Configuration tab.
+$js_default_url_local = $modx->config[\'site_url\']. \'/assets/js/jquery-1.3.2.min.js\';
+$js_default_url_remote = \'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js\';
+
+// You don\'t need to change anything else from here onwards
+//-------------------------------------------------------
+
+// Run the main code
+$asset_path = $modx->config[\'base_path\'] . \'assets/plugins/managermanager/mm.inc.php\';
+include($asset_path);';
+$p['ManagerManagerProps'] = '&config_chunk=Configuration Chunk;text;mm_demo_rules; &remove_deprecated_tv_types_pref=Remove deprecated TV types;list;yes,no;yes &which_jquery=jQuery source;list;local (assets/js),remote (google code),manual url (specify below);local (assets/js) &js_src_type=jQuery URL override;text; ';
+$p['Quick Manager+'] = '$show = TRUE;
+
+if ($disabled  != \'\') {
+    $arr = explode(",", $disabled );
+    if (in_array($modx->documentIdentifier, $arr)) {
+        $show = FALSE;
+    }
+}
+
+if ($show) {
+    include_once($modx->config[\'base_path\'].\'assets/plugins/qm/qm.inc.php\');
+    $qm = new Qm($modx, $jqpath, $loadmanagerjq, $loadfrontendjq, $noconflictjq, $loadtb, $tbwidth, $tbheight, $hidefields, $hidetabs, $hidesections, $addbutton, $tpltype, $tplid, $custombutton, $managerbutton, $logout, $autohide);
+}';
+$p['Quick Manager+Props'] = '&jqpath=Path to jQuery;text;assets/js/jquery-1.3.2.min.js &loadmanagerjq=Load jQuery in manager;list;true,false;true &loadfrontendjq=Load jQuery in front-end;list;true,false;true &noconflictjq=jQuery noConflict mode in front-end;list;true,false;true &loadtb=Load modal box in front-end;list;true,false;true &tbwidth=Modal box window width;text;80% &tbheight=Modal box window height;text;90% &hidefields=Hide document fields from front-end editors;text;parent &hidetabs=Hide document tabs from front-end editors;text; &hidesections=Hide document sections from front-end editors;text; &addbutton=Show add document here button;list;true,false;true &tpltype=New document template type;list;parent,id,selected;parent &tplid=New document template id;int;3  &custombutton=Custom buttons;textarea; &managerbutton=Show go to manager button;list;true,false;true &logout=Logout to;list;manager,front-end;manager &disabled=Plugin disabled on documents;text; &autohide=Autohide toolbar;list;true,false;true ';
+$p['Search Highlight'] = '/*
+  ------------------------------------------------------------------------
+  Plugin: Search_Highlight v1.5
+  ------------------------------------------------------------------------
+  Changes:
+  18/03/10 - Remove possibility of XSS attempts being passed in the URL
+           - look-behind assertion improved
+  29/03/09 - Removed urldecode calls;
+           - Added check for magic quotes - if set, remove slashes
+           - Highlights terms searched for when target is a HTML entity
+  18/07/08 - advSearch parameter and pcre modifier added
+  10/02/08 - Strip_tags added to avoid sql injection and XSS. Use of $_REQUEST
+  01/03/07 - Added fies/updates from forum from users mikkelwe/identity
+  (better highlight replacement, additional div around term/removal message)
+  ------------------------------------------------------------------------
+  Description: When a user clicks on the link from the AjaxSearch results
+    the target page will have the terms highlighted.
+  ------------------------------------------------------------------------
+  Created By:  Susan Ottwell (sottwell@sottwell.com)
+               Kyle Jaebker (kjaebker@muddydogpaws.com)
+
+  Refactored by Coroico (www.modx.wangba.fr) and TS
+  ------------------------------------------------------------------------
+  Based off the the code by Susan Ottwell (www.sottwell.com)
+    http://modxcms.com/forums/index.php/topic,1237.0.html
+  ------------------------------------------------------------------------
+  CSS:
+    The classes used for the highlighting are the same as the AjaxSearch
+  ------------------------------------------------------------------------
+  Notes:
+    To add a link to remove the highlighting and to show the searchterms
+    put the following on your page where you would like this to appear:
+
+      <!--search_terms-->
+
+    Example output for this:
+
+      Search Terms: the, template
+      Remove Highlighting
+
+    Set the following variables to change the text:
+
+      $termText - the text before the search terms
+      $removeText - the text for the remove link
+  ------------------------------------------------------------------------
+*/
+global $database_connection_charset;
+// Conversion code name between html page character encoding and Mysql character encoding
+// Some others conversions should be added if needed. Otherwise Page charset = Database charset
+$pageCharset = array(
+  \'utf8\' => \'UTF-8\',
+  \'latin1\' => \'ISO-8859-1\',
+  \'latin2\' => \'ISO-8859-2\'
+);
+
+if (isset($_REQUEST[\'searched\']) && isset($_REQUEST[\'highlight\'])) {
+
+  // Set these to customize the text for the highlighting key
+  // --------------------------------------------------------
+     $termText = \'<div class="searchTerms">Search Terms: \';
+     $removeText = \'Remove Highlighting\';
+  // --------------------------------------------------------
+
+  $highlightText = $termText;
+  $advsearch = \'oneword\';
+
+  $dbCharset = $database_connection_charset;
+  $pgCharset = array_key_exists($dbCharset,$pageCharset) ? $pageCharset[$dbCharset] : $dbCharset;
+
+  // magic quotes check
+  if (get_magic_quotes_gpc()){
+    $searched = strip_tags(stripslashes($_REQUEST[\'searched\']));
+    $highlight = strip_tags(stripslashes($_REQUEST[\'highlight\']));
+    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags(stripslashes($_REQUEST[\'advsearch\']));
+  }
+  else {
+    $searched = strip_tags($_REQUEST[\'searched\']);
+    $highlight = strip_tags($_REQUEST[\'highlight\']);
+    if (isset($_REQUEST[\'advsearch\'])) $advsearch = strip_tags($_REQUEST[\'advsearch\']);
+  }
+
+  if ($advsearch != \'nowords\') {
+
+    $searchArray = array();
+    if ($advsearch == \'exactphrase\') $searchArray[0] = $searched;
+    else $searchArray = explode(\' \', $searched);
+
+    $searchArray = array_unique($searchArray);
+    $nbterms = count($searchArray);
+    $searchTerms = array();
+    for($i=0;$i<$nbterms;$i++){
+      // Consider all possible combinations
+      $word_ents = array();
+      $word_ents[] = $searchArray[$i];
+      $word_ents[] = htmlentities($searchArray[$i], ENT_NOQUOTES, $pgCharset);
+      $word_ents[] = htmlentities($searchArray[$i], ENT_COMPAT, $pgCharset);
+      $word_ents[] = htmlentities($searchArray[$i], ENT_QUOTES, $pgCharset);
+      // Avoid duplication
+      $word_ents = array_unique($word_ents);
+      foreach($word_ents as $word) $searchTerms[]= array(\'term\' => $word, \'class\' => $i+1);
+    }
+
+    $output = $modx->documentOutput; // get the parsed document
+    $body = explode("<body", $output); // break out the head
+
+    $highlightClass = explode(\' \',$highlight); // break out the highlight classes
+    /* remove possibility of XSS attempts being passed in URL */
+    foreach ($highlightClass as $key => $value) {
+       $highlightClass[$key] = preg_match(\'/[^A-Za-z0-9_-]/ms\', $value) == 1 ? \'\' : $value;
+    }
+
+    $pcreModifier = ($pgCharset == \'UTF-8\') ? \'iu\' : \'i\';
+    $lookBehind = \'/(?<!&|&[\\w#]|&[\\w#]\\w|&[\\w#]\\w\\w|&[\\w#]\\w\\w\\w|&[\\w#]\\w\\w\\w\\w|&[\\w#]\\w\\w\\w\\w\\w)\';  // avoid a match with a html entity
+    $lookAhead = \'(?=[^>]*<)/\'; // avoid a match with a html tag
+
+    $nbterms = count($searchTerms);
+    for($i=0;$i<$nbterms;$i++){
+      $word = $searchTerms[$i][\'term\'];
+      $class = $highlightClass[0].\' \'.$highlightClass[$searchTerms[$i][\'class\']];
+
+      $highlightText .= ($i > 0) ? \', \' : \'\';
+      $highlightText .= \'<span class="\'.$class.\'">\'.$word.\'</span>\';
+
+      $pattern = $lookBehind . preg_quote($word, \'/\') . $lookAhead . $pcreModifier;
+      $replacement = \'<span class="\' . $class . \'">${0}</span>\';
+      $body[1] = preg_replace($pattern, $replacement, $body[1]);
+    }
+
+    $output = implode("<body", $body);
+
+    $removeUrl = $modx->makeUrl($modx->documentIdentifier);
+    $highlightText .= \'<br /><a href="\'.$removeUrl.\'" class="ajaxSearch_removeHighlight">\'.$removeText.\'</a></div>\';
+
+    $output = str_replace(\'<!--search_terms-->\',$highlightText,$output);
+    $modx->documentOutput = $output;
+  }
+}';
 $p['TinyMCE Rich Text Editor'] = '// Set the name of the plugin folder
 $plugin_dir = "tinymce";
 
@@ -5857,23 +6460,66 @@ switch ($e->name)
 		break; 
 }
 ';
-$p['TinyMCE Rich Text EditorProps'] = '&customparams=Custom Parameters;textarea; &mce_formats=Block Formats;text;p,h1,h2,h3,h4,h5,h6,div,blockquote,code,pre &entity_encoding=Entity Encoding;list;named,numeric,raw;named &entities=Entities;text; &mce_path_options=Path Options;list;rootrelative,docrelative,fullpathurl;docrelative &mce_resizing=Advanced Resizing;list;true,false;true &disabledButtons=Disabled Buttons;text; &link_list=Link List;list;enabled,disabled;enabled &webtheme=Web Theme;list;simple,editor,creative,custom;simple &webPlugins=Web Plugins;text;style,advimage,advlink,searchreplace,contextmenu,paste,fullscreen,nonbreaking,xhtmlxtras,visualchars,media &webButtons1=Web Buttons 1;text;undo,redo,selectall,|,pastetext,pasteword,|,search,replace,|,nonbreaking,hr,charmap,|,image,link,unlink,anchor,media,|,cleanup,removeformat,|,fullscreen,code,help &webButtons2=Web Buttons 2;text;bold,italic,underline,strikethrough,sub,sup,|,|,blockquote,bullist,numlist,outdent,indent,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,|,styleprops &webButtons3=Web Buttons 3;text; &webButtons4=Web Buttons 4;text; &webAlign=Web Toolbar Alignment;list;ltr,rtl;ltr &width=Width;text;100% &height=Height;text;400  ';
+$p['TinyMCE Rich Text EditorProps'] = '&customparams=Custom Parameters;textarea; &mce_formats=Block Formats;text;p,h1,h2,h3,h4,h5,h6,div,blockquote,code,pre &entity_encoding=Entity Encoding;list;named,numeric,raw;named &entities=Entities;text; &mce_path_options=Path Options;list;rootrelative,docrelative,fullpathurl;docrelative &mce_resizing=Advanced Resizing;list;true,false;true &disabledButtons=Disabled Buttons;text; &link_list=Link List;list;enabled,disabled;enabled &webtheme=Web Theme;list;simple,editor,creative,custom;simple &webPlugins=Web Plugins;text;style,advimage,advlink,searchreplace,contextmenu,paste,fullscreen,nonbreaking,xhtmlxtras,visualchars,media &webButtons1=Web Buttons 1;text;undo,redo,selectall,|,pastetext,pasteword,|,search,replace,|,nonbreaking,hr,charmap,|,image,link,unlink,anchor,media,|,cleanup,removeformat,|,fullscreen,code,help &webButtons2=Web Buttons 2;text;bold,italic,underline,strikethrough,sub,sup,|,|,blockquote,bullist,numlist,outdent,indent,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,|,styleprops &webButtons3=Web Buttons 3;text; &webButtons4=Web Buttons 4;text; &webAlign=Web Toolbar Alignment;list;ltr,rtl;ltr &width=Width;text;100% &height=Height;text;400 ';
+$p['TransAlias'] = '/*
+ * Initialize parameters
+ */
+if (!isset ($alias)) { return ; }
+if (!isset ($plugin_dir) ) { $plugin_dir = \'transalias\'; }
+if (!isset ($plugin_path) ) { $plugin_path = $modx->config[\'base_path\'].\'assets/plugins/\'.$plugin_dir; }
+if (!isset ($table_name)) { $table_name = \'common\'; }
+if (!isset ($char_restrict)) { $char_restrict = \'lowercase alphanumeric\'; }
+if (!isset ($remove_periods)) { $remove_periods = \'No\'; }
+if (!isset ($word_separator)) { $word_separator = \'dash\'; }
+if (!isset ($override_tv)) { $override_tv = \'\'; }
+
+if (!class_exists(\'TransAlias\')) {
+    require_once $plugin_path.\'/transalias.class.php\';
+}
+$trans = new TransAlias($modx);
+
+/*
+ * see if TV overrides the table name
+ */
+if(!empty($override_tv)) {
+    $tvval = $trans->getTVValue($override_tv);
+    if(!empty($tvval)) {
+        $table_name = $tvval;
+    }
+}
+
+/*
+ * Handle events
+ */
+$e =& $modx->event;
+switch ($e->name ) {
+    case \'OnStripAlias\':
+        if ($trans->loadTable($table_name, $remove_periods)) {
+            $output = $trans->stripAlias($alias,$char_restrict,$word_separator);
+            $e->output($output);
+            $e->stopPropagation();
+        }
+        break ;
+    default:
+        return ;
+}';
+$p['TransAliasProps'] = '&table_name=Trans table;list;common,russian,utf8,utf8lowercase;utf8lowercase &char_restrict=Restrict alias to;list;lowercase alphanumeric,alphanumeric,legal characters;legal characters &remove_periods=Remove Periods;list;Yes,No;No &word_separator=Word Separator;list;dash,underscore,none;dash &override_tv=Override TV name;string; ';
 $e = &$this->pluginEvent;
-$e['OnBeforeManagerLogin'] = array('Forgot Manager Login','DuckPackAuthentication');
-$e['OnBeforeWebLogin'] = array('DuckPackAuthentication');
-$e['OnDocFormPrerender'] = array('Quick Manager+','ManagerManager','Inherit Parent Template');
+$e['OnBeforeManagerLogin'] = array('ObojoboAuth','Forgot Manager Login');
+$e['OnBeforeWebLogin'] = array('ObojoboAuth');
+$e['OnDocFormPrerender'] = array('Inherit Parent Template','Quick Manager+','ManagerManager');
 $e['OnDocFormRender'] = array('ManagerManager');
 $e['OnDocFormSave'] = array('Quick Manager+');
 $e['OnInterfaceSettingsRender'] = array('TinyMCE Rich Text Editor');
-$e['OnManagerAuthentication'] = array('DuckPackAuthentication','Forgot Manager Login');
+$e['OnManagerAuthentication'] = array('ObojoboAuth','Forgot Manager Login');
 $e['OnManagerLoginFormRender'] = array('Forgot Manager Login');
-$e['OnManagerLogout'] = array('DuckPackAuthentication','Quick Manager+');
+$e['OnManagerLogout'] = array('ObojoboAuth','Quick Manager+');
 $e['OnPluginFormRender'] = array('ManagerManager');
 $e['OnRichTextEditorInit'] = array('TinyMCE Rich Text Editor');
 $e['OnRichTextEditorRegister'] = array('TinyMCE Rich Text Editor');
 $e['OnStripAlias'] = array('TransAlias');
 $e['OnTVFormRender'] = array('ManagerManager');
-$e['OnWebAuthentication'] = array('DuckPackAuthentication');
-$e['OnWebLogout'] = array('DuckPackAuthentication');
-$e['OnWebPagePrerender'] = array('Quick Manager+','Search Highlight','DuckPackAuthentication','Markdown 1.1.7','Page TOC Generator');
+$e['OnWebAuthentication'] = array('ObojoboAuth');
+$e['OnWebLogout'] = array('ObojoboAuth');
+$e['OnWebPagePrerender'] = array('Search Highlight','Quick Manager+','ObojoboAuth','Markdown 1.1.7','Page TOC Generator');
 ?>
