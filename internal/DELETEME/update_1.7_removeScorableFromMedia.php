@@ -15,6 +15,7 @@ if($q)
 	{
 		$data = base64_decode($r->questionData);
 		
+		// remove the scorable key
 		if(preg_match('/s:8:"scorable";i:0;/', $data))
 		{
 			$data = preg_replace('/s:8:"scorable";i:0;/', '', $data);
@@ -29,6 +30,37 @@ if($q)
 				die();
 			}
 		}
+		
+		// fix the serialized index for the media object to reduce the number of members by one
+		if(preg_match('/"nm_los_Media":(\d+):/', $data, $matches))
+		{
+			$x = @unserialize($data);
+			if($x === false)
+			{
+				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-1).':', $data);
+				$x = @unserialize($data);
+				if($x === false)
+				{
+					echo '!fail ';
+				}
+				else
+				{
+					echo "<* ";
+					$qs2 = "UPDATE ".cfg_obo_Question::TABLE." SET questionData='?' WHERE questionID = ?";
+					$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->questionID);
+					if(!$q2)
+					{
+						echo "\n\nERROR\n\n";
+						$DBM->rollback();
+						die();
+					}
+				}
+			}
+			else
+			{
+				echo ':) ';
+			}
+		}
 	}
 }
 
@@ -41,6 +73,7 @@ if($q)
 	{
 		$data = base64_decode($r->pageData);
 		
+		// remove the scorable key
 		if(preg_match('/s:8:"scorable";i:0;/', $data))
 		{
 			$data = preg_replace('/s:8:"scorable";i:0;/', '', $data);
@@ -54,6 +87,38 @@ if($q)
 				$DBM->rollback();
 				die();
 			}
+		}
+		
+		// fix the serialized index for the media object to reduce the number of members by one
+		
+		if(preg_match('/"nm_los_Media":(\d+):/', $data, $matches))
+		{
+			$x = @unserialize($data);
+			if($x === false)
+			{
+				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-0).':', $data);
+				$x = @unserialize($data);
+				if($x === false)
+				{
+					echo '!fail ';
+				}
+				else
+				{
+					echo "<* ";
+					$qs2 = "UPDATE ".cfg_obo_Page::TABLE." SET pageData='?' WHERE pageID = ?";
+					$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->pageID);
+					if(!$q2)
+					{
+						echo "\n\nERROR\n\n";
+						$DBM->rollback();
+						die();
+					}
+				}
+			}
+		}
+		else
+		{
+			echo ':) ';
 		}
 	}
 }
