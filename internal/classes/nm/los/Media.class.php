@@ -14,7 +14,6 @@ class nm_los_Media
 	public $auth;			//User:  creator of media
 	public $title;			//String:  The name of the piece of media
 	public $itemType;			//String:  What type of media it is (pic, swf, vid)
-	public $scorable;		//Bool:  it is set when the media is scorable
 	public $descText;			//String:  in-depth description of contents of package
 	public $createTime;			//Number:  date media was created
 	public $copyright;		//String:
@@ -27,7 +26,7 @@ class nm_los_Media
 	public $width;			//width in pixels of media
 	public $version;		//version of the file (swf version for instance)
 
-	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $scorable=0, $width=0, $height=0, $version='')
+	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='')
 	{
 	    if(func_num_args() == 1)
         {   	
@@ -42,7 +41,6 @@ class nm_los_Media
 			$this->url = $mediaObj['url'];
 			$this->size = $mediaObj['size'];
 			$this->length = $mediaObj['length'];
-			$this->scorable = $mediaObj['scorable'];
 			$this->width = $mediaObj['width'];
 			$this->height = $mediaObj['height'];
 			$this->version = $mediaObj['version'];
@@ -61,7 +59,6 @@ class nm_los_Media
 			$this->size = $size;
 			$this->length = $length;
 			$this->perms = $perms;
-			$this->scorable = $scorable;
 			$this->width = $width;
 			$this->height = $height;
 			$this->version = $version;
