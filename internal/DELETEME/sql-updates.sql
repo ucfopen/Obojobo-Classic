@@ -7,7 +7,7 @@ ALTER TABLE  `lo_map_authors` ADD UNIQUE (
 `loID`
 );
 
-ALTER TABLE  `lo_media` DROP  `scorable`
+ALTER TABLE  `lo_media` DROP  `scorable`;
 
 RENAME TABLE  `lo_visits` TO  `lo_tracking_visits` ;
 RENAME TABLE  `lo_computer_data` TO  `lo_tracking_profile` ;
