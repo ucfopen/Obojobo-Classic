@@ -7,6 +7,7 @@ ALTER TABLE  `lo_map_authors` ADD UNIQUE (
 `loID`
 );
 
+ALTER TABLE  `lo_media` DROP  `scorable`
 
 RENAME TABLE  `lo_visits` TO  `lo_tracking_visits` ;
 RENAME TABLE  `lo_computer_data` TO  `lo_tracking_profile` ;
@@ -34,7 +35,7 @@ RENAME TABLE  `lo_attempts_extra` TO  `lo_map_extra_attempts_to_user` ;
 RENAME TABLE  `lo_languages` TO  `lo_los_languages` ;
 
 
-ENAME TABLE  `los`.`lo_deleted_instances` TO  `los`.`obo_deleted_instances` ;
+RENAME TABLE  `los`.`lo_deleted_instances` TO  `los`.`obo_deleted_instances` ;
 RENAME TABLE  `los`.`lo_deleted_los` TO  `los`.`obo_deleted_los` ;
 RENAME TABLE  `los`.`lo_locks` TO  `los`.`obo_locks` ;
 RENAME TABLE  `los`.`lo_los` TO  `los`.`obo_los` ;
@@ -97,3 +98,4 @@ INDEX (  `mediaID` ,  `loID` )
 ALTER TABLE  `obo_map_media_to_lo` ENGINE = INNODB
 
 DROP TABLE  `obo_los_answers`;
+

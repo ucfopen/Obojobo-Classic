@@ -201,7 +201,6 @@ class nm_los_MediaManager extends core_db_dbEnabled
 				".cfg_core_User::ID."='?', 
 				".cfg_obo_Media::TITLE."='?', 
 				".cfg_obo_Media::TYPE."='?',
-				".cfg_obo_Media::SCORABLE."='?', 
 				`".cfg_obo_Media::DESC."`='?', 
 				".cfg_obo_Media::URL."='?', 
 				".cfg_obo_Media::TIME."='?',
@@ -214,7 +213,7 @@ class nm_los_MediaManager extends core_db_dbEnabled
 				".cfg_obo_Media::VER."='?'";
 		
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
-		$media->scorable, $media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
+		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
 		$media->size, $media->length, $media->height, $media->width, $media->version)) )
 		{
 		    $this->DBM->rollback();
