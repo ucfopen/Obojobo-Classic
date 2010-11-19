@@ -50,7 +50,7 @@ $stats = array();
    $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS FROM ".cfg_obo_Track::TABLE." WHERE ".cfg_obo_Track::TYPE." ='nm_los_tracking_PageChanged' AND ".cfg_obo_Track::TIME." > 1214193600");
 
    // Count of next/prev button used in content;
-   //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM lo_tracking WHERE type='nm_los_tracking_NextPreviousUsed' AND time > 1214193600";
+   //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM obo_logs WHERE type='nm_los_tracking_NextPreviousUsed' AND time > 1214193600";
    // Media Views
    $stats[] = array ('name' => '12_MediaViews', 'value'=>"SELECT COUNT(".cfg_core_User::ID.") AS MEDIA_VIEWS FROM ".cfg_obo_Track::TABLE." WHERE ".cfg_obo_Track::TYPE."='nm_los_tracking_MediaRequested' AND ".cfg_obo_Track::TIME." > 1214193600");
 
@@ -64,10 +64,10 @@ $stats = array();
    $stats[] = array ('name' => '15_NumberOfAssessmentSessionsStarted', 'value'=>"SELECT COUNT(*) AS ASSESSMENT_STARTED_COUNT FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
 
    // Number of instances deleted
-   $stats[] = array ('name' => '16_NumberOfInstancesDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_INST_COUNT FROM `lo_instances_deleted` WHERE 1");
+   $stats[] = array ('name' => '16_NumberOfInstancesDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_INST_COUNT FROM ".cfg_obo_Instance::DELETED_TABLE." WHERE 1");
 
    // Number of master objects deleted
-   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM `lo_los_deleted` WHERE 1");
+   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM ".cfg_obo_LO::DEL_TABLE." WHERE 1");
 
    // Total learning object draft saves
    $stats[] = array ('name' => '18_TotalLearningObjectDraftSaves', 'value'=>"SELECT MAX(".cfg_obo_LO::ID.") AS NUM_DRAFT_SAVES FROM ".cfg_obo_LO::TABLE."");
@@ -94,10 +94,10 @@ $stats = array();
    $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".cfg_obo_Keyword::MAP_ITEM.") as COUNT FROM ".cfg_obo_Keyword::MAP_TABLE." AS M, ".cfg_obo_Keyword::TABLE." AS K WHERE M.".cfg_obo_Keyword::ID." = K.".cfg_obo_Keyword::ID." GROUP BY K.".cfg_obo_Keyword::ID." ORDER BY KEYWORD");
 
    //Page Layouts use in Masters
-   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." AS P, ".cfg_obo_Layout::TABLE." AS L WHERE P.".cfg_obo_Page::ID." IN (SELECT ".cfg_obo_Page::ID." FROM ".cfg_obo_Page::MAP_TABLE." WHERE ".cfg_obo_LO::ID." IN (SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." != '0' AND ".cfg_obo_LO::SUB_VER." ='0')) AND L.".cfg_obo_Layout::ID." = P.".cfg_obo_Layout::ID."  Group By LAYOUT");
+//   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." AS P, ".cfg_obo_Layout::TABLE." AS L WHERE P.".cfg_obo_Page::ID." IN (SELECT ".cfg_obo_Page::ID." FROM ".cfg_obo_Page::MAP_TABLE." WHERE ".cfg_obo_LO::ID." IN (SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE." WHERE ".cfg_obo_LO::VER." != '0' AND ".cfg_obo_LO::SUB_VER." ='0')) AND L.".cfg_obo_Layout::ID." = P.".cfg_obo_Layout::ID."  Group By LAYOUT");
 
    //Page Layouts use in Masters
-   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".cfg_obo_Layout::ID." AS LAYOUT, count(".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." Group By ".cfg_obo_Layout::ID."");
+//   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".cfg_obo_Layout::ID." AS LAYOUT, count(".cfg_obo_Page::ID.") as COUNT FROM ".cfg_obo_Page::TABLE." Group By ".cfg_obo_Layout::ID."");
 
    //Resolution by Views
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".cfg_obo_ComputerData::RES_WIDTH.", ".cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".cfg_obo_ComputerData::TIME.") as COUNT  FROM ".cfg_obo_ComputerData::TABLE." WHERE ".cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".cfg_obo_ComputerData::RES_WIDTH.", ".cfg_obo_ComputerData::RES_HEIGHT);

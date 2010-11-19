@@ -220,7 +220,11 @@ abstract class core_auth_AuthModule extends core_db_dbEnabled
 		{
 			
 			$this->defaultDBM();
-			if(!session_id()) @session_start();
+			if(!session_id())
+			{
+				session_name(AppCfg::SESSION_NAME);
+			 	@session_start();
+			}
 			@session_regenerate_id(false);
 			$_SESSION = array();// force a fresh start on the session variables
 			$_SESSION['userID'] = $userID;

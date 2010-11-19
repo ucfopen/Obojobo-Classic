@@ -2,7 +2,7 @@
 class cfg_core_Perm
 {
 
-	const TABLE = 'lo_perms_item';
+	const TABLE = 'obo_map_perms_to_item';
 	const ID = 'permID';
 	const ITEM = 'itemID';
 	const TYPE = 'itemType';

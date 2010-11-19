@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Semester
 {
-	const TABLE = 'lo_semesters';
+	const TABLE = 'obo_semesters';
 	
 	const ID = 'semesterID';
 	const NAME = 'semester';

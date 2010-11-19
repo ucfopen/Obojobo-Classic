@@ -1,7 +1,7 @@
 <?php
 class cfg_obo_Perm
 {
-	const TABLE = 'lo_map_perms';
+	const TABLE = 'obo_map_perms_to_lo';
 	const ITEM = 'itemID';
 	const TYPE = 'itemType';
 	const READ = 'read';

@@ -16,6 +16,7 @@ class nm_los_Question
 	public $answers;		//Array: answers
 	public $perms;			//Permissions object:  merged from global and user
 	public $items;			//Array: of page items
+	public $questionIndex;
 	
 	function __construct($questionID=0, $userID=0, $itemType='QA', $answers=Array(), $perms=0, $items=Array())
 	{

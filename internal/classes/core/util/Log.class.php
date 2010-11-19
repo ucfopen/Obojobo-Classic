@@ -8,34 +8,51 @@ class core_util_Log
 		if($force || AppCfg::DEBUG_MODE)
 		{
 			@$dt = debug_backtrace();
-			if(count($dt) > 1)
+			// if traceText is an object, print_r it
+			if(is_object($traceText) || is_array($traceText))
 			{
-				if(is_object($traceText) || is_array($traceText))
+				$traceText = print_r($traceText, true);
+			}
+			
+			if(is_array($dt))
+			{
+				$len = count($dt);
+				if($len > 1)
 				{
-					self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[$increaseBackTraceIndex]['line'].' printr: '. print_r($traceText, true));
+					// called using global trace function from app.php
+					if(basename($dt[0]['file']) == 'app.php')
+					{
+						if($len > 2) // called from a class file
+						{
+							self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[0+$increaseBackTraceIndex]['line'].': '.$traceText, false);
+						}
+						else // called from a script
+						{
+							self::writeLog(basename($dt[1]['file']).'#'.$dt[1]['line'].': '.$traceText, false);
+						}
+						return; // exit here if either of these methods wrote to the log
+					}
 				}
-				else
-				{
-					self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[$increaseBackTraceIndex]['line'].': '.$traceText);
-				}
+			}
+			// couldnt get backtrace, just export what we have
+			if(is_object($traceText) || is_array($traceText))
+			{
+				self::writeLog('printr: ' .print_r($traceText, true));
 			}
 			else
 			{
-				if(is_object($traceText) || is_array($traceText))
-				{
-					self::writeLog('printr: ' .print_r($traceText, true));
-				}
-				else
-				{
-					self::writeLog('trace: ' .$traceText);
-				}
-				
+				self::writeLog('trace: ' .$traceText);
 			}
 		}
 	}
 	
 	private static function writeLog($output, $fileName=false)
-	{		
+	{	
+		// create the log directory if it doesnt exist
+		if(!file_exists(AppCfg::DIR_BASE.AppCfg::DIR_LOGS))
+		{
+			@mkdir(AppCfg::DIR_BASE.AppCfg::DIR_LOGS, 0770, true);
+		}
 		if($fileName)
 		{
 			$f = AppCfg::DIR_BASE.AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';

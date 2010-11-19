@@ -210,6 +210,11 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		}
 	}
 
+	public function getSessionUserID()
+	{
+		return $_SESSION['userID'];
+	}
+
 	/**
 	 * Logs the user out of the system, completely clearing the session variable and destroying the session.
 	 * @param $userID (number) User ID to log out of the system
@@ -218,6 +223,7 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	{
 		if(!headers_sent() && !isset($_SESSION))
 		{
+			session_name(AppCfg::SESSION_NAME);
 			session_start();
 		}
 		// TODO: add tracking back in
@@ -590,8 +596,8 @@ class core_auth_AuthManager extends core_db_dbEnabled
 					return $authMod;
 				}
 			}
+			trace('couldnt fetch user authmod: ' . $userID, true);
 		}
-		trace('couldnt fetch user authmod: ' . $userID, true);
 		return false;
 	}
 
