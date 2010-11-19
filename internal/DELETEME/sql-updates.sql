@@ -6,3 +6,5 @@ ALTER TABLE  `lo_map_authors` ADD UNIQUE (
 `userID` ,
 `loID`
 );
+
+ALTER TABLE  `lo_media` DROP  `scorable`
