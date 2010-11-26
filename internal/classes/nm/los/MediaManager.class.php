@@ -246,8 +246,10 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		$media->perms = new nm_los_Permissions($media->auth, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
 		
 		//Add owner permissions to this object for this user
-		$permman = nm_los_PermissionsManager::getInstance();
-		$permman->setNewUserPerms($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
+//		$PM = nm_los_PermissionsManager::getInstance();
+//		$PM->setPermsForUserToItem($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
+//			public function setUserPerms($itemID=0, $itemType='l', $permObj)
+//		$permman->setNewUserPerms($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
 		
 		
 		core_util_Cache::getInstance()->setMedia($media);
@@ -300,16 +302,9 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		}
 		
 		$newFileLocation = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA . md5($fileName);
-		
-		if($config->isUnitTest)
-		{
-			// in test, just move the test file
-			copy($fileData['tmp_name'], $newFileLocation);
-		}
-		else
-		{
-			move_uploaded_file($fileData['tmp_name'], $newFileLocation);
-		}
+	
+
+		move_uploaded_file($fileData['tmp_name'], $newFileLocation);
 		
 		if(file_exists($newFileLocation))
 		{
