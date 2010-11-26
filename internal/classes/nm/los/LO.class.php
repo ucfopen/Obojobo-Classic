@@ -546,9 +546,18 @@ class nm_los_LO
 			$qgm->newGroup($this->pGroup); // the referenced objects ids will be updated if needed
 			$qgm->newGroup($this->aGroup);
 			
+			//********* Build Summary Object **************/
+			// build summary object
+			$this->summary = array(
+				'contentSize' => count($this->pages),
+				'practiceSize' => count($this->pGroup->kids),
+				'assessmentSize' => count($this->aGroup->kids)
+			);
+			
+			
 			/********** UPDATE LO **********************/
-			$qstr = "INSERT INTO ".cfg_obo_LO::TABLE." SET `".cfg_obo_LO::TITLE."` = '?', `".cfg_obo_Language::ID."` = '?',`".cfg_obo_LO::NOTES."` = '?', `".cfg_obo_LO::OBJECTIVE."` = '?', `".cfg_obo_LO::LEARN_TIME."` = '?', `".cfg_obo_LO::PGROUP."` = '?', `".cfg_obo_LO::AGROUP."` = '?', `".cfg_obo_LO::VER."` = '?', `".cfg_obo_LO::SUB_VER."` = '?', `".cfg_obo_LO::ROOT_LO."` = '?', `".cfg_obo_LO::PARENT_LO."` = '?', `".cfg_obo_LO::TIME."` = UNIX_TIMESTAMP(), `".cfg_obo_LO::COPYRIGHT."` = '?'";
-			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright);
+			$qstr = "INSERT INTO ".cfg_obo_LO::TABLE." SET `".cfg_obo_LO::TITLE."` = '?', `".cfg_obo_Language::ID."` = '?',`".cfg_obo_LO::NOTES."` = '?', `".cfg_obo_LO::OBJECTIVE."` = '?', `".cfg_obo_LO::LEARN_TIME."` = '?', `".cfg_obo_LO::PGROUP."` = '?', `".cfg_obo_LO::AGROUP."` = '?', `".cfg_obo_LO::VER."` = '?', `".cfg_obo_LO::SUB_VER."` = '?', `".cfg_obo_LO::ROOT_LO."` = '?', `".cfg_obo_LO::PARENT_LO."` = '?', `".cfg_obo_LO::TIME."` = UNIX_TIMESTAMP(), `".cfg_obo_LO::COPYRIGHT."` = '?',  ".cfg_obo_LO::NUM_PAGES." = '?', ".cfg_obo_LO::NUM_PRACTICE." = '?', ".cfg_obo_LO::NUM_ASSESSMENT." = '?'";
+			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright, $this->summary['contentSize'], $this->summary['practiceSize'], $this->summary['assessmentSize']);
 			if(!$q)
 			{
 			    trace(mysql_error(), true);
