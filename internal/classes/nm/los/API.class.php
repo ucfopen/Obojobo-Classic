@@ -23,14 +23,14 @@ class nm_los_API extends core_db_dbEnabled
 		return self::$instance;
 	}
 
-    public function __construct($isRemoting = false)
-    {
-        parent::__construct();
-        if($isRemoting)
-        {
-            //$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
-        }
-    }
+	public function __construct($isRemoting = false)
+	{
+		parent::__construct();
+		if($isRemoting)
+		{
+			//$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
+		}
+	}
 	
 	/**
 	 * Verifies that the user has a current session and generates a new SESSID for them 
@@ -96,37 +96,55 @@ class nm_los_API extends core_db_dbEnabled
 		return $PM->callAPI($plugin, $method, $args);
 	}
 
-		// TODO: future course code
-	// public function getCourses()
-	// {
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$CM = nm_los_CourseManager::getInstance();
-	// 		return $CM->getMyCourses();
-	// 	}
-	// 	else
-	// 	{
-	// 			// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
+	public function getCourses()
+	{
+		$result = false;
+		if($this->getSessionValid())
+		{
+			// TODO: change this to work as a plugin architecture
+			// Ideal place to have events/listeners
+			$user = $this->getUser();
+			$PM = core_plugin_PluginManager::getInstance();
+			$UCF = $PM->getAPI('UCFCourses');
+			$result = $UCF->getCourses($user->login);
+		}
+		else
+		{
+			$error = AppCfg::ERROR_TYPE;
+			$result = new $error(1);
+		}
+		return $result;
+	}
 	
-	// TODO: future course code
-	// public function getCourse($courseID)
-	// {
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$CM = nm_los_CourseManager::getInstance();
-	// 		return $CM->getCourse($courseID);
-	// 	}
-	// 	else
-	// 	{
-	// 			// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
+	public function setCourseForInstance($instID, $courseID, $columnName)
+	{
+		$result = false;
+		if($this->getSessionValid())
+		{
+			// TODO: change this to work as a plugin architecture
+			// Ideal place to have events/listeners
+			$user = $this->getUser();
+			$PM = core_plugin_PluginManager::getInstance();
+			$UCF = $PM->getAPI('UCFCourses');
+			// create the gradebook column
+			$column = $UCF->createColumn($user->login, $courseID, $columnName);
+			if(is_array($column) && $column['columnID'] > 0)
+			{
+				// store mapping relationship
+				$qstr = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_COURSE." SET ".cfg_los_Instance::ID." ='?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COLUMN_ID." = '?'";
+				if($this->DBM->querySafe($qstr, $instID, $_SESSION['userID'], $courseID, $column['columnID']))
+				{
+					$result = true;
+				}
+			}
+		}
+		else
+		{
+			$error = AppCfg::ERROR_TYPE;
+			$result = new $error(1);
+		}
+		return $result;	
+	}
 	
 	/**
 	 * Logs out the current active user

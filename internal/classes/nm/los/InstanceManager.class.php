@@ -142,35 +142,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 				return core_util_Error::getError(4);
 			}
 		}
-		// TODO: future course code
-		// if no courseID is sent, assume its a new course
-		// if(!is_object($course))
-		// {
-		// 	$course = (object) $course;
-		// 	
-		// }
-		// trace($course);
-		// if( !($course->courseID > 0) )
-		// {
-		// 	$CM = nm_los_CourseManager::getInstance();
-		// 	$CM->saveCourse($course);
-		// }
-		
-		//Generate query string
-		// TODO: future course code
-		// $qstr = "INSERT INTO `".cfg_obo_Instance::TABLE."`
-		// 		SET 
-		// 			`".cfg_obo_Instance::TITLE."`='?',
-		// 			`".cfg_obo_LO::ID."`='?',
-		// 			`".cfg_core_User::ID."`='?',
-		// 			`".cfg_obo_Instance::TIME."`='?',
-		// 			`".cfg_obo_Instance::COURSE."`='?',
-		// 			`".cfg_obo_Instance::START_TIME."`='?',
-		// 			`".cfg_obo_Instance::END_TIME."`='?',
-		// 			`".cfg_obo_Instance::ATTEMPT_COUNT."`='?',
-		// 			`".cfg_obo_Instance::SCORE_METHOD."`='?',
-		// 			`".cfg_obo_Instance::SCORE_IMPORT."`='?',
-		// 			`".cfg_obo_Course::ID."`='?'";
+
 		$qstr = "INSERT INTO `".cfg_obo_Instance::TABLE."`
 				SET 
 					`".cfg_obo_Instance::TITLE."`='?',
@@ -405,20 +377,11 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		}
 
 		$authMan = core_auth_AuthManager::getInstance();
-		// TODO: future course code: $CM = nm_los_CourseManager::getInstance();
 
 		while($r = $this->DBM->fetch_obj($q))
 		{
-
-			// TODO: future course code: $course = $CM->getCourse($r->{cfg_obo_Course::ID});
 			$ownerName = $authMan->getName($r->{cfg_core_User::ID});
-
-
-
-			// TODO: future course code: $iData = new nm_los_InstanceData($r->{cfg_obo_Instance::ID}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $ownerName, $r->{cfg_obo_Instance::TITLE}, $course, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT});
 			$iData = new nm_los_InstanceData($r->{cfg_obo_Instance::ID}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $ownerName, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT});
-
-
 			core_util_Cache::getInstance()->setInstanceData($iData);
 			// get perms
 
@@ -527,32 +490,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 			
 			return core_util_Error::getError(2);
 		}
-		// TODO: future course code
-		// if no courseID is sent, assume its a new course
-		// if(!is_object($course))
-		// {
-		// 	$course = (object) $course;
-		// 	
-		// }
-		// // if no courseID is sent, assume its a new course
-		// $CM = nm_los_CourseManager::getInstance();
-		// $CM->saveCourse($course);
 
-		// TODO: future course code
-		//Generate query string
-		// $qstr = "UPDATE ".cfg_obo_Instance::TABLE."
-		// 	SET 
-		// 		`".cfg_obo_Instance::TITLE."` = '?', 
-		// 		`".cfg_obo_Instance::COURSE."` = '?', 
-		// 		`".cfg_obo_Instance::START_TIME."` = '?', 
-		// 		`".cfg_obo_Instance::END_TIME."` = '?', 
-		// 		`".cfg_obo_Instance::ATTEMPT_COUNT."` = '?', 
-		// 		`".cfg_obo_Instance::SCORE_METHOD."` = '?',
-		// 		`".cfg_obo_Instance::SCORE_IMPORT."` = '?',
-		// 		`".cfg_obo_Course::ID."`='?'
-		// 	WHERE 
-		// 		`".cfg_obo_Instance::ID."` = '?'";
-				
 		$qstr = "UPDATE ".cfg_obo_Instance::TABLE."
 			SET 
 				`".cfg_obo_Instance::TITLE."` = '?', 

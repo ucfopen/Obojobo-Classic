@@ -633,70 +633,6 @@ class nm_los_Cache extends core_util_Memcache
 		}
 	}
 	
-	public function setMyCourses($userID, $courses)
-	{
-		if($this->memEnabled)
-		{
-			if($this->set($this->ns.'plugin_UCFCourseDataAPI:getMyCourses:'.$userID, $courses, false, 3600))
-			{
-				return;
-			}
-			core_util_Log::trace('failure writing memcache', true);
-		}
-	}
-	
-	public function getMyCourses($userID)
-	{
-		if($this->memEnabled)
-		{
-			if($result = $this->get($this->ns.'plugin_UCFCourseDataAPI:getMyCourses:'.$userID))
-			{
-				return $result;
-			}
-		core_util_Log::profile('memcache_missed', 'myCourses:'.$userID."\n");
-		}
-	}
-	
-	public function clearMyCourses($userID)
-	{
-		if($this->memEnabled)
-		{
-			$this->delete($this->ns.'plugin_UCFCourseDataAPI:getMyCourses:'.$userID);
-		}
-	}
-	
-	public function getCourse($courseID)
-	{
-		if($this->memEnabled)
-		{
-			if($result = $this->get($this->ns.'nm_los_Course:getCourse:'.$courseID))
-			{
-				return $result;
-			}
-			core_util_Log::profile('memcache_missed', 'course:'.$courseID."\n");
-		}
-	}
-	
-	public function setCourse($course)
-	{
-		if($this->memEnabled)
-		{
-			if($this->set($this->ns.'nm_los_Course:getCourse:'.$course->courseID, $course, false, 3600))
-			{
-				return;
-			}
-			core_util_Log::trace('failure writing memcache', true);
-		}
-	}
-	
-	public function clearCourse($courseID)
-	{
-		if($this->memEnabled)
-		{
-			$this->delete($this->ns.'plugin_UCFCourseDataAPI:getCourseStudents:'.$courseID);
-		}
-	}
-	
 	public function setCourseStudents($courseID, $students)
 	{
 		if($this->memEnabled)
@@ -751,53 +687,6 @@ class nm_los_Cache extends core_util_Memcache
 		return;
 	}
 	
-	public function getSemesters()
-	{
-		if($this->memEnabled)
-		{
-			if($result = $this->get($this->ns.'nm_los_CourseManager:getSemesters'))
-			{
-				return $result;
-			}
-			core_util_Log::profile('memcache_missed', 'semesters'."\n");
-		}
-	}
-	
-	public function setSemesters($semesters)
-	{
-		if($this->memEnabled)
-		{
-			if($this->set($this->ns.'nm_los_CourseManager:getSemesters', $semesters, false, 3600))
-			{
-				return;
-			}
-			core_util_Log::trace('failure writing memcache', true);
-		}
-	}
-	
-	public function getCurrentSemester()
-	{
-		if($this->memEnabled)
-		{
-			if($result = $this->get($this->ns.'nm_los_CourseManager:getCurrentSemester'))
-			{
-				return $result;
-			}
-			core_util_Log::profile('memcache_missed', 'cSemester'."\n");
-		}
-	}
-	
-	public function setCurrentSemester($semester)
-	{
-		if($this->memEnabled)
-		{	
-			if($this->set($this->ns.'nm_los_CourseManager:getCurrentSemester', $semester, false, $semester->endTime)) // expire at the end of the semester
-			{
-				return;
-			}
-			core_util_Log::trace('failure writing memcache', true);
-		}
-	}
 	
 }
 
