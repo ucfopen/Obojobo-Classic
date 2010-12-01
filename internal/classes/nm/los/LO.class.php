@@ -233,7 +233,6 @@ class nm_los_LO
 					$this->version = 0; // force 0.1
 					$this->subVersion = 1; // force 0.1
 					$success = $this->dbStore($DBM);
-//					$this->rootID = $this->loID; // the client needs the rootID not to be 0 (rootID 0 is only on the database side)
 					return $success;
 				}
 				
@@ -248,7 +247,6 @@ class nm_los_LO
 					$this->rootID = 0;
 					$this->loID = 0;
 					$success = $this->dbStore($DBM);
-//					$this->rootID = $this->loID; // the client needs the rootID not to be 0 (rootID 0 is only on the database side)
 					
 					// copy the permissions from the master object to the new draft
 					$PM = nm_los_PermissionsManager::getInstance();
@@ -263,18 +261,18 @@ class nm_los_LO
 				else
 				{
 					$this->subVersion++; // incriment subVersion
-					//$this->parentID = 0;
 					$this->loID = 0;
 					$success = $this->dbStore($DBM);
 					return $success;
 				}
 				break;
 				
-			case self::MASTER:
+			case self::MASTER: 				// TODO: see if we can utilize dbStore for most of this?
 				/*************************** MASTER *************************
 				 * rootID is it's own loID - NOTE: in the database we store rootID as 0, which implies it is the same as the loID
 				 * parentID is the previous full version, if there is one. 1.0 has none, 2.0 points at 1.0
 				 * drafts for a master are removed  1.1, 1.2, 1.3 are removed leaving only 2.0
+				 * saving a master converts the latest draft to a master object, no changes can be saved at the same time, save a draft first if needed
 				 ************************************************************/
 				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
 				
@@ -298,7 +296,7 @@ class nm_los_LO
 				$this->version = $this->version + 1;
 				$this->subVersion = 0;
 				
-				// 1.0 has no parent !!! UNLESS its a deriviative TODO: deal with derivatives here? - may be elsewhere in createDerivative
+				// 1.0 has no parent !!! UNLESS its a deriviative (see create derivative)
 				if($this->version == 1)
 				{
 					$this->parentID = 0;
@@ -324,6 +322,7 @@ class nm_los_LO
 						$pageman->mapPageToLO($this->loID, $page->pageID, $orderIndex); // map this page
 					}
 				}
+				
 				/********* ASSOCIATE KEYWORDS *************/
 				$KM = nm_los_KeywordManager::getInstance();
 				foreach($this->keywords AS $tag)
@@ -355,7 +354,7 @@ class nm_los_LO
 				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
 				if($this->isValidMaster(true) !== true) return core_util_Error::getError(2); // Validate
 
-				$this->parentID = $this->loID; // link parent to previous root id
+				$this->parentID = $this->loID; // link parent to previous root id (only case where a 1.0 object has a parent id)
 				$this->loID = 0;// force it to save a copy
 				$this->version = 1; // reset
 				$this->subVersion = 0; // reset
