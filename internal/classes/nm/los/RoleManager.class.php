@@ -243,7 +243,6 @@ class nm_los_RoleManager extends core_db_dbEnabled
 		if(is_array($roleid) && count($roleid) > 0)
 		{
 			$cacheKey = implode(',',  $roleid);
-			trace($cacheKey);
 			// check memcache for the list of user indexes
 			
 			$usersIndexes = core_util_Cache::getInstance()->getUsersInRole($cacheKey);
@@ -252,7 +251,6 @@ class nm_los_RoleManager extends core_db_dbEnabled
 			if(!is_array($usersIndexes))
 			{
 				$qstr = "SELECT DISTINCT ".cfg_core_User::ID." FROM ".cfg_obo_Role::MAP_USER_TABLE." WHERE ".cfg_obo_Role::ID." IN (?)";
-				trace($qstr, true);
 				if(!($q = $this->DBM->querySafe($qstr, $cacheKey)))
 				{
 				    trace(mysql_error(), true);
@@ -374,7 +372,6 @@ class nm_los_RoleManager extends core_db_dbEnabled
 			}
 			else
 			{
-				trace(' not super user.', true);
 				return false;
 			}
 		}

@@ -77,7 +77,8 @@ class core_util_Error
 
 			/* Plugin Errors */
 			case 200: return "Plugin disabled or missing";
-
+			case 201: return "Plugin method not found";
+			
 			/* UserManager Errors */
 			case 1000: return "General User Manager Error.";
 			case 1001: return "Invalid input.";

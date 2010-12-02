@@ -2,6 +2,7 @@
 class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 {
 
+	const PUBLIC_FUNCTION_LIST = ''; // dont allow any direct calls
 	private static $instance;
 	static public function getInstance()
 	{
@@ -41,7 +42,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				return $semester;
 			}
 		}
-
 		return new nm_los_Semester();
 	}
 	
@@ -63,23 +63,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			core_util_Cache::getInstance()->setSemesters($semesters);
 			return $semesters;
 		}
-	}
-
-	public function getLinkedCourseDetails($instID)
-	{
-		$qstr = "SELECT * FROM ".cfg_plugin_UCFCourses::MAP_GRADES ." WHERE ".cfg_obo_Instance::ID." = '?'";
-		if(!$q = $this->DBM->querySafe($qstr, $instID))
-		{
-			// query error
-		}
-		if($r = $this->DBM->fetch_obj($q))
-		{
-			
-			$r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
-			MAP_COL_ID
-		}
-		return false;
-		
 	}
 	
 	/**
@@ -107,30 +90,43 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	public function getCourses($NID)
+	public function getCourses()
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
+		$AM = core_auth_AuthManager::getInstance();
+		if($AM->verifySession())
+		{
+			$userID = $AM->getSessionUserID();
+			$NID = $AM->getUserName($userID);
 		
-		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
+		
+			$request->execute();
+			$resultInfo = $request->getResponseInfo();
+		
+			// check for http response code of 200
+			if($resultInfo['http_code'] != 200)
+			{
+				$error = AppCfg::ERROR_TYPE;
+				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			}
+		
+			$result = $this->decodeJSON($request->getResponseBody());
+			$courses = $result->data;
+		
+			$errors = $this->parseErrors($result->errors);
+			if($errors && count($courses) == 0)
+			{
+				return $errors;
+			}
+		
+			return $courses;
+		}
+		else
 		{
 			$error = AppCfg::ERROR_TYPE;
-			return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			return new $error(1);
 		}
-		
-		$result = $this->decodeJSON($request->getResponseBody());
-		$courses = $result->data;
-		
-		$errors = $this->parseErrors($result->errors);
-		if($errors && count($courses) == 0)
-		{
-			return $errors;
-		}
-		
-		return $courses;
 	}
 	
 	/**
@@ -162,40 +158,56 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 *	4, Gradebook column with specified name already exists
 	 *	7, Unable to create gradebook column
 	 *
-	 * @param string $NID 	Webcourses Vista user id of the Section Instructor (typically NID)
 	 * @param string $sectionID 	Webcourses Vista learning context id
 	 * @param string $columnName 	desired grade book column name will be prefixed with 'obo:'
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	public function createColumn($NID, $sectionID, $columnName)
+	public function createColumn($instID, $sectionID, $columnName)
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-		$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
+		// TODO: require user to have rights to the instance
+		$AM = core_auth_AuthManager::getInstance();
+		if($AM->verifySession())
+		{
+			$userID = $AM->getSessionUserID();
+			$NID = $AM->getUserName($userID);
+		
+			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+			$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
+			$request->execute();
+			$resultInfo = $request->getResponseInfo();
 
-		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+			// check for http response code of 200
+			if($resultInfo['http_code'] != 200)
+			{
+				$error = AppCfg::ERROR_TYPE;
+				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			}
+		
+			$result = $this->decodeJSON($request->getResponseBody());
+		
+			$return = array();
+			$return['columnID'] = isset($result->data->column_id) ? $result->data->column_id : 0;
+			$return['msg'] = $result->msgs[0];
+		
+			$errors = $this->parseErrors($result->errors);
+			if($errors && $return['columnID'] == 0)
+			{
+				return $errors;
+			}
+		
+			// success, record the column
+			$sql = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_TABLE." SET ". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ". cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_obo_Instance::ID." = '?'";
+			$this->DBM->querySafe($sql, $sectionID, $userID, $return['columnID'], 'obo:' . $columnName, $instID);
+			return $return;
+		}
+		else
 		{
 			$error = AppCfg::ERROR_TYPE;
-			return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			return new $error(1);
 		}
-		
-		$result = $this->decodeJSON($request->getResponseBody());
-		
-		$return = array();
-		$return['columnID'] = isset($result->data->column_id) ? $result->data->column_id : 0;
-		$return['msg'] = $result->msgs[0];
-		
-		
-		$errors = $this->parseErrors($result->errors);
-		if($errors && $return['columnID'] == 0)
-		{
-			return $errors;
-		}
-		return $return;
+
 	}
 	
 	/**
@@ -228,45 +240,107 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 *	11, Specified user is not a member of section gradebook
 	 *	18, Section specified does not exist
 	 *	
-	 * @param string $instructorNID 	Webcourses Vista user id of the Section Instructor (typically NID)
-	 * @param string $studentNID 	Webcourses Vista user id of the Section Student (typically NID)
-	 * @param string $sectionID 	Webcourses Vista learning context id
-	 * @param string $columnID 	Webcourses Vista column id of the grade book column to insert the score into
+	 * @param int $instID 	Obojobo Learning Object Instance ID for the instance scored
+	 * @param int $studentUserID 	Webcourses Vista user id of the Section Student (typically NID)
 	 * @param string $score 	numeric between 0 and 100
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	public function sendScore($instructorNID, $studentNID, $sectionID, $columnID, $score)
+	public function sendScore($instID, $studentUserID, $score)
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-		$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
-		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+		// TODO: restrict this to not allow nm_los_API to call it
+		$AM = core_auth_AuthManager::getInstance();
+		if($AM->verifySession())
+		{	
+			// get the course data for the selected instance
+			
+			$sql = "SELECT * FROM ".cfg_plugin_UCFCourses::MAP_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
+			$q = $this->DBM->querySafe($sql, $instID);
+			if(!$r = $this->DBM->fetch_obj($q))
+			{
+				// WHA! No column info availible
+				// TODO: return error
+				trace("Gradebook Column information missing for instance: $instID, $studentUserID, $score", true);
+				return false;
+			}
+			
+			$instructorID = $r->{cfg_core_User::ID};
+			$instructorNID = $AM->getUserName($instructorID);
+			$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+			$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
+			$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+			
+			$currentUserID = $AM->getSessionUserID();
+			$currentNID = $AM->getUserName($currentUserID);
+			if(!$studentNID = $AM->getUserName($studentUserID))
+			{
+				// OH NOOS!  student user cant be found
+				trace("Couldn't locate the student to send score: $instID, $studentUserID, $score", true);
+				return false;
+			}
+			
+			// if studentUserID isnt current user, make sure the current user has rights to the instance
+			// this will either have to be called by the user
+			if($studentUserID != $currentUserID)
+			{
+				$IM = nm_los_InstanceManager::getInstance();
+				if(!$IM->userCanEditInstance($currentUserID, $instID))
+				{
+					return core_util_Error::getError(4);
+				}
+			}
+			
+			// Begin the service request
+			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+			$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
+			$request->execute();
+			$resultInfo = $request->getResponseInfo();
+			// check for http response code of 200
+			if($resultInfo['http_code'] != 200)
+			{
+				$error = AppCfg::ERROR_TYPE;
+				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
+				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			}
+
+			$result = $this->decodeJSON($request->getResponseBody());
+			$return = false;
+			
+			// look to see if the msg was successfull
+			if(isset($result->msgs[0]) && substr($result->msgs[0], 0, 1) == "1")
+			{
+				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 1);
+				$return = true;
+			}
+			else // Failure, parse the errors
+			{
+				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
+				$errors = $this->parseErrors($result->errors);
+				if($errors)
+				{
+					$return = $errors;
+				}
+			}
+
+			return $return;
+		}
+		else // user isnt logged in
 		{
 			$error = AppCfg::ERROR_TYPE;
-			return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+			return new $error(1);
 		}
-
-		$result = $this->decodeJSON($request->getResponseBody());
-		$return = false;
-		// look to see if the msg was successfull
-		if(isset($result->msgs[0]) && substr($result->msgs[0], 0, 1) == "1")
-		{
-			$return = true;
-		}
-		
-		$errors = $this->parseErrors($result->errors);
-		if($errors && $return == false)
-		{
-			return $errors;
-		}
-		
-		return $return;
-		
 	}
+	
+	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
+	{
+		$time = time();
+		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
+		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
+		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
+		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, $success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
+	}
+	
 	/**
 	 * Loop through errors returned and create an error for each one
 	 *
@@ -317,34 +391,32 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 * @param string $term_code ucf term code (1260, 1360, etc)
 	 * @return array array( 'year' => 2000, 'semester' => 'Spring')
 	 */
-	protected function term_code2term_string($term_code)
-	{
-		$term = array();
-		$term["year"] = 0;
-		$term["semester"] = "";
-
-		$tc = $term_code;
-		if ($tc % 3 == 0)
-		{
-			$term["semester"] = 'Spring';
-		}
-		else
-		{
-			$tc = $tc - 10;
-			if ($tc % 3 == 0)
-			{
-				$term["semester"] = 'Summer';
-			}
-			else
-			{
-				$tc = $tc - 10;
-				$term["semester"] = 'Fall';
-			}
-		}
-
-		$term["year"] = ( ($tc/10) /3 ) + 1964;
-
-		return $term;
-	}
+	// protected function term_code2term_string($term_code)
+	// {
+	// 	$term = array('year' => 0, 'semester' => '');
+	// 
+	// 	$tc = $term_code;
+	// 	if ($tc % 3 == 0)
+	// 	{
+	// 		$term['semester'] = 'Spring';
+	// 	}
+	// 	else
+	// 	{
+	// 		$tc = $tc - 10;
+	// 		if ($tc % 3 == 0)
+	// 		{
+	// 			$term['semester'] = 'Summer';
+	// 		}
+	// 		else
+	// 		{
+	// 			$tc = $tc - 10;
+	// 			$term['semester'] = 'Fall';
+	// 		}
+	// 	}
+	// 
+	// 	$term['year'] = ( ($tc/10) /3 ) + 1964;
+	// 
+	// 	return $term;
+	// }
 }
 ?>

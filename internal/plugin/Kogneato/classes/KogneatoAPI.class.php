@@ -3,6 +3,7 @@ class plg_Kogneato_KogneatoAPI extends core_plugin_PluginAPI
 {
 	// Block all API calls directly referencing this api
 
+	const PUBLIC_FUNCTION_LIST = 'getKogneatoEngineLink'; // dont allow any direct calls
 	private static $instance;
 	static public function getInstance()
 	{
