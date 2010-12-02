@@ -93,7 +93,7 @@ class nm_los_API extends core_db_dbEnabled
 	public function doPluginCall($plugin, $method, $args = -1)
 	{
 		$PM = core_plugin_PluginManager::getInstance();
-		return $PM->callAPI($plugin, $method, $args);
+		return $PM->callAPI($plugin, $method, $args, false); // call the plugin method, but restrict it to whitelisted functions
 	}
 
 	public function getCourses()
@@ -105,8 +105,7 @@ class nm_los_API extends core_db_dbEnabled
 			// Ideal place to have events/listeners
 			$user = $this->getUser();
 			$PM = core_plugin_PluginManager::getInstance();
-			$UCF = $PM->getAPI('UCFCourses');
-			$result = $UCF->getCourses($user->login);
+			$result = $PM->callAPI('UCFCourses', 'getCourses', $user->login, true);
 		}
 		else
 		{
@@ -124,10 +123,11 @@ class nm_los_API extends core_db_dbEnabled
 			// TODO: change this to work as a plugin architecture
 			// Ideal place to have events/listeners
 			$user = $this->getUser();
-			$PM = core_plugin_PluginManager::getInstance();
-			$UCF = $PM->getAPI('UCFCourses');
+			
 			// create the gradebook column
-			$column = $UCF->createColumn($user->login, $courseID, $columnName);
+			$PM = core_plugin_PluginManager::getInstance();
+			$column = $PM->callAPI('UCFCourses', 'createColumn', array($user->login, $courseID, $columnName), true);
+			
 			if(is_array($column) && $column['columnID'] > 0)
 			{
 				// store mapping relationship

@@ -161,6 +161,10 @@ class core_auth_AuthManager extends core_db_dbEnabled
 			session_name(AppCfg::SESSION_NAME);
 			session_start();
 		}
+		if(session_name() != AppCfg::SESSION_NAME)
+		{
+			trace('session name mismatch - check modx session name & headers not sent  ' . session_name(), true);
+		}
 		//If they had a valid session before, and if the session ID fits the one in the database, let them pass
 		if (isset($_SESSION['passed']) && $_SESSION['passed'] === true )
 		{
@@ -174,7 +178,7 @@ class core_auth_AuthManager extends core_db_dbEnabled
 					$inRole = $roleMan->doesUserHaveARole(array($roleName));
 					if(!$inRole)
 					{
-						return core_util_Error::getError(4004);
+						return false;
 					}
 				}
 				return $this->checkTimeOut() && $inRole;

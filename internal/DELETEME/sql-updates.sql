@@ -113,3 +113,35 @@ DROP TABLE  `lo_desc_obj` ,
 `lo_page_items_new` ,
 `lo_qgroups_cache` ,
 `lo_questions` ;
+
+
+CREATE TABLE `plg_wc_grade_columns` (
+  `instID` bigint(255) unsigned NOT NULL,
+  `sectionID` bigint(255) unsigned NOT NULL,
+  `columnID` bigint(255) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE  `plg_wc_grade_columns` ADD PRIMARY KEY (  `instID` );
+ALTER TABLE  `plg_wc_grade_columns` ADD  `userID` BIGINT( 255 ) UNSIGNED NOT NULL AFTER  `instID`;
+ALTER TABLE  `plg_wc_grade_columns` ADD  `columnName` VARCHAR( 255 ) NOT NULL;
+
+CREATE TABLE  `los`.`plg_wc_grade_log` (
+`instID` BIGINT( 255 ) UNSIGNED NOT NULL ,
+`userID` BIGINT( 255 ) UNSIGNED NOT NULL ,
+`timestamp` INT( 30 ) UNSIGNED NOT NULL ,
+`courseID` BIGINT( 255 ) UNSIGNED NOT NULL ,
+`columnID` BIGINT( 255 ) UNSIGNED NOT NULL ,
+`columnName` VARCHAR( 255 ) NOT NULL ,
+`success` ENUM(  "0",  "1" ) NOT NULL ,
+INDEX (  `instID` ,  `userID` ,  `success` )
+) ENGINE = INNODB;
+ALTER TABLE  `plg_wc_grade_log` CHANGE  `courseID`  `sectionID` BIGINT( 255 ) UNSIGNED NOT NULL;
+ALTER TABLE  `plg_wc_grade_log` ADD  `studentID` BIGINT( 255 ) UNSIGNED NOT NULL AFTER  `userID` ,
+ADD INDEX (  `studentID` );
+ALTER TABLE  `plg_wc_grade_log` ADD  `score` INT( 3 ) UNSIGNED NOT NULL AFTER  `columnName`;
+ALTER TABLE  `plg_wc_grade_log` ADD UNIQUE (
+`instID` ,
+`studentID` ,
+`sectionID` ,
+`columnID`
+);
+ALTER TABLE  `plg_wc_grade_log` CHANGE  `timestamp`  `createTime` INT( 30 ) UNSIGNED NOT NULL;

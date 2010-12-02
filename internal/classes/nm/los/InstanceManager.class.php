@@ -40,87 +40,63 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		{
 			if(!$roleMan->isLibraryUser())
 			{
-				
-				
 				return core_util_Error::getError(4);
 			}
 			
 			$permman = nm_los_PermissionsManager::getInstance();
 			if( ! $permman->getMergedPerm($loID, cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::PUBLISH, $_SESSION['userID']) )
 			{
-				
-				
 				return core_util_Error::getError(4);
 			}
 		}
 		
 		if(!nm_los_Validator::isString($name))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		if(!nm_los_Validator::isPosInt($loID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		if(!nm_los_Validator::isPosInt($startTime))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isPosInt($endTime))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if($startTime > $endTime || $endTime < time())
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isPosInt($attemptCount))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isScoreMethod($scoreMethod))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isBoolean($allowScoreImport))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		$lo = new nm_los_LO();
 		if( ! $lo->dbGetFull($this->DBM, $loID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if($lo->subVersion > 0)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
@@ -137,8 +113,6 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 			$permMan = nm_los_PermissionsManager::getInstance();
 			if(!$permMan->getMergedPerm($loID, cfg_obo_Perm::TYPE_LO, cfg_obo_Perm::PUBLISH, $userID))
 			{
-				
-				
 				return core_util_Error::getError(4);
 			}
 		}
@@ -305,27 +279,21 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		
 		$return = array();
 		$permman = nm_los_PermissionsManager::getInstance();
-
 		
 		if(is_array($instID))
 		{
-
 			// remove non posInts from the array
 			foreach($instID AS $key => $arrItem)
 			{
-
 				if( !nm_los_Validator::isPosInt($arrItem) )
 				{
-
 					unset($instID[$key]);
 				}
 				else
 				{
-
 					// TRY Retrieving from Cache
 					if($curInstData = core_util_Cache::getInstance()->getInstanceData($arrItem))
 					{
-
 						$curInstData->perms = $permman->getMergedPerms($curInstData->instID, cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
 						$return[] = $curInstData; // store in return
 						unset($instID[$key]); // remove from list of keys to get
@@ -336,20 +304,15 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 			// no items left to look up
 			if(count($instID) < 1)
 			{
-
 				if(count($return) > 0) // all items were found in cache or invalidated
 				{
-
 					return $return;
 				}
 				else // arg passed was empty array and or only contained non positive integers, return empty array
 				{
-
-					return $instID; 
+					return $instID;
 				}
-				
 			}
-
 			$instArr = implode(',', $instID);
 		}
 		else
@@ -372,38 +335,30 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		$qstr = "SELECT * FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::ID." IN (?)";
 		if(!$q = $this->DBM->querySafe($qstr, $instArr))
 		{
-
 			return false;
 		}
 
 		$authMan = core_auth_AuthManager::getInstance();
-
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			$ownerName = $authMan->getName($r->{cfg_core_User::ID});
 			$iData = new nm_los_InstanceData($r->{cfg_obo_Instance::ID}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $ownerName, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT});
 			core_util_Cache::getInstance()->setInstanceData($iData);
 			// get perms
-
+			
 			// OBOJOBO OMG FIX
 			if($authMan->verifySession() && $_SESSION['userID'] == 1)
 			{
 				$iData->perms = $permman->getMergedPerms($r->{cfg_obo_Instance::ID}, cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
 			}
 			$return[] = $iData;
-
 		}
 		
 		// only return one object if request was a single ID not an array
 		if(!is_array($instID))
 		{
-
-
 			return $return[0];
 		}
-		
-
-
 		return $return;
 	}
 
@@ -414,13 +369,8 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	 */
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getAllInstances()
-	{
-		//$roleMan = nm_los_RoleManager::getInstance();
-		//$permman = nm_los_PermissionsManager::getInstance();
-		//$myInstances = $permman->getItemsWithPerm(cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE);
-		
+	{		
 		$PMan = nm_los_PermManager::getInstance();
-
 		$itemPerms = $PMan->getAllItemsForUser($_SESSION['userID'], cfg_core_Perm::TYPE_INSTANCE, true);
 
 		// TODO: limit what is returned based on what perm they have
@@ -437,57 +387,41 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isString($name))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		if(!nm_los_Validator::isPosInt($startTime))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isPosInt($endTime))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if($startTime > $endTime)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isPosInt($attemptCount))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isScoreMethod($scoreMethod))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!nm_los_Validator::isBoolean($allowScoreImport))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
@@ -517,42 +451,47 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		return true;
 	}
 	
+	public function userCanEditInstance($userID, $instID)
+	{
+		$roleMan = nm_los_RoleManager::getInstance();
+		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
+		{
+			trace('not su');
+			if(!$roleMan->isLibraryUser())
+			{
+				trace('not lib');
+				return false;
+			}
+			$permman = nm_los_PermissionsManager::getInstance();
+			if( ! $permman->getUserPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $userID) )
+			{
+				trace('no write perms');
+				// check 2nd Perms system to see if they have write or own
+				$pMan = nm_los_PermManager::getInstance();
+				$perms = $pMan->getPermsForUserToItem($userID, cfg_core_Perm::TYPE_INSTANCE, $instID);
+				trace($perms);
+				if(!is_array($perms) || ( !in_array(cfg_core_Perm::P_WRITE, $perms) && !in_array(cfg_core_Perm::P_OWN, $perms)) )
+				{
+					trace('no extra write perms');
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	public function deleteInstance($instID = 0)
 	{
 	    if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-	       
-	        return core_util_Error::getError(2);
-		}		
-		$roleMan = nm_los_RoleManager::getInstance();
-		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
+			return core_util_Error::getError(2);
+		}
+		// Can this user edit the instance?
+		if(!$this->userCanEditInstance($_SESSION['userID'], $instID))
 		{
-			if(!$roleMan->isLibraryUser())
-			{
-				
-				
-				return core_util_Error::getError(4);
-			}
-			$permman = nm_los_PermissionsManager::getInstance();
-			if( ! $permman->getUserPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $_SESSION['userID']) )
-			{
-				// check 2nd Perms system to see if they have write or own
-				$pMan = nm_los_PermManager::getInstance();
-				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], cfg_core_Perm::TYPE_INSTANCE, $instID);
-				if(!is_array($perms) && !in_array(cfg_core_Perm::P_WRITE, $perms) && !in_array(cfg_core_Perm::P_OWN, $perms) )
-				{
-					
-					
-					return core_util_Error::getError(4);
-				}
-			}
+			return core_util_Error::getError(4);
 		}
 	
-		if(!nm_los_Validator::isPosInt($instID))
-		{
-			return false; // error invalid input
-		}
 		// Delete permission relating to that instance
 		$permman = nm_los_PermissionsManager::getInstance();
 		if(!$permman->removeAllPermsForItem($instID, cfg_obo_Perm::TYPE_INSTANCE))

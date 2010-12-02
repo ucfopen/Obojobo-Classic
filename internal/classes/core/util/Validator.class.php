@@ -20,14 +20,16 @@ class core_util_Validator
     static function isInt(&$var)
     {
         if(!is_numeric($var))
-            return false;
-        $var = floatval($var);
-        return $var == floor($var);
-    }
+		{
+			return false;
+		}
+		$var = floatval($var);
+		return $var == floor($var);
+	}
 
 	static function isUserArr($user)
 	{
-        return self::isInt($user['userID']) && self::isString($user['login']) && self::isString($user['first']) && self::isString($user['last']) && self::isEmail($user['email']);
+		return self::isInt($user['userID']) && self::isString($user['login']) && self::isString($user['first']) && self::isString($user['last']) && self::isEmail($user['email']);
 	}
 
     /**
@@ -66,8 +68,6 @@ class core_util_Validator
 		// use relection to get a list of all class constants
 		$oClass = new ReflectionClass('cfg_core_Perm');
 		$consts = array_values($oClass->getConstants());
-		trace($consts);
-		trace($perm);
 		return in_array($perm, $consts);
 	}
 	
@@ -100,6 +100,8 @@ class core_util_Validator
 	{
 	    return self::isString($phoneNum);
 	}
+
+
 
 }
 ?>
