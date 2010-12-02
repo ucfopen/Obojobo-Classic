@@ -731,12 +731,12 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		if($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
 		{
 			$r = $this->DBM->fetch_obj($q);
-			$PM = core_plugin_PluginManager::getInstance();
-			$UCF = $PM->getAPI('UCFCourses');
+
 			$UM = core_auth_AuthManger::getInstance();
 			$instructor = $UM->fetchUserByID($r->userID);
 			
-			$UCF->sendScore($instructor->login, $_SESSION['userID'], $r->sectionID, $r->columnID, $score);
+			$PM = core_plugin_PluginManager::getInstance();
+			$PM->callAPI('UCFCourses', 'sendScore', array($instructor->login, $_SESSION['userID'], $r->sectionID, $r->columnID, $score), true);
 		}
 		
 		// clear cached scores for this instance

@@ -15,7 +15,6 @@ class core_plugin_PluginManager
 	
 	public function pluginInstalled($pluginName, $includeNonCorePlugins = false)
 	{
-		trace(AppCfg::CORE_PLUGINS);
 		if(strpos(AppCfg::CORE_PLUGINS, $pluginName) !== false)
 		{
 			return true;
@@ -31,13 +30,12 @@ class core_plugin_PluginManager
 				return true;
 			}
 		}
+		trace("plugin missing: $pluginName - installed: " . AppCfg::CORE_PLUGINS, true);
 		return false;
 	}
 	
-	public function getAPI($pluginName)
+	protected function getAPI($pluginName)
 	{
-		
-		
 		// make sure the plugin is enabled
 		if($this->pluginInstalled($pluginName))
 		{
@@ -56,70 +54,42 @@ class core_plugin_PluginManager
 		return false;
 	}
 	
-	public function get($pluginName)
-	{
-		
-		
-		// make sure the plugin is enabled
-		if($this->pluginInstalled($pluginName, true))
-		{
-			// make a classname based off plugin name
-			$pluginAPIClassName = 'plg_' . $pluginName . '_'  . strtoupper(substr($pluginName, 0,1)) . substr($pluginName, 1);
-			$class = call_user_func(array($pluginAPIClassName, 'getInstance'));
-			return $class;
-		}
-		else
-		{
-			trace('Plugin access attempted for disabled plugin: '.$pluginName,true);
-		}
-		return false;
-	}
-	
-	public function callAPI($plugin, $method, $args=-1)
+	/**
+	 * Call a plugin method using it's API
+	 *
+	 * @param string $plugin	Name of plugin to call - this points to the file /plugins/pluginName/classes/pluginNameAPI.class.php
+	 * @param string $method	Name of the public method to call - this must be public AND must be listed in the plugin white list constant for the API class (unless you set bypassPublicRestriction)
+	 * @param array $args	Array of arguments that are sent to the requested function
+	 * @param boolean $bypassPublicRestriction	 set to true if you need to bypass the public whitelist restrictions, designed to limit direct public api access from the client
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	public function callAPI($plugin, $method, $args=-1, $bypassPublicRestriction=0)
 	{
 		if(is_array($args) && $pluginAPI = $this->getAPI($plugin))
 		{
 			
 			if(method_exists($pluginAPI, $method))
 			{
-				$r = new ReflectionMethod($pluginAPI, $method); 
-				if($r->isPublic())
+				// check to see if the function is whitelisted or bypass
+				if($bypassPublicRestriction != true)
 				{
-					if($args == -1) $args = array();
-					return call_user_func_array(array($pluginAPI, $method), $args);
+					$publicFunctions = explode(',', $pluginAPI::PUBLIC_FUNCTION_LIST);
+					if(!in_array($method, $publicFunctions))
+					{
+						return core_util_Error::getError(201);
+					}
 				}
+
+				// call the api function
+				if(!is_array($args)) $args = array();
+				return call_user_func_array(array($pluginAPI, $method), $args);
+
 			}
-			
-			
-			
 			return core_util_Error::getError(201);
 		}
-		
-		
 		return core_util_Error::getError(200);
 	}
-	
-	public function call($plugin, $method, $args)
-	{
-		if($plugin = $this->get($plugin))
-		{
-			
-			if(method_exists($plugin, $method))
-			{
-				$r = new ReflectionMethod($plugin, $method); 
-				if($r->isPublic())
-				{
-					return call_user_func_array(array($plugin, $method), $args);
-				}
-			}
-			
-			
-			
-			return core_util_Error::getError(201);
-		}
-		
-		
-		return core_util_Error::getError(200);
-	}
+
 }
 ?>
