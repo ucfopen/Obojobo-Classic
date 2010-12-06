@@ -39,8 +39,8 @@ if($_GET['submit'])
 	$t = microtime(true);
 	flush();
 	
-	$PM = core_plugin_PluginManager::getInstance();
-	$sections = $PM->callAPI('UCFCourses', 'getCourses', array(), true);
+	$API = nm_los_API::getInstance();
+	$sections = $API->getCourses();
 	
 	$t = (microtime(true) - $t);
 	echo count($sections) . " courses fetched in $t sec \n-----------------------------------------\n";

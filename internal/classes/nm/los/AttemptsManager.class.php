@@ -62,8 +62,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(is_object($equivalentAttempt))
@@ -71,16 +69,12 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			if(!nm_los_Validator::isPosInt($equivalentAttempt->attemptID) || !nm_los_Validator::isPosInt($equivalentAttempt->score) || !nm_los_Validator::isPosInt($equivalentAttempt->loID))
 			{
 				trace($equivalentAttempt, true);
-				
-				
 				return core_util_Error::getError(2);
 			}
 		}
 		//exit if they havent been assigned a visit id meaning they arent viewing an instance
 		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1 )
 		{
-			
-			
 			return core_util_Error::getError(2002); // error: No visit id assigned.
 		}
 		
@@ -109,8 +103,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 				// fail if a linked attempt is found, they cant use equivelant scores after starting an attempt
 				if(is_object($equivalentAttempt))
 				{
-					
-					
 					return core_util_Error::getError(2007); // error: no assessments attempts available
 				}
 				// store the open attempts in the session (required to sort out what open instance is making this call)
@@ -160,24 +152,18 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 				$numRemainingAttempts = $this->getNumRemainingAttempts($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 				if($numRemainingAttempts == 0)
 				{
-					
-					
 					return core_util_Error::getError(2004); // error: no assessments attempts available
 				}
 			
 				// check to make sure they havnt previously chosen to import an old score for this instance
 				if($this->isEquivalentAttemptUsed($_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
 				{
-					
-					
 					return core_util_Error::getError(2008); // error: no assessments attempts available
 				}
 				
 				// create the attempt, pass the equivalent attempt if its set
 				if(!$this->createAttempt($lo->loID, $qGroupID, $equivalentAttempt))
 				{
-					
-					
 					return core_util_Error::getError(2001); // error: should never happen
 				}
 				// if importing previous score, return now true, no need to build question list
@@ -216,20 +202,14 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
@@ -310,8 +290,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
@@ -338,11 +316,8 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
-
 
 		$qstr = "SELECT " . cfg_obo_Attempt::ORDER . " FROM ". cfg_obo_Attempt::TABLE ." WHERE ".cfg_obo_Attempt::ID." = '?'";
 		
@@ -414,7 +389,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		}
 		$r = $this->DBM->fetch_obj($q);
 		
-		
 		return $r->{cfg_obo_Attempt::ID};
 	}
 	
@@ -422,8 +396,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($instID))
@@ -440,8 +412,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		$qstr = "	SELECT ".cfg_obo_Instance::ATTEMPT_COUNT."
@@ -461,8 +431,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// if no userID is set, use the current user
@@ -490,8 +458,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// if no userID is set, use the current user
@@ -520,8 +486,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// if no userID is set, use the current user
@@ -539,46 +503,35 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($userID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($count, true))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		//If they do not have permissions to write to this instance, reject the request
-		$roleMan = nm_los_RoleManager::getInstance();
-		if(!$roleMan->isSuperUser())
+		$IM = nm_los_InstanceManager::getInstance();
+		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
 		{
-			$permman = nm_los_PermissionsManager::getInstance();
-			if( !($permman->getMergedPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $_SESSION['userID'])) ){
-				
-				// check 2nd Perms system to see if they have write or own
-				$pMan = nm_los_PermManager::getInstance();
-				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], cfg_core_Perm::TYPE_INSTANCE, $instID);
-				if(!is_array($perms) && !in_array(cfg_core_Perm::P_WRITE, $perms) && !in_array(cfg_core_Perm::P_OWN, $perms) )
-				{
-					return false;
-				}
-			}
+			return core_util_Error::getError(4);
 		}
+
 		
-		if($count == 0) {
+		if($count == 0)
+		{
 			return $this->removeAdditionalAttempts($userID, $instID);
-		} else {
+		}
+		else
+		{
 			$curCount = $this->getNumExtraAttempts($instID, $userID);
 			
-			if($curCount == 0) {
+			if($curCount == 0)
+			{
 				$qstr = "	INSERT INTO ".cfg_obo_ExtraAttempt::TABLE." (".cfg_core_User::ID.", ".cfg_obo_Instance::ID.", ".cfg_obo_ExtraAttempt::EXTRA_COUNT.")
 							VALUES('?', '?', '?')";
 				
@@ -589,7 +542,9 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		        	//die();
 					return false;
 				}
-			} else {
+			}
+			else
+			{
 				$qstr = "	UPDATE ".cfg_obo_ExtraAttempt::TABLE."
 							SET ".cfg_obo_ExtraAttempt::EXTRA_COUNT."='?'
 							WHERE ".cfg_core_User::ID." = '?'
@@ -599,8 +554,7 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 				if(!($q = $this->DBM->querySafe($qstr, $count, $userID, $instID)))
 				{
 					$this->DBM->rollback();
-		        	trace(mysql_error(), true);
-		        	//die();
+					trace(mysql_error(), true);
 					return false;
 				}
 			}
@@ -609,29 +563,23 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		}
 	}
 	
-	public function removeAdditionalAttempts($userID = 0, $instID = 0) {
+	public function removeAdditionalAttempts($userID = 0, $instID = 0)
+	{
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($userID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
 		
 		//If they do not have permissions to write to this instance, reject the request
-		$roleMan = nm_los_RoleManager::getInstance();
-		if(!$roleMan->isSuperUser())
+		$IM = nm_los_InstanceManager::getInstance();
+		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
 		{
-			$permman = nm_los_PermissionsManager::getInstance();
-			if( !($permman->getMergedPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $_SESSION['userID'])) ){
-				return false;
-			}
+			return core_util_Error::getError(4);
 		}
 		
 		$qstr = "	DELETE FROM ".cfg_obo_ExtraAttempt::TABLE."
@@ -725,19 +673,10 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		}
 		$this->unRegisterCurrentAttempt();
 		
+		// TODO: NEED TO USE SYSTEM EVENTS
 		// Send the score to webcourses
-		// get the mapping info
-		$qstr = "SELECT * FROM plg_wc_grade_columns WHERE instID = '?'";
-		if($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
-		{
-			$r = $this->DBM->fetch_obj($q);
-
-			$UM = core_auth_AuthManger::getInstance();
-			$instructor = $UM->fetchUserByID($r->userID);
-			
-			$PM = core_plugin_PluginManager::getInstance();
-			$PM->callAPI('UCFCourses', 'sendScore', array($instructor->login, $_SESSION['userID'], $r->sectionID, $r->columnID, $score), true);
-		}
+		$PM = core_plugin_PluginManager::getInstance();
+		$grade = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
 		
 		// clear cached scores for this instance
 		core_util_Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
@@ -758,14 +697,10 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($loID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(is_object($equivalentAttempt))
@@ -819,8 +754,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
@@ -849,8 +782,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
     {
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 
@@ -909,21 +840,15 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		
 		if(!nm_los_Validator::isPosInt($attemptID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if(!is_array($GLOBALS['CURRENT_INSTANCE_DATA']))
 		{
-			
-			
 			return core_util_Error::getError(2006);
 		}
 		if( !nm_los_Validator::isPosInt($GLOBALS['CURRENT_INSTANCE_DATA']['instID']) )
 		{
-			
-			
 			return core_util_Error::getError(2006);
 		}
 		
@@ -938,21 +863,15 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($userID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// check permission
 		if($_SESSION['userID'] != $userID)
 		{
-			
-			
 			return core_util_Error::getError(4);
 		}
 		
@@ -967,15 +886,11 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		$VM = nm_los_VisitManager::getInstance();
 		if(!$VM->registerCurrentViewKey($visitKey))
 		{
-			
-			
 			return core_util_Error::getError(5);
 		}
 		// make sure its not already used
 		if($this->isEquivalentAttemptUsed($_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
 		{
-			
-			
 			return core_util_Error::getError(2008);
 		}
 		// get the qgroupid and the loID
@@ -983,22 +898,16 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 		if(!($instData instanceof nm_los_InstanceData ))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// make sure the instance allows importing
 		if($instData->allowScoreImport != 1)
 		{
-			
-			
 			return core_util_Error::getError(2009);
 		}
 		$lo = new nm_los_LO();
 		if(!$lo->dbGetFull($this->DBM, $instData->loID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
@@ -1006,22 +915,16 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		$equivalent = $this->getEquivalentAttempt($_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $lo->loID);
 		if(!is_object($equivalent))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// submit the attempt
 		if($this->startAttempt($lo->aGroup->qGroupID, $equivalent) != true)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// end the attempt
 		if($this->endAttempt($lo->aGroup->qGroupID, $equivalent) != true)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
@@ -1043,21 +946,15 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 	{
 		if(!nm_los_Validator::isPosInt($userID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if(!nm_los_Validator::isPosInt($instID))
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		// check permission
 		if($_SESSION['userID'] != $userID)
 		{
-			
-			
 			return core_util_Error::getError(4);
 		}
 		
@@ -1068,8 +965,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			$loID = $IM->getLOID($instID);
 			if(!nm_los_Validator::isPosInt($loID))
 			{
-				
-				
 				return core_util_Error::getError(2);
 			}
 		}

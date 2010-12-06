@@ -187,24 +187,15 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 		{
 			return false; // error: invalid input
 		}
-		//If they do not have permissions to write to this instance, reject the request
-		$roleMan = nm_los_RoleManager::getInstance();
-		if(!$roleMan->isSuperUser())
-		{
-			$permman = nm_los_PermissionsManager::getInstance();
-			if( !($permman->getMergedPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $_SESSION['userID'])) ){
-
-				// check 2nd Perms system to see if they have read or own
-				$pMan = nm_los_PermManager::getInstance();
-				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], cfg_core_Perm::TYPE_INSTANCE, $instID);
-				if(!is_array($perms) && !in_array(cfg_core_Perm::P_READ, $perms) && !in_array(cfg_core_Perm::P_OWN, $perms) )
-				{
-					return false;
-				}
-			}
-		}
-		// get from memcache
 		
+		//If they do not have permissions to write to this instance, reject the request
+		$IM = nm_los_InstanceManager::getInstance();
+		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
+		{
+			return core_util_Error::getError(4);
+		}
+		
+		// get from memcache
 		if(false && $scores = core_util_Cache::getInstance()->getInstanceScores($instID))
 		{
 			return $scores;
@@ -236,6 +227,13 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 		$i = -1;
 		$lastUID = -1;
 		$attempts;
+		
+		// TODO: SYSTEM EVENTS
+		
+		// get their sync status
+		$PM = core_plugin_PluginManager::getInstance();
+		$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
+		
 		$userMan = core_auth_AuthManager::getInstance();
 		while($r = $this->DBM->fetch_obj($q))
 		{
@@ -247,7 +245,10 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 					'userID' => $r->{cfg_core_User::ID},
 					'user' => $userMan->getNameObject($r->{cfg_core_User::ID}),
 					'additional' => $r->additional_attempts,
-					'attempts' => array()
+					'attempts' => array(),
+					// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
+					'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
+					'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
 				);
 				$lastUID = $r->{cfg_core_User::ID};
 			}

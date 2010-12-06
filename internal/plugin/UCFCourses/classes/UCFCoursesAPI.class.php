@@ -13,57 +13,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		return self::$instance;
 	}
-
-
-	public function getCurrentSemester()
-	{
-		
-		if($semesters = core_util_Cache::getInstance()->getCurrentSemester())
-		{
-			return $semesters;
-		}
-		else
-		{
-			$result = $this->getSemesterForDate(time());
-			core_util_Cache::getInstance()->setCurrentSemester($result);
-			return $result;
-		}
-	}
-	
-	public function getSemesterForDate($date)
-	{
-		if($date>0)
-		{
-			trace($date);
-			$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Semester::TABLE." WHERE  ".cfg_obo_Semester::END_TIME." > '?' ORDER BY ".cfg_obo_Semester::END_TIME." ASC", $date);
-			if($r = $this->DBM->fetch_obj($q))
-			{
-				$semester = new nm_los_Semester($r);
-				return $semester;
-			}
-		}
-		return new nm_los_Semester();
-	}
-	
-	public function getSemesters()
-	{
-		
-		if($semesters = core_util_Cache::getInstance()->getSemesters())
-		{
-			return $semesters;
-		}
-		else
-		{
-			$semesters = array();
-			$q = $this->DBM->query("SELECT * FROM ".cfg_obo_Semester::TABLE." ORDER BY ".cfg_obo_Semester::START_TIME." ASC");
-			if($r = $this->DBM->fetch_obj($q))
-			{
-				$semesters[] = new nm_los_Semester($r);
-			}
-			core_util_Cache::getInstance()->setSemesters($semesters);
-			return $semesters;
-		}
-	}
 	
 	/**
 	 *   --------------Retrieving Instructor Sections---------------
@@ -96,37 +45,70 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($AM->verifySession())
 		{
 			$userID = $AM->getSessionUserID();
+			// current user must have a UCF NID to get course data
+			if(!$this->isNIDAccount($userID))
+			{
+				return false;
+			}
 			$NID = $AM->getUserName($userID);
-		
-			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
-		
-			$request->execute();
-			$resultInfo = $request->getResponseInfo();
-		
-			// check for http response code of 200
-			if($resultInfo['http_code'] != 200)
-			{
-				$error = AppCfg::ERROR_TYPE;
-				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
-			}
-		
-			$result = $this->decodeJSON($request->getResponseBody());
-			$courses = $result->data;
-		
-			$errors = $this->parseErrors($result->errors);
-			if($errors && count($courses) == 0)
-			{
-				return $errors;
-			}
-		
-			return $courses;
+			
+			$result = $this->sendGetCourseRequest($NID);
+			return  $result;
 		}
 		else
 		{
 			$error = AppCfg::ERROR_TYPE;
 			return new $error(1);
 		}
+	}
+	
+	protected function sendGetCourseRequest($NID)
+	{
+		$NID = 'wink';
+		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
+	
+		$request->execute();
+		$resultInfo = $request->getResponseInfo();
+	
+		// check for http response code of 200
+		if($resultInfo['http_code'] != 200)
+		{
+			$error = AppCfg::ERROR_TYPE;
+			return array('courses' => array(), 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])));
+		}
+	
+		$result = $this->decodeJSON($request->getResponseBody());
+		
+		$courses = $result->data;
+		$errors = $this->parseErrors($result->errors);
+		
+		// add semester info when availible
+		if(is_array($courses))
+		{
+			foreach($courses as $course)
+			{
+				if($course->type == 'ps_only' || $course->type == 'related')
+				{
+					$semester = $this->term_code2term_string($course->ps_term);
+					$course->semester = $semester['semester'];
+					$course->year = $semester['year'];
+				}
+			}
+		}
+
+		return array('courses' => $courses, 'errors' => $errors);
+	}
+	
+	protected function isNIDAccount($userID)
+	{
+		$AM = core_auth_AuthManager::getInstance();
+		$val = $AM->getAuthModuleForUserID($userID);
+		if($val instanceof plg_UCFAuth_UCFAuthModule)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -158,6 +140,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 *	4, Gradebook column with specified name already exists
 	 *	7, Unable to create gradebook column
 	 *
+	 * @param string $instID	Instance ID for the instance
 	 * @param string $sectionID 	Webcourses Vista learning context id
 	 * @param string $columnName 	desired grade book column name will be prefixed with 'obo:'
 	 * @return void
@@ -170,45 +153,62 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($AM->verifySession())
 		{
 			$userID = $AM->getSessionUserID();
+			// current user must have a UCF NID to create a course column
+			if(!$this->isNIDAccount($userID))
+			{
+				return false;
+			}
 			$NID = $AM->getUserName($userID);
-		
-			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-			$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
-			$request->execute();
-			$resultInfo = $request->getResponseInfo();
 
-			// check for http response code of 200
-			if($resultInfo['http_code'] != 200)
+			// send request
+			$result = $this->sendCreateColumnRequest($NID, $sectionID, $columnName);
+			
+			// it worked? 
+			if($result['columnID'] > 0)
 			{
-				$error = AppCfg::ERROR_TYPE;
-				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
+				$sql = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_TABLE." SET ". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ". cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_obo_Instance::ID." = '?'";
+				$this->DBM->querySafe($sql, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName, $instID);
 			}
-		
-			$result = $this->decodeJSON($request->getResponseBody());
-		
-			$return = array();
-			$return['columnID'] = isset($result->data->column_id) ? $result->data->column_id : 0;
-			$return['msg'] = $result->msgs[0];
-		
-			$errors = $this->parseErrors($result->errors);
-			if($errors && $return['columnID'] == 0)
-			{
-				return $errors;
-			}
-		
-			// success, record the column
-			$sql = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_TABLE." SET ". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ". cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_obo_Instance::ID." = '?'";
-			$this->DBM->querySafe($sql, $sectionID, $userID, $return['columnID'], 'obo:' . $columnName, $instID);
-			return $return;
+			
+			return $result;
 		}
 		else
 		{
 			$error = AppCfg::ERROR_TYPE;
 			return new $error(1);
 		}
-
 	}
+
+	
+	protected function sendCreateColumnRequest($NID, $sectionID, $columnName)
+	{
+		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+		$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
+		$request->execute();
+		$resultInfo = $request->getResponseInfo();
+
+		// check for http response code of 200
+		if($resultInfo['http_code'] != 200)
+		{
+			$error = AppCfg::ERROR_TYPE;
+			return array('columnID' => 0, 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])));
+		}
+	
+		$result = $this->decodeJSON($request->getResponseBody());
+		
+		$columnID = 0;
+		// column created successfully 
+		if(isset($result->data->column_id) && $result->data->column_id > 0)
+		{
+			$columnID =  $result->data->column_id;
+		}
+		// column not created, return errors or just return what we got
+		$errors = $this->parseErrors($result->errors);
+		
+		return array('columnID' => $columnID, 'errors' => $errors);
+	}
+	
 	
 	/**
 	 *	--------------------- Inserting a grade into webcourses -----------------------
@@ -253,14 +253,11 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($AM->verifySession())
 		{	
 			// get the course data for the selected instance
-			
 			$sql = "SELECT * FROM ".cfg_plugin_UCFCourses::MAP_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
 			$q = $this->DBM->querySafe($sql, $instID);
 			if(!$r = $this->DBM->fetch_obj($q))
 			{
 				// WHA! No column info availible
-				// TODO: return error
-				trace("Gradebook Column information missing for instance: $instID, $studentUserID, $score", true);
 				return false;
 			}
 			
@@ -278,6 +275,12 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				trace("Couldn't locate the student to send score: $instID, $studentUserID, $score", true);
 				return false;
 			}
+			// student must be a NID user
+			if(!$this->isNIDAccount($studentUserID))
+			{
+				trace("Student isnt a NID user: $instID, $studentUserID, $score", true);
+				return false;
+			}
 			
 			// if studentUserID isnt current user, make sure the current user has rights to the instance
 			// this will either have to be called by the user
@@ -290,46 +293,50 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				}
 			}
 			
-			// Begin the service request
-			$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-			$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-			$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
-			$request->execute();
-			$resultInfo = $request->getResponseInfo();
-			// check for http response code of 200
-			if($resultInfo['http_code'] != 200)
-			{
-				$error = AppCfg::ERROR_TYPE;
-				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
-				return new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code']);
-			}
-
-			$result = $this->decodeJSON($request->getResponseBody());
-			$return = false;
+			// Send the score set request
+			$result = $this->sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score);
 			
-			// look to see if the msg was successfull
-			if(isset($result->msgs[0]) && substr($result->msgs[0], 0, 1) == "1")
-			{
-				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 1);
-				$return = true;
-			}
-			else // Failure, parse the errors
-			{
-				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
-				$errors = $this->parseErrors($result->errors);
-				if($errors)
-				{
-					$return = $errors;
-				}
-			}
+			// log the result
+			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 
-			return $return;
+			return $result;
 		}
 		else // user isnt logged in
 		{
 			$error = AppCfg::ERROR_TYPE;
 			return new $error(1);
 		}
+	}
+	
+	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
+	{
+		// Begin the service request
+		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
+		$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
+		$request->execute();
+		$resultInfo = $request->getResponseInfo();
+		// check for http response code of 200
+		if($resultInfo['http_code'] != 200)
+		{
+			$error = AppCfg::ERROR_TYPE;
+			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
+			return array('scoreSent' => false, 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
+
+		}
+
+		$result = $this->decodeJSON($request->getResponseBody());
+		
+		$scoreSent = false;
+		// look to see if the msg was successfull
+		if(isset($result->msgs[0]) && substr($result->msgs[0], 0, 1) == "1")
+		{
+			$scoreSent = true;
+		}
+
+		$errors = $this->parseErrors($result->errors);
+
+		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
 	
 	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
@@ -339,6 +346,21 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
 		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
 		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, $success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
+	}
+	
+	public function getScoreLogsForInstance($instID)
+	{
+		$qstr = "SELECT ".cfg_core_User::ID.", ".cfg_plugin_UCFCourses::STUDENT.", ".cfg_plugin_UCFCourses::TIME.", ".cfg_plugin_UCFCourses::MAP_COL_NAME.", ".cfg_plugin_UCFCourses::SCORE.", ".cfg_plugin_UCFCourses::SUCCESS." FROM ".cfg_plugin_UCFCourses::LOG_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
+		$q = $this->DBM->querySafe($qstr, $instID);
+		$result = $this->DBM->getAllRows($q);
+		
+		$scores = array();
+		foreach($result AS $score)
+		{
+			$scores[$score->{cfg_plugin_UCFCourses::STUDENT}] = $score;
+		}
+		trace($scores);
+		return $scores;
 	}
 	
 	/**
@@ -391,32 +413,82 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 * @param string $term_code ucf term code (1260, 1360, etc)
 	 * @return array array( 'year' => 2000, 'semester' => 'Spring')
 	 */
-	// protected function term_code2term_string($term_code)
+	protected function term_code2term_string($term_code)
+	{
+		$term = array('year' => 0, 'semester' => '');
+	
+		$tc = $term_code;
+		if ($tc % 3 == 0)
+		{
+			$term['semester'] = 'Spring';
+		}
+		else
+		{
+			$tc = $tc - 10;
+			if ($tc % 3 == 0)
+			{
+				$term['semester'] = 'Summer';
+			}
+			else
+			{
+				$tc = $tc - 10;
+				$term['semester'] = 'Fall';
+			}
+		}
+	
+		$term['year'] = ( ($tc/10) /3 ) + 1964;
+	
+		return $term;
+	}
+	
+	// public function getCurrentSemester()
 	// {
-	// 	$term = array('year' => 0, 'semester' => '');
-	// 
-	// 	$tc = $term_code;
-	// 	if ($tc % 3 == 0)
+	// 	
+	// 	if($semesters = core_util_Cache::getInstance()->getCurrentSemester())
 	// 	{
-	// 		$term['semester'] = 'Spring';
+	// 		return $semesters;
 	// 	}
 	// 	else
 	// 	{
-	// 		$tc = $tc - 10;
-	// 		if ($tc % 3 == 0)
+	// 		$result = $this->getSemesterForDate(time());
+	// 		core_util_Cache::getInstance()->setCurrentSemester($result);
+	// 		return $result;
+	// 	}
+	// }
+	// 
+	// public function getSemesterForDate($date)
+	// {
+	// 	if($date>0)
+	// 	{
+	// 		trace($date);
+	// 		$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Semester::TABLE." WHERE  ".cfg_obo_Semester::END_TIME." > '?' ORDER BY ".cfg_obo_Semester::END_TIME." ASC", $date);
+	// 		if($r = $this->DBM->fetch_obj($q))
 	// 		{
-	// 			$term['semester'] = 'Summer';
-	// 		}
-	// 		else
-	// 		{
-	// 			$tc = $tc - 10;
-	// 			$term['semester'] = 'Fall';
+	// 			$semester = new nm_los_Semester($r);
+	// 			return $semester;
 	// 		}
 	// 	}
+	// 	return new nm_los_Semester();
+	// }
 	// 
-	// 	$term['year'] = ( ($tc/10) /3 ) + 1964;
-	// 
-	// 	return $term;
+	// public function getSemesters()
+	// {
+	// 	
+	// 	if($semesters = core_util_Cache::getInstance()->getSemesters())
+	// 	{
+	// 		return $semesters;
+	// 	}
+	// 	else
+	// 	{
+	// 		$semesters = array();
+	// 		$q = $this->DBM->query("SELECT * FROM ".cfg_obo_Semester::TABLE." ORDER BY ".cfg_obo_Semester::START_TIME." ASC");
+	// 		if($r = $this->DBM->fetch_obj($q))
+	// 		{
+	// 			$semesters[] = new nm_los_Semester($r);
+	// 		}
+	// 		core_util_Cache::getInstance()->setSemesters($semesters);
+	// 		return $semesters;
+	// 	}
 	// }
 }
 ?>
