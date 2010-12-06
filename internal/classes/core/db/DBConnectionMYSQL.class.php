@@ -139,5 +139,26 @@ class core_db_DBConnectionMYSQL extends core_db_DBConnection
 		$q = $this->query($query);
 		return $this->fetch_obj($res, $objName);
 	}
+	
+	public function getAllRows($res, $returnType='object')
+	{
+		$rows = array();
+		switch($returnType)
+		{
+			case 'array':
+				$method = 'fetch_assoc';
+				break;
+			case 'object':
+				$method = 'fetch_obj';
+			default:
+				break;
+		}
+		$returnType == 'obj';
+		while($r = $this->$method($res))
+		{
+			$rows[] = $r;
+		}
+		return $rows;
+	}
 }
 ?>

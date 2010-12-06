@@ -101,11 +101,9 @@ class nm_los_API extends core_db_dbEnabled
 		$result = false;
 		if($this->getSessionValid())
 		{
-			// TODO: change this to work as a plugin architecture
-			// Ideal place to have events/listeners
-			$user = $this->getUser();
+			// TODO: NEED TO USE SYSTEM EVENTS
 			$PM = core_plugin_PluginManager::getInstance();
-			$result = $PM->callAPI('UCFCourses', 'getCourses', $user->login, true);
+			$result = $PM->callAPI('UCFCourses', 'getCourses', array(), true);
 		}
 		else
 		{
@@ -120,23 +118,12 @@ class nm_los_API extends core_db_dbEnabled
 		$result = false;
 		if($this->getSessionValid())
 		{
-			// TODO: change this to work as a plugin architecture
-			// Ideal place to have events/listeners
+			// TODO: NEED TO USE SYSTEM EVENTS
 			$user = $this->getUser();
 			
 			// create the gradebook column
 			$PM = core_plugin_PluginManager::getInstance();
-			$column = $PM->callAPI('UCFCourses', 'createColumn', array($user->login, $courseID, $columnName), true);
-			
-			if(is_array($column) && $column['columnID'] > 0)
-			{
-				// store mapping relationship
-				$qstr = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_COURSE." SET ".cfg_los_Instance::ID." ='?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COLUMN_ID." = '?'";
-				if($this->DBM->querySafe($qstr, $instID, $_SESSION['userID'], $courseID, $column['columnID']))
-				{
-					$result = true;
-				}
-			}
+			$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $columnName), true);
 		}
 		else
 		{
