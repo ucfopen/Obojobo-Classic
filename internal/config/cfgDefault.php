@@ -22,7 +22,6 @@ class AppCfgDefault
 	const FLASH_VER_WARN = '10.0.12.36';
 
 	//--------------------   DIRECTORYS & PATHS  -----------------------//
-
 	// Define output of all php errors
 	const DIR_LOGS = 'internal/logs/';
 
@@ -86,7 +85,6 @@ class AppCfgDefault
 	const ACCOUNT_FORM_ID = '27373';
 	
 	//--------------------   ERRORS   -----------------------//	
-
 	// Mail Error File Name
 	const ERROR_FILE = 'php_errors';
 
@@ -106,7 +104,6 @@ class AppCfgDefault
 	const PROFILE_MODE = true;
 	
 	//--------------------   CACHE   -----------------------//	
-
 	// Should Obobjobo cache the learning objects
 	const DB_CACHE_LO = true;
 
@@ -127,14 +124,8 @@ class AppCfgDefault
 	const CACHE_CLASS = 'nm_los_Cache';
 	
 	//--------------------   AUTHENTICATION   -----------------------//	
-
 	// Look at the PLUGINS section for auth plugin modules
-
-	// SESSION NAME
 	const SESSION_NAME = 'OBOSESSION';
-
-	// Never set true in production, [true, false]
-	const UCF_AUTH_BYPASS_PASSWORDS = false; 
 
 	// Define Idle Time Logout in seconds
 	const AUTH_TIMEOUT = 1800; // 30 minute timeout
@@ -142,17 +133,16 @@ class AppCfgDefault
 
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
-	
-	const UCF_USE_WS_AUTH = false;  // use the ucf web service to check for reasons of password failure
-	
+		
 	//--------------------   PLUGINS   -----------------------//
-
-	const CORE_PLUGINS = 'sets';
+	// add in camma seperated class names of authentication plugins to us
+	const AUTH_PLUGINS = 'core_auth_ModInternal';
 	
-	const AUTH_PLUGINS = 'core_auth_ModInternal,plg_UCFAuth_UCFAuthModule';
+	// add in camma seperated names of plugins from the internal/plugins/ directory
+	const CORE_PLUGINS = '';
 	
-	const COURSE_PLUGINS = 'UCFCourses';
-
-	
+	//-----------------   PLUGIN SETTINGS   -----------------//
+	// Never set true in production, [true, false]
+	const UCF_AUTH_BYPASS_PASSWORDS = false;	
 }
 ?>
