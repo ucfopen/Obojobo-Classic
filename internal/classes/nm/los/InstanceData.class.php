@@ -16,7 +16,7 @@ class nm_los_InstanceData
 	public $userName;
 	public $name;
 	//TODO: future course code: public $course;
-	public $courseID; // remove
+	public $courseID; // remove, use $course instead
 	public $createTime;
 	public $startTime;
 	public $endTime;
@@ -24,6 +24,7 @@ class nm_los_InstanceData
 	public $scoreMethod;
 	public $allowScoreImport;
 	public $perms;
+	public $courseData;
 	
 	function __construct($instID=0, $loID=0, $userID=0, $userName='', $name='', $course='', $createTime=0, $startTime=0, $endTime=0, $attemptCount=0, $scoreMethod=0, $allowScoreImport=0, $perms=array())
 	{
