@@ -154,3 +154,5 @@ ALTER TABLE  `plg_wc_grade_log` CHANGE  `timestamp`  `createTime` INT( 30 ) UNSI
 #// App key for pushing scores to webcourses
 #const UCFCOURSES_APP_KEY = 'aaa';
 #const UCFCOURSES_URL_WEB = 'http://endor:8000';
+
+RENAME TABLE  `obo_map_perms_to_lo` TO  `obo_map_perms_to_item_old` ;
