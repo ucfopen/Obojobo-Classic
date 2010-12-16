@@ -4,7 +4,7 @@
 		<![CDATA[Your published instance will be displayed to students as the name you input here.  By default this name is the same as the object name.]]>
 	</helpItem>
 	<helpItem field="item2">
-		<![CDATA[This is the course where this instance will be deployed.  This is simply to assist you in the organization of your instances.]]>
+		<![CDATA[This is the course where this instance will be deployed.  It is recommended that you select one of the courses in the list, however you can write in a custom course by selecting the last option in the list.]]>
 	</helpItem>
 	<helpItem field="item3">
 		<![CDATA[This is the date when this instance will be opened to students.  Before this date, students will not be able to access the instance.  By default it is now.]]>
@@ -26,5 +26,11 @@
 	</helpItem>
 	<helpItem field="item9">
 		<![CDATA[This option allows students who have already taken this learning object to import their past highest attempt score instead of re-taking the object.]]>
+	</helpItem>
+	<helpItem field="item10">
+		<![CDATA[If you choose to sync scores to Webcourses, then Obojobo will send copies of assessment scores automatically to the Webcourses gradebook for this course.  Scores will be recorded in a newly created gradebook column prefixed with '<b>obo:</b>', followed by the name of your instance when you initially publish it.  Regardless of which option you choose, scores will still be retained within Obojobo.<br><br>Once you publish this instance you will <b>not</b> be able to modify this setting.]]>
+	</helpItem>
+	<helpItem field="item11">
+		<![CDATA[This field allows you to write in a custom course title.]]>
 	</helpItem>
 </helpItems>

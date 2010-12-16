@@ -64,7 +64,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function sendGetCourseRequest($NID)
 	{
-		$NID = 'wink';
+		//$NID = 'wink';
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
 	
@@ -258,6 +258,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			if(!$r = $this->DBM->fetch_obj($q))
 			{
 				// WHA! No column info availible
+				trace("No column info availible: $instID, $studentUserID, $score", true);
 				return false;
 			}
 			
@@ -310,6 +311,13 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{
+		trace('zach:sendScoreSetRequest()');
+		trace($instructorNID);
+		trace($studentNID);
+		trace($sectionID);
+		trace($columnID);
+		trace($score);
+		
 		// Begin the service request
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
@@ -345,12 +353,13 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
 		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
 		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
-		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, $success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
+		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
 	}
 	
 	public function getScoreLogsForInstance($instID)
 	{
 		$qstr = "SELECT ".cfg_core_User::ID.", ".cfg_plugin_UCFCourses::STUDENT.", ".cfg_plugin_UCFCourses::TIME.", ".cfg_plugin_UCFCourses::MAP_COL_NAME.", ".cfg_plugin_UCFCourses::SCORE.", ".cfg_plugin_UCFCourses::SUCCESS." FROM ".cfg_plugin_UCFCourses::LOG_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
+		
 		$q = $this->DBM->querySafe($qstr, $instID);
 		$result = $this->DBM->getAllRows($q);
 		

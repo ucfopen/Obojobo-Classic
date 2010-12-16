@@ -96,7 +96,7 @@ if($q)
 			$x = @unserialize($data);
 			if($x === false)
 			{
-				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-0).':', $data);
+				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-1).':', $data);
 				$x = @unserialize($data);
 				if($x === false)
 				{

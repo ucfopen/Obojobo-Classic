@@ -74,7 +74,8 @@ class core_plugin_PluginManager
 				// check to see if the function is whitelisted or bypass
 				if($bypassPublicRestriction != true)
 				{
-					$publicFunctions = explode(',', $pluginAPI::PUBLIC_FUNCTION_LIST);
+					//$publicFunctions = explode(',', $pluginAPI::PUBLIC_FUNCTION_LIST);
+					$publicFunctions = explode(',', constant(get_class($pluginAPI) . '::PUBLIC_FUNCTION_LIST'));
 					if(!in_array($method, $publicFunctions))
 					{
 						return core_util_Error::getError(201);
