@@ -146,4 +146,15 @@ ALTER TABLE  `plg_wc_grade_log` ADD UNIQUE (
 );
 ALTER TABLE  `plg_wc_grade_log` CHANGE  `timestamp`  `createTime` INT( 30 ) UNSIGNED NOT NULL;
 
+
+# ADD the following options in your cfgLocal:
+# add ucfcourses to CORE_PLUGINS:
+#const CORE_PLUGINS = 'sets,Kogneato,UCFCourses';
+#
+#// App key for pushing scores to webcourses
+#const UCFCOURSES_APP_KEY = 'aaa';
+#const UCFCOURSES_URL_WEB = 'http://endor:8000';
+
+RENAME TABLE  `obo_map_perms_to_lo` TO  `obo_map_perms_to_item_old` ;
+
 ALTER TABLE  `obo_lo_instances` ADD  `syncScores` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT  '0';

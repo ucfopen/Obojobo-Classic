@@ -575,6 +575,8 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		$authMods = explode(',', AppCfg::AUTH_PLUGINS);
 		return $authMods;
 	}
+	
+	// TODO: add getUser
 
 	public function getAuthModuleForUserID($userID=false)
 	{
