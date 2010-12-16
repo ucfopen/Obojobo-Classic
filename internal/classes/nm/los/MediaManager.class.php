@@ -74,8 +74,6 @@ class nm_los_MediaManager extends core_db_dbEnabled
 			{
 				if(!nm_los_Validator::isPosInt($eachMediaID))
 				{
-					
-			       
 			        return core_util_Error::getError(2);
 				}
 			}
@@ -117,7 +115,8 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		{
 			foreach($mediaIDs AS $mediaID)
 			{
-				if($media = $this->getMedia($mediaID)){
+				if($media = $this->getMedia($mediaID))
+				{
 					$mediaArr[] = $media;
 				}
 			}
@@ -138,14 +137,10 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		
 	    if(! $media instanceof nm_los_Media)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		if( $media->mediaID > 0)
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
@@ -161,37 +156,22 @@ class nm_los_MediaManager extends core_db_dbEnabled
 			$roleMan = nm_los_RoleManager::getInstance();
 			if(!$roleMan->isSuperUser())
 			{
-				
-				
 				return core_util_Error::getError(2);
 			}
 		}
 		
 		if( ! nm_los_Validator::isString($media->title) )
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
 		if( ! nm_los_Validator::isString($media->itemType) )
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 		
-		// if( ! is_bool($media->scorable) )
-		// {
-		// 	
-		// 	
-		// 	return core_util_Error::getError(2);
-		// }
-		
 		if( ! nm_los_Validator::isString($media->copyright) )
 		{
-			
-			
 			return core_util_Error::getError(2);
 		}
 	    
@@ -246,12 +226,9 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		$media->perms = new nm_los_Permissions($media->auth, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
 		
 		//Add owner permissions to this object for this user
-//		$PM = nm_los_PermissionsManager::getInstance();
-//		$PM->setPermsForUserToItem($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
-//			public function setUserPerms($itemID=0, $itemType='l', $permObj)
-//		$permman->setNewUserPerms($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
-		
-		
+		$PM = nm_los_PermissionsManager::getInstance();
+		$PM->setUserPerms($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
+
 		core_util_Cache::getInstance()->setMedia($media);
 		
 		return $media;
@@ -279,13 +256,11 @@ class nm_los_MediaManager extends core_db_dbEnabled
 	
 	public function handleMediaUpload($fileData, $title, $description, $copyright, $length=0)
 	{
-		// TODO:
-		//Make sure user is logged in, file is less than or equal to max size, and a title has been sent
+		// TODO: Make sure file is less than or equal to max size, and a title has been sent
+
 		$roleMan = nm_los_RoleManager::getInstance();
 		if(!$roleMan->isLibraryUser())
 		{
-			
-			
 			core_util_Error::getError(4);
 			return false;
 		}
@@ -303,7 +278,6 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		
 		$newFileLocation = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA . md5($fileName);
 	
-
 		move_uploaded_file($fileData['tmp_name'], $newFileLocation);
 		
 		if(file_exists($newFileLocation))

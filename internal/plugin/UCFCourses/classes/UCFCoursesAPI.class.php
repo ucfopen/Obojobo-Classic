@@ -158,6 +158,14 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			{
 				return false;
 			}
+			
+			// Do they have the rights to edit the instance?
+			$IM = nm_los_InstanceManager::getInstance();
+			if(!$IM->userCanEditInstance($userID, $instID))
+			{
+				return false;
+			}
+			
 			$NID = $AM->getUserName($userID);
 
 			// send request
@@ -166,9 +174,74 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			// it worked? 
 			if($result['columnID'] > 0)
 			{
-				$sql = "INSERT INTO ".cfg_plugin_UCFCourses::MAP_TABLE." SET ". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ". cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_obo_Instance::ID." = '?'";
-				$this->DBM->querySafe($sql, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName, $instID);
+				$sql = "INSERT INTO
+							".cfg_plugin_UCFCourses::MAP_TABLE."
+						SET
+							".cfg_obo_Instance::ID." = '?',
+							".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+							".cfg_core_User::ID." = '?',
+							".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+							".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'
+						ON DUPLICATE KEY UPDATE
+							".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+							".cfg_core_User::ID." = '?',
+							".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+							".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'";
+							
+				$this->DBM->querySafe($sql, $instID, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName);
 			}
+			
+			return $result;
+		}
+		else
+		{
+			$error = AppCfg::ERROR_TYPE;
+			return new $error(1);
+		}
+	}
+
+	/**
+	 * Links a Instance to a course *** REMOVES WEBCOURSES COLUMN LINKAGE ****  You must call create Column again to link to a course column
+	 *
+	 * @param string $instID 
+	 * @param string $sectionID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
+	public function setInstanceCourseLink($instID, $sectionID)
+	{
+		// TODO: require user to have rights to the instance
+		$AM = core_auth_AuthManager::getInstance();
+		if($AM->verifySession())
+		{
+			$userID = $AM->getSessionUserID();
+			// current user must have a UCF NID to create a course column
+			if(!$this->isNIDAccount($userID))
+			{
+				return false;
+			}
+			
+			// Do they have the rights to edit the instance?
+			$IM = nm_los_InstanceManager::getInstance();
+			if(!$IM->userCanEditInstance($userID, $instID))
+			{
+				return false;
+			}
+			
+			$sql = "INSERT INTO
+						".cfg_plugin_UCFCourses::MAP_TABLE."
+					SET
+						".cfg_obo_Instance::ID." = '?',
+						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+						". cfg_core_User::ID." = '?',
+						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
+						".cfg_plugin_UCFCourses::MAP_COL_NAME." = ''
+					ON DUPLICATE KEY UPDATE 
+						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+						". cfg_core_User::ID." = '?',
+						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
+						".cfg_plugin_UCFCourses::MAP_COL_NAME." = '',";
+			$this->DBM->querySafe($sql, $instID, $sectionID, $userID, $sectionID, $userID);
 			
 			return $result;
 		}
@@ -368,7 +441,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		{
 			$scores[$score->{cfg_plugin_UCFCourses::STUDENT}] = $score;
 		}
-		trace($scores);
 		return $scores;
 	}
 	

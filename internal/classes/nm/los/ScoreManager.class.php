@@ -177,87 +177,199 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 	/**
 	 * Get all user's  scores for one instance, for class grading use
 	 *
-	 * @param string $instid 
+	 * @param string $instid 	ID of the instance your looking for
+	 * @param int $userID	ID of the user your interested if you only want one user
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	public function getScores($instID = 0)
+	public function getScores($instID, $userID=0)
 	{
 		if(!is_numeric($instID) || $instID < 1)
 		{
 			return false; // error: invalid input
 		}
 		
-		//If they do not have permissions to write to this instance, reject the request
-		$IM = nm_los_InstanceManager::getInstance();
-		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
+		//********************  GET ALL SCORES - REQUIRES INSTANCE PERMISSIONS  ****************************//
+		if($userID == 0)
 		{
-			return core_util_Error::getError(4);
-		}
-		
-		// get from memcache
-		if(false && $scores = core_util_Cache::getInstance()->getInstanceScores($instID))
-		{
-			return $scores;
-		}
-		// grab every assessment attempt for each user (including unsubmitted ones!)
-		$qstr = "SELECT t1.".cfg_core_User::ID.", ".cfg_obo_Attempt::ID." as attemptID, ".cfg_obo_Attempt::LINKED_ATTEMPT.", ".cfg_obo_Attempt::SCORE.", ".cfg_obo_Attempt::END_TIME.", COALESCE(".cfg_obo_ExtraAttempt::EXTRA_COUNT.", 0) as additional_attempts
-					FROM 
-					(
-						SELECT A.".cfg_obo_Attempt::ID.", V.".cfg_core_User::ID.", A.".cfg_obo_Attempt::SCORE.", V.".cfg_obo_Instance::ID." as instance_id, A.".cfg_obo_Attempt::LINKED_ATTEMPT.", A.".cfg_obo_Attempt::END_TIME."
- 						FROM ".cfg_obo_Attempt::TABLE." AS A, ".cfg_obo_Visit::TABLE." AS V, ".cfg_obo_LO::TABLE." AS L, ".cfg_obo_Instance::TABLE." as I
- 						WHERE V.".cfg_obo_Instance::ID." = '?'
-						AND V.".cfg_obo_Instance::ID." = I.".cfg_obo_Instance::ID."
-						AND L.".cfg_obo_LO::ID." = I.".cfg_obo_LO::ID."
-						AND L.".cfg_obo_LO::AGROUP." = A.".cfg_obo_QGroup::ID."
- 						AND A.".cfg_obo_Visit::ID." = V.".cfg_obo_Visit::ID."
-					) AS t1
-					LEFT OUTER JOIN ".cfg_obo_ExtraAttempt::TABLE." AS AA
-					ON (AA.".cfg_core_User::ID." = t1.".cfg_core_User::ID." AND AA.".cfg_obo_Instance::ID." = t1.instance_id)
-					ORDER BY ".cfg_core_User::ID." ASC, ".cfg_obo_Attempt::ID." ASC";
-
-		if(!($q = $this->DBM->querySafe($qstr, $instID)))
-		{
-			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		$result = array();
-		$i = -1;
-		$lastUID = -1;
-		$attempts;
-		
-		// TODO: SYSTEM EVENTS
-		
-		// get their sync status
-		$PM = core_plugin_PluginManager::getInstance();
-		$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
-		
-		$userMan = core_auth_AuthManager::getInstance();
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			// only create new array items for each user
-			if($r->{cfg_core_User::ID} != $lastUID)
+			//If they do not have permissions to write to this instance, reject the request
+			$IM = nm_los_InstanceManager::getInstance();
+			if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
 			{
-				$i++;
-				$result[$i] = array(
-					'userID' => $r->{cfg_core_User::ID},
-					'user' => $userMan->getNameObject($r->{cfg_core_User::ID}),
-					'additional' => $r->additional_attempts,
-					'attempts' => array(),
-					// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
-					'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? (bool)$wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
-					'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
-				);
-				$lastUID = $r->{cfg_core_User::ID};
+				return core_util_Error::getError(4);
 			}
-			// add attempts
-			$result[$i]['attempts'][] = array('attemptID' => $r->attemptID, 'score' => $r->{cfg_obo_Attempt::SCORE}, 'linkedAttempt' => $r->{cfg_obo_Attempt::LINKED_ATTEMPT}, 'submitted' => $r->{cfg_obo_Attempt::END_TIME} > 0, 'submitDate' => $r->{cfg_obo_Attempt::END_TIME});
-		}
 
-		// store in memcache
-		core_util_Cache::getInstance()->setInstanceScores($instID, $result);
+			// get from memcache
+			if(false && $scores = core_util_Cache::getInstance()->getInstanceScores($instID))
+			{
+				return $scores;
+			}
+			// grab every assessment attempt for each user (including unsubmitted ones!)
+			$qstr = "SELECT
+						t1.".cfg_core_User::ID.",
+						".cfg_obo_Attempt::ID." as attemptID,
+						".cfg_obo_Attempt::LINKED_ATTEMPT.",
+						".cfg_obo_Attempt::SCORE.",
+						".cfg_obo_Attempt::END_TIME.",
+						COALESCE(".cfg_obo_ExtraAttempt::EXTRA_COUNT.", 0) as additional_attempts
+						FROM 
+						(
+							SELECT
+								A.".cfg_obo_Attempt::ID.",
+								V.".cfg_core_User::ID.",
+								A.".cfg_obo_Attempt::SCORE.",
+								V.".cfg_obo_Instance::ID." as instance_id,
+								A.".cfg_obo_Attempt::LINKED_ATTEMPT.",
+								A.".cfg_obo_Attempt::END_TIME."
+	 						FROM 
+								".cfg_obo_Attempt::TABLE." AS A,
+								".cfg_obo_Visit::TABLE." AS V,
+								".cfg_obo_LO::TABLE." AS L,
+								".cfg_obo_Instance::TABLE." as I
+	 						WHERE
+								V.".cfg_obo_Instance::ID." = '?'
+								AND V.".cfg_obo_Instance::ID." = I.".cfg_obo_Instance::ID."
+								AND L.".cfg_obo_LO::ID." = I.".cfg_obo_LO::ID."
+								AND L.".cfg_obo_LO::AGROUP." = A.".cfg_obo_QGroup::ID."
+	 							AND A.".cfg_obo_Visit::ID." = V.".cfg_obo_Visit::ID."
+						) AS t1
+						LEFT OUTER JOIN ".cfg_obo_ExtraAttempt::TABLE." AS AA
+							ON (AA.".cfg_core_User::ID." = t1.".cfg_core_User::ID."
+							AND AA.".cfg_obo_Instance::ID." = t1.instance_id)
+						ORDER BY
+							".cfg_core_User::ID." ASC,
+							".cfg_obo_Attempt::ID." ASC";
+
+			if(!($q = $this->DBM->querySafe($qstr, $instID)))
+			{
+				trace(mysql_error(), true);
+				$this->DBM->rollback();
+				return false;
+			}
+
+			$result = array();
+			$i = -1;
+			$lastUID = -1;
+			$attempts;
+
+			// TODO: SYSTEM EVENTS
+
+			// get their sync status
+			$PM = core_plugin_PluginManager::getInstance();
+			$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
+
+			$userMan = core_auth_AuthManager::getInstance();
+			while($r = $this->DBM->fetch_obj($q))
+			{
+				// only create new array items for each user
+				if($r->{cfg_core_User::ID} != $lastUID)
+				{
+					$i++;
+					$result[$i] = array(
+						'userID' => $r->{cfg_core_User::ID},
+						'user' => $userMan->getNameObject($r->{cfg_core_User::ID}),
+						'additional' => $r->additional_attempts,
+						'attempts' => array(),
+						// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
+						'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
+						'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
+					);
+					$lastUID = $r->{cfg_core_User::ID};
+				}
+				// add attempts
+				$result[$i]['attempts'][] = array('attemptID' => $r->attemptID, 'score' => $r->{cfg_obo_Attempt::SCORE}, 'linkedAttempt' => $r->{cfg_obo_Attempt::LINKED_ATTEMPT}, 'submitted' => $r->{cfg_obo_Attempt::END_TIME} > 0, 'submitDate' => $r->{cfg_obo_Attempt::END_TIME});
+			}
+			
+			// store in memcache
+			core_util_Cache::getInstance()->setInstanceScores($instID, $result);
+			
+		}
+		//********************  GET ONLY MY SCORES  ************************//
+		else
+		{
+			// TODO: fish around in memcache for this info if it exists
+			
+			// grab every assessment attempt for me (including unsubmitted ones!)
+			$qstr = "SELECT
+						t1.".cfg_core_User::ID.",
+						".cfg_obo_Attempt::ID." as attemptID,
+						".cfg_obo_Attempt::LINKED_ATTEMPT.",
+						".cfg_obo_Attempt::SCORE.",
+						".cfg_obo_Attempt::END_TIME.",
+						COALESCE(".cfg_obo_ExtraAttempt::EXTRA_COUNT.", 0) as additional_attempts
+						FROM 
+						(
+							SELECT
+								A.".cfg_obo_Attempt::ID.",
+								V.".cfg_core_User::ID.",
+								A.".cfg_obo_Attempt::SCORE.",
+								V.".cfg_obo_Instance::ID." as instance_id,
+								A.".cfg_obo_Attempt::LINKED_ATTEMPT.",
+								A.".cfg_obo_Attempt::END_TIME."
+	 						FROM
+								".cfg_obo_Attempt::TABLE." AS A,
+								".cfg_obo_Visit::TABLE." AS V,
+								".cfg_obo_LO::TABLE." AS L,
+								".cfg_obo_Instance::TABLE." as I
+	 						WHERE
+								V.".cfg_obo_Instance::ID." = '?'
+								AND V.".cfg_obo_Instance::ID." = I.".cfg_obo_Instance::ID."
+								AND L.".cfg_obo_LO::ID." = I.".cfg_obo_LO::ID."
+								AND L.".cfg_obo_LO::AGROUP." = A.".cfg_obo_QGroup::ID."
+		 						AND A.".cfg_obo_Visit::ID." = V.".cfg_obo_Visit::ID."
+								AND A.".cfg_core_User::ID." = '?'
+						) AS t1
+						LEFT OUTER JOIN ".cfg_obo_ExtraAttempt::TABLE." AS AA
+						ON
+							(AA.".cfg_core_User::ID." = t1.".cfg_core_User::ID."
+							AND AA.".cfg_obo_Instance::ID." = t1.instance_id)
+						ORDER BY
+							".cfg_core_User::ID." ASC,
+							".cfg_obo_Attempt::ID." ASC";
+
+			if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
+			{
+				trace(mysql_error(), true);
+				$this->DBM->rollback();
+				return false;
+			}
+
+			$result = array();
+			$i = -1;
+			$lastUID = -1;
+			$attempts;
+
+			// TODO: SYSTEM EVENTS
+
+			// get their sync status
+			$PM = core_plugin_PluginManager::getInstance();
+			$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
+
+			$userMan = core_auth_AuthManager::getInstance();
+			while($r = $this->DBM->fetch_obj($q))
+			{
+				// only create new array items for each user
+				if($r->{cfg_core_User::ID} != $lastUID)
+				{
+					$i++;
+					$result[$i] = array(
+						'userID' => $r->{cfg_core_User::ID},
+						'user' => $userMan->getNameObject($r->{cfg_core_User::ID}),
+						'additional' => $r->additional_attempts,
+						'attempts' => array(),
+						// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
+						'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
+						'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
+					);
+					$lastUID = $r->{cfg_core_User::ID};
+				}
+				// add attempts
+				$result[$i]['attempts'][] = array('attemptID' => $r->attemptID, 'score' => $r->{cfg_obo_Attempt::SCORE}, 'linkedAttempt' => $r->{cfg_obo_Attempt::LINKED_ATTEMPT}, 'submitted' => $r->{cfg_obo_Attempt::END_TIME} > 0, 'submitDate' => $r->{cfg_obo_Attempt::END_TIME});
+			}
+			
+		}
+		
+		
 		return $result;
 	}
 	
