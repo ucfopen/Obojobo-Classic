@@ -33,7 +33,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	 * @param $instArr (Array) Array of information about the new instance (needs name, lo_id, courseID, startTime, and endTime)
 	 * @return (number) new instance id
 	 */
-	public function newInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true)
+	public function newInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true, $syncScores = false)
 	{
 		$roleMan = nm_los_RoleManager::getInstance();
 		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
@@ -128,14 +128,15 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 					`".cfg_obo_Instance::END_TIME."`='?',
 					`".cfg_obo_Instance::ATTEMPT_COUNT."`='?',
 					`".cfg_obo_Instance::SCORE_METHOD."`='?',
-					`".cfg_obo_Instance::SCORE_IMPORT."`='?'";
+					`".cfg_obo_Instance::SCORE_IMPORT."`='?',
+					`".cfg_obo_Instance::SYNC_SCORES."`='?'";
 		
 		//Default scoreMethod (highest)
 		if(empty($scoreMethod)) $scoreMethod = 'h';
 		
 		//Send query to DB, checking for errors
 		//TODO: future course code: if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID)))
-		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport)))
+		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, (int)$syncScores)))
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
@@ -342,7 +343,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			$ownerName = $authMan->getName($r->{cfg_core_User::ID});
-			$iData = new nm_los_InstanceData($r->{cfg_obo_Instance::ID}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $ownerName, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT});
+			$iData = new nm_los_InstanceData($r->{cfg_obo_Instance::ID}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $ownerName, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT}, $r->{cfg_obo_Instance::SYNC_SCORES});
 			core_util_Cache::getInstance()->setInstanceData($iData);
 			// get perms
 			
@@ -383,7 +384,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	 * @param $instArr (Array) Array of information about the new instance (needs name, lo_id, courseID, startTime, and endTime)
 	 * @return (Array<Instance>) instance array
 	 */
-	public function updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport)
+	public function updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $syncScores)
 	{
 		if(!nm_los_Validator::isString($name))
 		{
@@ -424,6 +425,11 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		{
 			return core_util_Error::getError(2);
 		}
+		
+		if(!nm_los_Validator::isBoolean($syncScores))
+		{
+			return core_util_Error::getError(2);
+		}
 
 		$qstr = "UPDATE ".cfg_obo_Instance::TABLE."
 			SET 
@@ -433,7 +439,8 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 				`".cfg_obo_Instance::END_TIME."` = '?', 
 				`".cfg_obo_Instance::ATTEMPT_COUNT."` = '?', 
 				`".cfg_obo_Instance::SCORE_METHOD."` = '?',
-				`".cfg_obo_Instance::SCORE_IMPORT."` = '?'
+				`".cfg_obo_Instance::SCORE_IMPORT."` = '?',
+				`".cfg_obo_Instance::SYNC_SCORES."` = '?'
 			WHERE 
 				`".cfg_obo_Instance::ID."` = '?'";
 				
@@ -441,7 +448,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		core_util_Cache::getInstance()->clearInstanceData($instID);
 		//Send query to DB, checking for errors
 		// TODO:future course code: if( !($q = $this->DBM->querySafe($qstr, $name, $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID, $instID)) )
-		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $instID)) )
+		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, (int)$syncScores, $instID)) )
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);

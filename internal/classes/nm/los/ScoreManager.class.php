@@ -247,7 +247,7 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 					'additional' => $r->additional_attempts,
 					'attempts' => array(),
 					// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
-					'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
+					'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? (bool)$wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
 					'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
 				);
 				$lastUID = $r->{cfg_core_User::ID};
