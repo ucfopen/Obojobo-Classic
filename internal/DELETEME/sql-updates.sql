@@ -145,3 +145,5 @@ ALTER TABLE  `plg_wc_grade_log` ADD UNIQUE (
 `columnID`
 );
 ALTER TABLE  `plg_wc_grade_log` CHANGE  `timestamp`  `createTime` INT( 30 ) UNSIGNED NOT NULL;
+
+ALTER TABLE  `obo_lo_instances` ADD  `syncScores` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT  '0';

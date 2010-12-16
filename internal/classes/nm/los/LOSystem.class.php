@@ -212,8 +212,9 @@ class nm_los_LOSystem extends core_db_dbEnabled
 						".cfg_obo_Instance::ATTEMPT_COUNT." = '?',
 						".cfg_obo_Instance::SCORE_METHOD." = '?',
 						".cfg_obo_Instance::SCORE_IMPORT." = '?',
+						".cfg_obo_Instance::SYNC_SCORES." = '?',
 						".cfg_obo_Instance::DELETED_SCORE_DATA." = '?'";
-				$moveFailed = $this->DBM->querySafe($qstr, $r->{cfg_obo_Instance::ID}, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT}, $scoredata);
+				$moveFailed = $this->DBM->querySafe($qstr, $r->{cfg_obo_Instance::ID}, $r->{cfg_obo_Instance::TITLE}, $r->{cfg_obo_LO::ID}, $r->{cfg_core_User::ID}, $r->{cfg_obo_Instance::TIME}, $r->{cfg_obo_Instance::COURSE}, $r->{cfg_obo_Instance::START_TIME}, $r->{cfg_obo_Instance::END_TIME}, $r->{cfg_obo_Instance::ATTEMPT_COUNT}, $r->{cfg_obo_Instance::SCORE_METHOD}, $r->{cfg_obo_Instance::SCORE_IMPORT}, $r->{cfg_obo_Instance::SYNC_SCORES}, $scoredata);
 			}
 			// only delete the instances if they were succusfully moved to the deleted table
 			if($moveFailed == false)

@@ -98,7 +98,6 @@ class nm_los_API extends core_db_dbEnabled
 
 	public function getCourses()
 	{
-		$result = false;
 		if($this->getSessionValid())
 		{
 			// TODO: NEED TO USE SYSTEM EVENTS
@@ -585,12 +584,12 @@ class nm_los_API extends core_db_dbEnabled
 	 * @return (number) new instance id
 	 * @return (bool) False if error or no login
 	 */
-	public function createInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true)
+	public function createInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true, $syncScores = false)
 	{
 		if($this->getSessionValid()){
 			$this->DBM->startTransaction();
 			$instman = nm_los_InstanceManager::getInstance();
-			$result = $instman->newInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+			$result = $instman->newInstance($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $syncScores);
 			$this->DBM->commit();
 		}
 		else
@@ -658,13 +657,13 @@ class nm_los_API extends core_db_dbEnabled
 	 * @param $instArr (Array) Array of information about the instance
 	 * @param (Array) The instance Array
 	 */
-	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport)
+	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $syncScores)
 	{
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
 			$instman = nm_los_InstanceManager::getInstance();
-			$result = $instman->updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+			$result = $instman->updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $syncScores);
 			$this->DBM->commit();
 		}
 		else
