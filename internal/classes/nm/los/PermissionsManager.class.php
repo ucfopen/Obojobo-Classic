@@ -551,8 +551,6 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 	{
 		if(! nm_los_Validator::isPosInt($itemID) )
 		{
-			
-	       
 	        return core_util_Error::getError(2);
 		}
 		
@@ -576,7 +574,7 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		return true;				
+		return true;
 	}
 	
 	public function removeUsersPerms($userIDs, $itemID=0, $itemType='l')

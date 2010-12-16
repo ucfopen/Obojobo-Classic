@@ -112,7 +112,7 @@ class nm_los_API extends core_db_dbEnabled
 		return $result;
 	}
 	
-	public function setCourseForInstance($instID, $courseID, $columnName)
+	public function setCourseForInstance($instID, $courseID, $sendScores = false, $gradeBookColumnName = false)
 	{
 		$result = false;
 		if($this->getSessionValid())
@@ -120,9 +120,16 @@ class nm_los_API extends core_db_dbEnabled
 			// TODO: NEED TO USE SYSTEM EVENTS
 			$user = $this->getUser();
 			
-			// create the gradebook column
 			$PM = core_plugin_PluginManager::getInstance();
-			$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $columnName), true);
+			
+			// Link item to course
+			$result = $PM->callAPI('UCFCourses', 'setInstanceCourseLink', array($instID, $courseID), true);
+			
+			if($sendScores == true && strlen($gradeBookColumnName) > 0)
+			{
+				// create the gradebook column
+				$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $columnName), true);
+			}
 		}
 		else
 		{
@@ -1574,7 +1581,7 @@ class nm_los_API extends core_db_dbEnabled
 	public function getQuestionResponses($instid, $questionid)
 	{
 		if(nm_los_Validator::isPosInt($instid) && nm_los_Validator::isPosInt($questionid))
-		{		
+		{
 			
 			if($this->getSessionValid())
 			{
@@ -1583,13 +1590,12 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
+				$error = AppCfg::ERROR_TYPE;
 				$result = new $error(1);
 			}
-
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
+		$error = AppCfg::ERROR_TYPE;
 		return new $error(2);
 	}
 
@@ -1602,16 +1608,8 @@ class nm_los_API extends core_db_dbEnabled
 	 */
 	public function getLanguages()
 	{	
-		//if($this->getSessionValid())
-		//{
-			$langman = nm_los_LanguageManager::getInstance();
-			$result = $langman->getAllLanguages();
-		//}
-		//else
-		//{
-		//	$error = AppCfg::ERROR_TYPE;
-		//	$result = new $error(1);
-		//}
+		$langman = nm_los_LanguageManager::getInstance();
+		$result = $langman->getAllLanguages();
 		return $result;
 	}
 
@@ -1625,7 +1623,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -1641,7 +1639,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -1659,7 +1657,7 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
+				$error = AppCfg::ERROR_TYPE;
 				$result = new $error(1);
 			}
 			return $result;
@@ -1672,8 +1670,6 @@ class nm_los_API extends core_db_dbEnabled
 	// Function accepts RoleID as a positive int, or a stringRoleName
 	public function getUsersInRole($roleNames)
 	{
-
-
 		if($this->getSessionValid())
 		{
 			$roleMan = nm_los_RoleManager::getInstance();
@@ -1687,7 +1683,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -1706,7 +1702,7 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
+				$error = AppCfg::ERROR_TYPE;
 				$result = new $error(1);
 			}
 			return $result;
@@ -1717,24 +1713,16 @@ class nm_los_API extends core_db_dbEnabled
 	
 	public function createExternalMediaLink($mediaObj)
 	{
-		
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
 			$mediaMan = nm_los_MediaManager::getInstance();
-			if(is_object($mediaObj) && get_class($mediaObj) == 'nm_los_Media') // from upasset
-			{
-				$result = $mediaMan->newMedia($mediaObj);
-			}
-			else
-			{
-				$result = $mediaMan->newMedia(new nm_los_Media($mediaObj));
-			}
+			$result = $mediaMan->newMedia(new nm_los_Media($mediaObj));
 			$this->DBM->commit();
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
+			$error = AppCfg::ERROR_TYPE;
 			$result = new $error(1);
 		}
 		return $result;
@@ -1752,12 +1740,12 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
+				$error = AppCfg::ERROR_TYPE;
 				$result = new $error(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
+		$error = AppCfg::ERROR_TYPE;
 		return new $error(2);
 	}
 	
