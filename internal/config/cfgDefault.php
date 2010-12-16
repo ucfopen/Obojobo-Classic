@@ -32,6 +32,8 @@ class AppCfgDefault
 
 	// Define the relative location for the scripts directory with trailing /
 	const DIR_SCRIPTS = 'internal/scripts/';
+	
+	const DIR_TEMPLATES = 'internal/templates/';
 
 	// Define the relative location for the assets directory with trailing /
 	const DIR_ASSETS = 'assets/';
@@ -122,6 +124,10 @@ class AppCfgDefault
 
 	// make cache class
 	const CACHE_CLASS = 'nm_los_Cache';
+	
+	//--------------------- NOTIFICATION ---------------------------//
+	// Send email score notifications to student
+	const NOTIFY_SCORE = true; 
 	
 	//--------------------   AUTHENTICATION   -----------------------//	
 	// Look at the PLUGINS section for auth plugin modules

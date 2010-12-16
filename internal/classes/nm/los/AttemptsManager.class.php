@@ -26,7 +26,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		return self::$instance;
 	}
 
-
 	public function getUnfinishedAttempt($qGroupID = 0){
 		if(!nm_los_Validator::isPosInt($qGroupID))
 		{
@@ -92,8 +91,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			// make sure its not past closing time
 			if($instanceData->endTime <= time() || $instanceData->startTime >= time())
 			{
-				
-				
 				return core_util_Error::getError(2010); // error: assessment closed
 			}
 			
@@ -112,7 +109,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 				{
 					return  $regAttempt; // return the error if one is made here
 				}
-
 
 				// track resume attempt
 				$TM = nm_los_TrackingManager::getInstance();
@@ -178,8 +174,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			// create the attempt
 			if(!$this->createAttempt($lo->loID, $qGroupID))
 			{
-				
-				
 				return core_util_Error::getError(2001); // error: should never happen
 			}
 		}
@@ -298,7 +292,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		{
 			$kidIDs[] = $kid->questionID;
 		}
-
 		
 		$this->DBM->startTransaction();
 		$qstr = "UPDATE ".cfg_obo_Attempt::TABLE." SET ".cfg_obo_Attempt::ORDER." = '?' WHERE ".cfg_obo_Attempt::ID." = '?'";
@@ -330,7 +323,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		if( strlen($result->{cfg_obo_Attempt::ORDER}) > 0)
 		{
 			$kidOrder = explode(",", $result->{cfg_obo_Attempt::ORDER});
-
 
 			$returnArr = array();
 			foreach($kidOrder AS $kidID)
@@ -423,8 +415,8 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			return 0;
 		}
 		
-        $r = $this->DBM->fetch_obj($q);
-        return (int) $r->{cfg_obo_Instance::ATTEMPT_COUNT};
+		$r = $this->DBM->fetch_obj($q);
+		return (int) $r->{cfg_obo_Instance::ATTEMPT_COUNT};
 	}
 	
 	public function getNumExtraAttempts($instID = 0, $userID = 0)
@@ -497,8 +489,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		return $this->getTotalAttempts($instID, $userID) - $this->getNumTakenAttempts($instID, $userID);
 	}
 	
-
-	
 	public function setAdditionalAttempts($userID = 0, $instID = 0, $count = 0)
 	{
 		if(!nm_los_Validator::isPosInt($instID))
@@ -520,7 +510,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		{
 			return core_util_Error::getError(4);
 		}
-
 		
 		if($count == 0)
 		{
@@ -642,8 +631,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		{
 			if(!nm_los_Validator::isPosInt($equivalentAttempt->attemptID) || !nm_los_Validator::isPosInt($equivalentAttempt->score) || !nm_los_Validator::isPosInt($equivalentAttempt->loID))
 			{
-				
-				
 				return core_util_Error::getError(2);
 			}
 		}
@@ -676,7 +663,41 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		// TODO: NEED TO USE SYSTEM EVENTS
 		// Send the score to webcourses
 		$PM = core_plugin_PluginManager::getInstance();
-		$grade = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		$PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		
+		// Send email responce to student
+		if(AppCfg::NOTIFY_SCORE == true)
+		{
+			$IM = nm_los_InstanceManager::getInstance();
+			if($instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
+			{
+				
+				$scoreman = nm_los_ScoreManager::getInstance();
+				$scores = $scoreman->getScores($instid, $_SESSION['userID']);
+				
+				$attempts = $scores[0]['attempts'];
+				
+				// filter out incomplete attempts
+				if(count($attempts) > 0)
+				{
+					foreach($attempts AS &$attempt)
+					{
+						if($attempt['submitted'] != true)
+						{
+							unset($attempt);
+						}
+					}
+				}
+				else
+				{
+					$attempts = array();
+				}
+				
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
+			}
+	
+		}
 		
 		// clear cached scores for this instance
 		core_util_Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
@@ -707,8 +728,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		{
 			if(!nm_los_Validator::isPosInt($equivalentAttempt->attemptID) || !nm_los_Validator::isPosInt($equivalentAttempt->score) || !nm_los_Validator::isPosInt($equivalentAttempt->loID))
 			{
-				
-				
 				return core_util_Error::getError(2);
 			}
 		}
@@ -756,7 +775,6 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		{
 			return core_util_Error::getError(2);
 		}
-
 		
 		$qstr = "DELETE FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Attempt::ID."='?'";
 		
