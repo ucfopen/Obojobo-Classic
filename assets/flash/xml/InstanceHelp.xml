@@ -28,9 +28,12 @@
 		<![CDATA[This option allows students who have already taken this learning object to import their past highest attempt score instead of re-taking the object.]]>
 	</helpItem>
 	<helpItem field="item10">
-		<![CDATA[If you choose to sync scores to Webcourses, then Obojobo will send copies of assessment scores automatically to the Webcourses gradebook for this course.  Scores will be recorded in a newly created gradebook column prefixed with '<b>obo:</b>', followed by the name of your instance when you initially publish it.  Regardless of which option you choose, scores will still be retained within Obojobo.<br><br>Once you publish this instance you will <b>not</b> be able to modify this setting.]]>
+		<![CDATA[If you choose to sync scores to Webcourses, then Obojobo will send copies of student assessment scores automatically to the Webcourses gradebook for this course.  Scores will be recorded in a newly created gradebook column prefixed with '<b>obo:</b>', followed by the name of your instance when you initially publish it.  Regardless of which option you choose, scores will still be retained within Obojobo.<br><br>Once you publish this instance you will <b>not</b> be able to modify this setting.]]>
 	</helpItem>
 	<helpItem field="item11">
 		<![CDATA[This field allows you to write in a custom course title.]]>
+	</helpItem>
+	<helpItem field="item11">
+		<![CDATA[This field shows the course for this instance.  Since this instance is linked to an external course you cannot change it.]]>
 	</helpItem>
 </helpItems>
