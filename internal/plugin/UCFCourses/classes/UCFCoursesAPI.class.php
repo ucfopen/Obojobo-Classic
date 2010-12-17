@@ -167,7 +167,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			}
 			
 			$NID = $AM->getUserName($userID);
-
+			
 			// send request
 			$result = $this->sendCreateColumnRequest($NID, $sectionID, $columnName);
 			
@@ -240,7 +240,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
 						". cfg_core_User::ID." = '?',
 						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
-						".cfg_plugin_UCFCourses::MAP_COL_NAME." = '',";
+						".cfg_plugin_UCFCourses::MAP_COL_NAME." = ''";
 			$this->DBM->querySafe($sql, $instID, $sectionID, $userID, $sectionID, $userID);
 			
 			return $result;
@@ -401,9 +401,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($resultInfo['http_code'] != 200)
 		{
 			$error = AppCfg::ERROR_TYPE;
-			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
 			return array('scoreSent' => false, 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
-
 		}
 
 		$result = $this->decodeJSON($request->getResponseBody());
