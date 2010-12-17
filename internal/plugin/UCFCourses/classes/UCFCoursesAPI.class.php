@@ -122,6 +122,8 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 					$semester = $this->term_code2term_string($course->ps_term);
 					$course->semester = $semester['semester'];
 					$course->year = $semester['year'];
+					$course->start = $semester['start'];
+					$course->end = $startTime['end'];
 				}
 			}
 		}
@@ -588,6 +590,19 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 	
 		$term['year'] = ( ($tc/10) /3 ) + 1964;
+		
+		// get the start and end time for semesters based on the term code
+		// TODO: make the termcode work better
+		
+		$termCodeLookup = array();
+		$termCodeLookup[1380] = array('start' => 1281571200, 'end' => 1292543999); // fall 2010
+		$termCodeLookup[1390] = array('start' => 1292544000, 'end' => 1304639999); // spring 2011
+		$termCodeLookup[1400] = array('start' => 1304640000, 'end' => 1317445199); // summer 2011
+		$termCodeLookup[1410] = array('start' => 1317445200, 'end' => 1329112799); // fall 2011
+		$termCodeLookup[1420] = array('start' => 1329112800, 'end' => 1333515599); // spring 2012
+		
+		$term['start'] = $termCodeLookup[$term_code]['start'];
+		$term['end'] = $termCodeLookup[$term_code]['end'];
 	
 		return $term;
 	}
