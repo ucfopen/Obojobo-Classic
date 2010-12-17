@@ -128,7 +128,7 @@ class nm_los_API extends core_db_dbEnabled
 			if($sendScores == true && strlen($gradeBookColumnName) > 0)
 			{
 				// create the gradebook column
-				$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $columnName), true);
+				$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $gradeBookColumnName), true);
 
 				// it worked, return true
 				if($result['columnID'] > 0 )
