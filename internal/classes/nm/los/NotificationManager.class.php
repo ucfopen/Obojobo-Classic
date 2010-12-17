@@ -49,7 +49,8 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$sent = $this->sendEmail($user->email, $subject, $body);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
-		
+		trace('here is body:');
+		trace($body);
 		return $sent;
 	}
 	
