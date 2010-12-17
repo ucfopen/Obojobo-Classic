@@ -412,14 +412,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	}
 	
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
-	{
-		trace('zach:sendScoreSetRequest()');
-		trace($instructorNID);
-		trace($studentNID);
-		trace($sectionID);
-		trace($columnID);
-		trace($score);
-		
+	{		
 		// Begin the service request
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
@@ -489,8 +482,59 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			// log each error
 			foreach($errors AS $rError)
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$returnErrors[] = new $error(1008, $rError);
+				$rErrorNumber = explode(',', $rError, 1); // parse error code out of strings like "0, User does not exist in PeopleSoft"
+				$code = false;
+				switch($rErrorNumber[0])
+				{
+					case 0:
+					case 1:
+						$code = 7001;
+						break;
+					case 2:
+						$code = 7002;
+						break;
+					case 3:
+						$code = 7003;
+						break;
+					case 4:
+						$code = 7005;
+						break;
+					case 6:
+						$code = 7006;
+						break;
+					case 7:
+						$code = 7007;
+						break;
+					case 8:
+						$code = 7009;
+						break;
+					case 9:
+						$code = 7010;
+						break;
+					case 10:
+						$code = 7008;
+						break;
+					case 11:
+						$code = 7011;
+						break;
+					case 12:
+						$code = 7006;
+						break;
+					case 18:
+						$code = 7012;
+						break;
+				}
+				
+				// code found
+				if($code)
+				{
+					$returnErrors[] = core_util_Error::getError($code);
+				}
+				// code not found, use general error and return the error string
+				else
+				{
+					$returnErrors[] = core_util_Error::getError(7013, $rError);
+				}
 			}
 			return $returnErrors;
 		}
