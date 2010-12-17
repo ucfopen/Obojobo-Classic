@@ -269,7 +269,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
 						". cfg_core_User::ID." = '?',
 						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
-						".cfg_plugin_UCFCourses::MAP_COL_NAME." = '',";
+						".cfg_plugin_UCFCourses::MAP_COL_NAME." = ''";
 			
 			return (bool) $this->DBM->querySafe($sql, $instID, $sectionID, $userID, $sectionID, $userID);
 		}
