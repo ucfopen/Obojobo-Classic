@@ -35,7 +35,7 @@ class core_db_DBConnectionOCI8 extends core_db_DBConnection
 			trace($e);
 			return false;
 		}
-		return $stid;		
+		return $stid;
 	}
 	
 	/**

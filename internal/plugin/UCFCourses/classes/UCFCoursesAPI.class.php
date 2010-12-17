@@ -62,6 +62,35 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 	}
 	
+	
+	public function getInstanceCourseData($insID)
+	{
+		$courseData = new stdClass();
+		
+		$qstr = "SELECT * FROM ". cfg_plugin_UCFCourses::MAP_TABLE . " WHERE ". cfg_obo_Instance::ID . " = '?'";
+		$q = $this->DBM->querySafe($qstr, $insID);
+		if($r = $this->DBM->fetch_obj($q))
+		{
+			if($r->{cfg_plugin_UCFCourses::MAP_COL_ID} > 0)
+			{
+				$courseData->type = 'sync';
+				$courseData->gradeColumn = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+			}
+			else
+			{
+				$courseData->type = 'linked';
+			}
+			
+			$courseData->id = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+			$coursePlugin->plugin = 'UCFCourses';
+		}
+		else
+		{
+			$courseData->type = 'none';
+		}
+		return $courseData;
+	}
+	
 	protected function sendGetCourseRequest($NID)
 	{
 		//$NID = 'wink';
