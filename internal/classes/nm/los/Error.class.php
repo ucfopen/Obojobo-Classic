@@ -100,12 +100,6 @@ class nm_los_Error extends core_util_Error
 			case 7011: return "User is not a student of the specified course.";
 			case 7012: return "Course could not be found.";
 			case 7013: return "General course plugin error.";
-
-
-
-
-		 *	11, Specified user is not a member of section gradebook
-		 *	18, Section specified does not exist
 			
 			    
 			default: return "General Error.";
