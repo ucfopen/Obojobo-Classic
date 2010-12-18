@@ -123,7 +123,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 					$course->semester = $semester['semester'];
 					$course->year = $semester['year'];
 					$course->start = $semester['start'];
-					$course->end = $startTime['end'];
+					$course->end = $semester['end'];
 				}
 			}
 		}
@@ -595,11 +595,11 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// TODO: make the termcode work better
 		
 		$termCodeLookup = array();
-		$termCodeLookup[1380] = array('start' => 1281571200, 'end' => 1292543999); // fall 2010
-		$termCodeLookup[1390] = array('start' => 1292544000, 'end' => 1304639999); // spring 2011
-		$termCodeLookup[1400] = array('start' => 1304640000, 'end' => 1317445199); // summer 2011
-		$termCodeLookup[1410] = array('start' => 1317445200, 'end' => 1329112799); // fall 2011
-		$termCodeLookup[1420] = array('start' => 1329112800, 'end' => 1333515599); // spring 2012
+		$termCodeLookup[1400] = array('start' => '1281571200', 'end' => '1292543999'); // fall 2010
+		$termCodeLookup[1410] = array('start' => '1292544000', 'end' => '1304639999'); // spring 2011
+		$termCodeLookup[1420] = array('start' => '1304640000', 'end' => '1317445199'); // summer 2011
+		$termCodeLookup[1430] = array('start' => '1317445200', 'end' => '1329112799'); // fall 2011
+		$termCodeLookup[1440] = array('start' => '1329112800', 'end' => '1333515599'); // spring 2012
 		
 		$term['start'] = $termCodeLookup[$term_code]['start'];
 		$term['end'] = $termCodeLookup[$term_code]['end'];
