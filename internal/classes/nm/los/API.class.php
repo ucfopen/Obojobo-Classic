@@ -26,10 +26,10 @@ class nm_los_API extends core_db_dbEnabled
 	public function __construct($isRemoting = false)
 	{
 		parent::__construct();
-		if($isRemoting)
-		{
-			//$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
-		}
+		// if($isRemoting)
+		// {
+		// 	//$config->timeLimit = AppCfg::AUTH_TIMEOUT_REMOTING;
+		// }
 	}
 	
 	/**
@@ -52,8 +52,7 @@ class nm_los_API extends core_db_dbEnabled
 
 		if(!is_array($roleNames))
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return new $error(2);
+			return core_util_Error::getError(2);
 		}		
 		$AM = core_auth_AuthManager::getInstance();
 		$return = array();
@@ -106,8 +105,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -149,8 +147,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;	
 	}
@@ -180,8 +177,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -202,8 +198,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -223,8 +218,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -246,8 +240,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result =  core_util_Error::getError(1);
 		}
 		
 		return $result;
@@ -270,8 +263,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;	
 	}
@@ -289,8 +281,7 @@ class nm_los_API extends core_db_dbEnabled
 		// TODO: move validation
 	    if(!nm_los_Validator::isPosInt($loID))
 		{
-			$error = AppCfg::ERROR_TYPE;
-	        return new $error(2);
+			return core_util_Error::getError(2);
 		}   
 
 		if($this->getSessionValid())
@@ -303,37 +294,11 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$loObj = new $error(1);
+			$loObj = core_util_Error::getError(1);
 		}
 		return $loObj;
 	}
 	
-	/**
-	 * Gets the most recent draft of a tree
-	 * @param $rootid (number) root learning object id
-	 * @return (LO) learning object
-	 * @return (bool) False if error or no login
-	 */
-/*	public function getDraftOfLO($loID)
-	{
-	    if(!nm_los_Validator::isPosInt($loID))
-		{
-				       $error = AppCfg::ERROR_TYPE;
-	        return new $error(2);
-	    }   
-		if($this->getSessionValid())
-		{
-			$loman = nm_los_LOManager::getInstance();
-			$loObj = $loman->getLatestDraftByLOID($loID, 'full');
-		}
-		else
-		{
-						$error = AppCfg::ERROR_TYPE;
-			$loObj = new $error(1);
-		}
-		return $loObj;
-	}*/
 	
 	
 	/**
@@ -351,8 +316,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$loArr = new $error(1);
+			$loArr = core_util_Error::getError(1);
 		}
 		return $loArr;
 	}
@@ -391,8 +355,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -417,8 +380,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -433,8 +395,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
     }
@@ -458,8 +419,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$loObj = new $error(1);
+			$loObj = core_util_Error::getError(1);
 		}
 		return $loObj;
 	}
@@ -479,8 +439,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -496,8 +455,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -514,8 +472,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -535,8 +492,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -556,8 +512,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$loObj = new $error(1);
+			$loObj = core_util_Error::getError(1);
 		}
 		return $loObj;
 	}
@@ -578,8 +533,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -594,8 +548,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -617,8 +570,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -639,8 +591,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -669,8 +620,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -691,8 +641,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -708,120 +657,12 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
 	
-	// /**** Keyword Functions ****/
-	// /*Not Used*/
-	// /**
-	//  * Creates a new keyword, returning the new id
-	//  * @param $keyword (string) new keyword string
-	//  * @return (Keyword) keyword object
-	//  * @return (bool) False if error or no login
-	//  */
-	// public function newKeyword($keyword)
-	// {
-	// 	$this->DBM->startTransaction();
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$keyman = nm_los_KeywordManager::getInstance();
-	// 		$result = $keyman->newKeyword($keyword);
-	// 	}
-	// 	else
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
-	// 
-	// /**
-	//  * Links an already existing keyword to a learning object
-	//  * @param $loID (number) learning object id
-	//  * @param $keyid (number) keyword id
-	//  */
-	// public function linkKeywordLO($loID, $keyid)
-	// {
-	// 	$this->DBM->startTransaction();
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$keyman = nm_los_KeywordManager::getInstance();
-	// 		$result = $keyman->linkKeyword($keyid, $loID, 'l');
-	// 	}
-	// 	else
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
-	// 
-	// /**
-	//  * Removes the link between a keyword and a learning object
-	//  * @param $loID (number) learning object id
-	//  * @param $keyid (number) keyword id
-	//  */
-	// public function unlinkKeywordLO($loID, $keyid)
-	// {
-	// 	$this->DBM->startTransaction();
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$keyman = nm_los_KeywordManager::getInstance();
-	// 		$result = $keyman->unlinkKeyword($keyid, $loID, 'l');
-	// 	}
-	// 	else
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
-	// 
-	// /**
-	//  * Links an already existing keyword to a media object
-	//  * @param $mid (number) media id
-	//  * @param $keyid (number) keyword id
-	//  */
-	// public function linkKeywordMedia($mid, $keyid)
-	// {
-	// 	$this->DBM->startTransaction();
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$keyman = nm_los_KeywordManager::getInstance();
-	// 		$result = $keyman->linkKeyword($keyid, $mid, 'm');
-	// 	}
-	// 	else
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
-	// 
-	// /**
-	//  * Removes the link between a keyword and a media object
-	//  * @param $mid (number) media id
-	//  * @param $keyid (number) keyword id
-	//  */
-	// public function unlinkKeywordMedia($mid, $keyid)
-	// {
-	// 	$this->DBM->startTransaction();
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$keyman = nm_los_KeywordManager::getInstance();
-	// 		$result = $keyman->unlinkKeyword($keyid, $loID, 'm');
-	// 	}
-	// 	else
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
-	
+
 	/**
 	 * Gets list of all Media that are globally viewable or user has rights to view it
 	 * @return (Array<Media>) an array of minimum media objects
@@ -837,8 +678,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -866,8 +706,7 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 			}			
 			$this->DBM->startTransaction();
@@ -877,8 +716,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -905,8 +743,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -929,8 +766,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -949,8 +785,7 @@ class nm_los_API extends core_db_dbEnabled
 	{		
 	    if(!nm_los_Validator::isPosInt($itemID))
 		{
-						$error = AppCfg::ERROR_TYPE;
-			return new $error(2);
+			return core_util_Error::getError(2);
 	    }   
 		
 		if($this->getSessionValid())
@@ -981,15 +816,13 @@ class nm_los_API extends core_db_dbEnabled
 				default:
 					if(!nm_los_Validator::isItemType($itemType))
 					{
-												$error = AppCfg::ERROR_TYPE;
-						return new $error(2);
+						return core_util_Error::getError(2);
 				    }
 					foreach($permObjects as $permObj)
 					{
 						if(!nm_los_Validator::isPermObj($permObj))
 						{
-							$error = AppCfg::ERROR_TYPE;
-							return new $error(2);
+							return core_util_Error::getError(2);
 						}
 					}
 					$this->DBM->startTransaction();
@@ -1008,8 +841,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -1018,8 +850,7 @@ class nm_los_API extends core_db_dbEnabled
 	{
 	    if(!nm_los_Validator::isUserArray($users) || !nm_los_Validator::isPosInt($itemID) || !nm_los_Validator::isItemType($itemType))
 		{
-						$error = AppCfg::ERROR_TYPE;
-			return new $error(2);
+			return core_util_Error::getError(2);
 		}
 		if($this->getSessionValid())
 		{
@@ -1037,35 +868,11 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		
 		return $result;	    
 	}
-
-	// TODO: is this used?
-	// public function getUsersWithPerm($itemID = 0, $itemType = 'i', $perm = 'read')
-	// {
-	//     if(!nm_los_Validator::isPosInt($itemID, true) || !nm_los_Validator::isItemType($itemType) || !nm_los_Validator::isPerm($perm))
-	//     {
-	// 	   $error = AppCfg::ERROR_TYPE;
-	// 	    return new $error(2);
-	// 	}
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$permman = nm_los_PermissionsManager::getInstance();
-	// 		$result = $permman->getUsersWithPerm($itemID, $itemType, $perm);
-	// 	}
-	// 	else
-	// 	{
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);	
-	// 	}
-	// 	$this->DBM->commit();
-	// 	return $result;
-	// }
 	
 	/**
 	 * Enter description here...
@@ -1078,8 +885,7 @@ class nm_los_API extends core_db_dbEnabled
 	{
 	    if(!nm_los_Validator::isPosInt($itemID))
 		{
-				       $error = AppCfg::ERROR_TYPE;
-	        return new $error(2);
+			return core_util_Error::getError(2);
 	    }    
 		
 		if($this->getSessionValid())
@@ -1095,8 +901,7 @@ class nm_los_API extends core_db_dbEnabled
 				default:
 					if(!nm_los_Validator::isItemType($itemType))
 					{
-										       $error = AppCfg::ERROR_TYPE;
-				        return new $error(2);
+						return core_util_Error::getError(2);
 				    }
 					$permman = nm_los_PermissionsManager::getInstance();
 					$result = $permman->getPermsForItem($itemID, $itemType);
@@ -1105,86 +910,11 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
 	
-	/** 
-	 * Get single layout specified by a layout id
-	 * @param $lid (number) layout id
-	 * @return (Layout) A full layout (with items and everything)
-	 * @return (bool) False if error or no login
-	 */
-	// TODO: is this uesed?
-	// public function getLayout($layoutID = 0)
-	// {
-	//     if(!nm_los_Validator::isPosInt($layoutID))
-	// 	{
-	//        $error = AppCfg::ERROR_TYPE;
-	//         return new $error(2);
-	//     }   
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$layman = nm_los_LayoutManager::getInstance();
-	// 		$result = $layman->getLayout($layoutID);
-	// 	}
-	// 	else
-	// 	{
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
-
-	/** 
-	 * Returns the default layout for pages (Defined in the call to getLayout)
-	 * @return (Layout) A full layout (with items and everything)
-	 * @return (bool) False if error or no login
-	 */
-	// TODO: is this used?
-	// public function getDefaultLayout()
-	// {
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$layman = nm_los_LayoutManager::getInstance();
-	// 		$result = $layman->getLayout(2);
-	// 	}
-	// 	else
-	// 	{
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
-
-	/** 
-	 * Returns all layout tags
-	 * @return (Array<string>) An array of all layout tags
-	 * @return (bool) False if error or no login
-	 */
-	// TODO: is this used?
-	// public function getLayoutTags()
-	// {
-	// 	
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$layman = nm_los_LayoutManager::getInstance();
-	// 		$result = $layman->getAllTags();
-	// 	}
-	// 	else
-	// 	{
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
-
- //------------------------------------------------------------------------------------
-
 
 	/****  Quiz Functions ****/
 	/**
@@ -1296,56 +1026,8 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			
 		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
-
-	// TODO: not used
-	// public function getAttemptDetails($attemptID)
-	// 	{
-	// 		if(nm_los_Validator::isPosInt($attemptID))
-	// 		{
-	// 			
-	// 			if($this->getSessionValid())
-	// 			{
-	// 			    $attemptMan = nm_los_AttemptsManager::getInstance();
-	// 		        $result = $attemptMan->getAttemptDetails($attemptID);
-	// 			}
-	// 			else
-	// 			{
-	// 				$error = AppCfg::ERROR_TYPE;
-	// 				$result = new $error(1);
-	// 			}
-	// 			return $result;
-	// 		}
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		return new $error(2);			
-	// 	}
-	
-	/* @Author: Zachary Berry */
-	// TODO: not used
-	// public function getAttemptCount($qGroup, $instID)
-	// 	{
-	// 		if(nm_los_Validator::isPosInt($qGroup) && nm_los_Validator::isPosInt($instID))
-	// 		{
-	// 			$this->DBM->startTransaction();
-	// 			$UM = core_auth_AuthManager::getInstance();
-	// 			if($UM->verifySession())
-	// 			{
-	// 			    $attemptMan = nm_los_AttemptsManager::getInstance();
-	// 		        $result = $attemptMan->getAttemptCount($attemptID);
-	// 			}
-	// 			else
-	//			{
-	// 				$error = AppCfg::ERROR_TYPE;
-	// 				$result = new $error(1);
-	//			}
-	// 			$this->DBM->commit();
-	// 			return $result;
-	// 		}
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		return new $error(2);	
-	// 	}
 	
 	/**
 	 * This function end the attempt with the specified qGroupID.
@@ -1366,8 +1048,7 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}				
 				$this->DBM->startTransaction();
 				$attemptMan = nm_los_AttemptsManager::getInstance();
@@ -1376,38 +1057,14 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
-	// TODO: is this used?
-	// public function deleteAttempt($attemptID)
-	// 	{
-	// 		if(nm_los_Validator::isPosInt($attemptID))
-	// 		{		
-	// 			
-	// 			if($this->getSessionValid())
-	// 			{
-	// 				$this->DBM->startTransaction();
-	// 				$attemptMan = nm_los_AttemptsManager::getInstance();
-	// 				$result = $attemptMan->deleteAttempt($attemptID);
-	// 				$this->DBM->commit();
-	// 			}
-	// 			else
-	// 			{
-	// 				$error = AppCfg::ERROR_TYPE;
-	// 				$result = new $error(1);
-	// 			}
-	// 			return $result;
-	// 		}
-	// 		$error = AppCfg::ERROR_TYPE;
-	// 		return new $error(2);
-	// 	}
+
 	
 /*
 	
@@ -1448,13 +1105,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	
@@ -1469,8 +1124,7 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 		}
 		return false;
@@ -1487,8 +1141,7 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 				
 		}
@@ -1496,102 +1149,6 @@ class nm_los_API extends core_db_dbEnabled
 		
 
 	}
-/**
-	 * @author Zachary Berry
-	 * 
-	 * Gets a listing of the final score for each user of a learning object instance (for faculty)
-	 * @param $instid (number) instance id
-	 * @return (Array<Array>) An array of final score entries, with fields 'id', 'qGroupID', 'score', 'userID', 'user_name'
-	 * @return (bool) False if error or no login
-	 */
-/*	public function getCountedScores($instid)
-	{
-		if(nm_los_Validator::isPosInt($instid))
-		{
-			
-			if($this->getSessionValid())
-			{
-				$scoreman = nm_los_ScoreManager::getInstance();
-				$result = $scoreman->getCountedScores($instid);
-			}
-			else
-			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
-			}
-			return $result;
-		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);			
-	}*/
-	/*
-	 *
-	 * @author Zachary Berry
-	 * 
-	 * Gets all of the scores of a user for a given instance.
-	 * @param $instid (number) Instance ID
-	 * @param $userid (number) User ID
-	 * @return (Array<Array>) An array of final score entries, with fields 'id', 'qGroupID', 'score', 'userID', 'user_name'
-	 * @return (bool) False if error or no login
-	 *
-	
-	public function getUsersScores($instid, $userid)
-	{
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$scoreman = nm_los_ScoreManager::getInstance();
-			$result = $scoreman->getUsersScores($instid, $userid);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-	}
-	*/
-	/** @author Zachary Berry **/
-	// Not used in 1.0
-	/*
-	public function getPracticeScores($instid, $userid)
-	{
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$trackman = nm_los_TrackingManager::getInstance();
-			$result = $trackman->getPracticeScores($instid, $userid);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-	}
-	*/
-	/** @author Zachary Berry **/
-	// TODO:  not used YET
-	// public function getScoreStatistics($instid)
-	// {
-	// 	if(nm_los_Validator::isPosInt($instid))
-	// 	{
-	// 		
-	// 		if($this->getSessionValid())
-	// 		{
-	// 			$trackman = nm_los_TrackingManager::getInstance();
-	// 			$result = $trackman->getScoreStatistics($instid, $userid);
-	// 		}
-	// 		else
-	// 		{
-	// 			$error = AppCfg::ERROR_TYPE;
-	// 			$result = new $error(1);
-	// 		}
-	// 		return $result;
-	// 	}
-	// 	$error = AppCfg::ERROR_TYPE;
-	// 	return new $error(2);	
-	// }
 	
 	/** @author Zachary Berry **/
 	public function getQuestionResponses($instid, $questionid)
@@ -1606,13 +1163,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 
 
@@ -1639,8 +1194,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -1655,8 +1209,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -1673,13 +1226,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	// TODO: this is quite similar to getUserInRole, either rename or redundent
@@ -1699,8 +1250,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 
@@ -1718,13 +1268,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	public function createExternalMediaLink($mediaObj)
@@ -1738,8 +1286,7 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -1756,13 +1303,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	public function removeUsersRoles($users, $roles)
@@ -1779,38 +1324,13 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
-	// TODO: this may be redundant
-	/*
-	public function addUsersToRole($users, $role)
-	{
-		if(nm_los_Validator::isUserArray($users) && nm_los_Validator::isRoleName($role))
-		{
-			$this->DBM->startTransaction();
-			
-			if($this->getSessionValid())
-			{
-				$roleMan = nm_los_RoleManager::getInstance();
-				$result = $roleMan->addUsersToRole($users, $role);
-			}
-			else
-				$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
-			$this->DBM->commit();
-			return $result;
-		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
-	}
-	*/
 	/**
 	 * @author Zachary Berry
 	 */
@@ -1828,13 +1348,11 @@ class nm_los_API extends core_db_dbEnabled
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	/****	Tracking Functions ***/
@@ -1849,8 +1367,7 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 				
 				if($VM->getCurrentViewKeyInstID() > 0)
@@ -1862,19 +1379,16 @@ class nm_los_API extends core_db_dbEnabled
 				}
 				else
 				{
-										$error = AppCfg::ERROR_TYPE;
-					$result = new $error(4003);
+					$result = core_util_Error::getError(4003);
 				}
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-		$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 
 	public function trackSectionChanged($visitKey, $section)
@@ -1887,8 +1401,7 @@ class nm_los_API extends core_db_dbEnabled
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 								
 				if( $VM->getCurrentViewKeyInstID() > 0 )
@@ -1900,64 +1413,19 @@ class nm_los_API extends core_db_dbEnabled
 				}
 				else
 				{
-										$error = AppCfg::ERROR_TYPE;
-					$result = new $error(4003);
+					$result = core_util_Error::getError(4003);
 				}
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 
 	
-	// public function getTrackingDataByInstance($instID)
-	// {
-	// 	if(nm_los_Validator::isPosInt($instID) )		
-	// 	{
-	// 		
-	// 		if($this->getSessionValid())
-	// 		{
-	// 			$trackingMan = nm_los_TrackingManager::getInstance();
-	// 			$result = $trackingMan->getTrackingDataByInstance($instID);
-	// 		}
-	// 		else
-	// 		{
-	// 			$error = AppCfg::ERROR_TYPE;
-	// 			$result = new $error(1);
-	// 		}
-	// 		return $result;
-	// 	}
-	// 	$error = AppCfg::ERROR_TYPE;
-	// 	return new $error(2);	
-	// }
-
-	/**
-	 * Get Number of times an instance is accessed
-	 */
-	// not used in 1.0
-	/*
-	public function getNumAccessed($instID)
-	{
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$trackingMan = nm_los_TrackingManager::getInstance();
-			$result = $trackingMan->getNumAccessed($instID);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-	}
-	*/
 	// TODO: validation
 	public function trackComputerData($data)
 	{
@@ -1970,135 +1438,12 @@ class nm_los_API extends core_db_dbEnabled
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
 	
-	// public function trackMediaDownloaded($mid)
-	// {
-	// 	if(nm_los_Validator::isPosInt($mid) )		
-	// 	{
-	// 		
-	// 		if($this->getSessionValid())
-	// 		{
-	// 			$this->DBM->startTransaction();
-	// 			$trackingMan = nm_los_TrackingManager::getInstance();
-	// 			$result = $trackingMan->trackMediaDownloaded($mid);
-	// 			$this->DBM->commit();
-	// 		}
-	// 		else
-	// 		{
-	// 			$error = AppCfg::ERROR_TYPE;
-	// 			$result = new $error(1);
-	// 		}
-	// 		return $result;
-	// 	}
-	// 	$error = AppCfg::ERROR_TYPE;
-	// 	return new $error(2);		
-	// }
 
-/*
-Temp remove from 1.0
-    public function saveTemporaryLO($lo)
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$loMan = nm_los_LOManager::getInstance();
-			$result = $loMan->saveTemporaryLO($lo);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-
-    public function getTemporaryLO()
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$loMan = nm_los_LOManager::getInstance();
-			$result = $loMan->getTemporaryLO();
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-    
-    public function clearTemporaryLO()
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$loMan = nm_los_LOManager::getInstance();
-			$result = $loMan->clearTemporaryLO();
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-*/
-/*
-Temp remove from 1.0
-    public function addFavorite($loID)
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-			$favMan = nm_los_FavoriteManager::getInstance();
-			$result = $favMan->addFavorite($loID);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-    
-    public function deleteFavorite($loID)
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-            $favMan = nm_los_FavoriteManager::getInstance();
-			$result = $favMan->deleteFavorite($loID);
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-
-    public function getFavorites()
-    {
-		$this->DBM->startTransaction();
-		
-		if($this->getSessionValid())
-		{
-            $favMan = nm_los_FavoriteManager::getInstance();
-			$result = $favMan->getFavorites();
-		}
-		else
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
-		$this->DBM->commit();
-		return $result;
-    }
-*/ 
     public function trackVisitResume($visitKey, $instID)
     {
 		// register visitKey first
@@ -2110,8 +1455,7 @@ Temp remove from 1.0
 				$VM = nm_los_VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					return new $error(5);
+					return core_util_Error::getError(5);
 				}
 				
 				$this->DBM->startTransaction();
@@ -2121,13 +1465,11 @@ Temp remove from 1.0
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 			return $result;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
     }
 
 	public function getPasswordReset($username, $email, $returnURL)
@@ -2138,8 +1480,7 @@ Temp remove from 1.0
 			$UM = core_auth_AuthManager::getInstance();
 			return $UM->requestPasswordReset($username, $email, $returnURL);
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	public function editPassword($oldPassword, $newPassword)
@@ -2150,8 +1491,7 @@ Temp remove from 1.0
 			$AM = core_auth_AuthManager::getInstance();
 			return $AM->changePassword($oldPassword, $newPassword);
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	public function editPasswordWithKey($username, $key, $newpass)
@@ -2164,15 +1504,13 @@ Temp remove from 1.0
 				//try to automatically log them in if the reset was successful
 				if(!$UM->login($username, $newpass))
 				{
-										$error = AppCfg::ERROR_TYPE;
-					new $error(1007);
+					core_util_Error::getError(1007);
 				}
 				return true;
 			}
 			return false;
 		}
-				$error = AppCfg::ERROR_TYPE;
-		return new $error(2);
+		return core_util_Error::getError(2);
 	}
 	
 	public function editExtraAttempts($userID, $instID, $count)
@@ -2191,14 +1529,12 @@ Temp remove from 1.0
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(2);
+			$result = core_util_Error::getError(2);
 		}
 		
 		return $result;
@@ -2217,14 +1553,12 @@ Temp remove from 1.0
 			}
 			else
 			{
-								$error = AppCfg::ERROR_TYPE;
-				$result = new $error(1);
+				$result = core_util_Error::getError(1);
 			}
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(2);
+			$result = core_util_Error::getError(2);
 		}
 		
 		return $result;
@@ -2233,36 +1567,28 @@ Temp remove from 1.0
 	/* @author: Zachary Berry */
 	public function trackClientError($client, $message, $data)
 	{
-		return true;
-		// //$this->DBM->startTransaction();
-		// 
-		// if($this->getSessionValid())
-		// {
-		// 	if(nm_los_Validator::isClientType($client) && nm_los_Validator::isString($message) && nm_los_Validator::isString($data))
-		// 	{
-		// 		$clientError = new stdClass();
-		// 		$clientError->client = $client;
-		// 		$clientError->message = $message;
-		// 		$clientError->data = $data;
-		// 						$error = AppCfg::ERROR_TYPE;
-		// 		$error = new $error(101, $message, $clientError);
-		// 		return true;
-		// 
-		// 	}
-		// 	else
-		// 	{
-		// 						$error = AppCfg::ERROR_TYPE;
-		// 		$result = new $error(2);
-		// 	}
-		// }
-		// else
-		// {
-		// 				$error = AppCfg::ERROR_TYPE;
-		// 	$result = new $error(1);
-		// }
-		// 
-		// //$this->DBM->commit();
-		// return $result;
+		if($this->getSessionValid())
+		{
+			if(nm_los_Validator::isClientType($client) && nm_los_Validator::isString($message) && nm_los_Validator::isString($data))
+			{
+				$clientError = new stdClass();
+				$clientError->client = $client;
+				$clientError->message = $message;
+				$clientError->data = $data;
+				$result = core_util_Error::getError(101, $message, $clientError);
+				return true;
+			}
+			else
+			{
+				$result = core_util_Error::getError(2);
+			}
+		}
+		else
+		{
+			$result = core_util_Error::getError(1);
+		}
+		
+		return $result;
 
 	}
 	
@@ -2280,8 +1606,7 @@ Temp remove from 1.0
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -2307,27 +1632,6 @@ Temp remove from 1.0
 			'resetRequestHelp' => 'You must know your username and email address that we have on record. Use this form only if your username starts with a tilde (example: ~ucf123). <br><br>Once submitted, you will receive an email containing instructions about completing the reset process.',
 			'priority' => 1
  		);
-		/*$options[] = array(
-			'title' => 'Guest Login',
-			'thumb' => 'assets/shared/images/login_guest_icon.png',
-			'desc' => 'Use your guest "~" account to log in.',
-			'userNameLabel' => '~Username',
-			'userNameHelp' => 'Your username must start with a tilde "~".',
-			'passwordLabel' => 'Password',
-			'passwordHelp' => 'Your password is specific to Obojobo and must be at least 6 characters long, containing at least 2 letters AND 2 numbers.',
-			'overviewHelp' => 'Overview help here!',
-			'md5Password' => true,
-			'canActivate' => true,
-			'resetDialog' => "Fill out the form to set your new password.\n\nPasswords must be at least 6 characters long, containing at least 2 letters AND 2 numbers.",
-			'resetHelp' => 'reset help',
-			'resetRequestDialog' => "Can't remember your password?\n\nYou can request a new one here.  Input your username, your email address, and we'll send you an email with further instructions.",
-			'resetRequestHelp' => 'request reset help',
-			'activateAction' => 'internal',
-			'canReset' => true,
-			'resetAction' => 'internal',
-			'priority' => 1
- 		);
-		*/
 		return $options;
 	}
 	
@@ -2340,8 +1644,7 @@ Temp remove from 1.0
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
@@ -2355,69 +1658,10 @@ Temp remove from 1.0
 		}
 		else
 		{
-						$error = AppCfg::ERROR_TYPE;
-			$result = new $error(1);
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
 
-	
-	// public function getEquivalentAttempts($instID)
-	// {
-	// 	if($this->getSessionValid())
-	// 	{
-	// 		$AM = new nm_los_AttemptsManager();
-	// 		$result =  $AM->getEquivalentAttempts($_SESSION['userID'], $instID);
-	// 	}
-	// 	else
-	// 	{
-	// 			// 		$error = AppCfg::ERROR_TYPE;
-	// 		$result = new $error(1);
-	// 	}
-	// 	return $result;
-	// }
-	/**
-	//@TODO: Delayed after 1.2:
-	public function createMediaThumbnail($data)
-	{
-		//$mediaMan = nm_los_MediaManager::getInstance();
-		//return $mediaMan->createMediaThumbnail($data);
-		return false;
-	}
-	public function mediaMarkAsCaptivate($mediaID, $version){
-		return true;
-	}
-	public function createMediaThumbnail($data)
-	{
-		return false; //return $this->lor->createMediaThumbnail($data);
-	}
-    public function saveTemporaryLO($lo){
-        return $this->lor->saveTemporaryLO($lo);
-    }
-    public function getTemporaryLO(){
-        return $this->lor->getTemporaryLO();
-    }
-    public function clearTemporaryLO(){
-        return $this->lor->clearTemporaryLO();
-    }
-    public function addFavorite($loID){
-        return $this->lor->addFavorite($loID);
-    }
-    public function deleteFavorite($loID){
-        return $this->lor->deleteFavorite($loID);
-    }
-    public function getFavorites(){
-        return $this->lor->getFavorites();
-    }
-	public function getPracticeScores($instid, $userid){
-		return $this->lor->getPracticeScores($instid, $userid);
-	}
-	public function shareLO($loID, $permObj){
-		return $this->lor->shareLO($loID, $permObj);
-	}
-	public function copyLO($loID){
-		return $this->lor->copyLO($loID);
-	}
-	*/
 }
 ?>

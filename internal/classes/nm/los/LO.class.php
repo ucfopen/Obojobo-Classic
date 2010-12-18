@@ -67,9 +67,7 @@ class nm_los_LO
 		}
 		if(!is_numeric($loID) || $loID <= 0)
 		{
-			
-			$error = AppCfg::ERROR_TYPE;
-			new $error(2);
+			core_util_Error::getError(2);
 			return false;
 		}
 		
