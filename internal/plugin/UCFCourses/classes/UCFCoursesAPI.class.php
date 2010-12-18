@@ -123,7 +123,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 					$course->semester = $semester['semester'];
 					$course->year = $semester['year'];
 					$course->start = $semester['start'];
-					$course->end = $startTime['end'];
+					$course->end = $semester['end'];
 				}
 			}
 		}
