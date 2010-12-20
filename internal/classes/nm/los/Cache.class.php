@@ -678,8 +678,7 @@ class nm_los_Cache extends core_util_Memcache
 			if($rate > 30)
 			{
 				$this->set($this->ns.'rateLimit:'.$ip, $rate, false, 60); // extend the slow down for a minute
-				$error = AppCfg::ERROR_TYPE;
-				return new $error(6);
+				core_util_Error::getError(6);
 				usleep(10000000);
 			}
 			$this->increment($this->ns.'rateLimit:'.$ip, 1);
