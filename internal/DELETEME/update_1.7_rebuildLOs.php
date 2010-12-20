@@ -129,7 +129,7 @@ while($r = $DBM->fetch_obj($q))
 $DBM->commit();
 
 echo "done inserting serialized data\n";
-echo "Now update Server Classes to build LO's from the new tables.\n";
+echo "Now: 1 - update Server Classes     AND     2 - Execute the SQL updates up to line 93\n";
 echo "When your done, test a few LO's using the next script: <a href=\"testBuildLOs.php\">Test LOs</a>";
 
 
