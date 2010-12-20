@@ -25,6 +25,7 @@ if($_REQUEST['doit'] != 1)
 }
 
 // create pages 2
+$DBM->query("DROP TABLE IF EXISTS 'obo_lo_pages'");
 $DBM->query("CREATE TABLE `obo_lo_pages` (
   `pageID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
   `pageData` blob NOT NULL,
@@ -33,6 +34,7 @@ $DBM->query("CREATE TABLE `obo_lo_pages` (
 
 
 // create questions table
+$DBM->query("DROP TABLE IF EXISTS 'obo_lo_questions'");
 $DBM->query("CREATE TABLE `obo_lo_questions` (
   `questionData` blob NOT NULL,
   `questionID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
@@ -40,6 +42,7 @@ $DBM->query("CREATE TABLE `obo_lo_questions` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9004 ");
 
 // new los table
+$DBM->query("DROP TABLE IF EXISTS 'obo_los'");
 $DBM->query("CREATE TABLE `obo_los` (
   `loID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
   `isMaster` enum('0','1') NOT NULL DEFAULT '0',
