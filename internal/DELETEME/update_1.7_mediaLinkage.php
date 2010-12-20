@@ -52,6 +52,7 @@ echo count($los) . " - loIDs \n";
 // echo count($questionIDs) . " - questions \n";
 // print_r($questionIDs);
 
-echo "$c - ";
+echo "$c - media references updated";
+echo "done";
 
 ?>
