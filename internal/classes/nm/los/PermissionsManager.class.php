@@ -597,6 +597,8 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 	 * @param $permObj (Permissions) new user permissions for item
 	 * @return (bool) True if successful, False if not successful or error
 	 */
+	
+	// TODO: make sure the user can never call this directly
 	public function setFullPermsForItem($itemID, $itemType)
 	{
 		if($itemID==0)
@@ -624,7 +626,6 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 				`".cfg_obo_Perm::G_GLOBAL."`
 			)
 				VALUES ('?', '?', '?', '1', '1', '1', '1', '1', '1', '1', '1', '1');";
-			
 			if(!($q = $this->DBM->querySafe($qstr, $userID, $itemID, $itemType)) )
 			{
 				trace(mysql_error(), true);

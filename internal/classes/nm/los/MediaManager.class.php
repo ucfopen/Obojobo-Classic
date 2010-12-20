@@ -227,7 +227,7 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		
 		//Add owner permissions to this object for this user
 		$PM = nm_los_PermissionsManager::getInstance();
-		$PM->setUserPerms($media->mediaID, cfg_obo_Perm::TYPE_MEDIA, $media->perms);
+		$PM->setFullPermsForItem($media->mediaID, cfg_obo_Perm::TYPE_MEDIA);
 
 		core_util_Cache::getInstance()->setMedia($media);
 		

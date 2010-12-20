@@ -112,7 +112,8 @@ DROP TABLE  `lo_desc_obj` ,
 `lo_page_items` ,
 `lo_page_items_new` ,
 `lo_qgroups_cache` ,
-`lo_questions` ;
+`lo_questions`,
+`lo_courses` ;
 
 
 CREATE TABLE `plg_wc_grade_columns` (
