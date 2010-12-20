@@ -7,16 +7,16 @@
 		<![CDATA[This is the course where this instance will be deployed.  It is recommended that you select one of the courses in the list, however you can write in a custom course by selecting the last option in the list.]]>
 	</helpItem>
 	<helpItem field="item3">
-		<![CDATA[This is the date when this instance will be opened to students.  Before this date, students will not be able to access the instance.  By default it is now.]]>
+		<![CDATA[This is the date when this instance will be opened to students.  Before this date, students will not be able to access the instance.]]>
 	</helpItem>
 	<helpItem field="item4">
-		<![CDATA[The time when this instance will be opened to students.  By default it is the current time.]]>
+		<![CDATA[The time when this instance will be opened to students.]]>
 	</helpItem>
 	<helpItem field="item5">
 		<![CDATA[This is the date when the assessment will be closed to students.  After this date, students will not be able to take assessment attempts.  They will still have access to the content and practice.]]>
 	</helpItem>
 	<helpItem field="item6">
-		<![CDATA[The time when the assessment will be closed to students.  By default it is the current time.]]>
+		<![CDATA[The time when the assessment will be closed to students.]]>
 	</helpItem>
 	<helpItem field="item7">
 		<![CDATA[This is the number of tries a student will have to take the assessment quiz.  If you provide more than one assessment attempt then the final score is determined by the 'Score Method'.  Students will be able to see how many attempts they have before they begin the assessment quiz.]]>
