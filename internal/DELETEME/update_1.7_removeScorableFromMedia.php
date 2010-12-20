@@ -1,4 +1,8 @@
-<p>This script will remove 'scorable' from blobs in lo_los_questions and lo_los_pages.  Add ?run=1 to run!</p><pre>
+<p>This script will remove 'scorable' from blobs in lo_los_questions and lo_los_pages.  <a href="<?php echo $_SERVER['PHP_SELF']; ?>?run=1">run!</a></p>
+<p>if scoreable exists, youll see an ID of the item.  If you see &lt;*, it updated the serialized data, :) means no update was needed </p>
+<p>search for "ERROR" or "!fail"</p>
+<p>When completed, run this script again, all items should be :) <a href="<?php echo $_SERVER['PHP_SELF']; ?>">test</a></p>
+<pre>
 <?php
 require_once(dirname(__FILE__)."/../app.php");
 
