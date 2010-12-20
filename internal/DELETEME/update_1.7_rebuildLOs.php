@@ -25,7 +25,7 @@ if($_REQUEST['doit'] != 1)
 }
 
 // create pages 2
-$DBM->query("DROP TABLE IF EXISTS 'obo_lo_pages'");
+$DBM->query("DROP TABLE IF EXISTS obo_lo_pages");
 $DBM->query("CREATE TABLE `obo_lo_pages` (
   `pageID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
   `pageData` blob NOT NULL,
@@ -34,7 +34,7 @@ $DBM->query("CREATE TABLE `obo_lo_pages` (
 
 
 // create questions table
-$DBM->query("DROP TABLE IF EXISTS 'obo_lo_questions'");
+$DBM->query("DROP TABLE IF EXISTS obo_lo_questions");
 $DBM->query("CREATE TABLE `obo_lo_questions` (
   `questionData` blob NOT NULL,
   `questionID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ $DBM->query("CREATE TABLE `obo_lo_questions` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9004 ");
 
 // new los table
-$DBM->query("DROP TABLE IF EXISTS 'obo_los'");
+$DBM->query("DROP TABLE IF EXISTS obo_los");
 $DBM->query("CREATE TABLE `obo_los` (
   `loID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
   `isMaster` enum('0','1') NOT NULL DEFAULT '0',
@@ -81,14 +81,14 @@ while($r = $DBM->fetch_obj($q))
 	// put each page into the new pages table
 	foreach($lo->pages AS $index => $page)
 	{
-		$DBM->query("INSERT INTO obo_lo_pages SET pageID ='$page->pageID',  pageData = '".s($page)."'");
+		$DBM->query("INSERT Ignore INTO obo_lo_pages SET pageID ='$page->pageID',  pageData = '".s($page)."'");
 	}
 	
 	// put each question into the new questions table
 	foreach($lo->pGroup->kids AS $index => $question)
 	{
 		$s = s($question);
-		$DBM->query("INSERT IGNORE INTO obo_lo_questions
+		$DBM->query("INSERT Ignore INTO obo_lo_questions
 		SET
 		questionID = '$question->questionID',
 		questionData = '$s'");
@@ -107,14 +107,14 @@ while($r = $DBM->fetch_obj($q))
 
 	
 	// put the flatter LO's into the new lo table
-	$DBM->query("INSERT INTO obo_los
+	$DBM->querySafe("INSERT Ignore INTO obo_los
 	SET
 	loID = '$lo->loID',
-	isMaster = '$lo->isMaster',
-	title = '$lo->title',
+	isMaster = '".($lo->subVersion == 0 ? 1 : 0)."',
+	title = '?',
 	languageID = '$lo->languageID',
-	notes = '$lo->notes',
-	objective = '$lo->objective',
+	notes = '?',
+	objective = '?',
 	learnTime = '$lo->learnTime',
 	pGroupID = '".$lo->pGroup->qGroupID."',
 	aGroupID = '".$lo->aGroup->qGroupID."',
@@ -126,7 +126,7 @@ while($r = $DBM->fetch_obj($q))
 	copyright = '$lo->copyright',
 	numPages = '".$lo->summary['contentSize']."',
 	numPQuestions = '".$lo->summary['practiceSize']."',
-	numAQuestions = '".$lo->summary['assessmentSize']."'");
+	numAQuestions = '".$lo->summary['assessmentSize']."'", $lo->title, $lo->notes, $lo->objective);
 	
 }
 $DBM->commit();
