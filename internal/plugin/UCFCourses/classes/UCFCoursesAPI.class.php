@@ -57,8 +57,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return new $error(1);
+			return core_util_Error::getError(2);
 		}
 	}
 	
@@ -103,8 +102,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// check for http response code of 200
 		if($resultInfo['http_code'] != 200)
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return array('courses' => array(), 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])));
+			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
 		}
 	
 		$result = $this->decodeJSON($request->getResponseBody());
@@ -226,8 +224,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return new $error(1);
+			return core_util_Error::getError(1);
 		}
 	}
 
@@ -277,8 +274,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return new $error(1);
+			return core_util_Error::getError(1);
 		}
 	}
 
@@ -294,8 +290,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// check for http response code of 200
 		if($resultInfo['http_code'] != 200)
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return array('columnID' => 0, 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])));
+			return array('columnID' => 0, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
 		}
 	
 		$result = $this->decodeJSON($request->getResponseBody());
@@ -407,8 +402,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else // user isnt logged in
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return new $error(1);
+			return core_util_Error::getError(1);
 		}
 	}
 	
@@ -423,8 +417,9 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// check for http response code of 200
 		if($resultInfo['http_code'] != 200)
 		{
-			$error = AppCfg::ERROR_TYPE;
-			return array('scoreSent' => false, 'errors' => array(new $error(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
+			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
+			return array('scoreSent' => false, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
+
 		}
 
 		$result = $this->decodeJSON($request->getResponseBody());
