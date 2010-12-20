@@ -215,6 +215,7 @@ class nm_los_TrackingManager extends core_db_dbEnabled
 		
 		
 		$trackQ = "SELECT $this->selectString FROM ".cfg_obo_Track::TABLE." WHERE ".cfg_obo_Instance::ID." = '?' AND ".cfg_core_User::ID." = '?' ORDER BY ".cfg_obo_Instance::ID.", ".cfg_core_User::ID.", ".cfg_obo_Track::TIME;
+		trace($trackQ);
 		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID, $userID));
 		
 		core_util_Cache::getInstance()->setInteractionsByInstanceAndUser($instID, $userID, $return);
