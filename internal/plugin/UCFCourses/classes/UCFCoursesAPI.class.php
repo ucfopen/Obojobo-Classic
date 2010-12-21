@@ -15,6 +15,27 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	}
 	
 	/**
+	 * Sends an HTTP POST to the desired URL.  Requires PECL_HTTP http://pecl.php.net/package/pecl_http
+	 *
+	 * @param string $url 	Full URL to request
+	 * @param array $postVars 	associative array of post variables to send
+	 * @return array 'responseCode' is the http response code (ie 200 or 404) 'body' is the body of the response
+	 * @author Ian Turgeon
+	 */
+	protected function send($url, $postVars=false)
+	{
+
+		$request = new HttpRequest($url, HTTP_METH_POST);
+		if(is_array($postVars))
+		{
+			$request->addPostFields($postVars);
+		}
+		$response = $request->send();
+		return array('responseCode' =>  $request->getResponseCode(), 'body' => $request->getResponseBody());
+	}
+	
+	
+	/**
 	 *   --------------Retrieving Instructor Sections---------------
      *
 	 *   URL: /obojobo/v1/client/<INSTRUCTOR_NETWORK_ID>/instructor/sections
@@ -94,21 +115,19 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	{
 		//$NID = 'wink';
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
-	
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
+		
+		$result = $this->send($REQUESTURL);
 	
 		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+		if($result['responseCode'] != 200)
 		{
-			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
+			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
 		}
 	
-		$result = $this->decodeJSON($request->getResponseBody());
+		$response = $this->decodeJSON($result['body']);
 		
-		$courses = $result->data;
-		$errors = $this->parseErrors($result->errors);
+		$courses = $response->data;
+		$errors = $this->parseErrors($response->errors);
 		
 		// add semester info when availible
 		if(is_array($courses))
@@ -199,7 +218,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			
 			// send request
 			$result = $this->sendCreateColumnRequest($NID, $sectionID, $columnName);
-			
+
 			// it worked? 
 			if($result['columnID'] > 0)
 			{
@@ -282,27 +301,27 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	protected function sendCreateColumnRequest($NID, $sectionID, $columnName)
 	{
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-		$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
 
+		$postVars = array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName);
+		
+		$result = $this->send($REQUESTURL, $postVars);
+	
 		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+		if($result['responseCode'] != 200)
 		{
-			return array('columnID' => 0, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
+			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
 		}
 	
-		$result = $this->decodeJSON($request->getResponseBody());
-		
+		$response = $this->decodeJSON($result['body']);
+
 		$columnID = 0;
 		// column created successfully 
-		if(isset($result->data->column_id) && $result->data->column_id > 0)
+		if(isset($response->data->column_id) && $response->data->column_id > 0)
 		{
-			$columnID =  $result->data->column_id;
+			$columnID =  $response->data->column_id;
 		}
 		// column not created, return errors or just return what we got
-		$errors = $this->parseErrors($result->errors);
+		$errors = $this->parseErrors($response->errors);
 		
 		return array('columnID' => $columnID, 'errors' => $errors);
 	}
@@ -410,28 +429,27 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	{		
 		// Begin the service request
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
-		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
-		$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
-		$request->execute();
-		$resultInfo = $request->getResponseInfo();
+		
+		$postVars = array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score);
+		
+		$result = $this->send($REQUESTURL, $postVars);
+	
 		// check for http response code of 200
-		if($resultInfo['http_code'] != 200)
+		if($result['responseCode'] != 200)
 		{
-			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
-			return array('scoreSent' => false, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
-
+			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
 		}
-
-		$result = $this->decodeJSON($request->getResponseBody());
+	
+		$response = $this->decodeJSON($result['body']);
 		
 		$scoreSent = false;
 		// look to see if the msg was successfull
-		if(isset($result->msgs[0]) && substr($result->msgs[0], 0, 1) == "1")
+		if(isset($response->msgs[0]) && substr($response->msgs[0], 0, 1) == "1")
 		{
 			$scoreSent = true;
 		}
 
-		$errors = $this->parseErrors($result->errors);
+		$errors = $this->parseErrors($response->errors);
 
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
