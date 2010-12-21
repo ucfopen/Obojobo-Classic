@@ -24,13 +24,20 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 */
 	protected function send($url, $postVars=false)
 	{
-
-		$request = new HttpRequest($url, HTTP_METH_POST);
-		if(is_array($postVars))
+		try
 		{
-			$request->addPostFields($postVars);
+			$request = new HttpRequest($url, HTTP_METH_POST);
+			if(is_array($postVars))
+			{
+				$request->addPostFields($postVars);
+			}
+			$response = $request->send();
 		}
-		$response = $request->send();
+		catch(Exception $e)
+		{
+		 	core_util_Error::getError(1, $e->getMessage());
+			return array('responseCode' =>  0, 'body' => '');
+		}
 		return array('responseCode' =>  $request->getResponseCode(), 'body' => $request->getResponseBody());
 	}
 	
