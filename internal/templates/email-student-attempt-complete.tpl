@@ -77,11 +77,12 @@
 <br>
 {/if}
 
+{* -------------- ATTEMPT DETAILS  -----------------  *}
+{if $attempts|@count > 0}
 <table align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:#FFF;margin-top:40px;">
 	<tr >
 		<td colspan="2" style="background-color:#f2c191;font-size:15px;font-weight:bold;"><img src="{$imgDir}score-confirm-attempt-history.png" width="357" height="54" alt="Your Attempt History"></td>
 	</tr>
-	{* -------------- ATTEMPT DETAILS  -----------------  *}
 	{foreach $attempts as $attempt}
 	<tr style="padding:10px;">
 		<td align="center" style="padding:10px;">
@@ -99,6 +100,7 @@
 	{/foreach}
 	
 </table>
+{/if}
 
 </td>
 </tr>
