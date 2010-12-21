@@ -24,8 +24,7 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		
 		// get student info
 		$AM = core_auth_AuthManager::getInstance();
-		$authMod = $AM->getAuthModuleForUserID($studentID);
-		$user = $authMod->getUser($studentID);
+		$user = $AM->fetchUserByID($studentID);
 		
 		// load up email template
 		$smarty = new Smarty();
@@ -49,17 +48,14 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$sent = $this->sendEmail($user->email, $subject, $body);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
-		trace('here is body:');
-		trace($body);
+		// trace('here is body:');
+		// trace($body);
 		return $sent;
 	}
 	
 	public function sendEmail($to, $subject, $body, $autoDelay=true)
 	{
 		// TODO: add autodelay to build up a block of emails 
-		
-		
-		$to = 'iturgeon@gmail.com';
 
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
