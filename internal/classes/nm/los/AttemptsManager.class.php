@@ -673,7 +673,7 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 			{
 				
 				$scoreman = nm_los_ScoreManager::getInstance();
-				$scores = $scoreman->getScores($instid, $_SESSION['userID']);
+				$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
 				
 				$attempts = $scores[0]['attempts'];
 				
@@ -692,7 +692,7 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 				{
 					$attempts = array();
 				}
-				
+
 				$NM = nm_los_NotificationManager::getInstance();
 				$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 			}
