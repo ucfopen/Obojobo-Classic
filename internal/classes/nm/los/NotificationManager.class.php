@@ -46,25 +46,24 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$smarty->assign('finalScore', $score);
 		$smarty->assign('attempts', array_reverse($scores));
 
-		$headers = "MIME-Version: 1.0\r\n";
-		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\r\n";
-		$headers .= "Content-Type: multipart/alternative;boundary=" . $boundry . "\r\n";
+		$headers = "MIME-Version: 1.0\n";
+		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\n";
+		$headers .= "Content-Type: multipart/alternative;boundary=\"" . $boundry . "\"\n";
 		
-		$body = "--$boundry" . "\r\n";
-		$body .= "Content-Type: text/plain; charset=UTF-8" . "\r\n";
-		$body .= "Content-Disposition: inline" . "\r\n";
-		$body .= "Content-Transfer-Encoding: 7bit" . "\r\n\r\n";
+		$body = "--$boundry" . "\n";
+		$body .= "Content-Type: text/plain; charset=UTF-8" . "\n";
+		$body .= "Content-Disposition: inline" . "\n";
+		$body .= "Content-Transfer-Encoding: 7bit" . "\n\n";
 		$body .= $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-student-attempt-plain.tpl');
-		$body .= "\r\n\r\n--$boundry" . "\r\n";
-		$body .= "Content-Type: text/html; charset=UTF-8" . "\r\n";
-		$body .= "Content-Disposition: inline" . "\r\n";
-		$body .= "Content-Transfer-Encoding: 7bit" . "\r\n\r\n";
+		$body .= "\r\n\r\n--$boundry" . "\n";
+		$body .= "Content-Type: text/html; charset=UTF-8" . "\n";
+		$body .= "Content-Disposition: inline" . "\n";
+		$body .= "Content-Transfer-Encoding: 7bit" . "\n\n";
 		$body .= $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-student-attempt-html.tpl');
-		$body .= "\r\n\r\n--$boundry" . "--\r\n";
+		$body .= "\n\n--$boundry" . "--\n";
 		
 		$subject = $smarty->fetch('eval:Results for {$loTitle} {$loCourse|ternary:"($loCourse)":"no course"}');
 		
-//		trace($body);
 		$sent = mail($user->email, $subject, $body, $headers);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
