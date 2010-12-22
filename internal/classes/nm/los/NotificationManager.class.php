@@ -65,7 +65,7 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$subject = $smarty->fetch('eval:Results for {$loTitle} {$loCourse|ternary:"($loCourse)":"no course"}');
 		
 //		trace($body);
-		$sent = mail($to, $subject, $body, $headers);
+		$sent = mail($user->email, $subject, $body, $headers);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
 
