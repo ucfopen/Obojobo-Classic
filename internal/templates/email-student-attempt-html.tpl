@@ -1,4 +1,6 @@
-<html>
+<html><body><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#DDD' >
 
 <STYLE>
