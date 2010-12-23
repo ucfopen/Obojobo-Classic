@@ -90,7 +90,7 @@ class AMFBaseSerializer {
 			// //$isCachable = false;
 			// 
 			// $cacheName = 'amfphp'. $body->className . $body->methodName. $_SESSION['userID'];
-			// if($isCachable && $return = core_util_Cache::getInstance()->get($cacheName))
+			// if($isCachable && $return = \rocketD\util\Cache::getInstance()->get($cacheName))
 			// {
 			// 	$this->outBuffer = preg_replace('/(correlationId..)(.{36})/', '${1}'.$body->getResults()->correlationId, $return);
 			// }
@@ -101,7 +101,7 @@ class AMFBaseSerializer {
 			// }
 			// if($isCachable)
 			// {
-			// 	core_util_Cache::getInstance()->set($cacheName, $this->outBuffer, false, 3600);
+			// 	\rocketD\util\Cache::getInstance()->set($cacheName, $this->outBuffer, false, 3600);
 			// }
 		
 			$tempBuf2 = $this->outBuffer;

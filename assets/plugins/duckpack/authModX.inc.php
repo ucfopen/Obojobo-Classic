@@ -170,7 +170,7 @@ function duckPack_createLocalWebUser($username, $password, $fullname, $email)
 function duckPack_syncGroups($modxUserID)
 {
 	global $modx;
-	$oboAPI = nm_los_API::getInstance();
+	$oboAPI = \obo\API::getInstance();
 	$roles = $oboAPI->getUserRoles();
 	$groups = array();
 	foreach($roles as $role)

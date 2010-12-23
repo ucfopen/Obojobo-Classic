@@ -105,7 +105,7 @@ HTML;
 		foreach ($this->learning_objects as $instance)
 		{
 			$metadata = $this->repository->getInstanceData($instance->id);
-			$loMan = nm_los_LOManager::getInstance();
+			$loMan = \obo\lo\LOManager::getInstance();
 			
 			$lo = $loMan->getLO($metadata->loID);
 			#Tidy up any missing data

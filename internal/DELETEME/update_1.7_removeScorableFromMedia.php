@@ -6,12 +6,12 @@
 <?php
 require_once(dirname(__FILE__)."/../app.php");
 
-$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
 $DBM->startTransaction();
 
 echo "lo_los_questions:\n\n";
-$qs = "SELECT * FROM ".cfg_obo_Question::TABLE." WHERE 1";
+$qs = "SELECT * FROM ".\cfg_obo_Question::TABLE." WHERE 1";
 $q = $DBM->querySafe($qs);
 if($q)
 {
@@ -25,7 +25,7 @@ if($q)
 			$data = preg_replace('/s:8:"scorable";i:0;/', '', $data);
 			print_r($r->questionID);
 			echo " ";
-			$qs2 = "UPDATE ".cfg_obo_Question::TABLE." SET questionData='?' WHERE questionID = ?";
+			$qs2 = "UPDATE ".\cfg_obo_Question::TABLE." SET questionData='?' WHERE questionID = ?";
 			$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->questionID);
 			if(!$q2)
 			{
@@ -36,12 +36,12 @@ if($q)
 		}
 		
 		// fix the serialized index for the media object to reduce the number of members by one
-		if(preg_match('/"nm_los_Media":(\d+):/', $data, $matches))
+		if(preg_match('/"\obo\lo\Media":(\d+):/', $data, $matches))
 		{
 			$x = @unserialize($data);
 			if($x === false)
 			{
-				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-1).':', $data);
+				$data = preg_replace('/"\obo\lo\Media":(\d+):/', '"\obo\lo\Media":'.($matches[1]-1).':', $data);
 				$x = @unserialize($data);
 				if($x === false)
 				{
@@ -50,7 +50,7 @@ if($q)
 				else
 				{
 					echo "<* ";
-					$qs2 = "UPDATE ".cfg_obo_Question::TABLE." SET questionData='?' WHERE questionID = ?";
+					$qs2 = "UPDATE ".\cfg_obo_Question::TABLE." SET questionData='?' WHERE questionID = ?";
 					$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->questionID);
 					if(!$q2)
 					{
@@ -69,7 +69,7 @@ if($q)
 }
 
 echo "\n\nlo_los_pages:\n\n";
-$qs = "SELECT * FROM ".cfg_obo_Page::TABLE." WHERE 1";
+$qs = "SELECT * FROM ".\cfg_obo_Page::TABLE." WHERE 1";
 $q = $DBM->querySafe($qs);
 if($q)
 {
@@ -83,7 +83,7 @@ if($q)
 			$data = preg_replace('/s:8:"scorable";i:0;/', '', $data);
 			print_r($r->pageID);
 			echo " ";
-			$qs2 = "UPDATE ".cfg_obo_Page::TABLE." SET pageData='?' WHERE pageID = ?";
+			$qs2 = "UPDATE ".\cfg_obo_Page::TABLE." SET pageData='?' WHERE pageID = ?";
 			$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->pageID);
 			if(!$q2)
 			{
@@ -95,12 +95,12 @@ if($q)
 		
 		// fix the serialized index for the media object to reduce the number of members by one
 		
-		if(preg_match('/"nm_los_Media":(\d+):/', $data, $matches))
+		if(preg_match('/"\obo\lo\Media":(\d+):/', $data, $matches))
 		{
 			$x = @unserialize($data);
 			if($x === false)
 			{
-				$data = preg_replace('/"nm_los_Media":(\d+):/', '"nm_los_Media":'.($matches[1]-1).':', $data);
+				$data = preg_replace('/"\obo\lo\Media":(\d+):/', '"\obo\lo\Media":'.($matches[1]-1).':', $data);
 				$x = @unserialize($data);
 				if($x === false)
 				{
@@ -109,7 +109,7 @@ if($q)
 				else
 				{
 					echo "<* ";
-					$qs2 = "UPDATE ".cfg_obo_Page::TABLE." SET pageData='?' WHERE pageID = ?";
+					$qs2 = "UPDATE ".\cfg_obo_Page::TABLE." SET pageData='?' WHERE pageID = ?";
 					$q2 = $DBM->querySafe($qs2, base64_encode($data), $r->pageID);
 					if(!$q2)
 					{

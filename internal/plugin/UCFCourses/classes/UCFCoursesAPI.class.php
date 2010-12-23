@@ -1,5 +1,5 @@
 <?php
-class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
+class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 {
 
 	const PUBLIC_FUNCTION_LIST = ''; // dont allow any direct calls
@@ -41,7 +41,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 */
 	public function getCourses()
 	{
-		$AM = core_auth_AuthManager::getInstance();
+		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{
 			$userID = $AM->getSessionUserID();
@@ -57,7 +57,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else
 		{
-			return core_util_Error::getError(2);
+			return \rocketD\util\Error::getError(2);
 		}
 	}
 	
@@ -66,21 +66,21 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	{
 		$courseData = new stdClass();
 		
-		$qstr = "SELECT * FROM ". cfg_plugin_UCFCourses::MAP_TABLE . " WHERE ". cfg_obo_Instance::ID . " = '?'";
+		$qstr = "SELECT * FROM ". \cfg_plugin_UCFCourses::MAP_TABLE . " WHERE ". \cfg_obo_Instance::ID . " = '?'";
 		$q = $this->DBM->querySafe($qstr, $insID);
 		if($r = $this->DBM->fetch_obj($q))
 		{
-			if($r->{cfg_plugin_UCFCourses::MAP_COL_ID} > 0)
+			if($r->{\cfg_plugin_UCFCourses::MAP_COL_ID} > 0)
 			{
 				$courseData->type = 'sync';
-				$courseData->gradeColumn = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+				$courseData->gradeColumn = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
 			}
 			else
 			{
 				$courseData->type = 'linked';
 			}
 			
-			$courseData->id = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+			$courseData->id = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
 			$coursePlugin->plugin = 'UCFCourses';
 		}
 		else
@@ -93,7 +93,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	protected function sendGetCourseRequest($NID)
 	{
 		//$NID = 'wink';
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'GET');
 	
 		$request->execute();
@@ -102,7 +102,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// check for http response code of 200
 		if($resultInfo['http_code'] != 200)
 		{
-			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
+			return array('courses' => array(), 'errors' => array(\rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
 		}
 	
 		$result = $this->decodeJSON($request->getResponseBody());
@@ -131,7 +131,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function isNIDAccount($userID)
 	{
-		$AM = core_auth_AuthManager::getInstance();
+		$AM = \rocketD\auth\AuthManager::getInstance();
 		$val = $AM->getAuthModuleForUserID($userID);
 		if($val instanceof plg_UCFAuth_UCFAuthModule)
 		{
@@ -178,7 +178,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	public function createColumn($instID, $sectionID, $columnName)
 	{
 		// TODO: require user to have rights to the instance
-		$AM = core_auth_AuthManager::getInstance();
+		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{
 			$userID = $AM->getSessionUserID();
@@ -189,7 +189,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			}
 			
 			// Do they have the rights to edit the instance?
-			$IM = nm_los_InstanceManager::getInstance();
+			$IM = \obo\lo\InstanceManager::getInstance();
 			if(!$IM->userCanEditInstance($userID, $instID))
 			{
 				return false;
@@ -204,18 +204,18 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			if($result['columnID'] > 0)
 			{
 				$sql = "INSERT INTO
-							".cfg_plugin_UCFCourses::MAP_TABLE."
+							".\cfg_plugin_UCFCourses::MAP_TABLE."
 						SET
-							".cfg_obo_Instance::ID." = '?',
-							".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
-							".cfg_core_User::ID." = '?',
-							".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
-							".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'
+							".\cfg_obo_Instance::ID." = '?',
+							".\cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+							".\cfg_core_User::ID." = '?',
+							".\cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+							".\cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'
 						ON DUPLICATE KEY UPDATE
-							".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
-							".cfg_core_User::ID." = '?',
-							".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
-							".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'";
+							".\cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+							".\cfg_core_User::ID." = '?',
+							".\cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+							".\cfg_plugin_UCFCourses::MAP_COL_NAME." = '?'";
 							
 				$this->DBM->querySafe($sql, $instID, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName, $sectionID, $userID, $result['columnID'], 'obo:' . $columnName);
 			}
@@ -224,7 +224,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else
 		{
-			return core_util_Error::getError(1);
+			return \rocketD\util\Error::getError(1);
 		}
 	}
 
@@ -239,7 +239,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	public function setInstanceCourseLink($instID, $sectionID)
 	{
 		// TODO: require user to have rights to the instance
-		$AM = core_auth_AuthManager::getInstance();
+		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{
 			$userID = $AM->getSessionUserID();
@@ -250,38 +250,38 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			}
 			
 			// Do they have the rights to edit the instance?
-			$IM = nm_los_InstanceManager::getInstance();
+			$IM = \obo\lo\InstanceManager::getInstance();
 			if(!$IM->userCanEditInstance($userID, $instID))
 			{
 				return false;
 			}
 			
 			$sql = "INSERT INTO
-						".cfg_plugin_UCFCourses::MAP_TABLE."
+						".\cfg_plugin_UCFCourses::MAP_TABLE."
 					SET
-						".cfg_obo_Instance::ID." = '?',
-						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
-						". cfg_core_User::ID." = '?',
-						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
-						".cfg_plugin_UCFCourses::MAP_COL_NAME." = ''
+						".\cfg_obo_Instance::ID." = '?',
+						". \cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+						". \cfg_core_User::ID." = '?',
+						".\cfg_plugin_UCFCourses::MAP_COL_ID." = '',
+						".\cfg_plugin_UCFCourses::MAP_COL_NAME." = ''
 					ON DUPLICATE KEY UPDATE 
-						". cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
-						". cfg_core_User::ID." = '?',
-						".cfg_plugin_UCFCourses::MAP_COL_ID." = '',
-						".cfg_plugin_UCFCourses::MAP_COL_NAME." = ''";
+						". \cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+						". \cfg_core_User::ID." = '?',
+						".\cfg_plugin_UCFCourses::MAP_COL_ID." = '',
+						".\cfg_plugin_UCFCourses::MAP_COL_NAME." = ''";
 			
 			return (bool) $this->DBM->querySafe($sql, $instID, $sectionID, $userID, $sectionID, $userID);
 		}
 		else
 		{
-			return core_util_Error::getError(1);
+			return \rocketD\util\Error::getError(1);
 		}
 	}
 
 	
 	protected function sendCreateColumnRequest($NID, $sectionID, $columnName)
 	{
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
 		$request->buildPostBody(array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName));
 		$request->execute();
@@ -290,7 +290,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		// check for http response code of 200
 		if($resultInfo['http_code'] != 200)
 		{
-			return array('columnID' => 0, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
+			return array('columnID' => 0, 'errors' => array($result = \rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $resultInfo['http_code'])));
 		}
 	
 		$result = $this->decodeJSON($request->getResponseBody());
@@ -346,12 +346,12 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 */
 	public function sendScore($instID, $studentUserID, $score)
 	{
-		// TODO: restrict this to not allow nm_los_API to call it
-		$AM = core_auth_AuthManager::getInstance();
+		// TODO: restrict this to not allow \obo\API to call it
+		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{	
 			// get the course data for the selected instance
-			$sql = "SELECT * FROM ".cfg_plugin_UCFCourses::MAP_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
+			$sql = "SELECT * FROM ".\cfg_plugin_UCFCourses::MAP_TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'";
 			$q = $this->DBM->querySafe($sql, $instID);
 			if(!$r = $this->DBM->fetch_obj($q))
 			{
@@ -360,11 +360,11 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				return false;
 			}
 			
-			$instructorID = $r->{cfg_core_User::ID};
+			$instructorID = $r->{\cfg_core_User::ID};
 			$instructorNID = $AM->getUserName($instructorID);
-			$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
-			$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
-			$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+			$sectionID = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
+			$columnID = $r->{\cfg_plugin_UCFCourses::MAP_COL_ID};
+			$columnName = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
 			
 			$currentUserID = $AM->getSessionUserID();
 			$currentNID = $AM->getUserName($currentUserID);
@@ -385,10 +385,10 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			// this will either have to be called by the user
 			if($studentUserID != $currentUserID)
 			{
-				$IM = nm_los_InstanceManager::getInstance();
+				$IM = \obo\lo\InstanceManager::getInstance();
 				if(!$IM->userCanEditInstance($currentUserID, $instID))
 				{
-					return core_util_Error::getError(4);
+					return \rocketD\util\Error::getError(4);
 				}
 			}
 			
@@ -402,14 +402,14 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		else // user isnt logged in
 		{
-			return core_util_Error::getError(1);
+			return \rocketD\util\Error::getError(1);
 		}
 	}
 	
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{		
 		// Begin the service request
-		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
+		$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
 		$request = new plg_UCFCourses_RestRequest($REQUESTURL, 'POST');
 		$request->buildPostBody(array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score));
 		$request->execute();
@@ -418,7 +418,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($resultInfo['http_code'] != 200)
 		{
 			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, 0);
-			return array('scoreSent' => false, 'errors' => array($result = core_util_Error::getError(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
+			return array('scoreSent' => false, 'errors' => array($result = \rocketD\util\Error::getError(1008, 'HTTP RESPONSE: '. $resultInfo['http_code'])) );
 
 		}
 
@@ -439,15 +439,15 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
 	{
 		$time = time();
-		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
-		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
-		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
+		\rocketD\util\Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
+		$sql = "INSERT INTO ".\cfg_plugin_UCFCourses::LOG_TABLE." SET ".\cfg_obo_Instance::ID." = '?', ".\cfg_core_User::ID." = '?', ".\cfg_plugin_UCFCourses::STUDENT." = '?', ".\cfg_plugin_UCFCourses::TIME." = '?', ".\cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".\cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".\cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".\cfg_plugin_UCFCourses::SCORE." = '?', ".\cfg_plugin_UCFCourses::SUCCESS." ='?'
+		ON DUPLICATE KEY UPDATE ".\cfg_core_User::ID." = '?', ".\cfg_plugin_UCFCourses::SCORE." = '?', ".\cfg_plugin_UCFCourses::TIME." = '?', ".\cfg_plugin_UCFCourses::SUCCESS." = '?'";
 		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
 	}
 	
 	public function getScoreLogsForInstance($instID)
 	{
-		$qstr = "SELECT ".cfg_core_User::ID.", ".cfg_plugin_UCFCourses::STUDENT.", ".cfg_plugin_UCFCourses::TIME.", ".cfg_plugin_UCFCourses::MAP_COL_NAME.", ".cfg_plugin_UCFCourses::SCORE.", ".cfg_plugin_UCFCourses::SUCCESS." FROM ".cfg_plugin_UCFCourses::LOG_TABLE." WHERE ".cfg_obo_Instance::ID." = '?'";
+		$qstr = "SELECT ".\cfg_core_User::ID.", ".\cfg_plugin_UCFCourses::STUDENT.", ".\cfg_plugin_UCFCourses::TIME.", ".\cfg_plugin_UCFCourses::MAP_COL_NAME.", ".\cfg_plugin_UCFCourses::SCORE.", ".\cfg_plugin_UCFCourses::SUCCESS." FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'";
 		
 		$q = $this->DBM->querySafe($qstr, $instID);
 		$result = $this->DBM->getAllRows($q);
@@ -455,7 +455,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$scores = array();
 		foreach($result AS $score)
 		{
-			$scores[$score->{cfg_plugin_UCFCourses::STUDENT}] = $score;
+			$scores[$score->{\cfg_plugin_UCFCourses::STUDENT}] = $score;
 		}
 		return $scores;
 	}
@@ -522,12 +522,12 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				// code found
 				if($code)
 				{
-					$returnErrors[] = core_util_Error::getError($code);
+					$returnErrors[] = \rocketD\util\Error::getError($code);
 				}
 				// code not found, use general error and return the error string
 				else
 				{
-					$returnErrors[] = core_util_Error::getError(7013, $rError);
+					$returnErrors[] = \rocketD\util\Error::getError(7013, $rError);
 				}
 			}
 			return $returnErrors;
@@ -605,14 +605,14 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	// public function getCurrentSemester()
 	// {
 	// 	
-	// 	if($semesters = core_util_Cache::getInstance()->getCurrentSemester())
+	// 	if($semesters = \rocketD\util\Cache::getInstance()->getCurrentSemester())
 	// 	{
 	// 		return $semesters;
 	// 	}
 	// 	else
 	// 	{
 	// 		$result = $this->getSemesterForDate(time());
-	// 		core_util_Cache::getInstance()->setCurrentSemester($result);
+	// 		\rocketD\util\Cache::getInstance()->setCurrentSemester($result);
 	// 		return $result;
 	// 	}
 	// }
@@ -622,32 +622,32 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	// 	if($date>0)
 	// 	{
 	// 		trace($date);
-	// 		$q = $this->DBM->querySafe("SELECT * FROM ".cfg_obo_Semester::TABLE." WHERE  ".cfg_obo_Semester::END_TIME." > '?' ORDER BY ".cfg_obo_Semester::END_TIME." ASC", $date);
+	// 		$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Semester::TABLE." WHERE  ".\cfg_obo_Semester::END_TIME." > '?' ORDER BY ".\cfg_obo_Semester::END_TIME." ASC", $date);
 	// 		if($r = $this->DBM->fetch_obj($q))
 	// 		{
-	// 			$semester = new nm_los_Semester($r);
+	// 			$semester = new \obo\Semester($r);
 	// 			return $semester;
 	// 		}
 	// 	}
-	// 	return new nm_los_Semester();
+	// 	return new \obo\Semester();
 	// }
 	// 
 	// public function getSemesters()
 	// {
 	// 	
-	// 	if($semesters = core_util_Cache::getInstance()->getSemesters())
+	// 	if($semesters = \rocketD\util\Cache::getInstance()->getSemesters())
 	// 	{
 	// 		return $semesters;
 	// 	}
 	// 	else
 	// 	{
 	// 		$semesters = array();
-	// 		$q = $this->DBM->query("SELECT * FROM ".cfg_obo_Semester::TABLE." ORDER BY ".cfg_obo_Semester::START_TIME." ASC");
+	// 		$q = $this->DBM->query("SELECT * FROM ".\cfg_obo_Semester::TABLE." ORDER BY ".\cfg_obo_Semester::START_TIME." ASC");
 	// 		if($r = $this->DBM->fetch_obj($q))
 	// 		{
-	// 			$semesters[] = new nm_los_Semester($r);
+	// 			$semesters[] = new \obo\Semester($r);
 	// 		}
-	// 		core_util_Cache::getInstance()->setSemesters($semesters);
+	// 		\rocketD\util\Cache::getInstance()->setSemesters($semesters);
 	// 		return $semesters;
 	// 	}
 	// }
