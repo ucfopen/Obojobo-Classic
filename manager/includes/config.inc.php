@@ -3,20 +3,20 @@
  *	MODx Configuration file MODIFIED FOR KOGNEATO
  */
 require_once(dirname(__FILE__)."/../../internal/app.php");
-new core_db_dbConnectData(AppCfg::DB_MODX_HOST, AppCfg::DB_MODX_USER, AppCfg::DB_MODX_PASS, AppCfg::DB_MODX_NAME, AppCfg::DB_MODX_TYPE);
-$database_type = AppCfg::DB_MODX_TYPE;
-$database_server = AppCfg::DB_MODX_HOST;
-$database_user = AppCfg::DB_MODX_USER;
-$database_password = AppCfg::DB_MODX_PASS;
+new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST, \AppCfg::DB_MODX_USER, \AppCfg::DB_MODX_PASS, \AppCfg::DB_MODX_NAME, \AppCfg::DB_MODX_TYPE);
+$database_type = \AppCfg::DB_MODX_TYPE;
+$database_server = \AppCfg::DB_MODX_HOST;
+$database_user = \AppCfg::DB_MODX_USER;
+$database_password = \AppCfg::DB_MODX_PASS;
 $database_connection_charset = 'utf8';
 $database_connection_method = 'SET CHARACTER SET';
-$dbase = AppCfg::DB_MODX_NAME;
+$dbase = \AppCfg::DB_MODX_NAME;
 $table_prefix = 'modx_';
 //error_reporting(E_ALL & ~E_NOTICE);
 
 $lastInstallTime = 1279208055;
 
-$site_sessionname = AppCfg::SESSION_NAME;
+$site_sessionname = \AppCfg::SESSION_NAME;
 $https_port = '443';
 
 // automatically assign base_path and base_url

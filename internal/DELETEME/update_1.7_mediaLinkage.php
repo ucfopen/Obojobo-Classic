@@ -3,22 +3,22 @@
 require_once(dirname(__FILE__)."/../app.php");
 
 
-$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 //$DBM->startTransaction();
 
 
 $c = 0;
 $los = array();
 /****** DIG THROUGH THE PAGES ************/
-$q = $DBM->querySafe("SELECT * FROM ".cfg_obo_LO::TABLE);
+$q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_LO::TABLE);
 while($r = $DBM->fetch_obj($q))
 {
-	$lo = new nm_los_LO();
-	$lo->dbGetFull($DBM, $r->{cfg_obo_LO::ID});
+	$lo = new \obo\lo\LO();
+	$lo->dbGetFull($DBM, $r->{\cfg_obo_LO::ID});
 	
 	$s = serialize($lo);
 	
-	$los[$r->{cfg_obo_LO::ID}] = array();
+	$los[$r->{\cfg_obo_LO::ID}] = array();
 
 	// search for mediaIDs
 
@@ -27,12 +27,12 @@ while($r = $DBM->fetch_obj($q))
 	{
 		foreach($matches[1] AS $match)
 		{
-			$los[$r->{cfg_obo_LO::ID}][] = $match;
+			$los[$r->{\cfg_obo_LO::ID}][] = $match;
 		}
 	}
 	
-	$los[$r->{cfg_obo_LO::ID}] = array_unique($los[$r->{cfg_obo_LO::ID}]);
-	if(count($los[$r->{cfg_obo_LO::ID}]) == 0)	unset($los[$r->{cfg_obo_LO::ID}]);
+	$los[$r->{\cfg_obo_LO::ID}] = array_unique($los[$r->{\cfg_obo_LO::ID}]);
+	if(count($los[$r->{\cfg_obo_LO::ID}]) == 0)	unset($los[$r->{\cfg_obo_LO::ID}]);
 }
 
 // loop through LOs
@@ -41,7 +41,7 @@ foreach($los AS $loID => $mediaIDs)
 	// loop through each LO's Media
 	foreach($mediaIDs AS $mediaID)
 	{
-		$DBM->querySafe("INSERT INTO ".cfg_obo_Media::MAP_TABLE." SET ".cfg_obo_Media::ID." = '?', ".cfg_obo_LO::ID." = '?'", $mediaID, $loID);
+		$DBM->querySafe("INSERT INTO ".\cfg_obo_Media::MAP_TABLE." SET ".\cfg_obo_Media::ID." = '?', ".\cfg_obo_LO::ID." = '?'", $mediaID, $loID);
 	}
 }
 

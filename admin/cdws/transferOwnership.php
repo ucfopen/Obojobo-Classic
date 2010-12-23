@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
@@ -43,7 +43,7 @@ if(!$_REQUEST['from_user'] || !$_REQUEST['to_user'])
 else
 {
 
-	$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
 	if($_REQUEST['doit'] != 1) $DBM->startTransaction();
 	
@@ -52,13 +52,13 @@ else
 	if($_REQUEST['instances'])
 	{
 		// change ownership
-		$qstr = "UPDATE ".cfg_obo_Instance::TABLE." SET ".cfg_core_User::ID." = '?' WHERE ".cfg_core_User::ID." = '?' ";
+		$qstr = "UPDATE ".\cfg_obo_Instance::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' ";
 		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numInstances = $DBM->affected_rows();
 	
 		// change sharing options
-		$qstr = "UPDATE IGNORE ".cfg_obo_Perm::TABLE." SET ".cfg_core_User::ID." = '?' WHERE ".cfg_core_User::ID." = '?' AND ".cfg_core_Perm::TYPE." =  '".cfg_obo_Perm::TYPE_INSTANCE."'";
+		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_INSTANCE."'";
 		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numInstances += $DBM->affected_rows();
@@ -68,7 +68,7 @@ else
 	if($_REQUEST['learning_objects'])
 	{
 		// update all ownership/sharing permissions for los
-		$qstr = "UPDATE IGNORE ".cfg_obo_Perm::TABLE." SET ".cfg_core_User::ID." = '?' WHERE ".cfg_core_User::ID." = '?' AND ".cfg_core_Perm::TYPE." =  '".cfg_obo_Perm::TYPE_LO."'";
+		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_LO."'";
 		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numLOs = $DBM->affected_rows();
@@ -78,13 +78,13 @@ else
 	if($_REQUEST['media'])
 	{
 		// change ownership
-		$qstr = "UPDATE ".cfg_obo_Media::TABLE." SET ".cfg_core_User::ID." = '?' WHERE ".cfg_core_User::ID." = '?' ";
+		$qstr = "UPDATE ".\cfg_obo_Media::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' ";
 		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numMedia = $DBM->affected_rows();
 		
 		// update all ownership/sharing permissions for los
-		$qstr = "UPDATE IGNORE ".cfg_obo_Perm::TABLE." SET ".cfg_core_User::ID." = '?' WHERE ".cfg_core_User::ID." = '?' AND ".cfg_core_Perm::TYPE." =  '".cfg_obo_Perm::TYPE_MEDIA."'";
+		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_MEDIA."'";
 		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numMedia += $DBM->affected_rows();

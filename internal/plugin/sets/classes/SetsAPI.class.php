@@ -1,5 +1,5 @@
 <?php
-class plg_sets_SetsAPI extends core_plugin_PluginAPI
+class plg_sets_SetsAPI extends \rocketD\plugin\PluginAPI
 {
 
 	const PUBLIC_FUNCTION_LIST = ''; // dont allow any direct calls

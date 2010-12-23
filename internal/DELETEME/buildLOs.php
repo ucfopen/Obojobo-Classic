@@ -3,10 +3,10 @@
 require_once(dirname(__FILE__)."/../app.php");
 
 
-$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 $DBM->startTransaction();
 
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 
 $numruns = 1;
  
@@ -16,12 +16,12 @@ $numruns = 1;
 // while($len--)
 // {
 // 
-// 	$q = $DBM->query("SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE);
+// 	$q = $DBM->query("SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE);
 // 	$t = microtime(1);
 // 
 // 	while($r = $DBM->fetch_obj($q))
 // 	{
-// 		$lo = getNormalLO($r->{cfg_obo_LO::ID}, $DBM);
+// 		$lo = getNormalLO($r->{\cfg_obo_LO::ID}, $DBM);
 // 
 // 	}
 // 	$times[] = microtime(1) - $t;
@@ -39,7 +39,7 @@ $numruns = 1;
 
 // Test to make sure we dont have the updated objects
 
-$qm = nm_los_QuestionManager::getInstance();
+$qm = \obo\lo\QuestionManager::getInstance();
 if(method_exists($qm, 'getQuestionNew'))
 {
 	exit("The php classes appear to be updated already, revert the php classes to the unaltered code to create the new LO structures");
@@ -54,11 +54,11 @@ if($_REQUEST['doit'] != 1)
 
 
 
-$q = $DBM->querySafe("SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_LO::TABLE);
+$q = $DBM->querySafe("SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE);
 while($r = $DBM->fetch_obj($q))
 {
 	
-	$lo = getNormalLO($r->{cfg_obo_LO::ID}, $DBM);
+	$lo = getNormalLO($r->{\cfg_obo_LO::ID}, $DBM);
 
 	// $pageGroup = s($lo->pages);
 	// $DBM->query("INSERT INTO lo_los_pages
@@ -142,7 +142,7 @@ echo "When your done, test a few LO's using the next script: <a href=\"testBuild
 
 function getNormalLO($loID, $DBM)
 {
-	$lo = new nm_los_LO();
+	$lo = new \obo\lo\LO();
 	$lo->dbGetFull($DBM, $loID);
 	return $lo;
 }
@@ -153,7 +153,7 @@ function getSerializedLO($loID, $DBM)
 
 	if($r = $DBM->fetch_obj($q))
 	{
-		return new nm_los_LO($r->loID, $r->title, $r->languageID, 0, 0, $r->learnTime, $r->version, $r->subVersion, $r->rootLoID, $r->parentLoID, $r->createTime, $r->copyright, unserialize(base64_decode($r->pageData)), unserialize(base64_decode($r->practiceData)), unserialize(base64_decode($r->assessmentData)), array(), $perms);
+		return new \obo\lo\LO($r->loID, $r->title, $r->languageID, 0, 0, $r->learnTime, $r->version, $r->subVersion, $r->rootLoID, $r->parentLoID, $r->createTime, $r->copyright, unserialize(base64_decode($r->pageData)), unserialize(base64_decode($r->practiceData)), unserialize(base64_decode($r->assessmentData)), array(), $perms);
 	}
 }
 
