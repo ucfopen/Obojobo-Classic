@@ -5,9 +5,9 @@ header('Content-Type: application/xml',true);
 echo '<?xml version="1.0" encoding="UTF-8" ?>';
 ?>
 <config>
-	<remoting_gateway><?php echo AppCfg::URL_WEB.AppCfg::AMF_GATEWAY; ?></remoting_gateway>
+	<remoting_gateway><?php echo \AppCfg::URL_WEB.\AppCfg::AMF_GATEWAY; ?></remoting_gateway>
 
-	<debug><?php echo AppCfg::DEBUG_MODE; ?></debug>
+	<debug><?php echo \AppCfg::DEBUG_MODE; ?></debug>
 	
 	<show_debug_ui><?php echo false; ?></show_debug_ui>
 
@@ -32,71 +32,71 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	</creator_verbs_url>
 
 	<asset_script_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::DIR_ASSETS; ?>getAsset.php?id=]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::DIR_ASSETS; ?>getAsset.php?id=]]>
 	</asset_script_url>
 
 	<upload_script_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::DIR_ASSETS; ?>upAsset.php]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::DIR_ASSETS; ?>upAsset.php]]>
 	</upload_script_url>
 
 	<csv_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::DIR_ASSETS; ?>csv.php]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::DIR_ASSETS; ?>csv.php]]>
 	</csv_url>
 
 	<repository>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_REPOSITORY; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_REPOSITORY; ?>]]>
 	</repository>
 
 	<creator>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_CREATOR; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_CREATOR; ?>]]>
 	</creator>
 
 	<viewer>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_VIEWER; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_VIEWER; ?>]]>
 	</viewer>
 	
 	<preview>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_PREVIEW; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_PREVIEW; ?>]]>
 	</preview>
 
 	<status_url>
-		<![CDATA[<?php echo AppCfg::URL_STATUS; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_STATUS; ?>]]>
 	</status_url>
 
 	<updates_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_UPDATES; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_UPDATES; ?>]]>
 	</updates_url>
 
 	<knownIssues_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_KNOWN_ISSUES; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_KNOWN_ISSUES; ?>]]>
 	</knownIssues_url>
 
 	<wiki_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_WIKI; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_WIKI; ?>]]>
 	</wiki_url>
 
 	<about_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_ABOUT; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_ABOUT; ?>]]>
 	</about_url>
 
 	<home_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB; ?>]]>
 	</home_url>
 
 	<twitter_proxy_url>
-		<![CDATA[<?php echo AppCfg::URL_WEB.AppCfg::URL_TWITTER_PROXY; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_TWITTER_PROXY; ?>]]>
 	</twitter_proxy_url>
 	
 	<pro_account_form_url>
-		<![CDATA[<?php echo AppCfg::URL_ACCOUNT_FORM; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_ACCOUNT_FORM; ?>]]>
 	</pro_account_form_url>
 
 	<pro_account_formID>
-		<![CDATA[<?php echo AppCfg::ACCOUNT_FORM_ID; ?>]]>
+		<![CDATA[<?php echo \AppCfg::ACCOUNT_FORM_ID; ?>]]>
 	</pro_account_formID>
 	
 	<student_guide_url>
-		<![CDATA[<?php echo AppCfg::URL_STUDENT_QSTART; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_STUDENT_QSTART; ?>]]>
 	</student_guide_url>
 
 	<help_url>
@@ -108,7 +108,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	</shared_object_name>
 	
 	<next_minimum_flash_version>
-		<![CDATA[<?php echo AppCfg::FLASH_VER_WARN; ?>]]>
+		<![CDATA[<?php echo \AppCfg::FLASH_VER_WARN; ?>]]>
 	</next_minimum_flash_version>
 
 	<creator_shared_object_name>
@@ -125,7 +125,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 
 	<disable_incomplete_features>false</disable_incomplete_features>
 
-	<max_file_size><?php echo AppCfg::MAX_FILE_SIZE; ?></max_file_size>
+	<max_file_size><?php echo \AppCfg::MAX_FILE_SIZE; ?></max_file_size>
 
 	<jpeg_quality>30</jpeg_quality>
 

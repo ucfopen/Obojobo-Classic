@@ -5,7 +5,7 @@
  */
 $time = microtime(true);
 require_once(dirname(__FILE__)."/../internal/app.php");
-$lor = nm_los_API::getInstance();
+$lor = \obo\API::getInstance();
 
 $verifyReturn = $lor->getSessionValid();
 
@@ -13,23 +13,23 @@ if($verifyReturn)// verify login
 {
 	$uid = $_SESSION['userID'];
 	$mediaID = $_GET['id'];
-	$roleMan = nm_los_RoleManager::getInstance();
+	$roleMan = \obo\perms\RoleManager::getInstance();
 	if(true || $roleMan->isSuperUser() || $roleMan->isSuperViewer())
 	{
 		
-        $DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
-		$q = $DBM->querySafe("SELECT ".cfg_obo_Media::ID.", ".cfg_obo_Media::URL.", ".cfg_obo_Media::SIZE.", ".cfg_obo_Media::TIME."  FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::ID."='?' LIMIT 1", $mediaID);
+        $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+		$q = $DBM->querySafe("SELECT ".\cfg_obo_Media::ID.", ".\cfg_obo_Media::URL.", ".\cfg_obo_Media::SIZE.", ".\cfg_obo_Media::TIME."  FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1", $mediaID);
 		if(($r = $DBM->fetch_obj($q)))
 		{
-			//core_util_Log::trace("media found!");
+			//\rocketD\util\Log::trace("media found!");
 			
-		   $file = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA.$r->{cfg_obo_Media::URL};
+		   $file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::URL};
 		   $fileinfo = pathinfo($file);
-           $file = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA.$r->{cfg_obo_Media::ID} . "." .strtolower($fileinfo['extension']);
+           $file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::ID} . "." .strtolower($fileinfo['extension']);
 
 		}
 	    else{
-			core_util_Log::trace('media file not found: '.$file);
+			\rocketD\util\Log::trace('media file not found: '.$file);
 	        header('HTTP/1.0 404 Not Found');
 		}
 	}
@@ -61,16 +61,16 @@ if($verifyReturn)// verify login
 		}
 		session_write_close();
 		header('Content-Type: '.$MimeType,true);
-        header('Content-Disposition: inline; filename="' . $r->{cfg_obo_Media::URL} . '"'); 
+        header('Content-Disposition: inline; filename="' . $r->{\cfg_obo_Media::URL} . '"'); 
 		//header('Cache-Control: max-age=172800', true); //Adjust maxage appropriately
-        header('Last-Modified: ' . date('D, d M Y H:i:s \G\M\T' , $r->{cfg_obo_Media::TIME}));
+        header('Last-Modified: ' . date('D, d M Y H:i:s \G\M\T' , $r->{\cfg_obo_Media::TIME}));
         header('Expires: ' . date('D, d M Y H:i:s \G\M\T' , (time() + 31536000)));
 		header('Pragma: public', true);
-		header('Content-Length: '. ($r->{cfg_obo_Media::SIZE} > 0 ? $r->{cfg_obo_Media::SIZE} : filesize($file)) . "\r\n");
+		header('Content-Length: '. ($r->{\cfg_obo_Media::SIZE} > 0 ? $r->{\cfg_obo_Media::SIZE} : filesize($file)) . "\r\n");
 		// track file requests
 		if(isset($_SESSION['INSTANCE_ID']) && $_SESSION['INSTANCE_ID'] > 0)
 		{
-			$trackingMan = nm_los_TrackingManager::getInstance();
+			$trackingMan = \obo\log\LogManager::getInstance();
 			$trackingMan->trackMediaRequested($mediaID);
 		}
 		
@@ -104,7 +104,7 @@ if($verifyReturn)// verify login
 		exit();
 	}
 	else{
-		core_util_Log::trace('file doesnt exist: '.$file);
+		\rocketD\util\Log::trace('file doesnt exist: '.$file);
 		header('HTTP/1.0 404 Not Found');
 	} 
 

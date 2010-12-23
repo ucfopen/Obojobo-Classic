@@ -1,4 +1,4 @@
 <?php
-class loRepository extends nm_los_API{
+class loRepository extends \obo\API{
 }
 ?>

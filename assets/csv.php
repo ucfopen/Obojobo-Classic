@@ -5,9 +5,9 @@ switch($_GET['function'])
 	case 'scores':
 		if ($_GET['instID'] > 0 && strlen($_GET['filename']) > 0)
 		{
-			$lor = nm_los_API::getInstance();
+			$lor = \obo\API::getInstance();
 			$scores = $lor->getScoresForInstance($_GET['instID']);
-			$UM = core_auth_AuthManager::getInstance();
+			$UM = namespace obo;::getInstance();
 			if (is_array($scores))
 			{
 				session_write_close();

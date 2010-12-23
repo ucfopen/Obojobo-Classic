@@ -40,12 +40,12 @@
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
 		
-		$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
-		if($q = $DBM->querySafe("SELECT * FROM ".cfg_obo_Track::TABLE." WHERE ".cfg_obo_Track::ID." = '?'", $_POST['get_tracking_value']))
+		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+		if($q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::ID." = '?'", $_POST['get_tracking_value']))
 		{
 			if($r = $DBM->fetch_obj($q))
 			{
-				$data = $r->{cfg_obo_Track::DATA};
+				$data = $r->{\cfg_obo_Track::DATA};
 				$_POST['base_64_decode'] = 0;
 				$_POST['mysql_decompress'] = 1;
 				$_POST['unserialize'] = 1;
@@ -56,7 +56,7 @@
 	if($_POST['page_id'])
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
-		$PM = nm_los_PageManager::getInstance();
+		$PM = \obo\lo\PageManager::getInstance();
 		$data = $PM->getPage($_POST['page_id']);
 		$_POST['base_64_decode'] = 0;
 		$_POST['mysql_decompress'] = 0;
@@ -66,7 +66,7 @@
 	if($_POST['question_id'])
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
-		$QM = nm_los_QuestionManager::getInstance();
+		$QM = \obo\lo\QuestionManager::getInstance();
 		$data = $QM->getQuestion($_POST['question_id']);
 		$_POST['base_64_decode'] = 0;
 		$_POST['mysql_decompress'] = 0;
@@ -76,8 +76,8 @@
 	if($_POST['loid'])
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
-		$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
-		$data = new nm_los_LO();
+		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+		$data = new \obo\lo\LO();
 		$data->dbGetFull($DBM, $_POST['loid']);
 		$_POST['base_64_decode'] = 0;
 		$_POST['mysql_decompress'] = 0;

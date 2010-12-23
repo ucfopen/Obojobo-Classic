@@ -1,5 +1,5 @@
 <?php
-class plg_Kogneato_KogneatoAPI extends core_plugin_PluginAPI
+class plg_Kogneato_KogneatoAPI extends \rocketD\plugin\PluginAPI
 {
 	// Block all API calls directly referencing this api
 
@@ -20,22 +20,22 @@ class plg_Kogneato_KogneatoAPI extends core_plugin_PluginAPI
 	//  siteUrl . GIID .'/'. username .'/'. timestamp .'/'. hash
 	public function getKogneatoEngineLink($GIID, $preview=false)
 	{
-		$API = nm_los_API::getInstance();
+		$API = \obo\API::getInstance();
 		
 		// get current user
 		$user = $API->getUser();
 		
 		// must be logged in to get a user back
-		if($user instanceof core_auth_User)
+		if($user instanceof \rocketD\auth\User)
 		{
 			$params = array();
 			$params[plg_UCFAuth_SsoHash::SSO_USERID] = $user->login;
 			$time = $params[plg_UCFAuth_SsoHash::SSO_TIMESTAMP] = time();
 			
-			$SSO = new plg_UCFAuth_SsoHash(AppCfg::KOGNEATO_SSO_SECRET);
+			$SSO = new plg_UCFAuth_SsoHash(\AppCfg::KOGNEATO_SSO_SECRET);
 			$hash = $SSO->getSsoHash($params);
 
-			return array('url' => AppCfg::KOGNEATO_SSO_URL. ($preview ? 'preview/' : 'play/') .$GIID.'/'.$user->login.'/'. $time.'/'.$hash, 'GIID' => $GIID) ;
+			return array('url' => \AppCfg::KOGNEATO_SSO_URL. ($preview ? 'preview/' : 'play/') .$GIID.'/'.$user->login.'/'. $time.'/'.$hash, 'GIID' => $GIID) ;
 		}
 		
 		

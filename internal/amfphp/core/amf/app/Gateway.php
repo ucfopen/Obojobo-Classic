@@ -139,7 +139,7 @@ class Gateway {
 			$amf = new AMFObject($GLOBALS["HTTP_RAW_POST_DATA"]);   // create the amf object
 			
 			// log profiling data
-			if(AppCfg::PROFILE_MODE)
+			if(\AppCfg::PROFILE_MODE)
 			{
 				$tTime = 0;
 				$mem1 = memory_get_usage(true);
@@ -150,7 +150,7 @@ class Gateway {
 					$timer .= "'".round((microtime(1) - $t), 5)."',";
 					$tTime += microtime(1) - $t;
 				}
-				core_util_Log::profile('amfphp_Filters', "'".$_SESSION['userID'].'\','.$timer."'".round($tTime,5)."','".strlen($amf->outputStream)."',".time()."','$mem1','".memory_get_usage(true)."','".memory_get_peak_usage(true)."'\n");
+				\rocketD\util\Log::profile('amfphp_Filters', "'".$_SESSION['userID'].'\','.$timer."'".round($tTime,5)."','".strlen($amf->outputStream)."',".time()."','$mem1','".memory_get_usage(true)."','".memory_get_peak_usage(true)."'\n");
 			}
 			else // no need to keep hitting microtime
 			{
