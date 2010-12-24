@@ -246,7 +246,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			{
 				switch($r->{\cfg_obo_Track::TYPE})
 				{
-					case '\obo\log\Visited':
+					case '\\obo\\log\\Visited':
 						// print and tally totals for previous visit
 						$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
 						if(isset($thisVisit))
@@ -317,7 +317,7 @@ class LogManager extends \rocketD\db\DBEnabled
 
 						break;
 
-					case '\obo\log\SectionChanged':
+					case '\\obo\\log\\SectionChanged':
 						if($loFound)
 						{
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -334,7 +334,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\obo\log\PageChanged':
+					case '\\obo\\log\\PageChanged':
 						if($loFound)
 						{					
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -451,7 +451,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\obo\log\StartAttempt':
+					case '\\obo\\log\\StartAttempt':
 						if($loFound)
 						{
 							if(!$totalsOnly)
@@ -478,7 +478,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\obo\log\EndAttempt':
+					case '\\obo\\log\\EndAttempt':
 						if($loFound)
 						{
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -492,7 +492,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							}
 						}
 						break;
-					case '\obo\log\SubmitQuestion':
+					case '\\obo\\log\\SubmitQuestion':
 						if($loFound)
 						{					
 							if(!$totalsOnly)
@@ -560,7 +560,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\obo\log\SubmitMedia':
+					case '\\obo\\log\\SubmitMedia':
 						if($loFound)
 						{
 							if(!$totalsOnly)
@@ -597,7 +597,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							$thisVisit[] = $r;
 						}
 						break;
-					case '\obo\log\MediaRequested':
+					case '\\obo\\log\\MediaRequested':
 						$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
 						$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
 						$thisVisit[] = $r;
