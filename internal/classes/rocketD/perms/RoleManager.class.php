@@ -228,7 +228,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		
 		$users = array();
-		$UM = namespace obo;::getInstance();
+		$UM = \rocketD\auth\AuthManager::getInstance();
 		while($r = $this->DBM->fetch_obj($q))
 		{
 		    if($user = $UM->fetchUserByID($r->{\cfg_core_User::ID}))
