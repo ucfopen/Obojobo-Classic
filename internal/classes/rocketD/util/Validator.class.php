@@ -67,7 +67,7 @@ class Validator
 	static function isPerm2($perm)
 	{
 		// use relection to get a list of all class constants
-		$oClass = new ReflectionClass('\cfg_core_Perm');
+		$oClass = new \ReflectionClass('\cfg_core_Perm');
 		$consts = array_values($oClass->getConstants());
 		return in_array($perm, $consts);
 	}

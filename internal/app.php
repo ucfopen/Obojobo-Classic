@@ -1,6 +1,6 @@
 <?php
 //namespace RD;
-require_once('config/cfgDefault.php'); // default config
+require_once('config/cfgBase.php'); // default config
 require_once('config/cfgLocal.php'); // local config
 
 /*
@@ -31,13 +31,16 @@ function classAutoLoader($className)
 //    require_once($class);
 
 	// look at the first 4 characters to determine if its a plugin, config, or regular class file
-	if(strpos($className , '\\')!== false)
+	if(strpos($className , '\\') !== false)
 	{
-		error_log('loading file with namespace ' . $className);
 		$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES  . str_replace('\\', '/', $className) . '.class.php';
 		if(@include($file))
 		{
 			return;
+		}
+		else
+		{
+			error_log('loading file with namespace ' . $className);
 		}
 	}
 

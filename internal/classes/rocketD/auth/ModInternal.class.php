@@ -399,7 +399,7 @@ class ModInternal extends AuthModule {
 				if($r = $this->DBM->fetch_obj($q))
 				{
 					
-					return ((int)$r->{\cfg_core_AuthModInternal::PW_CHANGE_TIME} +  /AppCfg::AUTH_PW_LIFE) > time();
+					return ((int)$r->{\cfg_core_AuthModInternal::PW_CHANGE_TIME} +  \AppCfg::AUTH_PW_LIFE) > time();
 				}
 			}
 			return true;
@@ -457,7 +457,7 @@ class ModInternal extends AuthModule {
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			// no existing key, or invalid one, make new
-			if(strlen($r->{\cfg_core_AuthModInternal::RESET_KEY}) == 0 || $r->{\cfg_core_AuthModInternal::RESET_TIME} + /AppCfg::AUTH_PW_LIFE < time())
+			if(strlen($r->{\cfg_core_AuthModInternal::RESET_KEY}) == 0 || $r->{\cfg_core_AuthModInternal::RESET_TIME} + \AppCfg::AUTH_PW_LIFE < time())
 			{
 				$this->DBM->startTransaction();
 				$resetKey = $this->makeResetKey();
@@ -504,10 +504,10 @@ class ModInternal extends AuthModule {
 	{
 		
 		trace("mailing password reset " . $resetKey . ' ' . $sendTo, true);
-		$headers = 'From: '. /AppCfg::SYS_EMAIL . "\r\n" .
-		    'Reply-To: '. /AppCfg::SYS_EMAIL . "\r\n" .
+		$headers = 'From: '. AppCfg::SYS_EMAIL . "\r\n" .
+		    'Reply-To: '. \AppCfg::SYS_EMAIL . "\r\n" .
 		    'X-Mailer: PHP/' . phpversion();
-		$title = /AppCfg::SYS_NAME." Password Request";
+		$title = \AppCfg::SYS_NAME." Password Request";
 		// if the url doesn't contain a ?, it'll need one
 		if(strripos($returnURL, '?') == false)
 		{
@@ -517,7 +517,7 @@ class ModInternal extends AuthModule {
 		{
 			$returnURL .= '&';
 		}
-		$body = "You either started a new account or requested a password reset for your existing "./AppCfg::SYS_NAME." account.\r\n\r\nFollow this link to create your password: ".$returnURL."resetKey=".$resetKey;
+		$body = "You either started a new account or requested a password reset for your existing ".\AppCfg::SYS_NAME." account.\r\n\r\nFollow this link to create your password: ".$returnURL."resetKey=".$resetKey;
 		$success = false;
 		// try to send email 10 times before failing
 		for($i = 0; $i < 10; $i++)
@@ -555,7 +555,7 @@ class ModInternal extends AuthModule {
 					trace($key, true);
 					trace($r->{\cfg_core_AuthModInternal::RESET_KEY}, true);
 					
-					if($key == $r->{\cfg_core_AuthModInternal::RESET_KEY} && ($r->{\cfg_core_AuthModInternal::RESET_TIME} + /AppCfg::AUTH_PW_LIFE > time() ))
+					if($key == $r->{\cfg_core_AuthModInternal::RESET_KEY} && ($r->{\cfg_core_AuthModInternal::RESET_TIME} + \AppCfg::AUTH_PW_LIFE > time() ))
 					{;
 						if($this->validatePassword($newpass) === true) // validate new
 						{ 

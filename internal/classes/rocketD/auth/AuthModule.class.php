@@ -210,6 +210,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	protected function storeLogin($userID)
 	{
+		trace('start session');
 		// validate arguments
 		if(!$this->validateUID($userID))
 		{
@@ -220,7 +221,11 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		{
 			
 			$this->defaultDBM();
-			if(!session_id()) @session_start();
+			if(!session_id())
+			{
+				@session_name(\AppCfg::SESSION_NAME);
+				@session_start();	
+			}
 			@session_regenerate_id(false);
 			$_SESSION = array();// force a fresh start on the session variables
 			$_SESSION['userID'] = $userID;
@@ -228,6 +233,8 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			$_SESSION['timestamp'] = time() + \AppCfg::AUTH_TIMEOUT;
 			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::SID." = '".session_id()."',  ".\cfg_core_User::LOGIN_TIME." = UNIX_TIMESTAMP() WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
 		}
+		trace(session_id());
+				trace($_SESSION);
 	}
 
 	

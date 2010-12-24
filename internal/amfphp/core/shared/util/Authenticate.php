@@ -86,7 +86,8 @@ class Authenticate {
 	function login($name, $roles) {
 		if(!session_id())
 		{
-			session_start();
+			@session_name(\AppCfg::SESSION_NAME);
+			session_start(\AppCfg::SESSION_NAME);
 		}
 		$_SESSION['amfphp_username'] = $name;
 		$_SESSION['amfphp_roles'] = $roles;

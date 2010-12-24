@@ -60,11 +60,9 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 */
 	public function deleteUserByID($userID = 0)
 	{
-	    if(!\rocketD\util\Validator::isPosInt($userID))
+		if(!\rocketD\util\Validator::isPosInt($userID))
 		{
-			
-	       
-	        return \rocketD\util\Error::getError(2);
+			return \rocketD\util\Error::getError(2);
 		}
 
 		$roleMan = \rocketD\perms\RoleManager::getInstance();
@@ -161,6 +159,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			session_name(\AppCfg::SESSION_NAME);
 			session_start();
 		}
+
 		//If they had a valid session before, and if the session ID fits the one in the database, let them pass
 		if (isset($_SESSION['passed']) && $_SESSION['passed'] === true )
 		{
@@ -216,7 +215,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		if(!headers_sent() && !isset($_SESSION))
 		{
-			session_start();
+			@session_name(\AppCfg::SESSION_NAME);
+			session_start(\AppCfg::SESSION_NAME);
 		}
 		// TODO: add tracking back in
 		//$trackingMan = \obo\log\LogManager::getInstance();
@@ -454,7 +454,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 		{
 			foreach($authModList AS $authMod)
 			{
-				$authModule = call_user_func(array($authMod, 'getInstance'));
+				$authModule = $authMod::getInstance(); // requires 5.3
+				//$authModule = call_user_func(array($authMod, 'getInstance'));  
 
 				// attempt to authenticate each in order
 				if($authModule->authenticate($requestVars))
@@ -512,23 +513,17 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		if(!\obo\util\Validator::isPosInt($userID))
 		{
-			
-			
 			return \rocketD\util\Error::getError(2);
 		}
 		
 		$roleMan = \rocketD\perms\RoleManager::getInstance();
 		if(!$roleMan->isSuperUser())
 		{
-			
-			
 			return \rocketD\util\Error::getError(4);
 		}
 		
 		if($userID == $_SESSION['userID'])
 		{
-			
-			
 			return \rocketD\util\Error::getError(0);
 		}
 		
@@ -536,8 +531,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		$authMods = $this->getAllAuthModules();
 		foreach($authMods AS $authMod)
 		{
-		//	trace('removing from am '. $authMod->\cfg_core_AuthMan::MOD_CLASS);
-
 			$authModule = call_user_func(array($authMod, 'getInstance'));
 			$thisResult =  $authModule->removeRecord($userID);
 			$result = $result || $thisResult;
