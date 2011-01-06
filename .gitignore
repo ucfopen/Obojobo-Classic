@@ -37,7 +37,9 @@ admin/cdws/stats/*
 
 # ignore rss cache
 internal/scripts/rssCache/*
-i
+
+# ignore smarty template cashe
+internal/templates/compiled/
 
 # ignore test files
 internal/DELETEME/tests/*
