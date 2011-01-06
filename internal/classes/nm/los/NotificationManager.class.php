@@ -24,14 +24,16 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		
 		// get student info
 		$AM = core_auth_AuthManager::getInstance();
-		$authMod = $AM->getAuthModuleForUserID($studentID);
-		$user = $authMod->getUser($studentID);
+		$user = $AM->fetchUserByID($studentID);
+		$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
+		
 		
 		// load up email template
 		$smarty = new Smarty();
 		
 		$smarty->compile_dir = AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'compiled/';
-
+		
+		$smarty->assign('multiPartBoundry', $boundry);
 		$smarty->assign('loLink', AppCfg::URL_WEB . AppCfg::URL_VIEWER . $instData->instID);
 		$smarty->assign('loTitle', $instData->name);
 		$smarty->assign('loCourse', $instData->courseID);
@@ -44,31 +46,29 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$smarty->assign('finalScore', $score);
 		$smarty->assign('attempts', array_reverse($scores));
 
+		$headers = "MIME-Version: 1.0\n";
+		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\n";
+		$headers .= "Content-Type: multipart/alternative;boundary=\"" . $boundry . "\"\n";
+		
+		$body = "--$boundry" . "\n";
+		$body .= "Content-Type: text/plain; charset=UTF-8" . "\n";
+		$body .= "Content-Disposition: inline" . "\n";
+		$body .= "Content-Transfer-Encoding: 7bit" . "\n\n";
+		$body .= $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-student-attempt-plain.tpl');
+		$body .= "\r\n\r\n--$boundry" . "\n";
+		$body .= "Content-Type: text/html; charset=UTF-8" . "\n";
+		$body .= "Content-Disposition: inline" . "\n";
+		$body .= "Content-Transfer-Encoding: 7bit" . "\n\n";
+		$body .= $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-student-attempt-html.tpl');
+		$body .= "\n\n--$boundry" . "--\n";
+		
 		$subject = $smarty->fetch('eval:Results for {$loTitle} {$loCourse|ternary:"($loCourse)":"no course"}');
-		$body = $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-student-attempt-complete.tpl');
-		$sent = $this->sendEmail($user->email, $subject, $body);
+		
+		$sent = mail($user->email, $subject, $body, $headers);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
-		trace('here is body:');
-		trace($body);
+
 		return $sent;
-	}
-	
-	public function sendEmail($to, $subject, $body, $autoDelay=true)
-	{
-		// TODO: add autodelay to build up a block of emails 
-		
-		
-		$to = 'iturgeon@gmail.com';
-
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-
-		// Additional headers
-		$headers .= "To: $to\r\n";
-		$headers .= 'From: Obojobo <no-reply@obojobo.ucf.edu>' . "\r\n";
-		
-		return mail($to, $subject, $body, $headers);
 	}
 	
 }

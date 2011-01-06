@@ -271,8 +271,8 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 						'additional' => $r->additional_attempts,
 						'attempts' => array(),
 						// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
-						'synced' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
-						'syncedScore' => (isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
+						'synced' => (!($wcScoresLog instanceof core_util_Error) && isset($wcScoresLog[$r->{cfg_core_User::ID}] ) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SUCCESS} : false) ,
+						'syncedScore' => (!($wcScoresLog instanceof core_util_Error) && isset($wcScoresLog[$r->{cfg_core_User::ID}]) ? $wcScoresLog[$r->{cfg_core_User::ID}]->{cfg_plugin_UCFCourses::SCORE} : 0)
 					);
 					$lastUID = $r->{cfg_core_User::ID};
 				}
@@ -337,15 +337,15 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 			$result = array();
 			$i = -1;
 			$lastUID = -1;
-			$attempts;
 
 			// TODO: SYSTEM EVENTS
 
 			// get their sync status
 			$PM = core_plugin_PluginManager::getInstance();
 			$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
-
+			
 			$userMan = core_auth_AuthManager::getInstance();
+
 			while($r = $this->DBM->fetch_obj($q))
 			{
 				// only create new array items for each user
@@ -664,7 +664,6 @@ class nm_los_ScoreManager extends core_db_dbEnabled
 			return false;
 		}
 		//Get the scores for each individual question
-		trace('getting answers for attempt: ' . $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'] . ', qGroupID: ' . $qGroupID);
 		
 		$qstr = "SELECT
 					".cfg_obo_Score::ITEM_ID.", 
