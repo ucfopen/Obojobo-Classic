@@ -29,10 +29,10 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 </form>
 <?php
 
-if(strlen($_REQUEST['nid']) > 0 )
+if(strlen($_GET['nid']) > 0 )
 {
-	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_REQUEST['nid']), true);
-	echo $_REQUEST['nid'] . "'s Courses:<br>";
+	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_GET['nid']), true);
+	echo $_GET['nid'] . "'s Courses:<br>";
 	print_r($result);
 }
 
