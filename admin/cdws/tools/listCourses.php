@@ -26,6 +26,7 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 	<label for="nid">NID</label><input type="text" name="nid" value="" id="nid">
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>
+<pre>
 <?php
 
 if(!empty($_GET['nid']) )
@@ -37,5 +38,6 @@ if(!empty($_GET['nid']) )
 }
 
 ?>
+</pre>
 </body>
 </html>
