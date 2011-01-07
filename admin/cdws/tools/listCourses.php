@@ -30,7 +30,6 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 
 if(!empty($_GET['nid']) )
 {
-	echo ""
 	$PM = core_plugin_PluginManager::getInstance();
 	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_GET['nid']), true);
 	echo $_GET['nid'] . "'s Courses:<br>";
