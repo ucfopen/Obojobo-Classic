@@ -27,8 +27,8 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>
 <?php
-echo $_GET['nid'];
-if(strlen($_GET['nid']) > 0 )
+
+if(!empty($_GET['nid']) )
 {
 	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_GET['nid']), true);
 	echo $_GET['nid'] . "'s Courses:<br>";
