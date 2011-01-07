@@ -21,14 +21,13 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 	<!-- Date: 2011-01-07 -->
 </head>
 <body>
+<h2>List A User's Courses:</h2>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
 	<label for="nid">NID</label><input type="text" name="nid" value="" id="nid">
-	
-
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>
 <?php
-
+echo $_GET['nid'];
 if(strlen($_GET['nid']) > 0 )
 {
 	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_GET['nid']), true);
