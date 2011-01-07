@@ -89,6 +89,19 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 	}
 	
+	public function testOnlyGetCourses($NID)
+	{
+		$API = nm_los_API::getInstance();
+		$result = $API->getSessionRoleValid(array('SuperUser'));
+		if(! in_array('SuperUser', $result['hasRoles']) )
+		{
+			return core_util_Error::getError(2);
+		}
+				
+		$result = $this->sendGetCourseRequest($NID);
+		return  $result;
+	}
+	
 	
 	public function getInstanceCourseData($insID)
 	{
