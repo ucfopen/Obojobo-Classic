@@ -25,6 +25,12 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		{ 
 			// load this module's config
 			$this->oDBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::UCF_DB_HOST, AppCfg::UCF_DB_USER, AppCfg::UCF_DB_PASS, AppCfg::UCF_DB_NAME, AppCfg::UCF_DB_TYPE));
+			if(!$this->oDBM->connected)
+			{
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Lerxst on ' . date("F j, Y, g:i a"));
+				
+			}
 		}
 		parent::defaultDBM(); // build default dbm still for use with internal db
 	}
@@ -210,7 +216,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 				//catch exception
 				catch(Exception $e)
 				{
-					trace($e);
+					trace($e, true);
 				}
 				core_util_Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'\n");
 			}
@@ -264,6 +270,8 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			$ds = @ldap_connect(AppCfg::LDAP);
 			if (!$ds)
 			{
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('LDAP Connection Failure', 'Failed to connect to LDAP on ' . date("F j, Y, g:i a"));
 				trace('connecting to ldap failed', true);
 			}
 			else
@@ -275,6 +283,8 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		}
 		catch(Exception $e)
 		{
+			$NM = nm_los_NotificationManager::getInstance();
+			$NM->sendCriticalError('Oracle DB Connection Failure', 'LDAP Threw an Error ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
 			trace('ldap threw and exception', true);
 			trace($e);
 		}
@@ -300,8 +310,10 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			}
 			catch(Exception $e)
 			{
-				trace('webservice threw and exception', true);
-				trace($e);
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('AD Web Service Failure', 'Failed to connect to the AD Web Service via soap on ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
+				trace('webservice threw an exception', true);
+				trace($e, true);
 			}
 
 		}

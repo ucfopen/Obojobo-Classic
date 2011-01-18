@@ -663,7 +663,14 @@ class nm_los_AttemptsManager extends core_db_dbEnabled
 		// TODO: NEED TO USE SYSTEM EVENTS
 		// Send the score to webcourses
 		$PM = core_plugin_PluginManager::getInstance();
-		$PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		
+		// the score wasn't sent - warn the instructor
+		if($result['scoreSent'] != true)
+		{
+			$NM = nm_los_NotificationManager::getInstance();
+			$NM->sendCriticalError('WebCourses Score Send Failure', 'Failed to send a score to webcourses at ' . date("F j, Y, g:i a") . "\r\n" . print_r($result, true));
+		}
 		
 		// Send email responce to student
 		if(AppCfg::NOTIFY_SCORE == true)
