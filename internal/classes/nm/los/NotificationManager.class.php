@@ -18,6 +18,11 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		return self::$instance;
 	}
 	
+	public function sendCriticalError($subject, $message)
+	{
+		mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
+	}
+	
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
 	{
 		include_once(AppCfg::DIR_BASE . AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
