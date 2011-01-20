@@ -1,4 +1,4 @@
-The score of the following student(s) did not automatically sync to Webcourses@UCF due to an error.
+The score of the following student did not automatically sync to Webcourses@UCF due to an error.
 
 Name: {$studentName}
 Course: {$courseName}

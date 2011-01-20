@@ -20,20 +20,16 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 	
 	public function sendCriticalError($subject, $message)
 	{
-		mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
+		$this->mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
 	}
 	
-	public function sendScoreFailureNotice($instructorID, $studentID, $studentName, $courseName)
+	public function sendScoreFailureNotice($instructor, $student, $courseName)
 	{
 		include_once(AppCfg::DIR_BASE . AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
 		
 		// get student info
 		$AM = core_auth_AuthManager::getInstance();
-		$student = $AM->fetchUserByID($studentID);
 		$studentName = $AM->getName($student);
-		
-		// get instructor
-		$instructor = $AM->fetchUserByID($instructorID);
 		
 		// load up template
 		$smarty = new Smarty();
@@ -47,10 +43,20 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		$headers = "MIME-Version: 1.0\n";
 		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\n";
 		
-		$sent = mail($instructor->email, $subject, $body, $headers);
-		$this->sendCriticalError('Score Sync Failure - ' . $courseName, print_r($instructor, true) . ' ' . print_r($student, true));
+		$sent = $this->mail($instructor->email, $subject, $body, $headers);
+		$this->sendCriticalError('Score Sync Failure - ' . $courseName, 'instructor: '.print_r($instructor, true) . ' Student: ' . print_r($student, true));
 		
 		return $sent;
+	}
+	
+	protected function mail($to, $subject, $body, $headers = '')
+	{
+		return mail($to, $subject, $body, $headers);
+		// trace('subject: ' .$subject);
+		// trace('to: ' .$to);
+		// trace('headers: ' .$headers);
+		// trace('body: ' .$body);
+		// return mail('iturgeon@gmail.com', $subject . " ($to)", $body, $headers);
 	}
 	
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
@@ -59,7 +65,7 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		
 		// get student info
 		$AM = core_auth_AuthManager::getInstance();
-		$user = $AM->fetchUserByID($studentID);
+		$student = $AM->fetchUserByID($studentID);
 		$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
 		
 		
@@ -99,7 +105,7 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		
 		$subject = $smarty->fetch('eval:Results for {$loTitle} {$loCourse|ternary:"($loCourse)":"no course"}');
 		
-		$sent = mail($user->email, $subject, $body, $headers);
+		$sent = $this->mail($student->email, $subject, $body, $headers);
 		
 		core_util_Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
 

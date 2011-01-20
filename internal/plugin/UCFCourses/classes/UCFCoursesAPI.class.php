@@ -36,10 +36,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		catch(Exception $e)
 		{
-			trace('HTTPRequest Exception', true);
-			trace($e, true);
-		 	core_util_Error::getError(1, $e->getMessage());
-			return array('responseCode' =>  0, 'body' => '');
+			return array('responseCode' =>  0, 'body' => $e->getMessage());
 		}
 		return array('responseCode' =>  $request->getResponseCode(), 'body' => $request->getResponseBody());
 	}
@@ -144,17 +141,15 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($result['responseCode'] != 200)
 		{
 			// log error
-			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode']);
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
 			trace('HTTP FAILURE ' . $REQUESTURL, true);
-			trace(time(), true);
-			trace($result, true);
 			sleep(1); 
 			
 			// Send the score set request again
-			$result = $this->send($REQUESTURL, $postVars);
+			$result = $this->send($REQUESTURL);
 			if($result['responseCode'] != 200)
 			{
-				return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+				return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
 			}
 		}
 		
@@ -344,11 +339,9 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($result['responseCode'] != 200)
 		{
 			// log error
-			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode']);
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
 			trace('HTTP FAILURE ' . $REQUESTURL, true);
-			trace(time(), true);
 			trace($postVars, true);
-			trace($result, true);
 
 			sleep(1); 
 			
@@ -356,7 +349,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$result = $this->send($REQUESTURL, $postVars);
 			if($result['responseCode'] != 200)
 			{
-				return array('columnID' => 0, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+				return array('columnID' => 0, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
 			}
 		}
 	
@@ -491,11 +484,9 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($result['responseCode'] != 200)
 		{
 			// log error
-			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode']);
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
 			trace('HTTP FAILURE ' . $REQUESTURL, true);
-			trace(time(), true);
 			trace($postVars, true);
-			trace($result, true);
 
 			sleep(1); 
 			
@@ -503,7 +494,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$result = $this->send($REQUESTURL, $postVars);
 			if($result['responseCode'] != 200)
 			{
-				return array('scoreSent' => false, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+				return array('scoreSent' => false, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
 			}
 		}
 	
@@ -530,7 +521,8 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$sql = "SELECT
 					M.*,
 					L.".cfg_plugin_UCFCourses::STUDENT.",
-					L.".cfg_plugin_UCFCourses::SCORE." 
+					L.".cfg_plugin_UCFCourses::SCORE.",
+					L.".cfg_plugin_UCFCourses::ATTEMPT."
 				FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
 				JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
 				ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
@@ -539,7 +531,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 					AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1'
 					AND L.".cfg_plugin_UCFCourses::ATTEMPT." < $attemptLimit
 				LIMIT $limit";
-				
+
 		$q = $this->DBM->querySafe($sql);
 		while($r = $this->DBM->fetch_obj($q))
 		{
@@ -556,7 +548,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
 			
 			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
-			
+			trace($result);
 			// log the result and store status in db
 			$this->logScoreSet($r->{cfg_obo_Instance::ID}, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 
@@ -566,8 +558,10 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				$attempts++;
 				if($attempts >= $attemptLimit)
 				{
+					$IM = nm_los_InstanceManager::getInstance();
+					$instData = $IM->getInstanceData($instID);
 					$NM = nm_los_NotificationManager::getInstance();
-					$NM->sendScoreFailureNotice($instructor, $student, $courseName);
+					$NM->sendScoreFailureNotice($instructor, $student, $instData->courseID);
 				}
 			}
 			// Increment success counter
@@ -576,7 +570,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				$count++;
 			}
 		}
-		return array('successful' => $count, 'total' => $this->DBM->fetch_num($q));
+		return array('updated' => $count, 'total' => $this->DBM->fetch_num($q));
 	}
 	
 	
@@ -584,7 +578,8 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	{
 		$time = time();
 		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
-		// insert new row, or update with 
+		// insert new row, or update with current time, score, and incriment attempts
+		// NOTE that attempts are only incrimented if the row exists AND the score is the same.  If the score changes, we reset the attempts
 		$sql = "
 		INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE."
 		SET
@@ -601,12 +596,12 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		ON DUPLICATE KEY
 			UPDATE
 				".cfg_core_User::ID." = '?',
-				".cfg_plugin_UCFCourses::SCORE." = '?',
 				".cfg_plugin_UCFCourses::TIME." = '?',
 				".cfg_plugin_UCFCourses::SUCCESS." = '?',
-				".cfg_plugin_UCFCourses::ATTEMPT." = ".cfg_plugin_UCFCourses::ATTEMPT." + 1
+				".cfg_plugin_UCFCourses::ATTEMPT." = IF(".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::ATTEMPT." + 1, '0'),
+				".cfg_plugin_UCFCourses::SCORE." = '?'
 				";
-		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $score, $time, (int)$success);
+		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $time, (int)$success, $score, $score);
 	}
 	
 	public function getScoreLogsForInstance($instID)
