@@ -170,13 +170,11 @@ class core_auth_ModInternal extends core_auth_AuthModule {
 		// require userName
 		if($this->validateUsername($requestVars['userName']) !== true)
 		{
-			trace('invalid username', true);
 			return false;	
 		} 
 		// requre password
 		if($this->validatePassword($requestVars['password']) !== true)
 		{
-			trace('invalid password', true);
 			return false;
 		}
 		// begin authentication, lookup user id by username
@@ -320,18 +318,18 @@ class core_auth_ModInternal extends core_auth_AuthModule {
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($username) > self::MAX_USERNAME_LENGTH)
 		{
-			trace('User name maximum length is '.self::MAX_USERNAME_LENGTH.' characters.', true);
+			trace('User name maximum length is '.self::MAX_USERNAME_LENGTH.' characters.');
 			return 'User name maximum length is 255 characters.';
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($username) < self::MIN_USERNAME_LENGTH)
 		{
-			trace('User name minimum length is '.self::MIN_USERNAME_LENGTH.' characters.', true);
+			trace('User name minimum length is '.self::MIN_USERNAME_LENGTH.' characters.');
 			return 'User name minimum length is 2 characters.';
 		}
 		if(preg_match("/^~{1}[[:alnum:]]{".self::MIN_USERNAME_LENGTH.",".self::MAX_USERNAME_LENGTH."}$/i", $username) == false)
 		{
-			trace('User name can only contain alpha numeric characters (in addition to the tilda).', true);
+			trace('Username not formatted like: ~AA3333a1');
 			return 'User name can only contain alpha numeric characters (in addition to the tilda).';
 		}	
 		return true;
