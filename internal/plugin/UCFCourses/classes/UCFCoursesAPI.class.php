@@ -38,8 +38,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		{
 			trace('HTTPRequest Exception', true);
 			trace($e, true);
-			// trace($request->getResponseCode(), true);
-			// trace($request->getResponseBody(), true);
 		 	core_util_Error::getError(1, $e->getMessage());
 			return array('responseCode' =>  0, 'body' => '');
 		}
@@ -523,28 +521,57 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
 	
-	public function sendFailedScoreSetRequests()
+	public function sendFailedScoreSetRequests($limit=10)
 	{
 		$count = 0;
-		$sql = "SELECT M.*, L.".cfg_plugin_UCFCourses::STUDENT.", L.".cfg_plugin_UCFCourses::SCORE."  FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."  WHERE L.".cfg_plugin_UCFCourses::MAP_COL_ID." > 0 AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1' LIMIT 10";
+		$attemptLimit = 5;
+		
+		// get the sync failure queue
+		$sql = "SELECT
+					M.*,
+					L.".cfg_plugin_UCFCourses::STUDENT.",
+					L.".cfg_plugin_UCFCourses::SCORE." 
+				FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
+				JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
+				ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
+				WHERE
+					L.".cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+					AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1'
+					AND L.".cfg_plugin_UCFCourses::ATTEMPT." < $attemptLimit
+				LIMIT $limit";
+				
 		$q = $this->DBM->querySafe($sql);
 		while($r = $this->DBM->fetch_obj($q))
 		{
+			// grab all the info
 			$AM = core_auth_AuthManager::getInstance();
 			
-			$instructorID = $r->{cfg_core_User::ID};
-			$instructorNID = $AM->getUserName($instructorID);
+			$instID = $r->{cfg_obo_Instance::ID};
+			$instructor = $AM->fetchUserByID($r->{cfg_core_User::ID});
 			$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
 			$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
 			$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
-			$studentUserID = $r->{cfg_plugin_UCFCourses::STUDENT};
-			$studentNID = $AM->getUserName($studentUserID);
+			$student = $AM->fetchUserByID($r->{cfg_plugin_UCFCourses::STUDENT});
 			$score = $r->{cfg_plugin_UCFCourses::SCORE};
+			$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
 			
-			$result = $this->sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score);
-			// log the result
-			$this->logScoreSet($r->{cfg_obo_Instance::ID}, 0, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
-			if($result['scoreSent'] == true)
+			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+			
+			// log the result and store status in db
+			$this->logScoreSet($r->{cfg_obo_Instance::ID}, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+			// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
+			if($result['scoreSent'] != true)
+			{
+				$attempts++;
+				if($attempts >= $attemptLimit)
+				{
+					$NM = nm_los_NotificationManager::getInstance();
+					$NM->sendScoreFailureNotice($instructor, $student, $courseName);
+				}
+			}
+			// Increment success counter
+			else
 			{
 				$count++;
 			}
@@ -557,8 +584,28 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	{
 		$time = time();
 		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
-		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
-		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
+		// insert new row, or update with 
+		$sql = "
+		INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE."
+		SET
+			".cfg_obo_Instance::ID." = '?',
+			 ".cfg_core_User::ID." = '?',
+			 ".cfg_plugin_UCFCourses::STUDENT." = '?',
+			 ".cfg_plugin_UCFCourses::TIME." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?',
+			 ".cfg_plugin_UCFCourses::SCORE." = '?',
+			 ".cfg_plugin_UCFCourses::SUCCESS." ='?',
+			".cfg_plugin_UCFCourses::ATTEMPT." = 0
+		ON DUPLICATE KEY
+			UPDATE
+				".cfg_core_User::ID." = '?',
+				".cfg_plugin_UCFCourses::SCORE." = '?',
+				".cfg_plugin_UCFCourses::TIME." = '?',
+				".cfg_plugin_UCFCourses::SUCCESS." = '?',
+				".cfg_plugin_UCFCourses::ATTEMPT." = ".cfg_plugin_UCFCourses::ATTEMPT." + 1
+				";
 		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $score, $time, (int)$success);
 	}
 	
