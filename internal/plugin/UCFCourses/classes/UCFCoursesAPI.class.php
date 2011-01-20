@@ -2,7 +2,7 @@
 class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 {
 
-	const PUBLIC_FUNCTION_LIST = ''; // dont allow any direct calls
+	const PUBLIC_FUNCTION_LIST = 'syncFailedInstanceScores'; // dont allow any direct calls
 	private static $instance;
 	static public function getInstance()
 	{
@@ -512,9 +512,75 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
 	
+	/********************* PUBLICLY AVAILIBLE FROM APP API *******************/
+	public function syncFailedInstanceScores($instID)
+	{
+		
+		$AM = core_auth_AuthManager::getInstance();
+		// logged in
+		if($AM->verifySession() === true)
+		{
+			// invalid instID value
+			if(!nm_los_Validator::isPosInt($instid))
+			{
+				return core_util_Error::getError(2);
+			}
+			
+			// everything is valid
+			$IM = nm_los_InstanceManager::getInstance();
+			// user has rights
+			if($IM->userCanEditInstance($AM->getSessionUserID(), $instID))
+			{
+				$total = 0;
+				$updated = 0;
+				// attempt to push every score from the instance that hasnt been.
+				// get the sync failure queue
+				$sql = "SELECT
+							M.*,
+							L.".cfg_plugin_UCFCourses::STUDENT.",
+							L.".cfg_plugin_UCFCourses::SCORE."
+						FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
+						JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
+						ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
+						WHERE
+							L.".cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+							AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1'
+							AND L.".cfg_obo_Instance::ID." = '?' ";
+
+				$q = $this->DBM->querySafe($sql, $instID);
+				while($r = $this->DBM->fetch_obj($q))
+				{
+					$total++;
+					$instID = $r->{cfg_obo_Instance::ID};
+					$instructor = $AM->fetchUserByID($r->{cfg_core_User::ID});
+					$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+					$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
+					$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+					$student = $AM->fetchUserByID($r->{cfg_plugin_UCFCourses::STUDENT});
+					$score = $r->{cfg_plugin_UCFCourses::SCORE};
+					$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
+
+					$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+					trace($result);
+					// log the result and store status in db
+					$this->logScoreSet($instID, $AM->getSessionUserID(), $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+					// FAILED!, increment the attempt counter and send an email if its at the limit
+					if($result['scoreSent'] == true)
+					{
+						$updated++;
+					}
+				}
+				return array('updated' => $updated, 'total' => $total);
+			}
+		}
+		return core_util_Error::getError(4);
+	}
+	
 	public function sendFailedScoreSetRequests($limit=10)
 	{
-		$count = 0;
+		$updated = 0;
+		$total = 0;
 		$attemptLimit = 5;
 		
 		// get the sync failure queue
@@ -535,6 +601,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$q = $this->DBM->querySafe($sql);
 		while($r = $this->DBM->fetch_obj($q))
 		{
+			$total++;
 			// grab all the info
 			$AM = core_auth_AuthManager::getInstance();
 			
@@ -550,7 +617,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
 			trace($result);
 			// log the result and store status in db
-			$this->logScoreSet($r->{cfg_obo_Instance::ID}, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+			$this->logScoreSet($instID, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 
 			// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
 			if($result['scoreSent'] != true)
@@ -567,10 +634,10 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			// Increment success counter
 			else
 			{
-				$count++;
+				$updated++;
 			}
 		}
-		return array('updated' => $count, 'total' => $this->DBM->fetch_num($q));
+		return array('updated' => $updated, 'total' => $total);
 	}
 	
 	
