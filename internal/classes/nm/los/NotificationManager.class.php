@@ -23,6 +23,36 @@ class nm_los_NotificationManager extends core_db_dbEnabled
 		mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
 	}
 	
+	public function sendScoreFailureNotice($instructorID, $studentID, $studentName, $courseName)
+	{
+		include_once(AppCfg::DIR_BASE . AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
+		
+		// get student info
+		$AM = core_auth_AuthManager::getInstance();
+		$student = $AM->fetchUserByID($studentID);
+		$studentName = $AM->getName($student);
+		
+		// get instructor
+		$instructor = $AM->fetchUserByID($instructorID);
+		
+		// load up template
+		$smarty = new Smarty();
+		$smarty->compile_dir = AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'compiled/';
+		$smarty->assign('studentName', $studentName);
+		$smarty->assign('courseName', $courseName);
+		$smarty->assign('repositoryURL', AppCfg::URL_WEB . AppCfg::URL_REPOSITORY);
+		$body = $smarty->fetch(AppCfg::DIR_BASE . AppCfg::DIR_TEMPLATES . 'email-instructor-score-sync-failure-plain.tpl');
+		$subject = $smarty->fetch('eval:Obojobo Score Sync Notice - {$studentName} - {$courseName}');
+
+		$headers = "MIME-Version: 1.0\n";
+		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\n";
+		
+		$sent = mail($instructor->email, $subject, $body, $headers);
+		$this->sendCriticalError('Score Sync Failure - ' . $courseName, print_r($instructor, true) . ' ' . print_r($student, true));
+		
+		return $sent;
+	}
+	
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
 	{
 		include_once(AppCfg::DIR_BASE . AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');

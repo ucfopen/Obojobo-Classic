@@ -323,16 +323,24 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	 * @return (string) The formatted name
 	 * @return (bool) False if incorrect $userID
 	 */
-	public function getName($userID)
+	public function getName($userIDorUserObject)
 	{
-		if(!core_util_Validator::isPosInt($userID))
+		// argument is user object
+		if($userIDorUserObject instanceof core_auth_User)
 		{
-			
-	       
-	        return core_util_Error::getError(2);
+			$user = $userIDorUserObject;
+		}
+		// argument is userid
+		else if(core_util_Validator::isPosInt($userIDorUserObject))
+		{
+			$user = $this->fetchUserByID($userID);
+		}
+		// argument is invalid
+		else
+		{
+			return core_util_Error::getError(2);
 		}
 
-		$user = $this->fetchUserByID($userID);
 		if($user)
 		{
 			$name = $user->first . ' ';
