@@ -18,8 +18,10 @@ class nm_los_Error extends core_util_Error
 		// TODO: allow system events to register error types
 		
 		
-	    if(!is_numeric($id))
-	        $id = 0;
+		if(!is_numeric($id))
+		{
+			$id = 0;
+		}
 
 		switch($id)
 		{
