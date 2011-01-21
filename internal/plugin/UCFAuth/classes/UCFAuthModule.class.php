@@ -595,7 +595,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 						// user shouldnt be LibraryUser, but is, remove
 						return $RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(cfg_core_Role::EMPLOYEE_ROLE));
 					}
-				}				
+				}
 			}
 		}
 	}
