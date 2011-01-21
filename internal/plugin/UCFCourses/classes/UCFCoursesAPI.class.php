@@ -521,8 +521,9 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		if($AM->verifySession() === true)
 		{
 			// invalid instID value
-			if(!nm_los_Validator::isPosInt($instid))
+			if(!nm_los_Validator::isPosInt($instID))
 			{
+				trace($instID);
 				return core_util_Error::getError(2);
 			}
 			
@@ -538,7 +539,8 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 				$sql = "SELECT
 							M.*,
 							L.".cfg_plugin_UCFCourses::STUDENT.",
-							L.".cfg_plugin_UCFCourses::SCORE."
+							L.".cfg_plugin_UCFCourses::SCORE.",
+							L.".cfg_plugin_UCFCourses::ATTEMPT."
 						FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
 						JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
 						ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
@@ -561,7 +563,6 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 					$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
 
 					$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
-					trace($result);
 					// log the result and store status in db
 					$this->logScoreSet($instID, $AM->getSessionUserID(), $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 
