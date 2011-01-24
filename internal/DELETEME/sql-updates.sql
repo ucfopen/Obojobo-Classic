@@ -1,1 +1,0 @@
-ALTER TABLE  `plg_wc_grade_log` ADD  `attempts` INT( 10 ) NOT NULL AFTER  `success` , ADD INDEX (  `attempts` );
