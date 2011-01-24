@@ -457,23 +457,18 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		$roleMan = nm_los_RoleManager::getInstance();
 		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
 		{
-			trace('not su');
 			if(!$roleMan->isLibraryUser())
 			{
-				trace('not lib');
 				return false;
 			}
 			$permman = nm_los_PermissionsManager::getInstance();
 			if( ! $permman->getUserPerm($instID, cfg_obo_Perm::TYPE_INSTANCE, cfg_obo_Perm::WRITE, $userID) )
 			{
-				trace('no write perms');
 				// check 2nd Perms system to see if they have write or own
 				$pMan = nm_los_PermManager::getInstance();
 				$perms = $pMan->getPermsForUserToItem($userID, cfg_core_Perm::TYPE_INSTANCE, $instID);
-				trace($perms);
 				if(!is_array($perms) || ( !in_array(cfg_core_Perm::P_WRITE, $perms) && !in_array(cfg_core_Perm::P_OWN, $perms)) )
 				{
-					trace('no extra write perms');
 					return false;
 				}
 			}

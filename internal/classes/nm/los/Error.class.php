@@ -7,8 +7,7 @@ class nm_los_Error extends core_util_Error
 		
 		if(isset($_SESSION['userID']))
 		{
-			core_util_Log::trace('ERROR ' . $this->getErrorString($this->errorID), true, 2);
-			$trackingMan = nm_los_TrackingManager::getInstance();
+//			$trackingMan = nm_los_TrackingManager::getInstance();
 			//$trackingMan->track($this);
 		}
 		parent::logError();
@@ -19,8 +18,10 @@ class nm_los_Error extends core_util_Error
 		// TODO: allow system events to register error types
 		
 		
-	    if(!is_numeric($id))
-	        $id = 0;
+		if(!is_numeric($id))
+		{
+			$id = 0;
+		}
 
 		switch($id)
 		{
