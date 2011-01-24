@@ -19,7 +19,7 @@ $stats = array();
 
    // Count completed Assessments
    $stats[] = array ('name' => '1_CountCompletedAssessments', 'value'=>"SELECT COUNT(*) AS COMPLETED_ASSESSMENTS FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
-
+	$stats[] = array ('name' => '1a_CountCompletedAssessments', 'value'=>"SELECT COUNT(DISTINCT A.".cfg_obo_Attempt::ID.") AS COMPLETED_ASSESSMENTS FROM ".cfg_obo_Attempt::TABLE." AS A JOIN ".cfg_obo_LO::TABLE." AS O ON  O.".cfg_obo_LO::AGROUP." = A.".cfg_obo_QGroup::ID." WHERE ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
    // Number of scored Questions
    $stats[] = array ('name' => '2_NumberOfScoredQuestions', 'value'=>"SELECT COUNT(*) AS ANSWERED_QUESTIONS FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Answer::ID." !=0 AND ".cfg_obo_Answer::TEXT." != '' AND ".cfg_obo_Attempt::ID." IN (SELECT ".cfg_obo_Attempt::ID." FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." >   1214193600 )");
 
@@ -191,6 +191,7 @@ $stats[] = array ('name' => '46_StudentsScoresByInstance', 'value' => "SELECT  L
 
 
  
+
 $stats[] = array ('name' => '50_MasterAssessmentAvoidingPlagiarism1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(4373, $DBM));
 
 $stats[] = array ('name' => '51_MasterAssessmentCreatinSearchStrategy1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(4408, $DBM));
