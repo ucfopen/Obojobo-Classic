@@ -290,9 +290,7 @@ class core_auth_AuthManager extends core_db_dbEnabled
 			$mods = $this->getAllAuthModules();
 			foreach($mods as $authMod)
 			{
-				$AM = call_user_func(array($authMod, 'getInstance'));
-
-				$result = $AM ->createNewUser($usrObj['login'], $usrObj['first'], $usrObj['last'], $usrObj['mi'], $usrObj['email'], $optionalVars);
+				$result = $authMod->createNewUser($usrObj['login'], $usrObj['first'], $usrObj['last'], $usrObj['mi'], $usrObj['email'], $optionalVars);
 				if($result['success'])
 				{
 					return true;
@@ -323,16 +321,24 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	 * @return (string) The formatted name
 	 * @return (bool) False if incorrect $userID
 	 */
-	public function getName($userID)
+	public function getName($userIDorUserObject)
 	{
-		if(!core_util_Validator::isPosInt($userID))
+		// argument is user object
+		if($userIDorUserObject instanceof core_auth_User)
 		{
-			
-	       
-	        return core_util_Error::getError(2);
+			$user = $userIDorUserObject;
+		}
+		// argument is userid
+		else if(core_util_Validator::isPosInt($userIDorUserObject))
+		{
+			$user = $this->fetchUserByID($userIDorUserObject);
+		}
+		// argument is invalid
+		else
+		{
+			return core_util_Error::getError(2);
 		}
 
-		$user = $this->fetchUserByID($userID);
 		if($user)
 		{
 			$name = $user->first . ' ';
@@ -472,19 +478,16 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		{
 			foreach($authModList AS $authMod)
 			{
-				$authModule = call_user_func(array($authMod, 'getInstance'));
-				//trace($class.' attempting to authenticate');
 				// attempt to authenticate each in order
-				if($authModule->authenticate($requestVars))
+				if($authMod->authenticate($requestVars))
 				{
 					// keep record of the authmod used
 					if($_SESSION['passed'] === true)
 					{
 						//now make sure their password is up to date
-						$user =  $authModule->getUser();
-						if(!$authModule->isPasswordCurrent($user->userID))
+						$user = $authMod->getUser();
+						if(!$authMod->isPasswordCurrent($user->userID))
 						{
-
 							$_SESSION['passed'] = false;
 						}
 					}
@@ -513,8 +516,7 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		// loop through authmods
 		foreach($authMods AS $authMod)
 		{
-			$authModule = call_user_func(array($authMod, 'getInstance'));
-			if($modUsers = $authModule->getAllUsers())
+			if($modUsers = $authMod->getAllUsers())
 			{
 				// keep record of the authmod used
 				// return user
@@ -556,8 +558,7 @@ class core_auth_AuthManager extends core_db_dbEnabled
 		{
 		//	trace('removing from am '. $authMod->cfg_core_AuthMan::MOD_CLASS);
 
-			$authModule = call_user_func(array($authMod, 'getInstance'));
-			$thisResult =  $authModule->removeRecord($userID);
+			$thisResult = $authMod->removeRecord($userID);
 			$result = $result || $thisResult;
 		}
 		return $result;
@@ -572,7 +573,12 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getAllAuthModules()
 	{
-		$authMods = explode(',', AppCfg::AUTH_PLUGINS);
+		$authMods = array();
+		$authModNames = explode(',', AppCfg::AUTH_PLUGINS); // get the active mods from the config
+		foreach($authModNames AS $authModName)
+		{
+			$authMods[] = call_user_func(array($authModName, 'getInstance'));
+		}
 		return $authMods;
 	}
 	
@@ -589,16 +595,12 @@ class core_auth_AuthManager extends core_db_dbEnabled
 				return new $authModClass();
 			}
 			$authMods = $this->getAllAuthModules();
-			foreach($authMods AS $authData)
+			foreach($authMods AS $authMod)
 			{
-
-			// use Reflection to create a new instance, using the $args 
-				$authMod = call_user_func(array($authData, 'getInstance'));
 				if($authMod->recordExistsForID($userID))
 				{
 					// store in memcache
-					core_util_Cache::getInstance()->setAuthModClassForUser($userID, $authData);
-					
+					core_util_Cache::getInstance()->setAuthModClassForUser($userID, get_class($authMod) );
 					return $authMod;
 				}
 			}
@@ -620,13 +622,12 @@ class core_auth_AuthManager extends core_db_dbEnabled
 
 			$authMods = $this->getAllAuthModules();
 
-			foreach($authMods AS $authData)
+			foreach($authMods AS $authMod)
 			{
-				$authMod = call_user_func(array($authData, 'getInstance'));
 				if($authMod->getUIDforUsername($username))
 				{
 					// store in memcache
-					core_util_Cache::getInstance()->setAuthModForUser($username, $authData);
+					core_util_Cache::getInstance()->setAuthModForUser($username, get_class($authMod) );
 					return $authMod;
 				}
 			}

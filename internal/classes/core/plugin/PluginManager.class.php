@@ -66,7 +66,7 @@ class core_plugin_PluginManager
 	 */
 	public function callAPI($plugin, $method, $args=-1, $bypassPublicRestriction=0)
 	{
-		if(is_array($args) && $pluginAPI = $this->getAPI($plugin))
+		if( $pluginAPI = $this->getAPI($plugin))
 		{
 			
 			if(method_exists($pluginAPI, $method))
@@ -83,7 +83,7 @@ class core_plugin_PluginManager
 				}
 
 				// call the api function
-				if(!is_array($args)) $args = array();
+				if(!is_array($args)) $args = array($args); // if the argument is just one value, make it an array with the value as the first item
 				return call_user_func_array(array($pluginAPI, $method), $args);
 
 			}
