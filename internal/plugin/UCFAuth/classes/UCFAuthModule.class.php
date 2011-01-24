@@ -25,6 +25,12 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		{ 
 			// load this module's config
 			$this->oDBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::UCF_DB_HOST, AppCfg::UCF_DB_USER, AppCfg::UCF_DB_PASS, AppCfg::UCF_DB_NAME, AppCfg::UCF_DB_TYPE));
+			if(!$this->oDBM->connected)
+			{
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Lerxst on ' . date("F j, Y, g:i a"));
+				
+			}
 		}
 		parent::defaultDBM(); // build default dbm still for use with internal db
 	}
@@ -185,7 +191,6 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
-		trace('ucf authenticateing');
 		$validSSO = false;
 		// required stuff not sent, 
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
@@ -194,7 +199,6 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 			{
 				$time = microtime(true);
-				trace('args set');
 				$sso = new plg_UCFAuth_SsoHash(AppCfg::SSO_SECRET);
 				$sso_req = $sso->getSsoInParametersFromRequest();
 				trace($sso_req);
@@ -202,7 +206,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 				{
 					if($sso->validateSSOHash($sso_req))
 					{
-						trace('sso validated');
+						trace('sso validated', true);
 						$validSSO = true;
 						$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
 					}
@@ -210,7 +214,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 				//catch exception
 				catch(Exception $e)
 				{
-					trace($e);
+					trace($e, true);
 				}
 				core_util_Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'\n");
 			}
@@ -219,7 +223,6 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		if($this->validateUsername($requestVars['userName']) !== true) return false;
 		if($validSSO == false && $this->validatePassword($requestVars['password']) !== true) return false;
 		
-		trace('begin auth');
 		// begin authentication
 		
 		// create/update the user with the external database
@@ -236,6 +239,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			// if they are valid, allow them in
 			if($validSSO === true || $checkPassword['success'])
 			{
+				trace("$user->login logged in", true);
 				$this->storeLogin($user->userID);
 				$this->internalUser = $user;
 				return true;
@@ -264,6 +268,8 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			$ds = @ldap_connect(AppCfg::LDAP);
 			if (!$ds)
 			{
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('LDAP Connection Failure', 'Failed to connect to LDAP on ' . date("F j, Y, g:i a"));
 				trace('connecting to ldap failed', true);
 			}
 			else
@@ -275,6 +281,8 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		}
 		catch(Exception $e)
 		{
+			$NM = nm_los_NotificationManager::getInstance();
+			$NM->sendCriticalError('Oracle DB Connection Failure', 'LDAP Threw an Error ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
 			trace('ldap threw and exception', true);
 			trace($e);
 		}
@@ -300,8 +308,10 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			}
 			catch(Exception $e)
 			{
-				trace('webservice threw and exception', true);
-				trace($e);
+				$NM = nm_los_NotificationManager::getInstance();
+				$NM->sendCriticalError('AD Web Service Failure', 'Failed to connect to the AD Web Service via soap on ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
+				trace('webservice threw an exception', true);
+				trace($e, true);
 			}
 
 		}
@@ -433,15 +443,13 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		// look for user in external data
 		if($externalUser = $this->getUCFUserData($userName))
 		{
-			trace('extern found');
 			if($userID = $this->getUIDforUsername($userName))
 			{
 				// update internal record
 				if($user = $this->fetchUserByID($userID))
 				{
-					trace('intern found');
 					// update user data changes
-					if($externalUser->{cfg_plugin_AuthModUCF::FIRST} != $user->first || trim($externalUser->{cfg_plugin_AuthModUCF::MIDDLE}) != trim($user->mi) || $externalUser->{cfg_plugin_AuthModUCF::LAST} != $user->last || $externalUser->{cfg_plugin_AuthModUCF::EMAIL} != $user->email){
+					if($externalUser->{cfg_plugin_AuthModUCF::FIRST} != $user->first || substr(trim($externalUser->{cfg_plugin_AuthModUCF::MIDDLE}), 0, 1) != trim($user->mi) || $externalUser->{cfg_plugin_AuthModUCF::LAST} != $user->last || $externalUser->{cfg_plugin_AuthModUCF::EMAIL} != $user->email){
 						trace('updating user info: ' . $user->mi .'='. $externalUser->{cfg_plugin_AuthModUCF::MIDDLE} .','. $user->first .'='. $externalUser->{cfg_plugin_AuthModUCF::FIRST}.','.$user->last .'='. $externalUser->{cfg_plugin_AuthModUCF::LAST}.','.$user->email .'='. $externalUser->{cfg_plugin_AuthModUCF::EMAIL});
 						// external record differs from ours, update ours to match the external data
 						$user->mi = $externalUser->{cfg_plugin_AuthModUCF::MIDDLE};
@@ -459,7 +467,6 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			}
 			else
 			{
-				trace('new intern');
 				// create internal record
 				$created = $this->createNewUser($userName, $externalUser->{cfg_plugin_AuthModUCF::FIRST}, $externalUser->{cfg_plugin_AuthModUCF::LAST}, $externalUser->{cfg_plugin_AuthModUCF::MIDDLE}, $externalUser->{cfg_plugin_AuthModUCF::EMAIL}, array());
 				if(!$created['success'])
@@ -469,7 +476,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 				}
 				else
 				{
-					trace('intern created');
+					trace("creating new internal user $userName" , true);
 					// load user data from db
 					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
 					{
@@ -504,13 +511,10 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		$this->updateNIDChanges(); //  update internal nids if needed
 		
 		// try faculty first
-		trace('searching for ' . $userName);
 		$q = $this->oDBM->querySafe("Select * FROM ".cfg_plugin_AuthModUCF::TABLE_EMPLOYEE." WHERE ".cfg_plugin_AuthModUCF::NID." = '?'", $userName);
-		trace("Select * FROM ".cfg_plugin_AuthModUCF::TABLE_EMPLOYEE." WHERE ".cfg_plugin_AuthModUCF::NID." = '?'");
 		if($r = $this->oDBM->fetch_obj($q))
 		{
 			$r->isCreator = true;
-			trace('employee found');
 			$return = $this->trimArray($r);
 		}
 		else
@@ -520,7 +524,6 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			if($r = $this->oDBM->fetch_obj($q))
 			{
 				$r->isCreator = false;
-				trace('student found');
 				$return =  $this->trimArray($r);
 			}
 		}
@@ -531,8 +534,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			//store in memcache
 			core_util_Cache::getInstance()->setModUCFExternalUser($userName, $return);
 		}
-		trace('found?');
-		trace($return);
+		trace($return ? "$userName found, employee:$r->isCreator" : "$userName not found");
 		return $return;
 	}
 	
@@ -593,7 +595,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 						// user shouldnt be LibraryUser, but is, remove
 						return $RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(cfg_core_Role::EMPLOYEE_ROLE));
 					}
-				}				
+				}
 			}
 		}
 	}
@@ -633,6 +635,8 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 
 	public function updateNIDChanges($force=false)
 	{
+		$total = 0;
+		$updated = 0;
 		// TODO: remove memcache for any updated users
 		$this->defaultDBM();
 		if(!$this->oDBM->connected || !$this->DBM->connected)
@@ -649,8 +653,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 			$now = getdate();
 			if($r->{cfg_core_Temp::VALUE} > mktime(0,0, 0, $now['mon'], $now['mday'], $now['year']) && $force == false)
 			{
-				trace('update already run');
-				return;
+				return array('updated' => $updated, 'total' => $total);
 			}
 			// convert to string for comparison with oracle
 			$lastUpdate = strftime("%d-%b-%y", $r->{cfg_core_Temp::VALUE});
@@ -659,16 +662,17 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		// get all updates since last update
 		if($q = $this->oDBM->query("SELECT * FROM ".cfg_plugin_AuthModUCF::TABLE_NID." WHERE ".cfg_plugin_AuthModUCF::NID_CHANGE_DATE." >= '$lastUpdate'")) // no need for querySafe
 		{ 
-			
+
 			while($r = $this->oDBM->fetch_obj($q))
 			{
+				$total++;
 				// the latest update date will be first, lets keep track of it in case the EFFDT doesn't match up with every day
 				// update each NID
 				if($q2 = $this->DBM->querySafe("UPDATE ".cfg_plugin_AuthModUCF::TABLE." SET ".cfg_plugin_AuthModUCF::USER_NAME."='?' WHERE ".cfg_plugin_AuthModUCF::USER_NAME."='?' LIMIT 1", $r->{cfg_plugin_AuthModUCF::NEW_NID}, $r->{cfg_plugin_AuthModUCF::OLD_NID}))
 				{
 					if($this->DBM->affected_rows($q2) != 0)
 					{
-						
+						$updated++;
 						core_util_Cache::getInstance()->clearUserByID($userID);
 						trace('NID changed: ' . $r->{cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{cfg_plugin_AuthModUCF::NEW_NID}, true);
 					}  
@@ -694,6 +698,7 @@ class plg_UCFAuth_UCFAuthModule extends core_auth_AuthModule
 		{
 			$q = $this->DBM->query("UPDATE ".cfg_core_Temp::TABLE." SET ".cfg_core_Temp::VALUE."='". time() ."' WHERE ".cfg_core_Temp::ID."='".cfg_plugin_AuthModUCF::COL_EXTERNAL_SYNC_NAME."' ");
 		}
+		return array('updated' => $updated, 'total' => $total);
 	}
 	public function requestPasswordReset($userName, $email, $returnURL)
 	{

@@ -2,7 +2,7 @@
 class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 {
 
-	const PUBLIC_FUNCTION_LIST = ''; // dont allow any direct calls
+	const PUBLIC_FUNCTION_LIST = 'syncFailedInstanceScores'; // dont allow any direct calls
 	private static $instance;
 	static public function getInstance()
 	{
@@ -24,6 +24,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	 */
 	protected function send($url, $postVars=false)
 	{
+		trace('Sending HTTPRequest', true);
 		try
 		{
 			$request = new HttpRequest($url, HTTP_METH_POST);
@@ -35,8 +36,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		}
 		catch(Exception $e)
 		{
-		 	core_util_Error::getError(1, $e->getMessage());
-			return array('responseCode' =>  0, 'body' => '');
+			return array('responseCode' =>  0, 'body' => $e->getMessage());
 		}
 		return array('responseCode' =>  $request->getResponseCode(), 'body' => $request->getResponseBody());
 	}
@@ -137,13 +137,22 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		
 		$result = $this->send($REQUESTURL);
-	
-		// check for http response code of 200
+		// check for http response code of 200, TRY AGAIN if so
 		if($result['responseCode'] != 200)
 		{
-			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+			// log error
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
+			trace('HTTP FAILURE ' . $REQUESTURL, true);
+			sleep(1); 
+			
+			// Send the score set request again
+			$result = $this->send($REQUESTURL);
+			if($result['responseCode'] != 200)
+			{
+				return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
+			}
 		}
-	
+		
 		$response = $this->decodeJSON($result['body']);
 		
 		$courses = $response->data;
@@ -325,11 +334,23 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		$postVars = array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName);
 		
 		$result = $this->send($REQUESTURL, $postVars);
-	
-		// check for http response code of 200
+		
+		// check for http response code of 200, TRY AGAIN if so
 		if($result['responseCode'] != 200)
 		{
-			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+			// log error
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
+			trace('HTTP FAILURE ' . $REQUESTURL, true);
+			trace($postVars, true);
+
+			sleep(1); 
+			
+			// Send the score set request again
+			$result = $this->send($REQUESTURL, $postVars);
+			if($result['responseCode'] != 200)
+			{
+				return array('columnID' => 0, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
+			}
 		}
 	
 		$response = $this->decodeJSON($result['body']);
@@ -395,7 +416,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			if(!$r = $this->DBM->fetch_obj($q))
 			{
 				// WHA! No column info availible
-				trace("No column info availible: $instID, $studentUserID, $score", true);
+				trace("No column info available: $instID, $studentUserID, $score", true);
 				return false;
 			}
 			
@@ -405,45 +426,50 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
 			$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
 			
-			$currentUserID = $AM->getSessionUserID();
-			$currentNID = $AM->getUserName($currentUserID);
-			if(!$studentNID = $AM->getUserName($studentUserID))
+			if($columnID > 0 && $sectionID > 0 && isset($instructorNID))
 			{
-				// OH NOOS!  student user cant be found
-				trace("Couldn't locate the student to send score: $instID, $studentUserID, $score", true);
-				return false;
-			}
-			// student must be a NID user
-			if(!$this->isNIDAccount($studentUserID))
-			{
-				trace("Student isnt a NID user: $instID, $studentUserID, $score", true);
-				return false;
-			}
-			
-			// if studentUserID isnt current user, make sure the current user has rights to the instance
-			// this will either have to be called by the user
-			if($studentUserID != $currentUserID)
-			{
-				$IM = nm_los_InstanceManager::getInstance();
-				if(!$IM->userCanEditInstance($currentUserID, $instID))
+				$currentUserID = $AM->getSessionUserID();
+				$currentNID = $AM->getUserName($currentUserID);
+				if(!$studentNID = $AM->getUserName($studentUserID))
 				{
-					return core_util_Error::getError(4);
+					// OH NOOS!  student user cant be found
+					trace("Couldn't locate the student to send score: $instID, $studentUserID, $score", true);
+					return false;
 				}
-			}
-			
-			// Send the score set request
-			$result = $this->sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score);
-			
-			// log the result
-			$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+				// student must be a NID user
+				if(!$this->isNIDAccount($studentUserID))
+				{
+					trace("Student isnt a NID user: $instID, $studentUserID, $score", true);
+					return false;
+				}
 
-			return $result;
+				// if studentUserID isnt current user, make sure the current user has rights to the instance
+				// this will either have to be called by the user
+				if($studentUserID != $currentUserID)
+				{
+					$IM = nm_los_InstanceManager::getInstance();
+					if(!$IM->userCanEditInstance($currentUserID, $instID))
+					{
+						return core_util_Error::getError(4);
+					}
+				}
+				
+				// Send the score set request
+				$result = $this->sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score);
+				// log the result
+				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+				
+				return $result;
+			}
+			// no need to send the score - the column/section id's aren't set
+			return false;
 		}
 		else // user isnt logged in
 		{
 			return core_util_Error::getError(1);
 		}
 	}
+	
 	
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{		
@@ -454,10 +480,22 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		
 		$result = $this->send($REQUESTURL, $postVars);
 	
-		// check for http response code of 200
+		// check for http response code of 200, TRY AGAIN if so
 		if($result['responseCode'] != 200)
 		{
-			return array('courses' => array(), 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'])));
+			// log error
+			core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
+			trace('HTTP FAILURE ' . $REQUESTURL, true);
+			trace($postVars, true);
+
+			sleep(1); 
+			
+			// Send the score set request again
+			$result = $this->send($REQUESTURL, $postVars);
+			if($result['responseCode'] != 200)
+			{
+				return array('scoreSent' => false, 'errors' => array(core_util_Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
+			}
 		}
 	
 		$response = $this->decodeJSON($result['body']);
@@ -474,13 +512,164 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
 	
+	/********************* PUBLICLY AVAILIBLE FROM APP API *******************/
+	public function syncFailedInstanceScores($instID)
+	{
+		
+		$AM = core_auth_AuthManager::getInstance();
+		// logged in
+		if($AM->verifySession() === true)
+		{
+			// invalid instID value
+			if(!nm_los_Validator::isPosInt($instID))
+			{
+				trace($instID);
+				return core_util_Error::getError(2);
+			}
+			
+			// everything is valid
+			$IM = nm_los_InstanceManager::getInstance();
+			// user has rights
+			if($IM->userCanEditInstance($AM->getSessionUserID(), $instID))
+			{
+				$total = 0;
+				$updated = 0;
+				// attempt to push every score from the instance that hasnt been.
+				// get the sync failure queue
+				$sql = "SELECT
+							M.*,
+							L.".cfg_plugin_UCFCourses::STUDENT.",
+							L.".cfg_plugin_UCFCourses::SCORE.",
+							L.".cfg_plugin_UCFCourses::ATTEMPT."
+						FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
+						JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
+						ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
+						WHERE
+							L.".cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+							AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1'
+							AND L.".cfg_obo_Instance::ID." = '?' ";
+
+				$q = $this->DBM->querySafe($sql, $instID);
+				while($r = $this->DBM->fetch_obj($q))
+				{
+					$total++;
+					$instID = $r->{cfg_obo_Instance::ID};
+					$instructor = $AM->fetchUserByID($r->{cfg_core_User::ID});
+					$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+					$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
+					$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+					$student = $AM->fetchUserByID($r->{cfg_plugin_UCFCourses::STUDENT});
+					$score = $r->{cfg_plugin_UCFCourses::SCORE};
+					$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
+
+					$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+					// log the result and store status in db
+					$this->logScoreSet($instID, $AM->getSessionUserID(), $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+					// FAILED!, increment the attempt counter and send an email if its at the limit
+					if($result['scoreSent'] == true)
+					{
+						$updated++;
+					}
+				}
+				return array('updated' => $updated, 'total' => $total);
+			}
+		}
+		return core_util_Error::getError(4);
+	}
+	
+	public function sendFailedScoreSetRequests($limit=10)
+	{
+		$updated = 0;
+		$total = 0;
+		$attemptLimit = 5;
+		
+		// get the sync failure queue
+		$sql = "SELECT
+					M.*,
+					L.".cfg_plugin_UCFCourses::STUDENT.",
+					L.".cfg_plugin_UCFCourses::SCORE.",
+					L.".cfg_plugin_UCFCourses::ATTEMPT."
+				FROM ".cfg_plugin_UCFCourses::LOG_TABLE." AS L
+				JOIN ".cfg_plugin_UCFCourses::MAP_TABLE." AS M
+				ON L.".cfg_obo_Instance::ID." = M.".cfg_obo_Instance::ID."
+				WHERE
+					L.".cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+					AND L.".cfg_plugin_UCFCourses::SUCCESS." != '1'
+					AND L.".cfg_plugin_UCFCourses::ATTEMPT." < $attemptLimit
+				LIMIT $limit";
+
+		$q = $this->DBM->querySafe($sql);
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$total++;
+			// grab all the info
+			$AM = core_auth_AuthManager::getInstance();
+			
+			$instID = $r->{cfg_obo_Instance::ID};
+			$instructor = $AM->fetchUserByID($r->{cfg_core_User::ID});
+			$sectionID = $r->{cfg_plugin_UCFCourses::MAP_SECTION_ID};
+			$columnID = $r->{cfg_plugin_UCFCourses::MAP_COL_ID};
+			$columnName = $r->{cfg_plugin_UCFCourses::MAP_COL_NAME};
+			$student = $AM->fetchUserByID($r->{cfg_plugin_UCFCourses::STUDENT});
+			$score = $r->{cfg_plugin_UCFCourses::SCORE};
+			$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
+			
+			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+			trace($result);
+			// log the result and store status in db
+			$this->logScoreSet($instID, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+			// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
+			if($result['scoreSent'] != true)
+			{
+				$attempts++;
+				if($attempts >= $attemptLimit)
+				{
+					$IM = nm_los_InstanceManager::getInstance();
+					$instData = $IM->getInstanceData($instID);
+					$NM = nm_los_NotificationManager::getInstance();
+					$NM->sendScoreFailureNotice($instructor, $student, $instData->courseID);
+				}
+			}
+			// Increment success counter
+			else
+			{
+				$updated++;
+			}
+		}
+		return array('updated' => $updated, 'total' => $total);
+	}
+	
+	
 	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
 	{
 		$time = time();
 		core_util_Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
-		$sql = "INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE." SET ".cfg_obo_Instance::ID." = '?', ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::STUDENT." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?', ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::SUCCESS." ='?'
-		ON DUPLICATE KEY UPDATE ".cfg_core_User::ID." = '?', ".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::TIME." = '?', ".cfg_plugin_UCFCourses::SUCCESS." = '?'";
-		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $score, $time, $success);
+		// insert new row, or update with current time, score, and incriment attempts
+		// NOTE that attempts are only incrimented if the row exists AND the score is the same.  If the score changes, we reset the attempts
+		$sql = "
+		INSERT INTO ".cfg_plugin_UCFCourses::LOG_TABLE."
+		SET
+			".cfg_obo_Instance::ID." = '?',
+			 ".cfg_core_User::ID." = '?',
+			 ".cfg_plugin_UCFCourses::STUDENT." = '?',
+			 ".cfg_plugin_UCFCourses::TIME." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_SECTION_ID." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_COL_ID." = '?',
+			 ".cfg_plugin_UCFCourses::MAP_COL_NAME." = '?',
+			 ".cfg_plugin_UCFCourses::SCORE." = '?',
+			 ".cfg_plugin_UCFCourses::SUCCESS." ='?',
+			".cfg_plugin_UCFCourses::ATTEMPT." = 0
+		ON DUPLICATE KEY
+			UPDATE
+				".cfg_core_User::ID." = '?',
+				".cfg_plugin_UCFCourses::TIME." = '?',
+				".cfg_plugin_UCFCourses::SUCCESS." = '?',
+				".cfg_plugin_UCFCourses::ATTEMPT." = IF(".cfg_plugin_UCFCourses::SCORE." = '?', ".cfg_plugin_UCFCourses::ATTEMPT." + 1, '0'),
+				".cfg_plugin_UCFCourses::SCORE." = '?'
+				";
+		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $time, (int)$success, $score, $score);
 	}
 	
 	public function getScoreLogsForInstance($instID)
