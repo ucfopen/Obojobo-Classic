@@ -329,6 +329,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function sendCreateColumnRequest($NID, $sectionID, $columnName)
 	{
+		$columnName = trim($columnName);
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/create?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 
 		$postVars = array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName);
