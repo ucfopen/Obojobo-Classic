@@ -133,7 +133,7 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function sendGetCourseRequest($NID)
 	{
-		//$NID = 'wink';
+		$NID = 'wink';
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/client/'.$NID.'/instructor/sections?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		
 		$result = $this->send($REQUESTURL);
