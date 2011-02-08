@@ -19,7 +19,7 @@ $stats = array();
 
    // Count completed Assessments
    $stats[] = array ('name' => '1_CountCompletedAssessments', 'value'=>"SELECT COUNT(*) AS COMPLETED_ASSESSMENTS FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
-
+	$stats[] = array ('name' => '1a_CountCompletedAssessments', 'value'=>"SELECT COUNT(DISTINCT A.".cfg_obo_Attempt::ID.") AS COMPLETED_ASSESSMENTS FROM ".cfg_obo_Attempt::TABLE." AS A JOIN ".cfg_obo_LO::TABLE." AS O ON  O.".cfg_obo_LO::AGROUP." = A.".cfg_obo_QGroup::ID." WHERE ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
    // Number of scored Questions
    $stats[] = array ('name' => '2_NumberOfScoredQuestions', 'value'=>"SELECT COUNT(*) AS ANSWERED_QUESTIONS FROM ".cfg_obo_Score::TABLE." WHERE ".cfg_obo_Answer::ID." !=0 AND ".cfg_obo_Answer::TEXT." != '' AND ".cfg_obo_Attempt::ID." IN (SELECT ".cfg_obo_Attempt::ID." FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::END_TIME." !='0' AND ".cfg_obo_Attempt::START_TIME." >   1214193600 )");
 
@@ -38,13 +38,13 @@ $stats = array();
    $stats[] = array ('name' => '6_AverageFileSize', 'value'=>"SELECT AVG(".cfg_obo_Media::SIZE.") as SIZE_IN_BYTES  FROM ".cfg_obo_Media::TABLE." WHERE ".cfg_obo_Media::SIZE." !=0");
 
    // Answers with Feedback
-   $stats[] = array ('name' => '7_AnswersWithFeedback', 'value'=>"SELECT COUNT(*) AS Q_WITH_FEEDBACK FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_FEEDBACK." != ''");
+//   $stats[] = array ('name' => '7_AnswersWithFeedback', 'value'=>"SELECT COUNT(*) AS Q_WITH_FEEDBACK FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_FEEDBACK." != ''");
 
    //Ave length of feedback (in characters)
-   $stats[] = array ('name' => '8_AveCharLengthOfFeedback', 'value'=>"SELECT AVG(len) AS AV_FEEDBACK_LENGTH FROM (SELECT CHAR_LENGTH(".cfg_obo_Question::MAP_ANS_FEEDBACK.") AS len  FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_FEEDBACK." != '') AS LENGTHS");
+//   $stats[] = array ('name' => '8_AveCharLengthOfFeedback', 'value'=>"SELECT AVG(len) AS AV_FEEDBACK_LENGTH FROM (SELECT CHAR_LENGTH(".cfg_obo_Question::MAP_ANS_FEEDBACK.") AS len  FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_FEEDBACK." != '') AS LENGTHS");
 
    //Percent of answers with partial values
-   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
+//   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".cfg_obo_Question::MAP_ANS_TABLE." WHERE ".cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
 
    // Total Page Views (content and questions)
    $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS FROM ".cfg_obo_Track::TABLE." WHERE ".cfg_obo_Track::TYPE." ='nm_los_tracking_PageChanged' AND ".cfg_obo_Track::TIME." > 1214193600");
@@ -191,6 +191,7 @@ $stats[] = array ('name' => '46_StudentsScoresByInstance', 'value' => "SELECT  L
 
 
  
+
 $stats[] = array ('name' => '50_MasterAssessmentAvoidingPlagiarism1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(4373, $DBM));
 
 $stats[] = array ('name' => '51_MasterAssessmentCreatinSearchStrategy1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(4408, $DBM));
@@ -202,8 +203,6 @@ $stats[] = array ('name' => '53_MasterAssessmentEvaluatingWebSites2', 'value'=> 
 $stats[] = array ('name' => '54_PlayerVersionByMonth', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".cfg_obo_ComputerData::TIME."), '%m-%Y') AS DATE, COUNT(".cfg_obo_ComputerData::VER.") AS VISITS, SUBSTRING(".cfg_obo_ComputerData::VER.", 5) AS VERSIONS FROM ".cfg_obo_ComputerData::TABLE." WHERE ".cfg_obo_ComputerData::TIME." != '0' AND ".cfg_obo_ComputerData::IP." != '127.0.0.1' AND ".cfg_obo_ComputerData::IP." != '10.173.87,90' GROUP BY DATE, VERSIONS ORDER BY DATE");
 
 $stats[] = array ('name' => '55_SystemHitsByUser', 'value'=>"SELECT COUNT(".cfg_obo_ComputerData::TABLE.".".cfg_core_User::ID.") AS VISITS, ".cfg_core_User::LAST.", ".cfg_core_User::FIRST.", FROM_UNIXTIME(".cfg_core_User::CREATED_TIME.") AS CREATED, FROM_UNIXTIME(".cfg_core_User::LOGIN_TIME.") AS LAST_LOGIN FROM ".cfg_core_User::TABLE.", ".cfg_obo_ComputerData::TABLE." WHERE ".cfg_obo_ComputerData::TABLE.".".cfg_core_User::ID." != '0' AND ".cfg_core_User::TABLE.".".cfg_core_User::ID." = ".cfg_obo_ComputerData::TABLE.".".cfg_core_User::ID."  GROUP BY ".cfg_obo_ComputerData::TABLE.".".cfg_core_User::ID." ORDER BY  VISITS DESC, ".cfg_core_User::LAST.", ".cfg_core_User::FIRST);
-
-//$stats[] = array ('name' => 'Special_InstanceAssessment_Copyright_and_Fair_Use_in_Online_Courses', 'value'=> 'getQuestionAnswersByInstance' , 'args' => array(471, $DBM));   
 
 $stats[] = array ('name' => '56_MasterAssessmentEvaluatingWebSites3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(7811, $DBM));
 
@@ -221,9 +220,33 @@ $stats[] = array ('name' => '62_MasterAssessmentCitingSourcesUsintMLA2', 'value'
 
 $stats[] = array ('name' => '63_MasterAssessmentCitingSourcesUsintAPA2', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(7802, $DBM));
 
-$stats[] = array ('name' => '64_MasterAssessmentAvoidingPlagiarism2', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(7792, $DBM));
+$stats[] = array ('name' => '64_MasterAssessmentAvoidingPlagiarism3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13836, $DBM));
 
 $stats[] = array ('name' => '65_MasterAssessmentRecognizingResearchStudy2', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(7711, $DBM));
+
+$stats[] = array ('name' => '66_MasterAssessmentCreatinSearchStrategy3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13810, $DBM));
+
+$stats[] = array ('name' => '67_MasterAssessmentCitingSourcesUsintMLA3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13832, $DBM));
+
+$stats[] = array ('name' => '68_MasterAssessmentEvaluatingWebSites5', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13848, $DBM));
+
+$stats[] = array ('name' => '69_MasterAssessmentFocusingInformationSearch2', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13849, $DBM));
+
+$stats[] = array ('name' => '70_MasterAssessmentMaximizingGoogleScholarSearches3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13851, $DBM));
+
+$stats[] = array ('name' => '71_MasterAssessmentCitingSourcesUsintAPA3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13830, $DBM));
+
+$stats[] = array ('name' => '72_MasterAssessmentRecognizingResearchStudy3', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13853, $DBM));
+
+$stats[] = array ('name' => '73_MasterAssessmentRefWorks1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14303, $DBM));
+
+$stats[] = array ('name' => '74_MasterAssessmentUnderstandingTheInformationCycle1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14315, $DBM));
+
+$stats[] = array ('name' => '75_MasterAssessmentSelectingArticles1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13887, $DBM));
+
+$stats[] = array ('name' => '76_MasterAssessmentLiteratureReview1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14427, $DBM));
+
+
 
 $startTime = 1259647200;
 $endTime = time();
