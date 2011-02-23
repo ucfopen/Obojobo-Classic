@@ -474,6 +474,12 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 	
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{		
+		
+		// Check to see if the instructor is the student, if it is, just claim failure
+		if($instructorNID == $studentNID)
+		{
+			return array('scoreSent' => false, 'errors' => array());
+		}
 		// Begin the service request
 		$REQUESTURL = AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.AppCfg::UCFCOURSES_APP_KEY;
 		
@@ -617,12 +623,11 @@ class plg_UCFCourses_UCFCoursesAPI extends core_plugin_PluginAPI
 			$attempts = $r->{cfg_plugin_UCFCourses::ATTEMPT};
 			
 			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
-			trace($result);
 			// log the result and store status in db
 			$this->logScoreSet($instID, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 
 			// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
-			if($result['scoreSent'] != true)
+			if($result['scoreSent'] != true && $instructor->login != $student->login)
 			{
 				$attempts++;
 				if($attempts >= $attemptLimit)

@@ -15,9 +15,8 @@ class cfg_obo_Instance
 	const SCORE_METHOD_MEAN = 'm';
 	const SCORE_METHOD_RECENT = 'r';
 	const SCORE_IMPORT = 'allowScoreImport';
-	
-	const DELETED_TABLE = 'obo_deleted_instances';
-	const DELETED_SCORE_DATA = 'scoreData';
+	const DELETED = 'deleted';
+
 
 }
 ?>

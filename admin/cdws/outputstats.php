@@ -64,10 +64,10 @@ $stats = array();
    $stats[] = array ('name' => '15_NumberOfAssessmentSessionsStarted', 'value'=>"SELECT COUNT(*) AS ASSESSMENT_STARTED_COUNT FROM ".cfg_obo_Attempt::TABLE." WHERE ".cfg_obo_QGroup::ID." IN (SELECT ".cfg_obo_LO::AGROUP." FROM ".cfg_obo_LO::TABLE.") AND ".cfg_obo_Attempt::START_TIME." > 1214193600");
 
    // Number of instances deleted
-   $stats[] = array ('name' => '16_NumberOfInstancesDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_INST_COUNT FROM ".cfg_obo_Instance::DELETED_TABLE." WHERE 1");
+   $stats[] = array ('name' => '16_NumberOfInstancesDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_INST_COUNT FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::DELETED."  = '1'");
 
    // Number of master objects deleted
-   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM ".cfg_obo_LO::DEL_TABLE." WHERE 1");
+   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM ".cfg_obo_LO::TABLE." WHERE  ".cfg_obo_LO::DELETED." = '1' ");
 
    // Total learning object draft saves
    $stats[] = array ('name' => '18_TotalLearningObjectDraftSaves', 'value'=>"SELECT MAX(".cfg_obo_LO::ID.") AS NUM_DRAFT_SAVES FROM ".cfg_obo_LO::TABLE."");
@@ -416,7 +416,8 @@ $output = buildOutput($DBM, $statsToProcess);
 <?php
 
 
-function buildOutput($DBM,  &$statsArray){
+function buildOutput($DBM,  &$statsArray)
+{
 	foreach($statsArray AS &$item)
 	{
 		$fileName = $item['name'];
@@ -425,7 +426,7 @@ function buildOutput($DBM,  &$statsArray){
 		$output = '';
 		// 46 needs a temp table
 		if($item['name'] == '46_StudentsScoresByInstance'){
-			
+
 			$DBM->query("create temporary table tmp_visit (
 				".cfg_obo_Instance::ID." bigint,
 				".cfg_core_User::ID." bigint,
@@ -442,8 +443,6 @@ function buildOutput($DBM,  &$statsArray){
 		$output .= "{$fileName}.csv starting ....";
 		if(function_exists($execValue) && is_array($item['args']))
 		{
-			//$item['args']['statsFileName'] = './stats/'.$fileName.'.csv';
-			//call_user_func_array($execValue, $item['args']);
 			writeCSVFromString('./stats/'.$fileName.'.csv', call_user_func_array($execValue, $item['args']) );
 		}
 		else if(isset($item['logTotalsArrayKey']))
@@ -462,7 +461,7 @@ function buildOutput($DBM,  &$statsArray){
 		}
 		else
 		{
-			writeCSVFromQuery('./stats/'.$fileName.'.csv', $DBM, $execValue);	
+			writeCSVFromQuery('./stats/'.$fileName.'.csv', $DBM, $execValue);
 		}
 		$output .=  "complete (". (microtime(1) - $starttime )."s)\n";
 	}
@@ -470,10 +469,11 @@ function buildOutput($DBM,  &$statsArray){
 	return $output;
 }
 
-function writeCSVFromQuery($fileName, $DBM,  $query){
+function writeCSVFromQuery($fileName, $DBM,  $query)
+{
 	$fh = fopen($fileName, 'w') or die("can't open file");
 	$stringData ='';
-	if($q = $DBM->query($query))
+	if($q = $DBM->querySafeTrace($query, ''))
 	{
 		while($r = $DBM->fetch_assoc($q)){
 			if(!isset($keys)) $keys = '"' . implode('","' , array_keys($r)) . "\"\n";
@@ -490,19 +490,22 @@ function writeCSVFromQuery($fileName, $DBM,  $query){
 }
 
 
-function writeCSVFromString($fileName, $string){
+function writeCSVFromString($fileName, $string)
+{
 	$fh = fopen($fileName, 'w') or die("can't open file");
 	fwrite($fh, $string);
 	fclose($fh);
 }
-function writeCSVFromArray($fileName, $array){
+
+function writeCSVFromArray($fileName, $array)
+{
 	if(is_array($array))
 	{
 		$fh = fopen($fileName, 'w') or die("can't open file");
 		$stringData ='';
 		$keys = '"' . implode('","' , array_keys($array)) . "\"\n";
 		$stringData .= '"' . implode('","' , $array) . "\"\n";
-	
+
 		$stringData = $keys . $stringData;
 		fwrite($fh, $stringData);
 		fclose($fh);
@@ -521,7 +524,6 @@ function getQuestionAnswersByMaster($lo_id, $DBM, $file)
 	$ret = '"INSTANCE_ID","STUDENT_ID","MM_DD_YY","TIME","ATTEMPT_NUMBER","QUESTION_ID","QUIZ_QUESTION_NUMBER","ANSWER_NUMBER","ANSWER_ID_GIVEN","STUDENT_SCORE","CHOSEN_ANSWER_TEXT"'."\n";
 	
 	// find instances of an LO
-//	$qstr = "SELECT * FROM `".cfg_obo_Instance::TABLE."` WHERE `".cfg_obo_LO::ID."` = '?'";
 	$qstr = "SELECT ".cfg_obo_Instance::ID." FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_LO::ID." = '?' UNION DISTINCT SELECT ".cfg_obo_Instance::ID." FROM obo_deleted_instances WHERE ".cfg_obo_LO::ID." = '?'";
 	
 	$q = $DBM->querySafe($qstr, $lo_id, $lo_id);
