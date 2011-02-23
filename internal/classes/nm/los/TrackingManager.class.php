@@ -271,11 +271,6 @@ class nm_los_TrackingManager extends core_db_dbEnabled
 							$loQ = "SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::ID."='?'";
 							$loR = $this->DBM->fetch_obj($this->DBM->querySafe($loQ, $r->{cfg_obo_Instance::ID}));
 							// the inst wasnt in obo_los_instances, check for them in the deleted table
-							if(!is_object($loR))
-							{
-								$loQ = "SELECT ".cfg_obo_LO::ID." FROM ".cfg_obo_Instance::DELETED_TABLE." WHERE ".cfg_obo_LO::ID."='?'";
-								$loR = $this->DBM->fetch_obj($this->DBM->querySafe($loQ, $r->{cfg_obo_Instance::ID}));
-							}
 							if(is_object($loR))
 							{
 								// check to make sure we havn't opened this one before

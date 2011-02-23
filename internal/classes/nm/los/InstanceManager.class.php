@@ -268,7 +268,7 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 	 * @return (LO) Meta learning object or Error
 	 * @author Ian Turgeon
 	 */
-	public function getInstanceData($instID=0)
+	public function getInstanceData($instID=0, $includeDeleted=false)
 	{
 		
 		if( ! (nm_los_Validator::isPosInt($instID) || is_array($instID)) )
@@ -332,7 +332,15 @@ class nm_los_InstanceManager extends core_db_dbEnabled
 		}
 
 		// all cache attempts exhausted, get the remaining from the db
-		$qstr = "SELECT * FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::ID." IN (?)";
+		if($includeDeleted)
+		{
+			$qstr = "SELECT * FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::ID." IN (?)";
+		}
+		else
+		{
+			$qstr = "SELECT * FROM ".cfg_obo_Instance::TABLE." WHERE ".cfg_obo_Instance::ID." IN (?) AND ".cfg_obo_Instance::DELETED." = '0' ";
+		}
+		
 		if(!$q = $this->DBM->querySafe($qstr, $instArr))
 		{
 			return false;
