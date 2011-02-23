@@ -45,8 +45,9 @@ class core_auth_AuthManager extends core_db_dbEnabled
 	{
 		// need to get the user from the authmodule so that we can get the login name or login from the module
 
-		if($authMod = $this->getAuthModuleForUsername($userID))
+		if($authMod = $this->getAuthModuleForUsername($userName))
 		{
+			$userID = $authMod->getUIDforUsername($userName);
 			return $authMod->fetchUserByID($userID);
 		}
 

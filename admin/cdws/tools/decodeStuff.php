@@ -15,7 +15,8 @@
 	<h1>Decode a pasted value</h1>
 	<label for="rawinput">Paste Encoded Data:</label><br><textarea rows="10" cols="100" name="rawinput" id="rawinput"></textarea><br>
 	<label for="base_64_decode">base 64 decode?</label><input type="checkbox" name="base_64_decode" id="base_64_decode"><br>
-	<label for="unserialize">unserialize?</label><input type="checkbox" name="unserialize"  id="unserialize"><br><hr>
+	<label for="unserialize">unserialize?</label><input type="checkbox" name="unserialize"  id="unserialize"><br>
+	<label for="json_encode">Encode in JSON</label><input type="checkbox" name="json_encode" id="json_encode"><br><hr>
 	<label for="get_tracking_value">Retrieve a Log by ID</label><input type="text" name="get_tracking_value" value="" id="get_tracking_value"><br>
 	<label for="page_id">Retrieve a Page by ID</label><input type="text" name="page_id" value="" id="page_id"><br>
 	<label for="question_id">Retrieve a Question by ID</label><input type="text" name="question_id" value="" id="question_id"><br>
@@ -98,6 +99,11 @@
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
 		$data = unserialize($data);
+	}
+	
+	if($_POST['json_encode'])
+	{
+		print_r(json_encode($data));
 	}
 	
 	print_r($data);

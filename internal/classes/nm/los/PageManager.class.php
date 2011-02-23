@@ -58,7 +58,7 @@ class nm_los_PageManager extends core_db_dbEnabled
 	
 	public function mapPageToLO($loID, $pageID, $orderIndex)
 	{
-		$qstr = "INSERT INTO ".cfg_obo_Page::MAP_TABLE." SET ".cfg_obo_LO::ID."='?', ".cfg_obo_Page::ID."='?', ".cfg_obo_Page::MAP_ORDER."='?'";
+		$qstr = "INSERT IGNORE INTO ".cfg_obo_Page::MAP_TABLE." SET ".cfg_obo_LO::ID."='?', ".cfg_obo_Page::ID."='?', ".cfg_obo_Page::MAP_ORDER."='?'";
 		if( !( $this->DBM->querySafe($qstr, $loID, $pageID, $orderIndex) ) )
 		{
 			trace(mysql_error(), true);
