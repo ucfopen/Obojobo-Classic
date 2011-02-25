@@ -59,7 +59,7 @@ class PageManager extends \rocketD\db\DBEnabled
 	
 	public function mapPageToLO($loID, $pageID, $orderIndex)
 	{
-		$qstr = "INSERT INTO ".\cfg_obo_Page::MAP_TABLE." SET ".\cfg_obo_LO::ID."='?', ".\cfg_obo_Page::ID."='?', ".\cfg_obo_Page::MAP_ORDER."='?'";
+		$qstr = "INSERT IGNORE INTO ".\cfg_obo_Page::MAP_TABLE." SET ".\cfg_obo_LO::ID."='?', ".\cfg_obo_Page::ID."='?', ".\cfg_obo_Page::MAP_ORDER."='?'";
 		if( !( $this->DBM->querySafe($qstr, $loID, $pageID, $orderIndex) ) )
 		{
 			trace(mysql_error(), true);
@@ -130,12 +130,7 @@ class PageManager extends \rocketD\db\DBEnabled
 			trace('page does not exist ' . $pageid, true);
 		    return false; // error: page does not exist
 		}
-		$data = base64_decode($r->{\cfg_obo_Page::PAGE_DATA});
-		$data = preg_replace('/11:"nm_los_Page/', '11:"obo\lo\Page', $data);
-		$data = preg_replace('/15:"nm_los_PageItem/', '15:"obo\lo\PageItem', $data);
-		$data = preg_replace('/12:"nm_los_Media/', '12:"obo\lo\Media', $data);
-		$page = unserialize($data);
-//		$page = $this->db_unserialize($r->{\cfg_obo_Page::PAGE_DATA});
+		$page = $this->db_unserialize($r->{\cfg_obo_Page::PAGE_DATA});
 		$page->pageID = $r->{\cfg_obo_Page::ID};
 		
 		return $page;
@@ -189,37 +184,5 @@ class PageManager extends \rocketD\db\DBEnabled
 		
 		return $pages;
 	}
-	
-	protected function getPagesForLOIDNew($loID)
-	{
-		if(!is_numeric($loID) || $loID <= 0)
-		{
-			trace('failed input validation', true);
-			return false;
-		}
-	
-		
-				
-		// try to retrieve from cache first
-		
-		if($pages = \rocketD\util\Cache::getInstance()->getPagesForLOID($loID))
-		{
-			return $pages;
-		}
-
-		$pages = array();
-		$q = $this->DBM->querySafe("SELECT pageData FROM lo_los_pages WHERE ".\cfg_obo_LO::ID."='?'", $loID);
-		if($r = $this->DBM->fetch_obj($q))
-		{
-			$pages = unserialize(base64_decode($r->pageData));
-			
-		}
-	
-		\rocketD\util\Cache::getInstance()->setPagesForLOID($loID, $pages);
-		
-		return $pages;
-	}
-
-
 }
 ?>

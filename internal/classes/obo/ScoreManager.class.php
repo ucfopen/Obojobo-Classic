@@ -338,7 +338,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			$result = array();
 			$i = -1;
 			$lastUID = -1;
-			$attempts;
 
 			// TODO: SYSTEM EVENTS
 
@@ -347,6 +346,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
 
 			$userMan = \rocketD\auth\AuthManager::getInstance();
+
 			while($r = $this->DBM->fetch_obj($q))
 			{
 				// only create new array items for each user
@@ -665,7 +665,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		//Get the scores for each individual question
-		trace('getting answers for attempt: ' . $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'] . ', qGroupID: ' . $qGroupID);
 		
 		$qstr = "SELECT
 					".\cfg_obo_Score::ITEM_ID.", 

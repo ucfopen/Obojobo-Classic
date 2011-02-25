@@ -8,9 +8,8 @@ class Error extends \rocketD\util\Error
 		
 		if(isset($_SESSION['userID']))
 		{
-			\rocketD\util\Log::trace('ERROR ' . $this->getErrorString($this->errorID), true, 2);
+			//\rocketD\util\Log::trace('ERROR ' . $this->getErrorString($this->errorID), true, 2);
 			$trackingMan = \obo\log\LogManager::getInstance();
-			//$trackingMan->track($this);
 		}
 		parent::logError();
 	}
@@ -20,8 +19,10 @@ class Error extends \rocketD\util\Error
 		// TODO: allow system events to register error types
 		
 		
-	    if(!is_numeric($id))
-	        $id = 0;
+		if(!is_numeric($id))
+		{
+			$id = 0;
+		}
 
 		switch($id)
 		{

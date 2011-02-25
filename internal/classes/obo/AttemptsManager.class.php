@@ -663,8 +663,9 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		// TODO: NEED TO USE SYSTEM EVENTS
 		// Send the score to webcourses
+
 		$PM = \rocketD\plugin\PluginManager::getInstance();
-		$PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
 		
 		// Send email responce to student
 		if(\AppCfg::NOTIFY_SCORE == true)
@@ -674,7 +675,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			{
 				
 				$scoreman = \obo\ScoreManager::getInstance();
-				$scores = $scoreman->getScores($instid, $_SESSION['userID']);
+				$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
+
 				
 				$attempts = $scores[0]['attempts'];
 				
@@ -693,7 +695,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				{
 					$attempts = array();
 				}
-				
 				$NM = \obo\util\NotificationManager::getInstance();
 				$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 			}
@@ -902,7 +903,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 	public function useEquivalentAttempt($visitKey)
 	{
 		// first register the visitKey
-		$VM = nm_los_VisitManager::getInstance();
+		$VM = \obo\VisitManager::getInstance();
 		if(!$VM->registerCurrentViewKey($visitKey))
 		{
 			return \rocketD\util\Error::getError(5);
