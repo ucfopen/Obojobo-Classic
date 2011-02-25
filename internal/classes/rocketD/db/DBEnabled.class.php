@@ -19,14 +19,22 @@ class DBEnabled
 		}
 	}
 	
-	protected function db_serialize($obj)
+	public function db_serialize($obj)
 	{
 		return  base64_encode(serialize($obj));
 	}
 
-	protected function db_unserialize($obj)
+	public function db_unserialize($obj)
 	{
-		return unserialize(base64_decode($obj));
+		// TODO: get rid of this - its a temporary crutch to bypass actually updating the database
+		$data = base64_decode($obj);
+		$data = preg_replace('/13:"nm_los_Answer/', '13:"obo\lo\Answer', $data);
+		$data = preg_replace('/15:"nm_los_Question/', '15:"obo\lo\Question', $data);
+		$data = preg_replace('/11:"nm_los_Page/', '11:"obo\lo\Page', $data);
+		$data = preg_replace('/15:"nm_los_PageItem/', '15:"obo\lo\PageItem', $data);
+		$data = preg_replace('/12:"nm_los_Media/', '12:"obo\lo\Media', $data);
+		return unserialize($data);
+		//return unserialize(base64_decode($obj));
 	}
 }
 ?>

@@ -84,124 +84,45 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 		foreach($qgroup->kids as $key => $question)
 		{
 			$questionMan->newQuestion($question); // create the question if the id is 'dirty'
-			
-			// always map the question to the qgroup
-			$qstr = "INSERT INTO ".\cfg_obo_QGroup::MAP_TABLE." SET ".\cfg_obo_QGroup::ID."='?', ".\cfg_obo_QGroup::MAP_CHILD."='?', ".\cfg_obo_QGroup::MAP_ORDER."='?'";
-			if(!($q = $this->DBM->querySafe($qstr, $qgroup->qGroupID, $question->questionID, $key)))
-			{
-				$this->DBM->rollback();
-				return false;
-			}
-			
-			// always store alternate mapping if set
-			if($question->questionIndex != 0)
-			{
-				$qStr = " INSERT INTO ".\cfg_obo_QGroup::MAP_ALT_TABLE." SET ".\cfg_obo_QGroup::ID." = '?', ".\cfg_obo_Question::ID." = '?', ".\cfg_obo_QGroup::MAP_ALT_INDEX." = '?'";
-				if(!$q = $this->DBM->querySafe($qStr, $qgroup->qGroupID, $question->questionID, $question->questionIndex))
-				{
-					$this->DBM->rollback();
-					return false;
-				}
-			}
+			// map the question to this group
+			$this->mapQuestionToGroup($qgroup->qGroupID, $question->questionID, $key, $question->questionIndex);
 		}
 
 		return true;
 	}
 	
-	/**
-	 * Adds a question to the group mapping table
-	 * @param $gid (number) group ID
-	 * @param $cid (number) child ID
-	 * @param $ctype (number) child type (see table at top of source)
-	 * @param $corder (number) child order (0,1,2...)
-	 * @param @crequire (boolean) True = Force question to appear in a bs/br type assessment quiz.
-	 */
-	private function mapQuestion($qgid, $cid, $ctype, $corder)
+	public function mapQuestionToGroup($qgroupID, $questionID, $index, $altIndex=0)
 	{
-		// TODO: remove $ctype - not needed
-		$qstr = "INSERT INTO ".\cfg_obo_QGroup::MAP_TABLE." SET ".\cfg_obo_QGroup::ID."='?', ".\cfg_obo_QGroup::MAP_CHILD."='?', ".\cfg_obo_QGroup::MAP_ORDER."='?'";
-		
-		if(!($q = $this->DBM->querySafe($qstr, $qgid, $cid, $corder)))
+		// map the question to the qgroup
+		$qstr = "INSERT IGNORE INTO ".\cfg_obo_QGroup::MAP_TABLE." SET ".\cfg_obo_QGroup::ID."='?', ".\cfg_obo_QGroup::MAP_CHILD."='?', ".\cfg_obo_QGroup::MAP_ORDER."='?'";
+		if(!($q = $this->DBM->querySafe($qstr, $qgroupID, $questionID, $index)))
 		{
 			$this->DBM->rollback();
 			return false;
 		}
-	}
-	
-	public function getQuizSize($qGroupID)
-	{
-		if(!is_numeric($qGroupID) || $qGroupID <= 0)
-		{
-			trace('failed input validation', true);
-			trace($qGroupID, true);
-			return false;
-		}
 		
-		
-		if( ($qgroup = \rocketD\util\Cache::getInstance()->getQGroup($qGroupID) ) && is_array($qgroup))
+
+		// store alternate mapping if set
+		if($altIndex > 0)
 		{
-			return count($qgroup->kids);
-		}
-		else
-		{
-			$q = $this->DBM->querySafe("SELECT (t1.nonAlts + t2.uniqueAlts) AS quizSize FROM (SELECT COUNT(*) AS nonAlts FROM ".\cfg_obo_QGroup::MAP_TABLE." AS map
-										LEFT JOIN ".\cfg_obo_QGroup::MAP_ALT_TABLE." AS alt
-										ON map.".\cfg_obo_QGroup::MAP_CHILD." = alt.".\cfg_obo_Question::ID."
-										WHERE map.".\cfg_obo_QGroup::ID." = '?' AND alt.".\cfg_obo_QGroup::ID." IS NULL) AS t1, ( SELECT Count( DISTINCT ".\cfg_obo_QGroup::MAP_ALT_INDEX." ) AS uniqueAlts
-						FROM ".\cfg_obo_QGroup::MAP_ALT_TABLE."
-						WHERE ".\cfg_obo_QGroup::ID." = '?') AS t2", $qGroupID, $qGroupID);
-			if($r = $this->DBM->fetch_obj($q))
+			$qStr = " INSERT IGNORE INTO ".\cfg_obo_QGroup::MAP_ALT_TABLE." SET ".\cfg_obo_QGroup::ID." = '?', ".\cfg_obo_Question::ID." = '?', ".\cfg_obo_QGroup::MAP_ALT_INDEX." = '?'";
+			if(!$q = $this->DBM->querySafe($qStr, $qgroupID, $questionID, $altIndex))
 			{
-				return $r->quizSize;
+				$this->DBM->rollback();
+				return false;
 			}
 		}
-		return false;
-	}
-	
-	/**
-	 * Deletes a QuestionGroup from the database
-	 * @param $qgid (number) question group ID
-	 * @return (bool) True if successful, False if incorrect parameter
-	 * @deprecated no one should be able to just delete a question group, most of the deleting is done through deleting an LO
-	 * 
-	 * @todo add some kind of permissions checking here
-	 */
-		// TODO: remove this
-	public function delGroup($qgid = 0)
-	{
-		if(!is_numeric($qgid) || $qgid < 1)
-		{
-			return false;
-		}
-		//Gather up a list of questions to delete
-		$qstr = "SELECT ".\cfg_obo_QGroup::MAP_CHILD." FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' AND ".\cfg_obo_QGroup::MAP_CHILD." NOT IN (
-					SELECT ".\cfg_obo_QGroup::MAP_CHILD." FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."!='?')";
-		
-		$q = $this->DBM->querySafe($qstr, $qgid, $qgid);
-	
-		$qman = \obo\lo\QuestionManager::getInstance();
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$qman->delQuestion($r->{\cfg_obo_QGroup::MAP_CHILD});
-		}
-		//Clean out entries for this group in the mapping table
-		$qstr = "DELETE FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $qgid)))
-		{
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		//Delete the question group
-		$qstr = "DELETE FROM ".\cfg_obo_QGroup::TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' LIMIT 1";
-		if(!($q = $this->DBM->querySafe($qstr, $qgid)))
-		{
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		\rocketD\util\Cache::getInstance()->clearQGroup($qgid);
 		return true;
 	}
+
+	
+	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
+	// private function mapQuestion($qgid, $cid, $ctype, $corder)
+
+	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
+	// public function getQuizSize($qGroupID)
+	
+	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
+	//public function delGroup($qgid = 0){}
 }
 ?>

@@ -95,7 +95,23 @@ class DBConnectionMYSQL extends DBConnection
 		}
 		return $this->query($query);
 	}
-
+	
+	public function querySafeTrace($query)
+	{
+		$args  = func_get_args(); 
+		if(count($args) > 1)
+		{
+		  $query = array_shift($args); // remove first argument and save it as the query
+		  $query = str_replace("?", "%s", $query);
+		  $args = array_map( array($this, 'smartQuote'), $args);
+		  array_unshift($args, $query);
+		  $query = call_user_func_array('sprintf',$args);
+		}
+		trace($query);
+		return $this->query($query);
+	}
+	
+	
 	public function affected_rows()
 	{
 		return @mysql_affected_rows($this->connData->connID);

@@ -215,7 +215,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				$permman = \obo\perms\PermissionsManager::getInstance();
 				$roleMan = \obo\perms\RoleManager::getInstance();
 				
-				$visitMan = nm_los_VisitManager::getInstance();
+				$visitMan = \obo\VisitManager::getInstance();
 				$visitMan->startInstanceView($instID);
 				$visitMan->createVisit($instID);
 
@@ -269,7 +269,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	 * @return (LO) Meta learning object or Error
 	 * @author Ian Turgeon
 	 */
-	public function getInstanceData($instID=0)
+	public function getInstanceData($instID=0, $includeDeleted=false)
 	{
 		
 		if( ! (\obo\util\Validator::isPosInt($instID) || is_array($instID)) )
@@ -332,7 +332,15 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		}
 
 		// all cache attempts exhausted, get the remaining from the db
-		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (?)";
+		if($includeDeleted)
+		{
+			$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (?)";
+		}
+		else
+		{
+			$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (?) AND ".\cfg_obo_Instance::DELETED." = '0' ";
+		}
+
 		if(!$q = $this->DBM->querySafe($qstr, $instArr))
 		{
 			return false;
@@ -457,23 +465,18 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
 		{
-			trace('not su');
 			if(!$roleMan->isLibraryUser())
 			{
-				trace('not lib');
 				return false;
 			}
 			$permman = \obo\perms\PermissionsManager::getInstance();
 			if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $userID) )
 			{
-				trace('no write perms');
 				// check 2nd Perms system to see if they have write or own
 				$pMan = \obo\perms\PermManager::getInstance();
 				$perms = $pMan->getPermsForUserToItem($userID, \cfg_core_Perm::TYPE_INSTANCE, $instID);
-				trace($perms);
 				if(!is_array($perms) || ( !in_array(\cfg_core_Perm::P_WRITE, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms)) )
 				{
-					trace('no extra write perms');
 					return false;
 				}
 			}

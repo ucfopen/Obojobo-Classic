@@ -15,15 +15,15 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Get List of a Users Courses</title>
+	<title>Send Scores that Previously Failed to Send</title>
 	<meta name="generator" content="TextMate http://macromates.com/">
 	<meta name="author" content="Ian Turgeon">
 	<!-- Date: 2011-01-07 -->
 </head>
 <body>
-<h2>List A User's Courses:</h2>
+<h2>Process 10 Score Submissions:</h2>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
-	<label for="nid">NID</label><input type="text" name="nid" value="" id="nid">
+	<input type="hidden" name="nid" value="go" id="nid">
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>
 <pre>
@@ -32,8 +32,7 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 if(!empty($_GET['nid']) )
 {
 	$PM = \rocketD\plugin\PluginManager::getInstance();
-	$result = $PM->callAPI('UCFCourses', 'testOnlyGetCourses', array($_GET['nid']), true);
-	echo $_GET['nid'] . "'s Courses:<br>";
+	$result = $PM->callAPI('UCFCourses', 'sendFailedScoreSetRequests', array(), true);
 	print_r($result);
 }
 

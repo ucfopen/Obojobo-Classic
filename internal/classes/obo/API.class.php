@@ -704,7 +704,7 @@ class API extends \rocketD\db\DBEnabled
 			// require the visitKey if not a content creator
 			if($visitKey != -1)
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -934,7 +934,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -970,7 +970,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -1010,7 +1010,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -1046,7 +1046,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -1365,7 +1365,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -1399,7 +1399,7 @@ class API extends \rocketD\db\DBEnabled
 			
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
@@ -1453,14 +1453,14 @@ class API extends \rocketD\db\DBEnabled
 		{
 			if($this->getSessionValid())
 			{
-				$VM = nm_los_VisitManager::getInstance();
+				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
 				}
 				
 				$this->DBM->startTransaction();
-	            $visitMan = nm_los_VisitManager::getInstance();
+	            $visitMan = \obo\VisitManager::getInstance();
 	            $result = $visitMan->resumeVisit($instID);
 				$this->DBM->commit();
 			}
