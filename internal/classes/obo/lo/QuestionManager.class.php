@@ -65,89 +65,33 @@ class QuestionManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getQuestion($questionID=0, $inc_weight=true)
 	{
-		return $this->getQuestionNew($questionID, $inc_weight);
-	}
-
-
-	protected function getQuestionNew($questionID=0, $inc_weight=true)
-	{
 		$this->defaultDBM();
-		
-			$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Question::TABLE." WHERE ".\cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
-			
-			if( $r = $this->DBM->fetch_obj($q) )
-			{
-				$data = base64_decode($r->questionData);
-				$data = preg_replace('/15:"nm_los_Question/', '15:"obo\lo\Question', $data);
-				$data = preg_replace('/13:"nm_los_Answer/', '13:"obo\lo\Answer', $data);
-				$quest = unserialize($data);
-				if($quest instanceof \obo\lo\Question)
-				{
-					$quest->questionID = $questionID; // the question id isn't set in the serialized data when its inserted into the database
-				}
-			}
-			else
-			{
-				$quest = false;
-			}
-			
-			return $quest;
-	}
 
-	/**
-	 * Adds an existing Answer to a question
-	 * @param $questionID (number) Question ID
-	 * @param $answerID (number) Answer ID
-	 * @param $order (number) The order of the answer in the question (0,1,2...)
-	 * @param $weight (number) The weight of the answer (score someone gets if they select this answer)
-	 * @param $feedback (string) The feedback string that will be shown to the user if they select this answer
-	 */
-	private function addAnswer($questionID, $answerID, $order, $weight, $feedback){
-		$this->defaultDBM();
+		$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Question::TABLE." WHERE ".\cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
 		
-	//	$feedback_safe = mysql_escape_string($feedback);
-
-		$qstr = "INSERT INTO ".\cfg_obo_Question::MAP_ANS_TABLE." SET
-			".\cfg_obo_Question::ID."='?', ".\cfg_obo_Question::MAP_ANS_ORDER."='?', ".\cfg_obo_Question::MAP_ANS_WEIGHT."='?',
-			".\cfg_obo_Answer::ID."='?',
-			".\cfg_obo_Question::MAP_ANS_FEEDBACK."='?'";
-		
-		if( !($q = $this->DBM->querySafe($qstr, $questionID, $order, $weight, $answerID, $feedback)) )
+		if( $r = $this->DBM->fetch_obj($q) )
 		{
-			$this->DBM->rollback();
-			return false;
+			
+			$quest = $this->db_unserialize($r->questionData);
+			
+			if($quest instanceof \obo\lo\Question)
+			{
+				$quest->questionID = $questionID; // the question id isn't set in the serialized data when its inserted into the database
+			}
 		}
+		else
+		{
+			$quest = false;
+		}
+		
+		return $quest;
 	}
+
+	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
+	// private function addAnswer($questionID, $answerID, $order, $weight, $feedback){
 	
-	/**
-	 * Deletes a question from the database
-	 * @param $questionID (number) Question ID
-	 * @return (bool) True if successful, False if incorrect parameter
-	 */
-	public function delQuestion($questionID = 0)
-	{
-		if(!is_numeric($questionID) || $questionID == 0)
-		{
-			return false;
-		}
-		$this->defaultDBM();
-		
-		//Delete media references
-		if( !($q = $this->DBM->querySafe("DELETE FROM ".\cfg_obo_Media::MAP_TABLE." WHERE ".\cfg_obo_Page::ITEM_ID."='?' ", $questionID)) )
-		{
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		//Delete the question
-		if( !($q = $this->DBM->querySafe("DELETE FROM ".\cfg_obo_Question::TABLE." WHERE ".\cfg_obo_Question::ID."='?' LIMIT 1", $questionID)) )
-		{
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		return true;
-	}
+	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
+	// public function delQuestion($questionID = 0)
 
 	/**
 	 * Returns the weight of an answer to a question

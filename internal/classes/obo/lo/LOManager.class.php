@@ -438,7 +438,7 @@ class LOManager extends \rocketD\db\DBEnabled
 				//Check to see if user doesnt have read permissions, if not, they need to be currently visiting this instance
 				if(!$permman->getMergedPerm($this->getRootId($loIDArrOrInt), \cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::READ, $_SESSION['userID']))
 				{
-					$visitMan = nm_los_VisitManager::getInstance();
+					$visitMan = \obo\VisitManager::getInstance();
 					$visit = $visitMan->getVisit($GLOBALS['CURRENT_INSTANCE_DATA']['visitID']);
 					if(false && !$permman->getMergedPerm($visit->instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::READ, $_SESSION['userID'])){
 						// trying a switch to meta instead

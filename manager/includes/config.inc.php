@@ -12,7 +12,7 @@ $database_connection_charset = 'utf8';
 $database_connection_method = 'SET CHARACTER SET';
 $dbase = \AppCfg::DB_MODX_NAME;
 $table_prefix = 'modx_';
-//error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL);
 
 $lastInstallTime = 1279208055;
 

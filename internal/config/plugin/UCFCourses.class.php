@@ -19,6 +19,7 @@ class cfg_plugin_UCFCourses
 	const SUCCESS = 'success';
 	const SCORE = 'score';
 	const TIME = 'createTime';
+	const ATTEMPT = 'attempts';
 	
 }
 ?>

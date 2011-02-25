@@ -25,7 +25,7 @@ class Log
 					{
 						if($len > 2) // called from a class file
 						{
-							self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[0+$increaseBackTraceIndex]['line'].': '.$traceText, false);
+							@self::writeLog($dt[1+$increaseBackTraceIndex]['class'].'->'.$dt[1+$increaseBackTraceIndex]['function'].'#'.$dt[0+$increaseBackTraceIndex]['line'].': '.$traceText, false);
 						}
 						else // called from a script
 						{

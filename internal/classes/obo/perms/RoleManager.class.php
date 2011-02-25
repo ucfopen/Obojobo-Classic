@@ -548,9 +548,9 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 		
 		
-		foreach($users as $keyUser => $userID)
+		foreach($users as $userID)
 		{
-			foreach($roles as $keyRole => $roleName)
+			foreach($roles as $roleName)
 			{
 				//
 				$qstr = "DELETE FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_obo_Role::ID."='?'";
@@ -598,17 +598,13 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		$success = true;
 		
-
-		
-
-		
-		foreach($users as $keyUser => $userID)
+		foreach($users as $userID) // loop through users
 		{
-			foreach($roles as $keyRole => $roleName)
+			foreach($roles as $roleName) // loop through role names
 			{
 				$qstr = "INSERT IGNORE INTO ".\cfg_obo_Role::MAP_USER_TABLE." SET ".\cfg_core_User::ID."='?', ".\cfg_obo_Role::ID."='?'";
 			
-				if(!($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
+				if(!($q = $this->DBM->querySafeTrace($qstr, $userID, $this->getRoleID($roleName))))
 				{
 				    trace(mysql_error(), true);
 					$this->DBM->rollback();

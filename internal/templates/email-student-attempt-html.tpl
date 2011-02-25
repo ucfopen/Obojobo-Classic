@@ -1,18 +1,18 @@
-<html>
-<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#DDD' >
+<html><body><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<body style="font-size:12px;font-family:arial;" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#DDD' >
 
-<STYLE>
- td { font-size:12px; color:#000000; font-family:arial; }
- a { color:#FF0000; color:#FF6600; color:#FF6600; }
-</STYLE>
-
-<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" bgcolor='#DDD' >
+<table width="100%" cellpadding="10" cellspacing="0"  bgcolor='#DDD' >
+<style type=text/css>
+td { font-size:12px; color:#000000; font-family:arial; } a { color:#FF0000;}
+</style>
 <tr>
 <td valign="top" align="center">
 
 <table width="550" cellpadding="0" cellspacing="0">
 <tr>
-<td style="background-color:#66CC00;border-top:0px solid #000000;border-bottom:0px solid #FFF;text-align:right;" align="center"></td>
+<td style="background-color:#FF4647;border-top:0px solid #000000;border-bottom:0px solid #FFF;text-align:right;" align="center"></td>
 </tr>
 
 <tr>
@@ -49,7 +49,7 @@
 <table align="center" border="0" cellspacing="0" cellpadding="0" style="">
 	<tr>
 		<td align="right" style="">
-			<a href="{$loLink}"><img src="{$imgDir}score-confirm-icon.png" width="81" height="61" alt="View Object"></a>
+			<a href="{$loLink}"><img src="{$imgDir}score-confirm-icon.png"  width="81" height="61" alt="View Object"></a>
 		</td>
 		<td align="left" style="color:#2f2f31;padding:10px;font-size:12px;">
 			<ul style="list-style-type:none;padding-left:0px;">

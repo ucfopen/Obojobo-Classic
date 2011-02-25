@@ -185,50 +185,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 		}
 	}
 
-	public function cleanInstances()
-	{
-	   // move ownerless instances to deleted table
-	   // los deleted above
-		$t = microtime(true);
-		$SM = \obo\ScoreManager::getInstance();
-
-		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." NOT IN (SELECT ".\cfg_obo_Perm::ITEM." FROM ".\cfg_obo_Perm::TABLE." WHERE `".\cfg_obo_Perm::TYPE."`='i')";
-		if($q = $this->DBM->query($qstr))
-		{
-			$moveFailed = false;
-			while($r = $this->DBM->fetch_obj($q))
-			{
-				
-				$scoredata = $SM->buildInstanceScoresObject($r->{\cfg_obo_Instance::ID});
-				$scoredata = base64_encode(serialize($scoredata));
-				$qstr = "INSERT INTO ".\cfg_obo_Instance::DELETED_TABLE." SET 
-						".\cfg_obo_Instance::ID." = '?',
-						".\cfg_obo_Instance::TITLE." = '?',
-						".\cfg_obo_LO::ID." = '?',
-						".\cfg_core_User::ID." = '?',
-						".\cfg_obo_Instance::TIME." = '?',
-						".\cfg_obo_Instance::COURSE." = '?',
-						".\cfg_obo_Instance::START_TIME." = '?',
-						".\cfg_obo_Instance::END_TIME." = '?',
-						".\cfg_obo_Instance::ATTEMPT_COUNT." = '?',
-						".\cfg_obo_Instance::SCORE_METHOD." = '?',
-						".\cfg_obo_Instance::SCORE_IMPORT." = '?',
-						".\cfg_obo_Instance::DELETED_SCORE_DATA." = '?'";
-				$moveFailed = $this->DBM->querySafe($qstr, $r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT}, $scoredata);
-			}
-			// only delete the instances if they were succusfully moved to the deleted table
-			if($moveFailed == false)
-			{
-				$qstr = "DELETE FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." NOT IN (SELECT ".\cfg_obo_Perm::ITEM." FROM ".\cfg_obo_Perm::TABLE." WHERE `".\cfg_obo_Perm::TYPE."`='i')";
-				if(! $this->DBM->query($qstr)) // no need for querysafe
-				{
-					$this->DBM->rollback();
-					trace(mysql_error(), true);
-				}
-				trace('time: ' . (microtime(true) - $t) .' moved permless instances :' . $this->DBM->affected_rows(), true);
-			}
-		}
-	}
+	public function cleanInstances(){}
 
 	public function cleanContentPages()
 	{
@@ -459,7 +416,6 @@ class LOSystem extends \rocketD\db\DBEnabled
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_ExtraAttempt::TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_ComputerData::TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Instance::TABLE, $q2);
-			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Instance::DELETED_TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Lock::TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_LO::MAP_AUTH_TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Perm::TABLE, $q2);

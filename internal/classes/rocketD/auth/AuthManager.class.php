@@ -45,8 +45,9 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		// need to get the user from the authmodule so that we can get the login name or login from the module
 
-		if($authMod = $this->getAuthModuleForUsername($userID))
+		if($authMod = $this->getAuthModuleForUsername($userName))
 		{
+			$userID = $authMod->getUIDforUsername($userName);
 			return $authMod->fetchUserByID($userID);
 		}
 
@@ -207,6 +208,11 @@ class AuthManager extends \rocketD\db\DBEnabled
 		}
 	}
 
+	public function getSessionUserID()
+	{
+		return $_SESSION['userID'];
+	}
+
 	/**
 	 * Logs the user out of the system, completely clearing the session variable and destroying the session.
 	 * @param $userID (number) User ID to log out of the system
@@ -278,9 +284,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			$mods = $this->getAllAuthModules();
 			foreach($mods as $authMod)
 			{
-				$AM = call_user_func(array($authMod, 'getInstance'));
-
-				$result = $AM ->createNewUser($usrObj['login'], $usrObj['first'], $usrObj['last'], $usrObj['mi'], $usrObj['email'], $optionalVars);
+				$result = $authMod->createNewUser($usrObj['login'], $usrObj['first'], $usrObj['last'], $usrObj['mi'], $usrObj['email'], $optionalVars);
 				if($result['success'])
 				{
 					return true;
@@ -311,16 +315,25 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * @return (string) The formatted name
 	 * @return (bool) False if incorrect $userID
 	 */
-	public function getName($userID)
+	public function getName($userIDorUserObject)
 	{
-		if(!\obo\util\Validator::isPosInt($userID))
+		// argument is user object
+		if($userIDorUserObject instanceof \rocketD\auth\User)
 		{
-			
-	       
-	        return \rocketD\util\Error::getError(2);
+			$user = $userIDorUserObject;
+		}
+		// argument is userid
+		else if(\rocketD\util\Validator::isPosInt($userIDorUserObject))
+		{
+			$user = $this->fetchUserByID($userIDorUserObject);
+		}
+		// argument is invalid
+		else
+		{
+			return \rocketD\util\Error::getError(2);
+
 		}
 
-		$user = $this->fetchUserByID($userID);
 		if($user)
 		{
 			$name = $user->first . ' ';
@@ -376,6 +389,12 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 */
 	public function changePassword($oldpass, $newpass)
 	{
+		// start session if it hasnt been
+		if(!headers_sent() && !isset($_SESSION))
+		{
+			session_name(\AppCfg::SESSION_NAME);
+			session_start();
+		}
 		if($authMod = $this->getAuthModuleForUserID($_SESSION['userID']))
 		{
 			// does the authmod allow changing passwords?
@@ -454,20 +473,16 @@ class AuthManager extends \rocketD\db\DBEnabled
 		{
 			foreach($authModList AS $authMod)
 			{
-				$authModule = $authMod::getInstance(); // requires 5.3
-				//$authModule = call_user_func(array($authMod, 'getInstance'));  
-
 				// attempt to authenticate each in order
-				if($authModule->authenticate($requestVars))
+				if($authMod->authenticate($requestVars))
 				{
 					// keep record of the authmod used
 					if($_SESSION['passed'] === true)
 					{
 						//now make sure their password is up to date
-						$user =  $authModule->getUser();
-						if(!$authModule->isPasswordCurrent($user->userID))
+						$user = $authMod->getUser();
+						if(!$authMod->isPasswordCurrent($user->userID))
 						{
-
 							$_SESSION['passed'] = false;
 						}
 					}
@@ -496,8 +511,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		// loop through authmods
 		foreach($authMods AS $authMod)
 		{
-			$authModule = call_user_func(array($authMod, 'getInstance'));
-			if($modUsers = $authModule->getAllUsers())
+			if($modUsers = $authMod->getAllUsers())
 			{
 				// keep record of the authmod used
 				// return user
@@ -531,8 +545,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		$authMods = $this->getAllAuthModules();
 		foreach($authMods AS $authMod)
 		{
-			$authModule = call_user_func(array($authMod, 'getInstance'));
-			$thisResult =  $authModule->removeRecord($userID);
+			$thisResult = $authMod->removeRecord($userID);
 			$result = $result || $thisResult;
 		}
 		return $result;
@@ -547,9 +560,16 @@ class AuthManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getAllAuthModules()
 	{
-		$authMods = explode(',', \AppCfg::AUTH_PLUGINS);
+		$authMods = array();
+		$authModNames = explode(',', \AppCfg::AUTH_PLUGINS); // get the active mods from the config
+		foreach($authModNames AS $authModName)
+		{
+			$authMods[] = call_user_func(array($authModName, 'getInstance'));
+		}
 		return $authMods;
 	}
+	
+	// TODO: add getUser
 
 	public function getAuthModuleForUserID($userID=false)
 	{
@@ -562,16 +582,12 @@ class AuthManager extends \rocketD\db\DBEnabled
 				return new $authModClass();
 			}
 			$authMods = $this->getAllAuthModules();
-			foreach($authMods AS $authData)
+			foreach($authMods AS $authMod)
 			{
-
-			// use Reflection to create a new instance, using the $args 
-				$authMod = call_user_func(array($authData, 'getInstance'));
 				if($authMod->recordExistsForID($userID))
 				{
 					// store in memcache
-					\rocketD\util\Cache::getInstance()->setAuthModClassForUser($userID, $authData);
-					
+					\rocketD\util\Cache::getInstance()->setAuthModClassForUser($userID, get_class($authMod) );
 					return $authMod;
 				}
 			}
@@ -593,13 +609,12 @@ class AuthManager extends \rocketD\db\DBEnabled
 
 			$authMods = $this->getAllAuthModules();
 
-			foreach($authMods AS $authData)
+			foreach($authMods AS $authMod)
 			{
-				$authMod = call_user_func(array($authData, 'getInstance'));
 				if($authMod->getUIDforUsername($username))
 				{
 					// store in memcache
-					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, $authData);
+					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, get_class($authMod));
 					return $authMod;
 				}
 			}

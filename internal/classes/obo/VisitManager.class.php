@@ -11,7 +11,7 @@
  * When a user views an instance, a visit is created.  When the user logs out, the visit is closed.
  */
 namespace obo;
-class nm_los_VisitManager extends \rocketD\db\DBEnabled
+class VisitManager extends \rocketD\db\DBEnabled
 {
 	private static $instance;
 
@@ -129,8 +129,7 @@ class nm_los_VisitManager extends \rocketD\db\DBEnabled
 				if($roleMan->isSuperUser() || $permMan->getMergedPerm($rootID, \cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::READ, $_SESSION['userID']))
 				{
 					//$_SESSION['INSTANCE_ID'] = $instID;
-					$visitMan = nm_los_VisitManager::getInstance();
-					$visitMan->createVisit($instID);
+					$this->createVisit($instID);
 					return true;
 				}
 			}
