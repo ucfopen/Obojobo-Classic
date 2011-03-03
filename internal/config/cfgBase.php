@@ -31,7 +31,7 @@ class AppCfgDefault
 	const DIR_MEDIA = 'internal/media/';
 
 	// Define the relative location for the scripts directory with trailing /
-	const DIR_SCRIPTS = 'internal/scripts/';
+	const DIR_SCRIPTS = 'internal/includes/';
 	
 	const DIR_TEMPLATES = 'internal/templates/';
 
@@ -39,7 +39,7 @@ class AppCfgDefault
 	const DIR_ASSETS = 'assets/';
 	
 	// Define working directory for amfphp
-	const DIR_AMFPHP = 'internal/amfphp/';
+	const DIR_AMFPHP = 'internal/includes/amfphp/';
 
 	// Plugin Directory
 	const DIR_PLUGIN ='internal/plugin/';
