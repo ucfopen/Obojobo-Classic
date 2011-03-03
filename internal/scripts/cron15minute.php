@@ -8,7 +8,7 @@ This script is the main scheduled task runner
 
 ================ */
 require_once(dirname(__FILE__)."/../app.php");
-
+ini_set('error_log', AppCfg::DIR_BASE.AppCfg::DIR_LOGS.'php_cron_'. date('m_d_y', time()) .'.txt');
 
 //******************************** SYNC FAILURE QUEUE ****************************
 $t = microtime(1);
@@ -28,6 +28,5 @@ foreach($authMods AS $curAuthMod)
 		core_util_Log::profile('cron', "'updateNIDChanges','".time()."','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'\n");
 	}
 }
-
 
 ?>
