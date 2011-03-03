@@ -1,10 +1,10 @@
 <?php
 namespace rocketD\util;
 // Memcache singleton object
-class Memcache extends \Memcache 
+class Memcache
 {
 	static private $instance = NULL;
-	
+	protected $mc;
 
 	static public function getInstance()
 	{
@@ -28,13 +28,27 @@ class Memcache extends \Memcache
 	
 	function connectMemCache()
 	{
-		
+		$this->mc = new Memcache();
 		$hosts = explode(',', \AppCfg::MEMCACHE_HOSTS);
 		$ports = explode(',', \AppCfg::MEMCACHE_PORTS);
 		foreach($hosts AS $i => $host)
 		{
-			$this->connect($hosts[$i], $ports[$i]) or trace('connect to memcache server '. $hosts[$i] . ':' . $ports[$i], true);
+			$this->mc->connect($hosts[$i], $ports[$i]) or trace('connect to memcache server '. $hosts[$i] . ':' . $ports[$i], true);
 		}	
 	}
+	
+	public function __call($name, $args)
+	{
+		if($this->mc)
+		{
+			return call_user_func_array($this->mc->$name, $args);
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+
 }
 ?>
