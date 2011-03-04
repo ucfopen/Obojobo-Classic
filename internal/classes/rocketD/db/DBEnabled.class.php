@@ -23,7 +23,7 @@ class DBEnabled
 	{
 		return  base64_encode(serialize($obj));
 	}
-
+	
 	public function db_unserialize($obj)
 	{
 		// TODO: get rid of this - its a temporary crutch to bypass actually updating the database
