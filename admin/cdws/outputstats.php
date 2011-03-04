@@ -47,12 +47,12 @@ $stats = array();
 //   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
 
    // Total Page Views (content and questions)
-   $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='\obo\log\PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600");
+   $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600");
 
    // Count of next/prev button used in content;
    //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM obo_logs WHERE type='\obo\log\NextPreviousUsed' AND time > 1214193600";
    // Media Views
-   $stats[] = array ('name' => '12_MediaViews', 'value'=>"SELECT COUNT(".\cfg_core_User::ID.") AS MEDIA_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE."='\obo\log\MediaRequested' AND ".\cfg_obo_Track::TIME." > 1214193600");
+   // $stats[] = array ('name' => '12_MediaViews', 'value'=>"SELECT COUNT(".\cfg_core_User::ID.") AS MEDIA_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE."='MediaRequested' AND ".\cfg_obo_Track::TIME." > 1214193600");
 
    // Percent of Assessment Attempts not completed
    $stats[] = array ('name' => '13_PercentOfAssessmentAttemptsNotCompleted', 'value'=>"SELECT COUNT(*) / (SELECT COUNT(*) FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")) * 100  AS PERCENT FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::END_TIME." = 0 AND ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")");
@@ -67,7 +67,7 @@ $stats = array();
    $stats[] = array ('name' => '16_NumberOfInstancesDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_INST_COUNT FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::DELETED."  = '1'");
 
    // Number of master objects deleted
-   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM ".\cfg_obo_LO::TABLE." WHERE  ".\cfg_obo_LO::DELETED." = '1' ");
+   $stats[] = array ('name' => '17_NumberOfMasterObjectsDeleted', 'value'=>"SELECT COUNT(*) AS DELETED_MASTER_COUNT FROM ".\cfg_obo_LO::TABLE." WHERE  `".\cfg_obo_LO::DELETED."` = '1' ");
 
    // Total learning object draft saves
    $stats[] = array ('name' => '18_TotalLearningObjectDraftSaves', 'value'=>"SELECT MAX(".\cfg_obo_LO::ID.") AS NUM_DRAFT_SAVES FROM ".\cfg_obo_LO::TABLE."");
@@ -79,7 +79,7 @@ $stats = array();
    $stats[] = array ('name' => '20_TotalNumberOfUsers', 'value'=>"SELECT COUNT(*) AS NUM_USERS FROM ".\cfg_core_User::TABLE."");
 
    //Question Type Usage
-   $stats[] = array ('name' => '21_QuestionTypeUsage', 'value'=>"SELECT ".\cfg_obo_Question::TYPE." AS QUESTION_TYPE, COUNT(*) AS COUNT FROM ".\cfg_obo_Question::TABLE." GROUP BY QUESTION_TYPE");
+   // $stats[] = array ('name' => '21_QuestionTypeUsage', 'value'=>"SELECT ".\cfg_obo_Question::TYPE." AS QUESTION_TYPE, COUNT(*) AS COUNT FROM ".\cfg_obo_Question::TABLE." GROUP BY QUESTION_TYPE");
 
    // Instances Per User
    $stats[] = array ('name' => '22_InstancesPerUser', 'value'=>"SELECT CONCAT(U.last, ', ' , U.first) AS USER_NAME, COUNT(I.".\cfg_core_User::ID.") as NUM_INSTANCES FROM ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_core_User::TABLE." AS U WHERE U.".\cfg_core_User::ID." = I.".\cfg_core_User::ID." GROUP BY I.".\cfg_core_User::ID." ORDER BY U.".\cfg_core_User::LAST);
@@ -103,10 +103,10 @@ $stats = array();
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".\cfg_obo_ComputerData::TIME.") as COUNT  FROM ".\cfg_obo_ComputerData::TABLE." WHERE ".\cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT);
 
    // Visits by day
-   $stats[] = array ('name' => '29_InstanceTotalHitsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(".\cfg_obo_Track::TIME.") AS VISITS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." = '\obo\log\Visited' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_obo_Track::TIME);
+   $stats[] = array ('name' => '29_InstanceTotalHitsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(".\cfg_obo_Track::TIME.") AS VISITS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." = 'Visited' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_obo_Track::TIME);
 
    // Instance Views by date
-   $stats[] = array ('name' => '30_InstanceIndividualViewsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(T.".\cfg_obo_Track::TIME.") AS VISITS, CONCAT(L.title, ' v.', L.".\cfg_obo_LO::VER.") AS MASTER FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Track::TYPE." = '\obo\log\Visited' AND T.".\cfg_obo_Instance::ID." = I.".\cfg_core_User::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, MASTER ORDER BY T.".\cfg_obo_Track::TIME.", MASTER");
+   $stats[] = array ('name' => '30_InstanceIndividualViewsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(T.".\cfg_obo_Track::TIME.") AS VISITS, CONCAT(L.title, ' v.', L.".\cfg_obo_LO::VER.") AS MASTER FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Track::TYPE." = 'Visited' AND T.".\cfg_obo_Instance::ID." = I.".\cfg_core_User::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, MASTER ORDER BY T.".\cfg_obo_Track::TIME.", MASTER");
 
    // Flash Version Counts
    $stats[] = array ('name' => '31_FlashVersionCounts', 'value'=>"SELECT ".\cfg_obo_ComputerData::VER." AS FLASH_PLUGIN_VERSION, COUNT(".\cfg_obo_ComputerData::TIME.") as COUNT  FROM ".\cfg_obo_ComputerData::TABLE." WHERE ".\cfg_core_User::ID." !='0' Group By ".\cfg_obo_ComputerData::VER);
@@ -115,7 +115,7 @@ $stats = array();
    $stats[] = array ('name' => '32_ErrorCount', 'value'=>"SELECT ".\cfg_obo_Track::TYPE." AS ERROR_TYPE, COUNT(*) AS COUNT FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." > 0 AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY ".\cfg_obo_Track::TYPE." ORDER By ".\cfg_obo_Track::TYPE);
 
    //Error Counts by day
-   $stats[] = array ('name' => '33_ErrorCountsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, ".\cfg_obo_Track::TYPE." AS TYPE, COUNT(".\cfg_obo_Track::TYPE.") AS COUNT FROM ".\cfg_obo_Track::TABLE." AS T WHERE ".\cfg_obo_Track::TYPE." NOT LIKE 'nm_los%' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, ".\cfg_obo_Track::TYPE." ORDER BY ".\cfg_obo_Track::TIME.", ".\cfg_obo_Track::TYPE);
+   $stats[] = array ('name' => '33_ErrorCountsByDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, ".\cfg_obo_Track::TYPE." AS TYPE, COUNT(".\cfg_obo_Track::TYPE.") AS COUNT FROM ".\cfg_obo_Track::TABLE." AS T WHERE ".\cfg_obo_Track::TYPE." > 0 AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, ".\cfg_obo_Track::TYPE." ORDER BY ".\cfg_obo_Track::TIME.", ".\cfg_obo_Track::TYPE);
 
    // New Student Users by hour of day
    $stats[] = array ('name' => '34_NewStudentUsersByHourOfDay', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."), '%H:00') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." NOT IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." group by ".\cfg_core_User::ID.") AND ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME);
@@ -137,13 +137,13 @@ $stats = array();
    $stats[] = array ('name' => '39_NewFacultyUsersByDayOfWeek', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."),  '%a') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_obo_Role::ID." = (SELECT ".\cfg_obo_Role::ID." from ".\cfg_obo_Role::TABLE." WHERE ".\cfg_obo_Role::ROLE." = 'ContentCreator')) AND ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME);
 
    // Total Visists Per Master
-   $stats[] = array ('name' => '40_TotalVisistsPerMaster', 'value'=>"SELECT  CONCAT(L.".\cfg_obo_LO::TITLE.", ' v. ',L.".\cfg_obo_LO::VER.")  AS MASTER_TITLE, COUNT( T.".\cfg_core_User::ID.") AS VISITS FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Instance::ID." != '0' AND  T.".\cfg_obo_Track::TYPE."= '\obo\log\Visited' AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY L.".\cfg_obo_LO::ID."");
+   $stats[] = array ('name' => '40_TotalVisistsPerMaster', 'value'=>"SELECT  CONCAT(L.".\cfg_obo_LO::TITLE.", ' v. ',L.".\cfg_obo_LO::VER.")  AS MASTER_TITLE, COUNT( T.".\cfg_core_User::ID.") AS VISITS FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Instance::ID." != '0' AND  T.".\cfg_obo_Track::TYPE."= 'Visited' AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY L.".\cfg_obo_LO::ID."");
 
    // Total Visits Per Instance
-   $stats[] = array ('name' => '41_TotalVisitsPerInstance', 'value'=>"SELECT  CONCAT(L.".\cfg_obo_LO::TITLE.", ' v. ',L.".\cfg_obo_LO::VER.")  AS MASTER_TITLE, I.".\cfg_obo_Instance::TITLE." AS INSTANCE_NAME, I.".\cfg_obo_Instance::COURSE." AS INSTANCE_COURSE, CONCAT(U.".\cfg_core_User::FIRST.", ' ', U.".\cfg_core_User::LAST.") AS INTANCE_OWNER, COUNT( T.".\cfg_core_User::ID.") AS VISITS FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L, ".\cfg_core_User::TABLE." AS U WHERE T.".\cfg_obo_Instance::ID." != '0' AND  T.".\cfg_obo_Track::TYPE."= '\obo\log\Visited' AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND U.".\cfg_core_User::ID." = I.".\cfg_core_User::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY T.".\cfg_obo_Instance::ID."");
+   $stats[] = array ('name' => '41_TotalVisitsPerInstance', 'value'=>"SELECT  CONCAT(L.".\cfg_obo_LO::TITLE.", ' v. ',L.".\cfg_obo_LO::VER.")  AS MASTER_TITLE, I.".\cfg_obo_Instance::TITLE." AS INSTANCE_NAME, I.".\cfg_obo_Instance::COURSE." AS INSTANCE_COURSE, CONCAT(U.".\cfg_core_User::FIRST.", ' ', U.".\cfg_core_User::LAST.") AS INTANCE_OWNER, COUNT( T.".\cfg_core_User::ID.") AS VISITS FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L, ".\cfg_core_User::TABLE." AS U WHERE T.".\cfg_obo_Instance::ID." != '0' AND  T.".\cfg_obo_Track::TYPE."= 'Visited' AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND U.".\cfg_core_User::ID." = I.".\cfg_core_User::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY T.".\cfg_obo_Instance::ID."");
 
    //Instance View Count By Date
-   $stats[] = array ('name' => '42_InstanceViewCountByDate', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(T.".\cfg_obo_Track::TIME.") AS VISITS, CONCAT(L.".\cfg_obo_LO::TITLE.", ' v.', L.".\cfg_obo_LO::VER.") AS MASTER FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Track::TYPE." = '\obo\log\Visited' AND T.".\cfg_obo_Instance::ID." = I.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, MASTER ORDER BY T.".\cfg_obo_Track::TIME.", MASTER");
+   $stats[] = array ('name' => '42_InstanceViewCountByDate', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(T.".\cfg_obo_Track::TIME."), '%m-%d-%Y') AS DATE, COUNT(T.".\cfg_obo_Track::TIME.") AS VISITS, CONCAT(L.".\cfg_obo_LO::TITLE.", ' v.', L.".\cfg_obo_LO::VER.") AS MASTER FROM ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE T.".\cfg_obo_Track::TYPE." = 'Visited' AND T.".\cfg_obo_Instance::ID." = I.".\cfg_obo_Instance::ID." AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND T.".\cfg_obo_Track::TIME." > 1214193600 GROUP BY DATE, MASTER ORDER BY T.".\cfg_obo_Track::TIME.", MASTER");
 
    //Instance Count of Masters
    $stats[] = array ('name' => '43_InstanceCountOfMasters', 'value'=>"SELECT CONCAT(L.".\cfg_obo_LO::TITLE.", '  v.', L.".\cfg_obo_LO::VER.") AS MASTER_TITLE, count(I.".\cfg_obo_LO::ID.") as INSTANCES FROM ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_LO::TABLE." AS L WHERE L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." GROUP BY I.".\cfg_obo_LO::ID." ORDER BY MASTER_TITLE ASC");
@@ -252,7 +252,7 @@ $startTime = 1259647200;
 $endTime = time();
 $loIDs = implode(',', array(7841, 7820, 7819, 7814, 7802, 7801, 7792, 7711, 13810, 13832, 13848,13849,13851,13830,13853 ));
 
-$stats[] = array ('name' => '9999_StudentVisitContactList', 'value'=>"SELECT U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST.", U.".\cfg_core_User::EMAIL.", GROUP_CONCAT(DISTINCT L.".\cfg_obo_LO::TITLE." ORDER BY L.".\cfg_obo_LO::TITLE." ASC SEPARATOR ', ') AS master_titles, count(DISTINCT I.".\cfg_obo_LO::ID.") AS unique_masters_visited, count(*) AS raw_total_visits, FROM_UNIXTIME(MIN(T.".\cfg_obo_Track::TIME.")) AS first_log, FROM_UNIXTIME(MAX(T.".\cfg_obo_Track::TIME.")) AS last_log  FROM ".\cfg_core_User::TABLE." AS U, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_LO::TABLE." AS L WHERE L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND U.".\cfg_core_User::ID." = T.".\cfg_core_User::ID." AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND T.".\cfg_obo_Track::TYPE." = '\obo\log\Visited' AND I.".\cfg_obo_LO::ID." IN ($loIDs) AND T.".\cfg_obo_Track::TIME." >= '$startTime' AND T.".\cfg_obo_Track::TIME." <= '$endTime' AND U.".\cfg_core_User::ID." NOT IN ( SELECT DISTINCT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." )  GROUP BY U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST);
+$stats[] = array ('name' => '9999_StudentVisitContactList', 'value'=>"SELECT U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST.", U.".\cfg_core_User::EMAIL.", GROUP_CONCAT(DISTINCT L.".\cfg_obo_LO::TITLE." ORDER BY L.".\cfg_obo_LO::TITLE." ASC SEPARATOR ', ') AS master_titles, count(DISTINCT I.".\cfg_obo_LO::ID.") AS unique_masters_visited, count(*) AS raw_total_visits, FROM_UNIXTIME(MIN(T.".\cfg_obo_Track::TIME.")) AS first_log, FROM_UNIXTIME(MAX(T.".\cfg_obo_Track::TIME.")) AS last_log  FROM ".\cfg_core_User::TABLE." AS U, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_LO::TABLE." AS L WHERE L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND U.".\cfg_core_User::ID." = T.".\cfg_core_User::ID." AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND T.".\cfg_obo_Track::TYPE." = 'Visited' AND I.".\cfg_obo_LO::ID." IN ($loIDs) AND T.".\cfg_obo_Track::TIME." >= '$startTime' AND T.".\cfg_obo_Track::TIME." <= '$endTime' AND U.".\cfg_core_User::ID." NOT IN ( SELECT DISTINCT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." )  GROUP BY U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST);
 
 $stats[] = array ('name' => '9999_OwnersOfNewInstances', 'value'=>
 	"SELECT 
@@ -473,7 +473,8 @@ function writeCSVFromQuery($fileName, $DBM,  $query)
 {
 	$fh = fopen($fileName, 'w') or die("can't open file");
 	$stringData ='';
-	if($q = $DBM->querySafeTrace($query, ''))
+	echo $query . "<br>";
+	if($q = $DBM->query($query))
 	{
 		while($r = $DBM->fetch_assoc($q)){
 			if(!isset($keys)) $keys = '"' . implode('","' , array_keys($r)) . "\"\n";
@@ -512,7 +513,12 @@ function writeCSVFromArray($fileName, $array)
 	}
 }
 
-function getQuestionAnswersByMaster($lo_id, $DBM, $file)
+function fixObject($matches)
+{
+	return ($matches[0]-7) . ':"\\obo\\log\\';
+}
+
+function getQuestionAnswersByMaster($lo_id, $DBM)
 {
 	$times = array();
 	$lo = new \obo\lo\LO();
@@ -524,9 +530,9 @@ function getQuestionAnswersByMaster($lo_id, $DBM, $file)
 	$ret = '"INSTANCE_ID","STUDENT_ID","MM_DD_YY","TIME","ATTEMPT_NUMBER","QUESTION_ID","QUIZ_QUESTION_NUMBER","ANSWER_NUMBER","ANSWER_ID_GIVEN","STUDENT_SCORE","CHOSEN_ANSWER_TEXT"'."\n";
 	
 	// find instances of an LO
-	$qstr = "SELECT ".\cfg_obo_Instance::ID." FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_LO::ID." = '?' UNION DISTINCT SELECT ".\cfg_obo_Instance::ID." FROM obo_deleted_instances WHERE ".\cfg_obo_LO::ID." = '?'";
+	$qstr = "SELECT ".\cfg_obo_Instance::ID." FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_LO::ID." = '?'";
 	
-	$q = $DBM->querySafe($qstr, $lo_id, $lo_id);
+	$q = $DBM->querySafe($qstr, $lo_id);
 	$instances = array();
 	while($r = $DBM->fetch_obj($q))
 	{
@@ -543,16 +549,15 @@ function getQuestionAnswersByMaster($lo_id, $DBM, $file)
 	trace(count($instances) . ' instances');
 	
 	$instances = implode(',', $instances);
-
-	$q = $DBM->querySafeTrace("SELECT *, UNCOMPRESS(".\cfg_obo_Track::DATA.") as data FROM ".\cfg_obo_Track::TABLE." WHERE (".\cfg_obo_Track::TYPE." = 'nm_los_tracking_SubmitQuestion' OR ".\cfg_obo_Track::TYPE." = 'nm_los_tracking_StartAttempt' OR ".\cfg_obo_Track::TYPE." = 'nm_los_tracking_SubmitMedia')  AND ".\cfg_obo_Instance::ID." IN ($instances) ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME);
+	
+	$q = $DBM->querySafeTrace("SELECT *, UNCOMPRESS(".\cfg_obo_Track::DATA.") as data FROM ".\cfg_obo_Track::TABLE." WHERE (".\cfg_obo_Track::TYPE." = 'SubmitQuestion' OR ".\cfg_obo_Track::TYPE." = 'StartAttempt' OR ".\cfg_obo_Track::TYPE." = 'SubmitMedia')  AND ".\cfg_obo_Instance::ID." IN ($instances) ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME);
 	$userAttempts = array();
 	while($r = $DBM->fetch_obj($q))
 	{
-			if($r->{\cfg_obo_Track::TYPE} == 'nm_los_tracking_StartAttempt')
+			if($r->{\cfg_obo_Track::TYPE} == 'StartAttempt')
 			{
-				
+				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
 				$r->data = unserialize($r->data);
-				
 				if(isset($attempts[$r->data->attemptID]))
 				{
 					if(isset($userAttempts[$r->{\cfg_core_User::ID}]))
@@ -566,8 +571,9 @@ function getQuestionAnswersByMaster($lo_id, $DBM, $file)
 				}
 				
 			}
-			elseif($r->{\cfg_obo_Track::TYPE} == '\obo\log\SubmitQuestion')
+			elseif($r->{\cfg_obo_Track::TYPE} == 'SubmitQuestion')
 			{
+				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
 				$r->data = unserialize($r->data);
 				if($lo->aGroup->qGroupID == $r->data->qGroupID)
 				{
@@ -642,8 +648,9 @@ function getQuestionAnswersByMaster($lo_id, $DBM, $file)
 				}
 				
 			}
-			else if($r->{\cfg_obo_Track::TYPE} == '\obo\log\SubmitMedia')
+			else if($r->{\cfg_obo_Track::TYPE} == 'SubmitMedia')
 			{
+				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
 				$r->data = unserialize($r->data);
 				if($lo->aGroup->qGroupID == $r->data->qGroupID)
 				{
