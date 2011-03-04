@@ -530,14 +530,14 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		if($AM->verifySession() === true)
 		{
 			// invalid instID value
-			if(!/obo/util/Validator::isPosInt($instID))
+			if(!\obo\util\Validator::isPosInt($instID))
 			{
 				trace($instID);
 				return \rocketD\util\Log::getError(2);
 			}
 			
 			// everything is valid
-			$IM = /obo/lo/InstanceManager::getInstance();
+			$IM = \obo\lo\InstanceManager::getInstance();
 			// user has rights
 			if($IM->userCanEditInstance($AM->getSessionUserID(), $instID))
 			{
