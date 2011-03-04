@@ -177,7 +177,7 @@ class nm_los_PermissionsManager extends core_db_dbEnabled
 						".cfg_obo_Perm::G_USE.",
 						".cfg_obo_Perm::G_GLOBAL."
 					  FROM ".cfg_obo_Perm::TABLE."
-					  WHERE ".cfg_obo_Perm::ITEM." = '?'
+					  WHERE ".cfg_obo_Perm::ITEM." = '?' AND ".cfg_core_User::ID." != 0
 					  AND ".cfg_obo_Perm::TYPE." = '?'";
 		if(!$q = $this->DBM->querySafe($qstr, $newItemID, $oldItemID, $itemType))
 		{
