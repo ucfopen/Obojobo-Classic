@@ -360,6 +360,8 @@ class AMFBaseDeserializer {
 		/*
 			Allows flash classes to be exact same name as the RocketDuck Classes. ie: 'nm_lo_PageItem'
 		*/
+		trace($typeIdentifier);
+		$typeIdentifier = str_replace(".", "\\", $typeIdentifier);
 		if(class_exists($typeIdentifier))
 		{
 			$clazz = new $typeIdentifier;
