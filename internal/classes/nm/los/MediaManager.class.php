@@ -55,7 +55,7 @@ class nm_los_MediaManager extends core_db_dbEnabled
 		
 		$r = $this->DBM->fetch_obj($q);
 
-		$media = new nm_los_Media($r->{cfg_obo_Media::ID}, $r->{cfg_core_User::ID}, $r->{cfg_obo_Media::TITLE}, $r->{cfg_obo_Media::TYPE}, $r->{cfg_obo_Media::DESC}, $r->{cfg_obo_Media::TIME}, $r->{cfg_obo_Media::COPYRIGHT}, $r->{cfg_obo_Media::THUMB}, $r->{cfg_obo_Media::URL}, $r->{cfg_obo_Media::SIZE}, $r->{cfg_obo_Media::LENGTH}, 0, 0, $r->{cfg_obo_Media::WIDTH}, $r->{cfg_obo_Media::HEIGHT}, $r->{cfg_obo_Media::VER});
+		$media = new nm_los_Media($r->{cfg_obo_Media::ID}, $r->{cfg_core_User::ID}, $r->{cfg_obo_Media::TITLE}, $r->{cfg_obo_Media::TYPE}, $r->{cfg_obo_Media::DESC}, $r->{cfg_obo_Media::TIME}, $r->{cfg_obo_Media::COPYRIGHT}, $r->{cfg_obo_Media::THUMB}, $r->{cfg_obo_Media::URL}, $r->{cfg_obo_Media::SIZE}, $r->{cfg_obo_Media::LENGTH}, 0, $r->{cfg_obo_Media::WIDTH}, $r->{cfg_obo_Media::HEIGHT}, $r->{cfg_obo_Media::VER});
 		core_util_Cache::getInstance()->setMedia($media);
 		return $media;
 	}
