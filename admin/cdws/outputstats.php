@@ -5,7 +5,7 @@ $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
-	exit();
+	// exit();
 }
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
@@ -47,7 +47,7 @@ $stats = array();
 //   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
 
    // Total Page Views (content and questions)
-   $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600");
+   $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS, YEAR(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS YEAR, MONTH(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS MONTH FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH");
 
    // Count of next/prev button used in content;
    //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM obo_logs WHERE type='\obo\log\NextPreviousUsed' AND time > 1214193600";
@@ -128,7 +128,13 @@ $stats = array();
    $stats[] = array ('name' => '36_NewStudentUsersByDate', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."), '%m-%d-%Y') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." NOT IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." group by ".\cfg_core_User::ID.") AND ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME."");
 
    // New Faculty Users by Date
-   $stats[] = array ('name' => '37_NewFacultyUsersByDate', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."), '%m-%d-%Y') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_obo_Role::ID." = (SELECT ".\cfg_obo_Role::ID." from ".\cfg_obo_Role::TABLE." WHERE ".\cfg_obo_Role::ROLE." = 'ContentCreator')) AND     ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME."");
+   $stats[] = array ('name' => '37_NewProUsersByDate', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."), '%m-%d-%Y') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_obo_Role::ID." = (SELECT ".\cfg_obo_Role::ID." from ".\cfg_obo_Role::TABLE." WHERE ".\cfg_obo_Role::ROLE." = 'ContentCreator')) AND     ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME."");
+
+   // New Faculty Users by Date
+   $stats[] = array ('name' => '37a_NewUsersByDate', 'value'=>"SELECT GROUP_CONCAT(R.name) AS ROLES, IF(GROUP_CONCAT(R.name) LIKE '%LibraryUser%', 'yes', 'no') AS BASIC, IF(GROUP_CONCAT(R.name) LIKE '%ContentCreator%', 'yes', 'no') AS PRO, IF(GROUP_CONCAT(R.name) LIKE '%Administrator%', 'yes', 'no') AS ADMIN, IF(GROUP_CONCAT(R.name) LIKE '%SuperUser%', 'yes', 'no') AS SUPERUSER,
+MONTH(FROM_UNIXTIME(U.createTime)) AS JOIN_MONTH,
+YEAR(FROM_UNIXTIME(U.createTime)) AS JOIN_YEAR
+  FROM obo_users AS U LEFT JOIN obo_map_roles_to_user AS MR ON MR.UserID = U.UserID LEFT JOIN obo_user_roles AS R ON R.RoleID = MR.RoleID GROUP BY U.userID ORDER BY U.createTime");
 
    // New Student Users by Date
    $stats[] = array ('name' => '38_NewStudentUsersbyDayOfWeek', 'value'=>"SELECT DATE_FORMAT(FROM_UNIXTIME(".\cfg_core_User::CREATED_TIME."),  '%a') AS DATE, COUNT(".\cfg_core_User::ID.") AS COUNT FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID." NOT IN (SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." group by ".\cfg_core_User::ID.") AND ".\cfg_core_User::CREATED_TIME." > 1214193600 GROUP BY DATE ORDER BY ".\cfg_core_User::CREATED_TIME."");
@@ -240,12 +246,15 @@ $stats[] = array ('name' => '72_MasterAssessmentRecognizingResearchStudy3', 'val
 
 $stats[] = array ('name' => '73_MasterAssessmentRefWorks1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14303, $DBM));
 
-$stats[] = array ('name' => '74_MasterAssessmentUnderstandingTheInformationCycle1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14315, $DBM));
+$stats[] = array ('name' => '74_MasterAssessmentUnderstandingTheInformationCycle2', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14315, $DBM));
 
 $stats[] = array ('name' => '75_MasterAssessmentSelectingArticles1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(13887, $DBM));
 
 $stats[] = array ('name' => '76_MasterAssessmentLiteratureReview1', 'value'=> 'getQuestionAnswersByMaster' , 'args' => array(14427, $DBM));
 
+$stats[] = array ('name' => '77_AssessmentCompletionByMonth', 'value'=> "SELECT COUNT(`attemptID`) AS ATTEMPTS_TOTAL, COUNT(DISTINCT CONCAT(userID, instID)) AS FIRST_ATTEMPTS, YEAR(FROM_UNIXTIME(`startTime`)) AS YEAR, MONTH(FROM_UNIXTIME(`startTime`)) AS MONTH FROM `obo_log_attempts` WHERE endTime > 0 GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH");
+
+$stats[] = array ('name' => '78_InstancesCreatedByMonth', 'value'=> "SELECT COUNT(InstID) AS INSTANCES, MONTH(FROM_UNIXTIME(createTime)) AS MONTH, YEAR(FROM_UNIXTIME(createTime)) AS YEAR FROM obo_lo_instances GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH ");
 
 
 $startTime = 1259647200;
