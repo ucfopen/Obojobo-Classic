@@ -56,7 +56,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		
 		$r = $this->DBM->fetch_obj($q);
 
-		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER});
+		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER});
 		\rocketD\util\Cache::getInstance()->setMedia($media);
 		return $media;
 	}
@@ -192,7 +192,11 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
 				".\cfg_obo_Media::VER."='?'";
-		
+		trace($qstr);
+		trace($media->height);
+		trace($media->width);
+		trace($media->version);
+		trace('dones');
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
 		$media->size, $media->length, $media->height, $media->width, $media->version)) )
@@ -289,6 +293,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			{
 				$swf = new \obo\lo\media\SWF();
 				$swf->getDimensions($newFileLocation);
+				trace($swf);
 				$media->width = $swf->width;
 				$media->height = $swf->height;
 				$media->version = $swf->version;
@@ -311,6 +316,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			$media->url = $fileName.".".$extension; // same as basename?
 			$media->size = $fileData['size'];
 			$media->length = $length;
+			trace($media);
 			$lor = \obo\API::getInstance();
 			$result = $this->newMedia($media);
 			if( !($result instanceof \obo\lo\Media) )
