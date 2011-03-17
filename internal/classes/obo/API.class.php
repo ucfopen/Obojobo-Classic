@@ -170,32 +170,25 @@ class API extends \rocketD\db\DBEnabled
 	 * $return (User) User object
 	 * @return (bool) False if error or no login
 	 */
-	public function getUser(){
-		if($this->getSessionValid())
-		{
-			$UM = \rocketD\auth\AuthManager::getInstance();
-			$result = $UM->fetchUserByID($_SESSION['userID']);
-		}
-		else
-		{
-			$result = \rocketD\util\Error::getError(1);
-		}
-		return $result;
-	}
-
-	/**
-	 * Deletes a user with id
-	 * @return (bool) True if succesful, False if error or no login
-	 */
-	public function removeUser($userID)
+	public function getUser($username = false )
 	{
-
 		if($this->getSessionValid())
 		{
-			$this->DBM->startTransaction();
 			$UM = \rocketD\auth\AuthManager::getInstance();
-			$result = $UM->deleteUserByID($userID);
-			$this->DBM->commit();
+			if($username === false)
+			{
+				$result = $UM->fetchUserByID($_SESSION['userID']);
+
+			}
+			else
+			{
+				$RM = \obo\perms\RoleManager::getInstance();
+				if($RM->isAdministrator())
+				{
+					$result = $UM->fetchUserByUserName($username);
+				}
+				
+			}
 		}
 		else
 		{
@@ -203,6 +196,27 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
+
+	// /**
+	//  * Deletes a user with id
+	//  * @return (bool) True if succesful, False if error or no login
+	//  */
+	// public function removeUser($userID)
+	// {
+	// 
+	// 	if($this->getSessionValid())
+	// 	{
+	// 		$this->DBM->startTransaction();
+	// 		$UM = \rocketD\auth\AuthManager::getInstance();
+	// 		$result = $UM->deleteUserByID($userID);
+	// 		$this->DBM->commit();
+	// 	}
+	// 	else
+	// 	{
+	// 		$result = \rocketD\util\Error::getError(1);
+	// 	}
+	// 	return $result;
+	// }
 
 	/**
 	 * Gets the formatted name of a user given an id
@@ -267,6 +281,61 @@ class API extends \rocketD\db\DBEnabled
 			$result = \rocketD\util\Error::getError(1);
 		}
 		return $result;	
+	}
+	
+	public function getUserCMSData($username)
+	{
+		if($this->getSessionValid())
+		{
+			$RM = \obo\perms\RoleManager::getInstance();
+			if($RM->isAdministrator())
+			{
+				$cmsDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
+				$qstr = "SELECT * FROM modx_web_users AS U JOIN modx_web_user_attributes AS A ON U.id = A.internalKey  WHERE U.username = '?'";
+				$q = $cmsDBM->querySafe($qstr, $username);
+				$exists = false;
+				$blocked = false;
+				$loginCount = 0;
+				$failedAttempts = false;
+				$lastLogin = 0;
+				if($r = $cmsDBM->fetch_assoc($q))
+				{
+					$exists = true;
+					$blocked = $r['blocked'];
+					$failedAttempts = $r['failedlogincount'];
+					$loginCount = $r['logincount'];
+					$lastLogin = $r['lastlogin'];
+				}
+				$result = array('exists' => $exists, 'blocked' => $blocked, 'failedAttempts' => $failedAttempts, 'loginCount' => $loginCount, 'lastLogin' => $lastLogin);
+			}
+		}
+		else
+		{
+			$result = \rocketD\util\Error::getError(1);
+		}
+		return $result;
+	}
+	
+	public function getUserInteractionLogs($userID)
+	{
+		if($this->getSessionValid())
+		{
+			$RM = \obo\perms\RoleManager::getInstance();
+			if($RM->isAdministrator())
+			{
+				$TM = new \obo\log\LogManager();
+				$result = $TM->getInteractionLogByUser($userID);
+			}
+			else
+			{
+				$result = \rocketD\util\Error::getError(1);
+			}
+		}
+		else
+		{
+			$result = \rocketD\util\Error::getError(1);
+		}
+		return $result;
 	}
 	
 	/**** LO Functions ****/
@@ -1663,6 +1732,36 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
+	
+	public function getLOStats($los, $stats, $start, $end)
+	{
+		if($this->getSessionValid())
+		{
+			$UM = \rocketD\auth\AuthManager::getInstance();
+			if($username === false)
+			{
+				$result = $UM->fetchUserByID($_SESSION['userID']);
+
+			}
+			else
+			{
+				$RM = \obo\perms\RoleManager::getInstance();
+				if($RM->isAdministrator())
+				{
+					
+					$AM = \obo\util\Analytics::getInstance();
+					return $AM->getLOStat($los, $stats, $start, $end);
+					
+				}
+			}
+		}
+		else
+		{
+			$result = \rocketD\util\Error::getError(1);
+		}
+		return $result;
+	}
+
 
 }
 ?>

@@ -5,10 +5,10 @@ $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
-	exit();
+	// exit();
 }
 
-$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
 //if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');
 
 $nid = $_GET['nid'];
@@ -75,7 +75,7 @@ if(is_numeric($uid) && $uid > 0)
 	writeData($roles);
 	writeHelp('If the user is Faculty/Staff and they are attempting to use the Repository they should have the "LibraryUser" and/or "ContentCreator" roles listed above.  "LibraryUser" provides Basic access to the Repository. "ContentCreator" provides Pro access to the Repository.  Students most likely won\'t have any roles');
 	
-	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
+	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
 	
 	//if(!$DBM->db_select('los_modx'))
 	//{
