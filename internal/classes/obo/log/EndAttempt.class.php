@@ -1,7 +1,7 @@
 <?php
 namespace obo\log;
 
-class \obo\log\EndAttempt extends \obo\log\Trackable
+class EndAttempt extends \obo\log\Trackable
 {
 	public $attemptID;
 	

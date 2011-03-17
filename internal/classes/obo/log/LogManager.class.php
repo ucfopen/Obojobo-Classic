@@ -205,7 +205,7 @@ class LogManager extends \rocketD\db\DBEnabled
 	
 	public function getInteractionLogByUserAndInstance($instID=0, $userID=0)
 	{
-		// must own instance or be user or SU	
+		// must own instance or be user or SU
 		// check memcache
  		
 		if($tracking = \rocketD\util\Cache::getInstance()->getInteractionsByInstanceAndUser($instID, $userID))
@@ -213,14 +213,12 @@ class LogManager extends \rocketD\db\DBEnabled
 			return $tracking;
 		}
 		
-		
 		$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?' AND ".\cfg_core_User::ID." = '?' ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
-		trace($trackQ);
 		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID, $userID));
 		
 		\rocketD\util\Cache::getInstance()->setInteractionsByInstanceAndUser($instID, $userID, $return);
 		
-		return $return;	
+		return $return;
 	}
 	
 	public function getInteractionLogByVisit($vid=0)
@@ -246,7 +244,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			{
 				switch($r->{\cfg_obo_Track::TYPE})
 				{
-					case '\\obo\\log\\Visited':
+					case 'Visited':
 						// print and tally totals for previous visit
 						$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
 						if(isset($thisVisit))
@@ -312,7 +310,7 @@ class LogManager extends \rocketD\db\DBEnabled
 
 						break;
 
-					case '\\obo\\log\\SectionChanged':
+					case 'SectionChanged':
 						if($loFound)
 						{
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -329,7 +327,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\\obo\\log\\PageChanged':
+					case 'PageChanged':
 						if($loFound)
 						{					
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -446,7 +444,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\\obo\\log\\StartAttempt':
+					case 'StartAttempt':
 						if($loFound)
 						{
 							if(!$totalsOnly)
@@ -473,7 +471,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\\obo\\log\\EndAttempt':
+					case 'EndAttempt':
 						if($loFound)
 						{
 							$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
@@ -487,7 +485,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							}
 						}
 						break;
-					case '\\obo\\log\\SubmitQuestion':
+					case 'SubmitQuestion':
 						if($loFound)
 						{					
 							if(!$totalsOnly)
@@ -555,14 +553,14 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						break;
 
-					case '\\obo\\log\\SubmitMedia':
+					case 'SubmitMedia':
 						if($loFound)
 						{
 							if(!$totalsOnly)
 							{
 								$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
 								// if this log is a repeat of the previous log dont store it (submitMedia is sometimes sent more then it should be)
-								if($thisVisit[count($thisVisit)-1]->itemType == '\obo\log\SubmitMedia')
+								if($thisVisit[count($thisVisit)-1]->itemType == 'SubmitMedia')
 								{
 									$prevLog = $thisVisit[count($thisVisit)-1];
 									if($prevLog->data->score == $r->{\cfg_obo_Track::DATA}->score && $prevLog->{\cfg_obo_Track::DATA}->questionID == $r->{\cfg_obo_Track::DATA}->questionID && $r->{\cfg_obo_Track::TIME} == $prevLog->createTime)
@@ -592,7 +590,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							$thisVisit[] = $r;
 						}
 						break;
-					case '\\obo\\log\\MediaRequested':
+					case 'MediaRequested':
 						$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
 						$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
 						$thisVisit[] = $r;
@@ -640,17 +638,22 @@ class LogManager extends \rocketD\db\DBEnabled
 		$overallPageViews['unique'] = $overallPageViews['content']['unique'] + $overallPageViews['practice']['unique'] + $overallPageViews['assessment']['unique'];
 		$return['pageViews'] = $overallPageViews;
 		$return['visitLog'] = $visits;
-		//$return['lastInstanceID'] = $r->{\cfg_obo_Instance::ID};
 		return $return;
 	}
 	
 	protected function deserializeData($data)
 	{
+		$data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', array( &$this, 'fixObject'), $data);
 		$data = unserialize($data);
 		unset($data->userID);
 		unset($data->createTime);
 		unset($data->instID);
 		return $data;
+	}
+	
+	public function fixObject($matches)
+	{
+		return ($matches[0]-7) . ':"\\obo\\log\\';
 	}
 
 	public function trackCleanOrphans($runTime)
@@ -764,7 +767,7 @@ class LogManager extends \rocketD\db\DBEnabled
         $trackingArr = new stdClass();
 		$trackingArr->prevScores = $SM->getAssessmentScores($instID, $userID);
 
-        $qstr = "SELECT UNCOMPRESS(".\cfg_obo_Track::DATA.") as data FROM ".\cfg_obo_Track::TABLE." WHERE `".\cfg_obo_Track::TYPE."`='\obo\log\PageChanged' AND `".\cfg_obo_Instance::ID."` = '?' AND `".\cfg_core_User::ID."` = '?'";
+        $qstr = "SELECT UNCOMPRESS(".\cfg_obo_Track::DATA.") as data FROM ".\cfg_obo_Track::TABLE." WHERE `".\cfg_obo_Track::TYPE."`='PageChanged' AND `".\cfg_obo_Instance::ID."` = '?' AND `".\cfg_core_User::ID."` = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 		    $this->DBM->rollback();
