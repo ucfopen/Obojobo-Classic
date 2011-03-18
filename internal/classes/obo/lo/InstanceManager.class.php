@@ -551,14 +551,19 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	{
 		if(!\obo\util\Validator::isPosInt($loID))
 		{
-			
-			
-			return \rocketD\util\Error::getError(2);
+			if(!is_array($loID) && count($loID) < 1)
+			{
+				return \rocketD\util\Error::getError(2);
+			}
+			else
+			{
+				$loID = implode(',', $loID);
+			}
 		}
 		
-		$qstr = "SELECT ".\cfg_obo_Instance::ID."  FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_LO::ID."` = '?'";
+		$qstr = "SELECT ".\cfg_obo_Instance::ID."  FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_LO::ID."` IN (?)";
 		
-		if( !($q = $this->DBM->querySafe($qstr, $loID)) )
+		if( !($q = $this->DBM->querySafeTrace($qstr, $loID)) )
 		{
 			return false;
 		}
@@ -568,7 +573,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$result[] = $r->{\cfg_obo_Instance::ID};
 		}
 		// return empty array if non found
-		return count($result) > 0 ? $this->getInstanceData($result) : $result ;
+		return count($result) > 0 ? $this->getInstanceData($result) : $result;
 	}
 }
 ?>
