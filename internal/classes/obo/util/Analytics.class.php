@@ -19,25 +19,89 @@ class Analytics extends \rocketD\db\DBEnabled
 	    $this->defaultDBM();
 	}
 
-	public function getLOStat($los, $stat, $start, $end)
+	public function getLOStat($los, $stat, $start, $end, $resolution)
 	{
+		
+		$year = "YEAR(FROM_UNIXTIME(%)) AS year";
+		$month = "MONTH(FROM_UNIXTIME(%)) AS month";
+		$day = "DAY(FROM_UNIXTIME(%)) AS day";
+		$hour = "HOUR(FROM_UNIXTIME(%)) AS hour";
+		
+		switch($resolution)
+		{
+			case 'month':
+				$group = "year, month";
+				$order = "year, month";
+				$select = $year . ', ' . $month;
+				break;
+			case 'day':
+				$group = "year, month, day";
+				$order = "year, month, day";
+				$select = $year . ', ' . $month . ', ' . $day;
+				break;
+			case 'hour':
+				$group = "year, month, day, hour";
+				$order = "year, month, day, hour";
+				$select = $year . ', ' . $month . ', ' . $day . ', ' . $hour;
+				break;
+			default:
+			case 'year':
+				$group = "year";
+				$order = "year";
+				$select = $year;
+				break;
+		}
+		
 		switch($stat)
 		{
 			case 1: // instances created
-				$sql = "SELECT COUNT(InstID) AS num, DAY(FROM_UNIXTIME(createTime)) AS day, MONTH(FROM_UNIXTIME(createTime)) AS month, YEAR(FROM_UNIXTIME(createTime)) AS year FROM obo_lo_instances WHERE createTime > '?' AND createTime < '?' GROUP BY year, month, day ORDER BY year, month, day";
-				$q = $this->DBM->querySafe($sql, $start, $end);
+				$los = implode(',', $los);
+				$select = str_replace('%', 'createTime', $select);
+				$sql = "SELECT COUNT(InstID) AS INSTANCES, COUNT(DISTINCT userID) AS OWNERS, $select FROM obo_lo_instances WHERE loID IN (?) AND createTime > '?' AND createTime < '?' GROUP BY $group ORDER BY $order";
+				$q = $this->DBM->querySafe($sql, $los, $start, $end);
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;
-			case 2:
+			case 2: // student views
+				$select = str_replace('%', 'createTime', $select);
+				$IM = \obo\lo\InstanceManager::getInstance();
+				$instIDs = array();
+				$instances = $IM->getInstancesFromLOID($los);
+				foreach($instances AS $inst)
+				{
+					$instIDs[] = $inst->instID;
+				}
+				// trace($instIDs);
+				$sql = "SELECT COUNT(createTime) AS VISITS, COUNT(DISTINCT userID) AS VISITORS, $select FROM obo_logs WHERE createTime > '?' AND createTime < '?' AND itemType = 'Visited' AND instID IN (?) GROUP BY $group ORDER BY $order";
+				$q = $this->DBM->querySafe($sql,  $start, $end, implode(',', $instIDs));
+				$results = $this->DBM->getAllRows($q);
+				return $results;
 				break;
-			case 3:
+			case 3: // Derrivatives Created
 				break;
-			case 4:
+			case 4: // Assessments Completed
+				$los = implode(',', $los);
+				$select = str_replace('%', 'endTime', $select);
+				$sql = "SELECT COUNT(DISTINCT A.attemptID) AS COMPLETED_ASSESSMENTS, COUNT(DISTINCT A.userID) AS USERS, $select FROM obo_log_attempts AS A JOIN obo_los AS O ON  O.aGroupID = A.qGroupID WHERE endTime > '?' AND endTime < '?' AND A.loID IN (?) AND endTime !='0' GROUP BY $group ORDER BY $order";
+				$q = $this->DBM->querySafe($sql, $start, $end, $los);
+				$results = $this->DBM->getAllRows($q);
+				return $results;
 				break;
-			case 5:
+			case 5: // Who created instances of these los
+				$los = implode(',', $los);
+				$select = str_replace('%', 'I.createTime', $select);
+				$sql = "SELECT U.last AS LAST, U.first AS First, U.email AS EMAIL, COUNT(I.InstID) AS INSTANCES, $select FROM obo_lo_instances AS I JOIN obo_users AS U ON U.userID = I.userID WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' GROUP BY I.userID, $group ORDER BY $order, I.userID";
+				$q = $this->DBM->querySafe($sql, $los, $start, $end);
+				$results = $this->DBM->getAllRows($q);
+				return $results;
 				break;	
-			case 6:
+			case 6: // Which Courses are instances used in
+				$los = implode(',', $los);
+				$select = str_replace('%', 'createTime', $select);
+				$sql = "SELECT courseName, Count(courseName) AS COUNT, $select FROM obo_lo_instances WHERE loID IN (?) AND createTime > '?' AND createTime < '?' GROUP BY courseName, $group ORDER BY $order, courseName";
+				$q = $this->DBM->querySafe($sql, $los, $start, $end);
+				$results = $this->DBM->getAllRows($q);
+				return $results;
 				break;
 			case 7:
 				break;

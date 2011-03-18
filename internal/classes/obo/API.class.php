@@ -1733,7 +1733,7 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
-	public function getLOStats($los, $stats, $start, $end)
+	public function getLOStats($los, $stats, $start, $end, $resolution)
 	{
 		if($this->getSessionValid())
 		{
@@ -1750,7 +1750,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					
 					$AM = \obo\util\Analytics::getInstance();
-					return $AM->getLOStat($los, $stats, $start, $end);
+					return $AM->getLOStat($los, $stats, $start, $end, $resolution);
 					
 				}
 			}

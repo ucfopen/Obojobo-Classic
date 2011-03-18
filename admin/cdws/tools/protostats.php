@@ -13,91 +13,147 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
 	<script src="js/jquery.tablesorter.min.js"></script>
 	<script src="js/jquery.tablesorter.pager.js"></script>
-	
 	<script type="text/javascript" charset="utf-8">
-	$(window).load(function()
-	{
-	
-		$.ajax({
-			url: "/remoting/json.php/loRepository.getUser",
-			context: document.body,
-			dataType: 'json',
-			success: function(msg)
-				{
-					console.log(msg);
-					$('span.first').append(msg.first);
-					$('span.last').append(msg.last);
-					getMyLOs();
-				}
-		});
-		
-		function getMyLOs()
+		$(window).load(function()
 		{
+			// REMOTE - GET USER
 			$.ajax({
-				url: "/remoting/json.php/loRepository.getLOs",
+				url: "/remoting/json.php/loRepository.getUser",
 				context: document.body,
 				dataType: 'json',
-				success: function(los)
+				success: function(msg)
 					{
-						console.log(los);
-						var loBox = $('#mylos');
-						var options = loBox.attr('options');
-						
-						$.each(los, function(text, lo)
-						{
-							var d = new Date(lo.createTime * 1000);
-							options[options.length] = new Option(lo.title + " v." + lo.version + "." + lo.subVersion + ' ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear(), lo.loID);
-						});
+						$('span.first').append(msg.first);
+						$('span.last').append(msg.last);
+						getMyLOs();
 					}
 			});
-		}
 		
-		function showResults(results)
-		{
-			$('#results-table').remove();
-			$('#results').append('<table id="results-table" class="tablesorter"><thead><tr class="table-header"></tr></thead><tbody></tbody></table>');
-			for(index in results[0])
+			// REMOTE - GET LEARNING OBJECTS
+			function getMyLOs()
 			{
-				$('#results-table tr.table-header').append('<th>'+index+'</th>');
-			};
+				$.ajax({
+					url: "/remoting/json.php/loRepository.getLOs",
+					context: document.body,
+					dataType: 'json',
+					success: onGetMyLOs
+				});
+			}
+		
+			// PLACE RESULTS INTO THE SELECT BOX
+			function onGetMyLOs(los)
+			{
+				console.log(los);
+				var loBox = $('#mylos');
+				var options = loBox.attr('options');
 
-			$(results).each(function(index,val){
-				$('#results-table tbody').append('<tr><td>'+val.num+'</td><td>'+val.day+'</td><td>'+val.month+'</td><td>'+val.year+'</td></tr>');
-			});
+				// sort alphabetically
+				los = $(los).sort(function(a,b){
+					if(a.title.toLowerCase() > b.title.toLowerCase())
+					{
+						return 1
+					}
+					else if(a.title.toLowerCase() == b.title.toLowerCase())
+					{
+						return a.version > b.version ? 1 : -1
+					}
+					else
+					{
+						return -1
+					}
+				});
 			
-//			$("#results-table").tablesorter();
-			$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
-			
-		}
+				$.each(los, function(text, lo)
+				{
+					if(lo.version > 0 && lo.subVersion == 0)
+					{
+						var d = new Date(lo.createTime * 1000);
+						options[options.length] = new Option(lo.title + " v." + lo.version + "." + lo.subVersion + ' ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear(), lo.loID);
+					}
+				});
+			}
 		
-		$( "#start_date" ).datepicker();
-		$( "#start_date" ).datepicker('option', 'dateFormat', 'yy/mm/dd');
-		$( "#end_date" ).datepicker();
-		$( "#end_date" ).datepicker('option', 'dateFormat', 'yy/mm/dd');
+			// ON SUBMIT
+			$('#submit').click(function(){
+			
+				var los = new Array();
+				$("#mylos option:selected").each(function(index,val){
+					los.push($(this).val());
+				});
+				los = '['+los.join()+']';
+			
+				var s = $('#start_date').datepicker('getDate').getTime()/1000;
+				var e = $('#end_date').datepicker('getDate').getTime()/1000;
+			
+				getStats(los, $('input:radio[name=stat]:checked').val(), s, e, $('input:radio[name=resolution]:checked').val());
+				return false;
+			});
 		
-		$('#submit').click(function(){
+			function getStats(los, statID, startDate, endDate, resolution)
+			{
+				$.ajax({
+					url: "/remoting/json.php/loRepository.getLOStats/"+los+'/'+ statID + '/'+ startDate +'/' + endDate + '/' + resolution,
+					context: document.body,
+					dataType: 'json',
+					success: onGetStats
+				});
+			}
+		
+			// PLACE RESULTS IN A TABLE
+			function onGetStats(results)
+			{
+				// Clear previous results
+				$('#results-table').remove();
 			
-			var los = new Array();
-			$("#mylos option:selected").each(function(index,val){
-				los.push($(this).val());
+				// build the table
+				$('#results').append('<table id="results-table" class="tablesorter"><thead><tr class="table-header"></tr></thead><tbody></tbody></table>');
+
+				// Build the header row
+				for(index in results[0])
+				{
+					$('#results-table tr.table-header').append('<th>'+index+'</th>');
+				};
+			
+				// Place each data row
+				$(results).each(function(index,val){
+					var row = '<tr>'
+					for(index in val)
+					{
+						row += '<td>'+ val[index] +'</td>';
+					}
+					row += '</tr>'
+					$('#results-table tbody').append(row);
+				});
+			
+				// Enable the table sorter
+				$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+			
+			}
+			
+			// SET UP THE DATE PICKERS
+			$(function() {
+				var dates = $( "#start_date, #end_date" ).datepicker({
+					defaultDate: "+1w",
+					changeMonth: true,
+					numberOfMonths: 3,
+					onSelect: function( selectedDate ) {
+						var option = this.id == "start_date" ? "minDate" : "maxDate",
+							instance = $( this ).data( "datepicker" ),
+							date = $.datepicker.parseDate(
+								instance.settings.dateFormat ||
+								$.datepicker._defaults.dateFormat,
+								selectedDate, instance.settings );
+						dates.not( this ).datepicker( "option", option, date );
+					}
+				});
 			});
-			los = '['+los.join()+']';
-			
-			var s = $('#start_date').datepicker('getDate').getTime()/1000;
-			var e = $('#end_date').datepicker('getDate').getTime()/1000;
-			
-			$.ajax({
-				url: "/remoting/json.php/loRepository.getLOStats/"+los+'/'+ $('input:radio[name=stat]:checked').val() + '/'+ s +'/' + e,
-				context: document.body,
-				dataType: 'json',
-				success: showResults
-			});
-			return false;
+		
 		});
-		
-	});
 	</script>
 	<style type="text/css" media="screen">
+		div.ui-datepicker{
+		 font-size:10px;
+		}
 	</style>
 </head>
 <body>
@@ -109,9 +165,9 @@
 
 <h2>Choose Stat</h2>
 
-<input type="radio" name="stat" value="1" id="instance_count"><label for="instance_count">Instances Created</label><br>
-<input type="radio" name="stat" value="2" id="student_count"><label for="student_count">Student Views</label><br>
-<input type="radio" name="stat" value="3" id="derivative_count"><label for="derivative_count">Derivatives Created</label><br>
+<input type="radio" name="stat" value="1" id="instance_count"><label for="instance_count">Instances Created [1]</label><br>
+<input type="radio" name="stat" value="2" id="student_count"><label for="student_count">Student Views [3]</label><br>
+<input type="radio" name="stat" value="3" id="derivative_count"><label for="derivative_count">Derivatives Created [x]</label><br>
 <input type="radio" name="stat" value="4" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
 
 <input type="radio" name="stat" value="5" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
@@ -123,11 +179,19 @@
 <input type="radio" name="stat" value="10" id="attempt"><label for="attempt">Attempt</label><br>
 
 <h2>Choose Timeframe</h2>
-<p>Start Date: <input type="text" id="start_date" size="30"/></p>
 
 
-<p>End Date: <input type="text" id="end_date" size="30"/></p>
+<label for="start_date">From</label>
+<input type="text" id="start_date" name="start_date"/>
+<label for="end_date">to</label>
+<input type="text" id="end_date" name="end_date"/>
 
+<h2>Choose Data Resolution</h2>
+<input type="radio" name="resolution" value="all" id="resolution_all"><label for="resolution_all">All Time</label><br>
+<input type="radio" name="resolution" value="year" id="resolution_year"><label for="resolution_year">Years</label><br>
+<input type="radio" name="resolution" value="month" id="resolution_month"><label for="resolution_month">Months</label><br>
+<input type="radio" name="resolution" value="day" id="resolution_day"><label for="resolution_day">Days</label><br>
+<input type="radio" name="resolution" value="hour" id="resolution_hour"><label for="resolution_hour">Hours</label><br>
 
 
 	<p><input id="submit" type="submit" value="Generate &rarr;"></p>
@@ -136,11 +200,11 @@
 <div id="results"></div>
 <div id="pager" class="pager">
 	<form>
-		<img src="../addons/pager/icons/first.png" class="first"/>
-		<img src="../addons/pager/icons/prev.png" class="prev"/>
+		<img src="images/first.png" class="first"/>
+		<img src="images/prev.png" class="prev"/>
 		<input type="text" class="pagedisplay"/>
-		<img src="../addons/pager/icons/next.png" class="next"/>
-		<img src="../addons/pager/icons/last.png" class="last"/>
+		<img src="images/next.png" class="next"/>
+		<img src="images/last.png" class="last"/>
 		<select class="pagesize">
 			<option selected="selected"  value="10">10</option>
 			<option value="20">20</option>
