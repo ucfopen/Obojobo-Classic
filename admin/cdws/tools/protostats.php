@@ -164,20 +164,25 @@
 <select name="some_name" id="mylos" multiple onchange="" size="15"></select><br>
 
 <h2>Choose Stat</h2>
-
-<input type="radio" name="stat" value="1" id="instance_count"><label for="instance_count">Instances Created [1]</label><br>
-<input type="radio" name="stat" value="2" id="student_count"><label for="student_count">Student Views [3]</label><br>
-<input type="radio" name="stat" value="3" id="derivative_count"><label for="derivative_count">Derivatives Created [x]</label><br>
-<input type="radio" name="stat" value="4" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
-
-<input type="radio" name="stat" value="5" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
-<input type="radio" name="stat" value="6" id="which_courses"><label for="which_courses">Which Courses</label><br>
-
-<input type="radio" name="stat" value="7" id="question_answers"><label for="question_answers">Question Answer Values</label><br>
-<input type="radio" name="stat" value="8" id="content_views"><label for="content_views">Content Views</label><br>
-<input type="radio" name="stat" value="9" id="scores"><label for="scores">Scores</label><br>
-<input type="radio" name="stat" value="10" id="attempt"><label for="attempt">Attempt</label><br>
-
+<fieldset>
+    <legend>Instances Data:</legend>
+	<input type="radio" name="stat" value="1" id="instance_count"><label for="instance_count">Instances Created</label><br>
+	<input type="radio" name="stat" value="2" id="student_count"><label for="student_count">Student Views [3]</label><br>
+	<input type="radio" name="stat" value="3" id="derivative_count"><label for="derivative_count">Derivatives Created [x]</label><br>
+	<input type="radio" name="stat" value="4" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
+</fieldset>
+<fieldset>
+    <legend>Owner Data:</legend>
+	<input type="radio" name="stat" value="5" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
+	<input type="radio" name="stat" value="6" id="which_courses"><label for="which_courses">Which Courses</label><br>
+</fieldset>
+<fieldset>
+    <legend>Student Data:</legend>
+	<input type="radio" name="stat" value="7" id="question_answers"><label for="question_answers">Question Answer Values [x]</label><br>
+	<input type="radio" name="stat" value="8" id="content_views"><label for="content_views">Question and Content Page Views</label><br>
+	<input type="radio" name="stat" value="9" id="scores"><label for="scores">Scores [x]</label><br>
+	<input type="radio" name="stat" value="10" id="attempt"><label for="attempt">Attempt [x]</label><br>
+</fieldset>
 <h2>Choose Timeframe</h2>
 
 
