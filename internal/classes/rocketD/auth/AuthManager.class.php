@@ -50,7 +50,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 			$userID = $authMod->getUIDforUsername($userName);
 			return $authMod->fetchUserByID($userID);
 		}
-
 		return false;
 	}
 	
@@ -473,6 +472,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		{
 			foreach($authModList AS $authMod)
 			{
+				trace('authenticating ');
 				// attempt to authenticate each in order
 				if($authMod->authenticate($requestVars))
 				{
@@ -564,7 +564,9 @@ class AuthManager extends \rocketD\db\DBEnabled
 		$authModNames = explode(',', \AppCfg::AUTH_PLUGINS); // get the active mods from the config
 		foreach($authModNames AS $authModName)
 		{
+			trace($authModName);
 			$authMods[] = call_user_func(array($authModName, 'getInstance'));
+			trace('created');
 		}
 		return $authMods;
 	}
@@ -600,23 +602,21 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		if($username !== false)
 		{
-			// check memcache
-			
 			if($authModClass = \rocketD\util\Cache::getInstance()->getAuthModForUser($username))
 			{
 				return call_user_func(array($authModClass, 'getInstance'));
 			}
-
-			$authMods = $this->getAllAuthModules();
-
-			foreach($authMods AS $authMod)
+			
+			$this->defaultDBM();
+			$q = $this->DBM->querySafe("SELECT auth_module FROM obo_users WHERE login = '?'", $username);
+			if($r = $this->DBM->fetch_obj($q))
 			{
-				if($authMod->getUIDforUsername($username))
+				$authMod = call_user_func(array($r->{auth_module}, 'getInstance'));
+				if($authMod)
 				{
-					// store in memcache
-					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, get_class($authMod));
-					return $authMod;
+					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, $r->{auth_module});
 				}
+				return $authMod;
 			}
 		}
 		return false;
