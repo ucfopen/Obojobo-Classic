@@ -136,6 +136,8 @@
 					defaultDate: "+1w",
 					changeMonth: true,
 					numberOfMonths: 3,
+					minDate: new Date(2008, 1 - 1, 1),
+					maxDate: "+1D",
 					onSelect: function( selectedDate ) {
 						var option = this.id == "start_date" ? "minDate" : "maxDate",
 							instance = $( this ).data( "datepicker" ),
@@ -146,6 +148,10 @@
 						dates.not( this ).datepicker( "option", option, date );
 					}
 				});
+				
+				$( "#start_date" ).datepicker( "option", "defaultDate", new Date(2008, 1 - 1, 1) );
+				$( "#end_date" ).datepicker( "option", "defaultDate", "+1D");
+				
 			});
 		
 		});
