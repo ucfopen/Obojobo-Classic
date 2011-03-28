@@ -330,6 +330,16 @@ class API extends \rocketD\db\DBEnabled
 			{
 				$result = \rocketD\util\Error::getError(1);
 			}
+			return $result;
+		}
+	}
+	
+	public function getUsersMatchingUsername($searchString)
+	{
+		if($this->getSessionValid())
+		{
+			$UM = \rocketD\auth\AuthManager::getInstance();
+			$result = $UM->getUsersMatchingUsername($searchString);
 		}
 		else
 		{
