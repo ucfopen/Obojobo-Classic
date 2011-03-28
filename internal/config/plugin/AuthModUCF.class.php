@@ -17,12 +17,6 @@ class cfg_plugin_AuthModUCF
 	const DB_NAME = 'los_OracleStandin';
 	const DB_TYPE = 'mysql';
 	
-	// Local auth mod table
-	const TABLE = 'obo_user_auth_ucf';
-	const USER_NAME = 'login';
-	const PASS = 'password';
-	const SALT = 'salt';
-	
 	// External Employee Table
 	const TABLE_EMPLOYEE = 'NM_EMPLOYEE';
 	const NID = 'NETWORK_ID';

@@ -5,9 +5,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	protected $oDBM;
 	protected static $instance;
 
-	const CONFIG = '\cfg_plugin_AuthModUCF';
-	const CAN_CHANGE_PW = false; // override this!
-
 	static public function getInstance()
 	{
 		if(!isset(self::$instance))
@@ -36,19 +33,19 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
 	public function getAllUsers()
 	{
-		return parent::getAllUsers('\cfg_plugin_AuthModUCF');
+		return parent::getAllUsers();
 	}
 
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
-		return parent::recordExistsForID($userID, '\cfg_plugin_AuthModUCF');
+		return parent::recordExistsForID($userID);
 	}
 	
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function fetchUserByID($userID = 0)
 	{
-		return parent::fetchUserByID($userID, '\cfg_plugin_AuthModUCF');
+		return parent::fetchUserByID($userID);
 	}
 
 	// security check: Ian Turgeon 2008-05-08 - PASS
@@ -127,8 +124,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('not connected', true);
 			return false;
 		}
-		// not using getUIDforUsername to prevent de-provisioned user conflicts
-		$q = $this->DBM->querySafe("SELECT ".\cfg_plugin_AuthModUCF::USER_NAME." FROM ".\cfg_plugin_AuthModUCF::TABLE." WHERE ".\cfg_plugin_AuthModUCF::USER_NAME."='?' LIMIT 1", $userName);
+		// check for exising username
+		$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::LOGIN."='?' LIMIT 1", $userName);
 		if($this->DBM->fetch_num($q) > 0 )
 		{
 			trace('username already exists', true);
@@ -141,7 +138,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($userName)
 	{
-		return parent::getUIDforUsername($userName, '\cfg_plugin_AuthModUCF');
+		return parent::getUIDforUsername($userName);
 	}
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
@@ -167,7 +164,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if($result['success']==true)
 			{
 				// update with md5 pass
-				if($this->updateRecord($userID, $userName, $optionalVars['MD5Pass']))
+				if($this->updateRecord($userID, $userName))
 				{
 					return array('success' => true);
 				}		
@@ -338,10 +335,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('not connected', true);
 			return false;
 		}
-		$salt = $this->createSalt();
-		// MERGE OLD USERS 
-		//\rocketD\util\Log::profile('NIDConversionSQL', "INSERT into ".\cfg_plugin_AuthModUCF::TABLE." set ".\cfg_core_User::ID."='$userID', ".\cfg_plugin_AuthModUCF::USER_NAME." = '$userName', ".\cfg_plugin_AuthModUCF::PASS."=MD5(CONCAT('$salt', '$password')), ".\cfg_plugin_AuthModUCF::SALT."='$salt';\n");
-		return (bool) $this->DBM->querySafe("INSERT into ".\cfg_plugin_AuthModUCF::TABLE." set ".\cfg_core_User::ID."='?', ".\cfg_plugin_AuthModUCF::USER_NAME." = '?', ".\cfg_plugin_AuthModUCF::PASS."=MD5(CONCAT('?', '?')), ".\cfg_plugin_AuthModUCF::SALT."='?'", $userID, $userName, $salt, $password, $salt);
+		// save the NID and set the auth_module to this one
+		return (bool) $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
 	}
 
 	// security check: Ian Turgeon 2008-05-08 - PASS
@@ -357,24 +352,15 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		
 		// update login
-		$successCheck1 = true;
 		if($this->validateUsername($userName) === true)
 		{
-			// update username
-			$successCheck1 = $this->DBM->querySafe("UPDATE ".\cfg_plugin_AuthModUCF::TABLE." set ".\cfg_plugin_AuthModUCF::USER_NAME."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
-			
 			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
+			
+			// update username
+			 return $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, $userID);
+			
 		}
-		// update password
-		$successCheck2 = true;
-		if($this->validatePassword($password) === true)
-		{
-			// update password
-			$salt = $this->createSalt();
-			$successCheck2 =  $this->DBM->querySafe("UPDATE ".\cfg_plugin_AuthModUCF::TABLE." set ".\cfg_plugin_AuthModUCF::PASS."=MD5(CONCAT('?', '?')), ".\cfg_plugin_AuthModUCF::SALT."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $salt, $password, $salt, $userID);
-			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".self::COL_PW_CHANGE_DATE."='".time()."' WHERE ".\cfg_core_User::ID."='?'", $userID);
-		}
-		return $successCheck1 && $successCheck2;
+		return true;
 	
 	}
 	
@@ -420,19 +406,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			return 'Password is an empty string';
 		}
 		return true;
-	}
-	
-	public function updateNetworkID($userID, $networkID)
-	{
-		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
-		
-		\rocketD\util\Cache::getInstance()->clearUserByID($userID);
-		return (bool)$this->DBM->querySafe("UPDATE ".\cfg_plugin_AuthModUCF::TABLE." set ".\cfg_plugin_AuthModUCF::USER_NAME."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $networkID, $userID);		
 	}
 	
 	public function syncExternalUser($userName)
@@ -600,21 +573,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	
 	public function removeRecord($userID)
 	{
-		if(!$this->validateUID($userID)) return false;
-		$return = parent::removeRecord($userID); // remove user
-		$this->defaultDBM();
-		if( !$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
-		return $this->removeRecordInternal($userID);
-	}
-	
-	public function removeRecordInternal($userID)
-	{
-		trace('deleting record '. $userID, true);
-		return $return && $this->DBM->querySafe("DELETE FROM ".\cfg_plugin_AuthModUCF::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+		return parent::removeRecord($userID); // remove user
 	}
 
 	public function isPasswordCurrent($userID)
@@ -666,7 +625,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				$total++;
 				// the latest update date will be first, lets keep track of it in case the EFFDT doesn't match up with every day
 				// update each NID
-				if($q2 = $this->DBM->querySafe("UPDATE ".\cfg_plugin_AuthModUCF::TABLE." SET ".\cfg_plugin_AuthModUCF::USER_NAME."='?' WHERE ".\cfg_plugin_AuthModUCF::USER_NAME."='?' LIMIT 1", $r->{\cfg_plugin_AuthModUCF::NEW_NID}, $r->{\cfg_plugin_AuthModUCF::OLD_NID}))
+				if($q2 = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::LOGIN."='?' LIMIT 1", $r->{\cfg_plugin_AuthModUCF::NEW_NID}, $r->{\cfg_plugin_AuthModUCF::OLD_NID}))
 				{
 					if($this->DBM->affected_rows($q2) != 0)
 					{
@@ -680,7 +639,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 					}
 				}
 				// double check to make sure the old NID isnt in our db anymore
-				$saftyQ = $this->DBM->querySafe("SELECT * FROM ".\cfg_plugin_AuthModUCF::TABLE." WHERE ".\cfg_plugin_AuthModUCF::USER_NAME."='?'", $r->{\cfg_plugin_AuthModUCF::OLD_NID});
+				$saftyQ = $this->DBM->querySafe("SELECT * FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::LOGIN."='?'", $r->{\cfg_plugin_AuthModUCF::OLD_NID});
 				if($this->DBM->fetch_num($saftyQ) > 0 )
 				{
 					trace('NID change failed, record for old NID still exists in Obojobo: '. $r->{\cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{\cfg_plugin_AuthModUCF::NEW_NID}, true);

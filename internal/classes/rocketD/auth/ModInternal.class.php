@@ -12,6 +12,10 @@ class ModInternal extends AuthModule {
 	
 	const CAN_CHANGE_PW = true; // override this!
 	
+	const PW_CHANGE_TIME = 'lastPassChange';
+	const RESET_KEY = 'resetKey';
+	const RESET_TIME = 'resetTime';
+	
 	static public function getInstance()
 	{
 		if(!isset(self::$instance))
@@ -24,18 +28,18 @@ class ModInternal extends AuthModule {
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function fetchUserByID($userID = 0)
 	{
-		return parent::fetchUserByID($userID, 'cfg_core_AuthModInternal');
+		return parent::fetchUserByID($userID);
 	}
 	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
 	public function getAllUsers()
 	{
-		return parent::getAllUsers('cfg_core_AuthModInternal');
+		return parent::getAllUsers();
 	}
 	
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
-		return parent::recordExistsForID($userID, 'cfg_core_AuthModInternal');
+		return parent::recordExistsForID($userID);
 	}
 	
 	// security check: Ian Turgeon 2008-05-08 - PASS	
@@ -120,7 +124,7 @@ class ModInternal extends AuthModule {
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function getUIDforUsername($username)
 	{
-		return parent::getUIDforUsername($username, 'cfg_core_AuthModInternal');
+		return parent::getUIDforUsername($username);
 	}
 	
 	// security check: Ian Turgeon 2008-05-08 - PASS		
@@ -168,7 +172,6 @@ class ModInternal extends AuthModule {
 		// security first, check request vars for valid data
 		// check for required vars
 		// require userName
-		trace('internal auth');
 		if($this->validateUsername($requestVars['userName']) !== true)
 		{
 			return false;	
@@ -202,7 +205,8 @@ class ModInternal extends AuthModule {
 				trace('unable to fetch user', true);
 			}
 		}
-		else{
+		else
+		{
 			trace('unable to fetch username');
 		}
 		return false;
@@ -238,7 +242,10 @@ class ModInternal extends AuthModule {
 			trace('not connected', true);
 			return false;
 		}
-		$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_core_AuthModInternal::TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_core_AuthModInternal::PASS." = MD5(CONCAT(".\cfg_core_AuthModInternal::SALT.", '?')) LIMIT 1", $user->userID, $password);
+		
+		// check the db for a correct salt/pw hash
+		
+		$q = $this->DBM->querySafe("SELECT * FROM (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'password') AS B WHERE `value` = MD5(CONCAT( (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'salt'), '?'))", $user->userID, $user->userID, $password);
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			//ok session id was successfull, so store the stuff we need and return true
@@ -269,7 +276,15 @@ class ModInternal extends AuthModule {
 			return false;
 		}		
 		$salt = $this->createSalt();
-		return $this->DBM->querySafe("INSERT into ".\cfg_core_AuthModInternal::TABLE." set ".\cfg_core_User::ID."='?', ".\cfg_core_AuthModInternal::USER_NAME." = '?', ".\cfg_core_AuthModInternal::PASS."=MD5(CONCAT('?', '?')), ".\cfg_core_AuthModInternal::SALT."='?'", $userID, $userName, $salt, $password, $salt);
+		
+		
+		$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?'";
+		$result = $this->DBM->querySafe($qstr, $userID, 'password', $password); // add password
+		$result = $result &&  $this->DBM->querySafe($qstr, $userID, 'salt', $salt); // add salt
+		// set the login and auth_module
+		$result = $result &&  $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
+
+		return $result;
 	}
 	
 
@@ -290,7 +305,7 @@ class ModInternal extends AuthModule {
 		// update username
 		if($this->validateUsername($userName) === true)
 		{
-			$successCheck1 = $this->DBM->querySafe("UPDATE ".\cfg_core_AuthModInternal::TABLE." set ".\cfg_core_AuthModInternal::USER_NAME."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
+			$successCheck1 = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
 			// remove any cache references that use this username
 			
 			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
@@ -300,8 +315,9 @@ class ModInternal extends AuthModule {
 		if($this->validatePassword($password) === true)
 		{
 			$salt = $this->createSalt();
-			$successCheck2 =  $this->DBM->querySafe("UPDATE ".\cfg_core_AuthModInternal::TABLE." set ".\cfg_core_AuthModInternal::PASS."=MD5(CONCAT('?', '?')), ".\cfg_core_AuthModInternal::SALT."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $salt, $password, $salt, $userID);
-			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".\cfg_core_AuthModInternal::PW_CHANGE_TIME."='".time()."' WHERE ".\cfg_core_User::ID."='?'", $userID);
+			$successCheck2 =  $this->DBM->querySafe("UPDATE obo_user_meta set 'value' = MD5(CONCAT('?', '?')) WHERE ".\cfg_core_User::ID."='?' AND meta = 'salt' LIMIT 1", $salt, $password, $userID);
+			$successCheck2 =  $successCheck2 && $this->DBM->querySafe("UPDATE obo_user_meta set 'value' = '?' WHERE ".\cfg_core_User::ID."='?' AND meta = 'password' LIMIT 1", $password, $userID);
+			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".self::PW_CHANGE_TIME."='".time()."' WHERE ".\cfg_core_User::ID."='?'", $userID);
 			//  no need to update cache, password doesn't use cache
 		}
 		return $successCheck1 && $successCheck2;
@@ -361,7 +377,7 @@ class ModInternal extends AuthModule {
 		}
 		trace('deleting record '. $userID, true);
 		// remove authentication module record
-		return $return && $this->DBM->querySafe("DELETE FROM ".\cfg_core_AuthModInternal::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+		return $return && $this->DBM->querySafe("DELETE FROM obo_user_meta WHERE userID = '?'", $userID);
 	}
 	
 	public function dbSetPassword($userID, $newPassword)
@@ -380,8 +396,11 @@ class ModInternal extends AuthModule {
 		{
 			$salt = $this->createSalt();
 			// update password
-			$a = (bool) $this->DBM->querySafe("UPDATE ".\cfg_core_AuthModInternal::TABLE." set  ".\cfg_core_AuthModInternal::PW_CHANGE_TIME."='".time()."', ".\cfg_core_AuthModInternal::PASS."=MD5(CONCAT('?', '?')), ".\cfg_core_AuthModInternal::SALT."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $salt, $newPassword, $salt, $userID);
-			return $a;
+			$qstr = "UPDATE obo_user_meta SET value = '?' WHERE userID = '?' and meta = '?'";
+			$a = (bool) $this->DBM->querySafe($qstr, $salt, $userID, 'salt');
+			$b = (bool) $this->DBM->querySafe($qstr, md5($salt.$password), $userID, 'password');
+			$c = (bool) $this->DBM->querySafe($qstr, time(), $userID, 'lastPassChange');
+			return $a && $b && $c;
 		}
 		return false;
 	}
@@ -392,12 +411,12 @@ class ModInternal extends AuthModule {
 		{
 			
 			$this->defaultDBM();
-			if($q = $this->DBM->querySafe("SELECT ".\cfg_core_AuthModInternal::PW_CHANGE_TIME." FROM ".\cfg_core_AuthModInternal::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID))
+			if($q = $this->DBM->querySafe("SELECT value FROM obo_user_meta WHERE ".\cfg_core_User::ID."='?' AND meta='lastPassChange'", $userID))
 			{
 				if($r = $this->DBM->fetch_obj($q))
 				{
 					
-					return ((int)$r->{\cfg_core_AuthModInternal::PW_CHANGE_TIME} +  \AppCfg::AUTH_PW_LIFE) > time();
+					return ((int)$r->value +  \AppCfg::AUTH_PW_LIFE) > time();
 				}
 			}
 			return true;
@@ -438,7 +457,7 @@ class ModInternal extends AuthModule {
 		{
 			trace('couldnt fetch user by id', true);
 			
-			return \rocketD\util\Error::getError(1000);			
+			return \rocketD\util\Error::getError(1000);
 		}
 		// validate email address
 		if(strtolower($user->{\cfg_core_User::EMAIL}) != strtolower(trim($email)))
@@ -451,15 +470,19 @@ class ModInternal extends AuthModule {
 		trace('reset request working', true);
 		$this->defaultDBM();
 		// first check to see if there is an existing valid reset key
-		$q = $this->DBM->querySafe("SELECT ".\cfg_core_AuthModInternal::RESET_KEY.", ".\cfg_core_AuthModInternal::RESET_TIME." FROM ".\cfg_core_AuthModInternal::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $user->userID);
+		$q = $this->DBM->querySafe("SELECT (SELECT value FROM `obo_user_meta` WHERE `".\cfg_core_User::ID."` = '?' AND meta = '".self::RESET_KEY."') AS ".self::RESET_KEY.",  (SELECT value FROM `obo_user_meta` WHERE `".\cfg_core_User::ID."` = '?' AND meta = '".self::RESET_TIME."') AS ".self::RESET_TIME, $user->userID, $user->userID);
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			// no existing key, or invalid one, make new
-			if(strlen($r->{\cfg_core_AuthModInternal::RESET_KEY}) == 0 || $r->{\cfg_core_AuthModInternal::RESET_TIME} + \AppCfg::AUTH_PW_LIFE < time())
+			if(strlen($r->{self::RESET_KEY}) == 0 || $r->{self::RESET_TIME} + \AppCfg::AUTH_PW_LIFE < time())
 			{
 				$this->DBM->startTransaction();
 				$resetKey = $this->makeResetKey();
-				if($this->DBM->querySafe("UPDATE ".\cfg_core_AuthModInternal::TABLE." SET ".\cfg_core_AuthModInternal::RESET_KEY."='?', ".\cfg_core_AuthModInternal::RESET_TIME."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $resetKey , time(), $user->userID))
+				
+				$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta ='?', value='?' ON DUPLICATE KEY UPDATE value = '?'";
+				$resetQ = $this->DBM->querySafe($qstr, $user->userID, self::RESET_KEY,  $resetKey,  $resetKey);
+				$timeQ = $this->DBM->querySafe($qstr, $user->userID, self::RESET_TIME,  time(),  time());
+				if($timeQ && $resetQ)
 				{
 					// send email
 					$emailSent = $this->sendPasswordResetEmail($user->{\cfg_core_User::EMAIL}, $returnURL, $resetKey);
@@ -472,7 +495,7 @@ class ModInternal extends AuthModule {
 					{
 						
 						return \rocketD\util\Error::getError(1005);
-					}					
+					}
 				}
 				$this->DBM->rollBack();
 			}
@@ -480,7 +503,7 @@ class ModInternal extends AuthModule {
 			else
 			{
 				// send email
-				$emailSent = $this->sendPasswordResetEmail($user->{\cfg_core_User::EMAIL}, $returnURL, $r->{\cfg_core_AuthModInternal::RESET_KEY});
+				$emailSent = $this->sendPasswordResetEmail($user->{\cfg_core_User::EMAIL}, $returnURL, $r->{self::RESET_KEY});
 				if($emailSent)
 				{
 					$this->DBM->commit();
@@ -490,7 +513,7 @@ class ModInternal extends AuthModule {
 				{
 					
 					return \rocketD\util\Error::getError(1005);
-				}								
+				}
 			}
 		}
 		trace('couldnt find previous reset keys', true);
@@ -547,26 +570,26 @@ class ModInternal extends AuthModule {
 			if($userID)
 			{
 				$this->defaultDBM();
-				$q = $this->DBM->querySafe("SELECT ".\cfg_core_AuthModInternal::RESET_KEY.", ".\cfg_core_AuthModInternal::RESET_TIME." FROM ".\cfg_core_AuthModInternal::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+				
+				$q = $this->DBM->querySafe("SELECT (SELECT value FROM `obo_user_meta` WHERE `".\cfg_core_User::ID."` = '?' AND meta = '".self::RESET_KEY."') AS ".self::RESET_KEY.",  (SELECT value FROM `obo_user_meta` WHERE `".\cfg_core_User::ID."` = '?' AND meta = '".self::RESET_TIME."') AS ".self::RESET_TIME, $user->userID, $user->userID);
 				if($r = $this->DBM->fetch_obj($q))
 				{
 					trace($key, true);
-					trace($r->{\cfg_core_AuthModInternal::RESET_KEY}, true);
+					trace($r->{self::RESET_KEY}, true);
 					
-					if($key == $r->{\cfg_core_AuthModInternal::RESET_KEY} && ($r->{\cfg_core_AuthModInternal::RESET_TIME} + \AppCfg::AUTH_PW_LIFE > time() ))
+					if($key == $r->{self::RESET_KEY} && ($r->{self::RESET_TIME} + \AppCfg::AUTH_PW_LIFE > time() ))
 					{;
 						if($this->validatePassword($newpass) === true) // validate new
 						{ 
 							if($this->dbSetPassword($userID, $newpass))
 							{
-								$this->DBM->querySafe("UPDATE ".\cfg_core_AuthModInternal::TABLE." SET ".\cfg_core_AuthModInternal::RESET_KEY."='', ".\cfg_core_AuthModInternal::RESET_TIME."=0 WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+								$qstr = "DELETE FROM obo_user_meta WHERE ".\cfg_core_User::ID." = '?' AND (meta = '?' OR meta = '?') ";
+								$this->DBM->querySafe($qstr, $userID, self::RESET_KEY, self::RESET_TIME);
 								return true;
-							}					
+							}
 						}
 					}
 				}
-				
-				
 				return \rocketD\util\Error::getError(1006);
 			}
 		}
