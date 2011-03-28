@@ -521,6 +521,23 @@ class AuthManager extends \rocketD\db\DBEnabled
 		\rocketD\util\Cache::getInstance()->setAllUsers($allUsers); // store in memcache
 		return $allUsers;
 	}
+	
+	public function getUsersMatchingUsername($searchString)
+	{
+		trace($searchString);
+		/*select * from obo_users where lower(concat_ws(' ',first,last)) like '%jag%'*/
+		$this->defaultDBM();
+		$users = array();
+		$q = $this->DBM->querySafe("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE LOWER(CONCAT_WS(' ',".\cfg_core_User::FIRST.",".\cfg_core_User::LAST.")) LIKE '?'", $searchString."%");
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			if($newUser = $this->fetchUserByID($r->{\cfg_core_User::ID}))
+			{
+				$users[] = $newUser;
+			}
+		}
+		return $users;
+	}
 
 	// remove all records for this user 
 	public function removeUser($userID)
