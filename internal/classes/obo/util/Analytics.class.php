@@ -55,14 +55,13 @@ class Analytics extends \rocketD\db\DBEnabled
 				$order = "";
 				break;
 		}
-
 		
 		switch($stat)
 		{
 			case 1: // instances created
 				$los = implode(',', $los);
 				$select = str_replace('%', 'createTime', $select);
-				$sql = "SELECT COUNT(InstID) AS INSTANCES, COUNT(DISTINCT userID) AS OWNERS $select FROM obo_lo_instances WHERE loID IN (?) AND createTime > '?' AND createTime < '?' ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
+				$sql = "SELECT COUNT(InstID) AS INSTANCES, COUNT(DISTINCT userID) AS UNIQUE_OWNERS $select FROM obo_lo_instances WHERE loID IN (?) AND createTime > '?' AND createTime < '?' ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
 				$q = $this->DBM->querySafe($sql, $los, $start, $end);
 				$results = $this->DBM->getAllRows($q);
 				return $results;
@@ -77,40 +76,61 @@ class Analytics extends \rocketD\db\DBEnabled
 					$instIDs[] = $inst->instID;
 				}
 				// trace($instIDs);
-				$sql = "SELECT COUNT(createTime) AS VISITS, COUNT(DISTINCT userID) AS VISITORS $select FROM obo_logs WHERE createTime > '?' AND createTime < '?' AND itemType = 'Visited' AND instID IN (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
+				$sql = "SELECT COUNT(createTime) AS VISITS, COUNT(DISTINCT userID) AS UNIQUE_VISITORS, COUNT(DISTINCT instID) AS UNIQUE_INSTANCES $select FROM obo_logs WHERE createTime > '?' AND createTime < '?' AND itemType = 'Visited' AND instID IN (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
 				$q = $this->DBM->querySafe($sql,  $start, $end, implode(',', $instIDs));
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;
-			case 3: // Derrivatives Created
+			case 3: // Time On Task
+				$LM = new \obo\log\LogManager();
+				$output = array('OVERVIEW_TIME' => 0, 'CONTENT_TIME' => 0, 'PRACTICE_TIME' => 0, 'ASSESSMENT_TIME' => 0);
+				
+				foreach($los AS $lo)
+				{
+					$logs = $LM->getInteractionLogByMaster($lo, true);
+					$output['OVERVIEW_TIME'] += $logs['sectionTime']['overview'];
+					$output['CONTENT_TIME'] += $logs['sectionTime']['content'];
+					$output['PRACTICE_TIME'] += $logs['sectionTime']['practice'];
+					$output['ASSESSMENT_TIME'] += $logs['sectionTime']['assessment'];
+				}
+				trace((object)$output);
+				return array((object)$output);
 				break;
 			case 4: // Assessments Completed
 				$los = implode(',', $los);
 				$select = str_replace('%', 'endTime', $select);
-				$sql = "SELECT COUNT(DISTINCT A.attemptID) AS COMPLETED_ASSESSMENTS, COUNT(DISTINCT A.userID) AS USERS $select FROM obo_log_attempts AS A JOIN obo_los AS O ON  O.aGroupID = A.qGroupID WHERE endTime > '?' AND endTime < '?' AND A.loID IN (?) AND endTime !='0' ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
+				$sql = "SELECT COUNT(DISTINCT A.attemptID) AS COMPLETED_ASSESSMENTS, COUNT(DISTINCT A.instID) AS UNIQUE_INSTANCES, COUNT(DISTINCT A.loID) AS UNIQUE_LOS, AVG(A.score) AS AVERAGE_SCORE, STD(A.score) AS STANDARD_DEVIATION, COUNT(DISTINCT A.userID) AS UNIQUE_USERS $select FROM obo_log_attempts AS A JOIN obo_los AS O ON  O.aGroupID = A.qGroupID WHERE endTime > '?' AND endTime < '?' AND A.loID IN (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
 				$q = $this->DBM->querySafe($sql, $start, $end, $los);
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;
-			case 5: // Who created instances of these los
+			case 5: // count score import usage
+				$los = implode(',', $los);
+				$select = str_replace('%', 'endTime', $select);
+				$sql = "SELECT COUNT(DISTINCT A.attemptID) AS IMPORTS_USED, COUNT(DISTINCT A.userID) AS UNIQUE_USERS, COUNT(DISTINCT A.InstID) AS UNIQUE_INSTANCES, COUNT(DISTINCT A.loID) AS UNIQUE_LOS $select FROM obo_log_attempts AS A JOIN obo_los AS O ON  O.aGroupID = A.qGroupID WHERE endTime > '?' AND endTime < '?' AND A.loID IN (?) AND A.linkedAttemptID > 0 ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '');
+				$q = $this->DBM->querySafe($sql, $start, $end, $los);
+				$results = $this->DBM->getAllRows($q);
+				return $results;
+				break;	
+			case 6: // Who created instances of these los
 				$los = implode(',', $los);
 				$select = str_replace('%', 'I.createTime', $select);
-				$sql = "SELECT U.last AS LAST, U.first AS First, U.email AS EMAIL, COUNT(I.InstID) AS INSTANCES $select FROM obo_lo_instances AS I JOIN obo_users AS U ON U.userID = I.userID WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' ".(strlen($group) ? " GROUP BY I.userID, $group" : ' GROUP BY I.userID') . (strlen($order) ? " ORDER BY $order, I.userID " : ' ORDER BY I.userID');
+				$sql = "SELECT U.last AS LAST, U.first AS First, U.email AS EMAIL, COUNT(I.InstID) AS INSTANCES, COUNT(DISTINCT I.loID) AS UNIQUE_LOS $select FROM obo_lo_instances AS I JOIN obo_users AS U ON U.userID = I.userID WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' ".(strlen($group) ? " GROUP BY I.userID, $group" : ' GROUP BY I.userID') . (strlen($order) ? " ORDER BY $order, I.userID " : ' ORDER BY I.userID');
 				$q = $this->DBM->querySafe($sql, $los, $start, $end);
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;	
-			case 6: // Which Courses are instances used in
+			case 7: // Which Courses are instances used in
 				$los = implode(',', $los);
 				$select = str_replace('%', 'I.createTime', $select);
-				$sql = "SELECT I.courseName, IF(MAX(GC.sectionID), MAX(GC.sectionID), 'none') AS WEBCOURSES_SECTION, Count(I.courseName) AS COUNT $select FROM obo_lo_instances AS I LEFT JOIN plg_wc_grade_columns AS GC ON GC.instID = I.instID  WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' ".(strlen($group) ? " GROUP BY I.courseName, $group" : ' GROUP BY I.courseName') . (strlen($order) ? " ORDER BY $order, I.courseName" : ' ORDER BY I.courseName');
+				$sql = "SELECT I.courseName, IF(MAX(GC.sectionID), MAX(GC.sectionID), 'none') AS WEBCOURSES_SECTION, Count(I.courseName) AS COUNT, COUNT(DISTINCT I.loID) AS UNIQUE_LOS $select FROM obo_lo_instances AS I LEFT JOIN plg_wc_grade_columns AS GC ON GC.instID = I.instID  WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' ".(strlen($group) ? " GROUP BY I.courseName, $group" : ' GROUP BY I.courseName') . (strlen($order) ? " ORDER BY $order, I.courseName" : ' ORDER BY I.courseName');
 				$q = $this->DBM->querySafe($sql, $los, $start, $end);
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;
-			case 7:
-				break;
 			case 8:
+				break;
+			case 9:
 				$IM = \obo\lo\InstanceManager::getInstance();
 				$instIDs = array();
 				$instances = $IM->getInstancesFromLOID($los);
@@ -125,9 +145,9 @@ class Analytics extends \rocketD\db\DBEnabled
 				$results = $this->DBM->getAllRows($q);
 				return $results;
 				break;
-			case 9:
-				break;
 			case 10:
+				break;
+			case 12:
 				break;
 		}
 		return array($los, $stat,$start,$end);

@@ -1641,7 +1641,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			if(\obo\util\Validator::isClientType($client) && \obo\util\Validator::isString($message) && \obo\util\Validator::isString($data))
 			{
-				$clientError = new stdClass();
+				$clientError = new \stdClass();
 				$clientError->client = $client;
 				$clientError->message = $message;
 				$clientError->data = $data;
