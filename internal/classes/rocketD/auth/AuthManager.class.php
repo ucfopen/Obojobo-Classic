@@ -564,9 +564,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		$authModNames = explode(',', \AppCfg::AUTH_PLUGINS); // get the active mods from the config
 		foreach($authModNames AS $authModName)
 		{
-			trace($authModName);
 			$authMods[] = call_user_func(array($authModName, 'getInstance'));
-			trace('created');
 		}
 		return $authMods;
 	}

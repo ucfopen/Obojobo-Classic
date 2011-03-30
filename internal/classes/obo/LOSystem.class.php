@@ -49,7 +49,6 @@ class LOSystem extends \rocketD\db\DBEnabled
 				{
 					case 1:
 						// move MASTER lo's with no perms to the deleted table
-						$this->cleanLOs();
 						
 						break;
 					case 2:
@@ -135,55 +134,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 		}
 	}
 
-	public function cleanLOs()
-	{
-		// move MASTER lo's with no perms to the deleted table
-		$t = microtime(true);
-		$moveCount = 0;
-		// TODO: abstract perms
-		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE."  WHERE ".\cfg_obo_LO::VER." > '0' AND ".\cfg_obo_LO::SUB_VER." = '0' AND ".\cfg_obo_LO::ROOT_LO." NOT IN (SELECT ".\cfg_obo_Perm::ITEM." FROM ".\cfg_obo_Perm::TABLE." WHERE `".\cfg_obo_Perm::TYPE."`='l')";
-		$q = $this->DBM->query($qstr);
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$lo = new \obo\lo\LO();
-			if($lo->dbGetFull($this->DBM, $r->{\cfg_obo_LO::ID}))
-			{
-				
-				$moveLO = "INSERT IGNORE INTO ".\cfg_obo_LO::DEL_TABLE." SET
-						".\cfg_obo_LO::ID." = '?',
-						".\cfg_obo_LO::TITLE." = '?',
-						".\cfg_obo_LO::VER." = '?',
-						".\cfg_obo_LO::ROOT_LO." = '?',
-						".\cfg_obo_LO::PARENT_LO." = '?',
-						".\cfg_obo_LO::TIME." = '?',
-						".\cfg_obo_LO::DEL_DATA." = COMPRESS('?')";
-				
-				if($this->DBM->querySafe($moveLO, $lo->loID, $lo->title, $lo->version, $lo->rootID, $lo->parentID, $lo->createTime, base64_encode(serialize($lo)) ))
-				{
-					$moveCount++;
-				}
-				else
-				{
-					trace('failed to move ' . print_r($lo, true), true);
-				}				
-			}
-		
-		}
-		trace('time: ' . (microtime(true) - $t) .' moved permless MASTERS :' . $moveCount, true);
-	 	if($moveCount == $this->DBM->fetch_num($q))
-		{
-			// Removes all los with no perms
-			$t = microtime(true);
-			// TODO: abstract perms
-			$qstr = "DELETE FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ROOT_LO." NOT IN (SELECT ".\cfg_obo_Perm::ITEM." FROM ".\cfg_obo_Perm::TABLE." WHERE `".\cfg_obo_Perm::TYPE."`='l')";
-			if(! $this->DBM->query($qstr)) // no need for querysafe
-			{
-				$this->DBM->rollback();
-				trace(mysql_error(), true);
-			}
-			trace('time: ' . (microtime(true) - $t) .' deleted permless los :' . $this->DBM->affected_rows(), true);
-		}
-	}
+
 
 	public function cleanInstances(){}
 
