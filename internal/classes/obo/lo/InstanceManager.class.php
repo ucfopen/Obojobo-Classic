@@ -502,18 +502,18 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		// clean secondary permissions 
+		// clean secondary permissions (shared users)
 		$pMan = \obo\perms\PermManager::getInstance();
 		$pMan->clearPermsForItem(\cfg_core_Perm::TYPE_INSTANCE, $instID);
 		
-		
+		// clear cache
 		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 		\rocketD\util\Cache::getInstance()->clearInstanceScores($instID);
 		$tracking = \obo\log\LogManager::getInstance();
 		$tracking->trackDeleteInstance($instID);
 		
-		$system = new \obo\LOSystem();
-		$system->cleanInstances();
+		// mark the instance as deleted
+		$this->DBM->querySafe("UPDATE ".\cfg_obo_Instance::TABLE." SET ".\cfg_obo_Instance::DELETED." = '1' WHERE ".\cfg_obo_Instance::ID." = '?'", $instID);
 		return true;
 	}
 

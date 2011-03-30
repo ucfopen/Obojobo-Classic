@@ -770,32 +770,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-
-	public function deleteAttempt($attemptID = 0)
-	{
-		if(!\obo\util\Validator::isPosInt($attemptID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		$qstr = "DELETE FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
-		
-		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
-		{
-            $this->DBM->rollback();
-			return false;
-		}
-			
-		$qstr = "DELETE FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
-		
-		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
-		{
-            $this->DBM->rollback();
-			return false;
-		}
-		
-		return true;
-	}
 	
 	// TODO: FIX RETURN FOR DB ABSTRACTION
     public function getAttemptDetails($attemptID = 0)
