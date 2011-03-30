@@ -100,9 +100,6 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-
-		$system = new \obo\LOSystem();
-		$system->cleanOrphanData();
 		
 		$userID = $_SESSION['userID'];
 	    
