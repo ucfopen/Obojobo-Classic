@@ -557,7 +557,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$this->DBM->startTransaction();
 			$loman = \obo\lo\LOManager::getInstance();
-			$result = $loman->delTree($loID);
+			$result = $loman->deleteLO($loID);
 			$this->DBM->commit();
 		}
 		else
