@@ -145,8 +145,6 @@ class LogManager extends \rocketD\db\DBEnabled
 		{
 			if(!$roleMan->isLibraryUser())
 			{
-				
-				
 				return \rocketD\util\Error::getError(4);
 			}
 			$permman = \obo\perms\PermissionsManager::getInstance();
@@ -157,8 +155,6 @@ class LogManager extends \rocketD\db\DBEnabled
 				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
 				if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
 				{
-					
-					
 					return \rocketD\util\Error::getError(4);
 				}
 			}
@@ -232,12 +228,16 @@ class LogManager extends \rocketD\db\DBEnabled
 
 		if($query)
 		{
-			$AM = \obo\AttemptsManager::getInstance();;
+			$AM = \obo\AttemptsManager::getInstance();
+			$missingInstances = array();
+			$missingLOs = array();
 			$los = array();
 			$visits = array();
 			$curSection = 0;
+			$loFound = false;
 			$curInst = 0; // track cur instance to keep db hits low 
 			$overallSectionTime = array('overview' => 0, 'content' => 0, 'practice' => 0, 'assessment' => 0, 'total' => 0);
+			$sectionTime = array('overview' => 0, 'content' => 0, 'practice' => 0, 'assessment' => 0, 'total' => 0, 'other' => 0);
 			$overallPageViews  = array('content' => array('total'=>0,'unique'=>0), 'practice' => array('total'=>0,'unique'=>0), 'assessment' => array('total'=>0,'unique'=>0));
 			$sectionNames = array('overview', 'content', 'practice', 'assessment');
 			while($r = $this->DBM->fetch_obj($query))
@@ -247,7 +247,8 @@ class LogManager extends \rocketD\db\DBEnabled
 					case 'Visited':
 						// print and tally totals for previous visit
 						$r->{\cfg_obo_Track::DATA} = $this->deserializeData($r->{\cfg_obo_Track::DATA});
-						if(isset($thisVisit))
+						// total up the time from the previous visit's data
+						if(isset($thisVisit) && isset($sectionTime))
 						{
 							$sectionTime['total'] += ($thisVisit[count($thisVisit) - 1]->createTime - $thisVisit[0]->createTime);
 							$sectionTime['other'] = $sectionTime['total'] - $sectionTime['overview'] - $sectionTime['content'] - $sectionTime['practice'] - $sectionTime['assessment'];
@@ -256,7 +257,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							$overallSectionTime['content'] += $sectionTime['content'];
 							$overallSectionTime['practice'] += $sectionTime['practice'];
 							$overallSectionTime['assessment'] += $sectionTime['assessment'];
-							if(!$totalsOnly)
+							if(!$totalsOnly && isset($lo))
 							{
 								$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->data->visitID, 'loID' => $lo->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);	
 							}
@@ -268,34 +269,36 @@ class LogManager extends \rocketD\db\DBEnabled
 								
 							$loQ = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID."='?'";
 							$loR = $this->DBM->fetch_obj($this->DBM->querySafe($loQ, $r->{\cfg_obo_Instance::ID}));
-							// the inst wasnt in obo_los_instances, check for them in the deleted table
 							if(is_object($loR))
 							{
 								// check to make sure we havn't opened this one before
 								if(!isset($los[$loR->{\cfg_obo_LO::ID}]))
 								{
-									if( $loR->{\cfg_obo_LO::ID} != $lo->loID)
+									if($loFound == false || $loR->{\cfg_obo_LO::ID} != $lo->loID)
 									{
 										$lo = new \obo\lo\LO();
 										$loFound = $lo->dbGetFull($this->DBM, $loR->{\cfg_obo_LO::ID});
+										if($loFound)
+										{
+											$los[$loR->{\cfg_obo_LO::ID}] =  $lo;
+										}
+										else
+										{
+											$missingLOs[] = $loR->{\cfg_obo_LO::ID};
+										}
+										
 									}
-									else
-									{
-										$lo = new \obo\lo\LO();
-										$loFound = $lo->dbGetFull($this->DBM, $loR->{\cfg_obo_LO::ID});	
-									}
-									$los[$loR->{\cfg_obo_LO::ID}] =  $lo;
-									$curInst = $r->{\cfg_obo_Instance::ID};
 								}
 								else // already loaded, just use the one in memory
 								{
 									$lo = $los[$loR->{\cfg_obo_LO::ID}];
-									$curInst = $r->{\cfg_obo_Instance::ID};
+									
 								}
+								$curInst = $r->{\cfg_obo_Instance::ID};
 							}
 							else
 							{
-								trace('LO for instance ' .$r->{\cfg_obo_Instance::ID} . ' was missing when parsing the tracking table.', true);
+								$missingInstances[] =  $r->{\cfg_obo_Instance::ID};
 							}
 						}
 						// Initialize this visit
@@ -596,9 +599,11 @@ class LogManager extends \rocketD\db\DBEnabled
 						$thisVisit[] = $r;
 						break;
 					default:
-						$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
-						unset($r->{\cfg_obo_Track::DATA}); // dont allow error tracing to get to the user
-						$thisVisit[] = $r;
+						if(isset($thisVisit)){
+							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
+							unset($r->{\cfg_obo_Track::DATA}); // dont allow error tracing to get to the user
+							$thisVisit[] = $r;
+						}
 						break;
 
 				}
@@ -622,7 +627,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			$pageViews['practice']['unique'] = count($pageViews['practice'])-2;	
 			$pageViews['assessment']['unique'] = count($pageViews['assessment'])-2;
 			$pageViews['unique'] = $pageViews['content']['unique'] + $pageViews['practice']['unique'] + $pageViews['assessment']['unique'];
-			if(!$totalsOnly)
+			if(!$totalsOnly && isset($lo))
 			{
 				$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->data->visitID, 'loID' => $lo->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);
 			}
@@ -638,6 +643,17 @@ class LogManager extends \rocketD\db\DBEnabled
 		$overallPageViews['unique'] = $overallPageViews['content']['unique'] + $overallPageViews['practice']['unique'] + $overallPageViews['assessment']['unique'];
 		$return['pageViews'] = $overallPageViews;
 		$return['visitLog'] = $visits;
+		
+		if(count($missingInstances) > 0)
+		{
+			trace('missing instances');
+			trace(array_unique($missingInstances));
+		}
+		if(count($missingLOs) > 0)
+		{
+			trace('missing LOs');
+			trace(array_unique($missingLOs));
+		}
 		return $return;
 	}
 	
