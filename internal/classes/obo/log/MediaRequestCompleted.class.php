@@ -7,7 +7,7 @@ class MediaRequestCompleted extends \obo\log\Trackable
 	function __construct($userID = 0, $createTime = 0, $instID = 0, $mediaID = 0)
 	{
 		parent::__construct($userID, $createTime, $instID);
-		$this->mediaID = $mediaID;
+		$this->valueA = $this->mediaID = $mediaID;
 	}
 }
 ?>

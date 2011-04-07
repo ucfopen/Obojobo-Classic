@@ -31,19 +31,20 @@ class DBConnectionMYSQL extends DBConnection
 
 	public function query($query)
 	{
-		//@$this->addQueryCount();
 		if( !($return = @mysql_query($query, $this->connData->connID)))
 		{
 			trace('query error  :'.$query, true);
 			trace(mysql_error(), true);
 			trace(array_slice(debug_backtrace(), 0, 3));
 		}
-		// if(preg_match_all("/FROM\W(\w+)/", $query, $matches))
-		// {
-		// 	\rocketD\util\Log::profile('db', implode(' ', $matches[1]) . ' ');
-		// }
 		$this->insertID = @mysql_insert_id($this->connData->connID);
 		return $return;
+	}
+	
+	public function queryTrace($query)
+	{
+		trace($query);
+		return $this->query($query);
 	}
 
 	public function startTransaction()
