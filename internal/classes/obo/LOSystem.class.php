@@ -27,8 +27,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 			
 			if( !($fromUser instanceof \rocketD\auth\User) || !($toUser instanceof \rocketD\auth\User) )
 			{
-		       
-		        return \rocketD\util\Error::getError(2);
+				return \rocketD\util\Error::getError(2);
 			}
 			$this->DBM->startTransaction();
 			$q2 = "SET ".\cfg_core_User::ID." = '$userIDTo' WHERE ".\cfg_core_User::ID." = '$userIDFrom'";

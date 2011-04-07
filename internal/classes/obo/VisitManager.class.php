@@ -37,7 +37,6 @@ class VisitManager extends \rocketD\db\DBEnabled
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}		
 		// locate the correct session
@@ -71,19 +70,13 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 		if($visitID == 0) // for shorter code, instead of getVisit($_SESSION['visitID']), use getVisit()
 		{
-			if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
-			{
-				return false;
-			}
-			$visitID = $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'];
+			$visitID = $thi->getCurrentVisitID();
 		}
 		$qstr = "SELECT * FROM ".\cfg_obo_Visit::TABLE." WHERE ".\cfg_obo_Visit::ID."='?' LIMIT 1";
 		
 		if( !($q = $this->DBM->querySafe($qstr, $visitID)) )
 		{
 			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 
@@ -95,6 +88,15 @@ class VisitManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
+	}
+	
+	public function getCurrentVisitID()
+	{
+		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
+		{
+			return false;
+		}
+		return $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'];
 	}
 
     public function resumeVisit($instID = 0)
