@@ -1,12 +1,13 @@
 <?php
-namespace obo\log;
-class LogManager extends \rocketD\db\DBEnabled
+class TrackingManager extends \rocketD\db\DBEnabled
 {
 	private static $instance;
+	private $selectString;
 	
 	function __construct()
 	{
 		$this->defaultDBM();
+		$this->selectString = \cfg_core_User::ID.", `".\cfg_obo_Track::TYPE."`, ".\cfg_obo_Track::TIME.", ".\cfg_obo_Instance::ID.", UNCOMPRESS(`data`) as data";
 	}
 	
 	static public function getInstance()
@@ -53,8 +54,8 @@ class LogManager extends \rocketD\db\DBEnabled
 				$instID	 = 0;
 			}
 			
-			$qstr = "INSERT INTO `".\cfg_obo_Track::TABLE."` (`".\cfg_core_User::ID."`, `".\cfg_obo_Track::TYPE."`, `".\cfg_obo_Track::TIME."`, `".\cfg_obo_Instance::ID."`) VALUES ('{$_SESSION['userID']}', '?', '".time()."', '{$instID}')";
-			if(!($q = $this->DBM->querySafe($qstr, $trackable->errorID ) ) )
+			$qstr = "INSERT INTO `".\cfg_obo_Track::TABLE."` (`".\cfg_core_User::ID."`, `".\cfg_obo_Track::TYPE."`, `".\cfg_obo_Track::TIME."`, `".\cfg_obo_Instance::ID."`, `data`) VALUES ('{$_SESSION['userID']}', '?', '".time()."', '{$instID}', COMPRESS('?'))";
+			if(!($q = $this->DBM->querySafe($qstr, $trackable->errorID, serialize($trackable->data) ) ) )
 			{
 				$this->DBM->rollback();
 				return false;
@@ -67,32 +68,76 @@ class LogManager extends \rocketD\db\DBEnabled
 		}
 
 	}
+	/*
+	NOT BEING USE USED 12/10/08
+	public function getAllTrackingData($userID = 0, $instID = 0)
+	{
+		if(!is_numeric($userID) || $userID < 1 || !is_numeric($instID) || $instID < 1)
+		{
+			return false; // error: invalid input
+		}
+
+		$qstr = "SELECT ".self::SELECT_STRING." FROM ".self::table." WHERE `userID` = '?' AND `instID` = '?'";
+		
+		if(!($q = $this->DBM->querySafe($qstr, $userID, $instID)))
+		{
+			$this->DBM->rollback();
+			//echo "ERROR: getAllTrackingData";
+			error_log("ERROR: getAllTrackingData".mysql_error());
+			//exit;
+			return false;
+		}
+		$trackingData = array();
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$data = $this->deserializeData($r->data);
+			$data->userID = (int)$r->userID;
+			$data->type = $r->type;
+			$data->createTime = (int)$r->createTime;
+			$data->instID = (int)$r->instID;
+			$trackingData[] = $data;
+		}
+		
+		return $trackingData;
+	}
+	*/
 	
+	//@TODO only allow this for the creator of the instance and SU of course
+	/* NOT USED 12/10/08
+	public function getTrackingDataByInstance($instID = 0)
+	{
+		if(!is_numeric($instID) || $instID < 1)
+		{
+			return false; // error: invalid input
+		}
+		$qstr = "SELECT ".self::SELECT_STRING." FROM ".self::table." WHERE `instID` = '?'";
+		
+		if(!($q = $this->DBM->querySafe($qstr, $instID)))
+		{
+			$this->DBM->rollback();
+			error_log("ERROR: getTrackingDataByInstance  ".mysql_error());
+			return false;
+		}
+		$trackingData = array();
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$data = $this->deserializeData($r->data);
+			$data->userID = (int)$r->userID;
+			$data->type = $r->type;
+			$data->createTime = (int)$r->createTime;
+			$data->instID = (int)$r->instID;
+			$trackingData[] = $data;
+		}
+		
+		return $trackingData;
+	}
+	*/
+
 	public function getInteractionLogByInstance($instID=0)
 	{
 		
-		$roleMan = \obo\perms\RoleManager::getInstance();
-		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
-		{
-			if(!$roleMan->isLibraryUser())
-			{
-				return \rocketD\util\Error::getError(4);
-			}
-			$permman = \obo\perms\PermissionsManager::getInstance();
-			if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $_SESSION['userID']) )
-			{
-				// check 2nd Perms system to see if they have write or own
-				$pMan = \obo\perms\PermManager::getInstance();
-				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
-				if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
-				{
-					return \rocketD\util\Error::getError(4);
-				}
-			}
-		}
-		
-		
-		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'	ORDER BY ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
+
+		$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'	ORDER BY ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		return $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID));
 		
 	}
@@ -110,7 +155,7 @@ class LogManager extends \rocketD\db\DBEnabled
 		}
 		if(count($loIDs) > 0)
 		{
-			$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (" . implode(",", $loIDs) . ") ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
+			$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (" . implode(",", $loIDs) . ") ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 			return $this->getInteractionLogs($this->DBM->query($trackQ), $totalsOnly);
 		}
 	 	return array();
@@ -119,14 +164,14 @@ class LogManager extends \rocketD\db\DBEnabled
 	public function getInteractionLogTotals()
 	{
 		// must be user, instance owner, or SU
-		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." != 0 AND ".\cfg_obo_Track::TIME." > 1214193600 ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
+		$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." != 0 AND ".\cfg_obo_Track::TIME." > 1214193600 ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		return $this->getInteractionLogs($this->DBM->query($trackQ), true, 10);
 	}
 	
 	public function getInteractionLogByUser($userID=0)
 	{
 		// must be SU or this user
-		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." != 0 AND ".\cfg_core_User::ID." = '?'	ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;		
+		$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." != 0 AND ".\cfg_core_User::ID." = '?'	ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;		
 		return $this->getInteractionLogs($this->DBM->querySafe($trackQ, $userID));
 	}
 	
@@ -140,7 +185,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			return $tracking;
 		}
 		
-		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?' AND ".\cfg_core_User::ID." = '?' ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
+		$trackQ = "SELECT $this->selectString FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?' AND ".\cfg_core_User::ID." = '?' ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID, $userID));
 		
 		\rocketD\util\Cache::getInstance()->setInteractionsByInstanceAndUser($instID, $userID, $return);
@@ -177,7 +222,7 @@ class LogManager extends \rocketD\db\DBEnabled
 				{
 					case 'Visited':
 						// print and tally totals for previous visit
-						
+						$r->data = $this->deserializeData($r->data);
 						// total up the time from the previous visit's data
 						if(isset($thisVisit) && isset($sectionTime))
 						{
@@ -247,9 +292,10 @@ class LogManager extends \rocketD\db\DBEnabled
 					case 'SectionChanged':
 						if($loFound)
 						{
+							$r->data = $this->deserializeData($r->data);
 							$sectionTime[$curSection] += ($r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime);
 							//if((int)$r->data->to != 3) 
-							$curSection = $sectionNames[(int)$r->{\cfg_obo_Track::TO}];
+							$curSection = $sectionNames[(int)$r->data->to];
 							$thisVisit[] = $r;
 						
 							if(!$totalsOnly && isset($prevPageView) && is_object($prevPageView) )
@@ -263,7 +309,8 @@ class LogManager extends \rocketD\db\DBEnabled
 					case 'PageChanged':
 						if($loFound)
 						{					
-							$toSection = (int) ($r->{\cfg_obo_Track::IN} == 0 ? 1 : $r->{\cfg_obo_Track::IN});
+							$r->data = $this->deserializeData($r->data);
+							$toSection = (int) ($r->data->in == 0 ? 1 : $r->data->in);
 							$pageIndex = '?';
 							if(isset($lo->pages) && count($lo->pages > 0))
 							{ 
@@ -274,7 +321,7 @@ class LogManager extends \rocketD\db\DBEnabled
 										{
 											foreach($lo->pages AS $key => $page)
 											{
-												if($page->pageID == $r->{\cfg_obo_Track::TO})
+												if($page->pageID == $r->data->to)
 												{
 													$r->title = $page->title;
 													$pageIndex =  1 + (int)$key;
@@ -288,7 +335,7 @@ class LogManager extends \rocketD\db\DBEnabled
 										{
 											foreach($lo->pGroup->kids AS $key => $page)
 											{
-												if($page->questionID == $r->{\cfg_obo_Track::TO})
+												if($page->questionID == $r->data->to)
 												{
 													$r->qType = $page->itemType;
 													//if(!$totalsOnly) $r->qText = substr(($page->itemType == 'M' ? preg_replace("/[\n\r]/","", strip_tags($page->media[0]->title)) : preg_replace("/[\n\r]/","",strip_tags($page->items[0]->{\cfg_obo_Page::ITEM_DATA}))), 0, 120);
@@ -318,7 +365,7 @@ class LogManager extends \rocketD\db\DBEnabled
 													$altIndex++;
 												}
 												
-												if($page->questionID == $r->{\cfg_obo_Track::TO})
+												if($page->questionID == $r->data->to)
 												{
 													if($page->questionIndex) $r->altIndex = $altIndex;
 													$r->normalIndex = $realQNum;
@@ -337,7 +384,7 @@ class LogManager extends \rocketD\db\DBEnabled
 											{
 												foreach($currentAttemptOrder AS $key => $page)
 												{
-													if($page->questionID == $r->{\cfg_obo_Track::TO})
+													if($page->questionID == $r->data->to)
 													{
 														$r->realIndex = $pageIndex;
 														$pageIndex =  1 + (int)$key;
@@ -381,7 +428,8 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
-								$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
+								$r->data = $this->deserializeData($r->data);
+								$r->attemptData = $AM->getAttemptDetails($r->data->attemptID);
 								if(isset($prevPageView) && is_object($prevPageView))
 								{
 									$prevPageView->viewTime = $r->{\cfg_obo_Track::TIME} - $prevPageView->createTime;
@@ -391,7 +439,7 @@ class LogManager extends \rocketD\db\DBEnabled
 								// if this is the assessment section AND the assessment uses randomization or alternate questions, get the questions in order
 								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) )
 								{
-									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Attempt::ID});
+									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->data->attemptID);
 								}
 								else
 								{
@@ -405,6 +453,7 @@ class LogManager extends \rocketD\db\DBEnabled
 					case 'EndAttempt':
 						if($loFound)
 						{
+							$r->data = $this->deserializeData($r->data);
 							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
 							$thisVisit[] = $r;
 							
@@ -420,6 +469,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						{					
 							if(!$totalsOnly)
 							{
+								$r->data = $this->deserializeData($r->data);						// find question in lo
 								$secNum = array_search($curSection, $sectionNames);
 								$parentGroup = $secNum==2 ? $lo->pGroup->kids : $lo->aGroup->kids;
 								$r->score = 0;
@@ -428,7 +478,7 @@ class LogManager extends \rocketD\db\DBEnabled
 								$aIndex = '?'; 
 								foreach($parentGroup AS $key => $qu)
 								{
-									if($qu->questionID == $r->{\cfg_obo_Track::QID})
+									if($qu->questionID == $r->data->questionID)
 									{
 										$question = $qu;
 										$qIndex =  $key+1; 
@@ -445,7 +495,7 @@ class LogManager extends \rocketD\db\DBEnabled
 										case 'MC':
 											foreach($question->answers AS $key=> $a)
 											{
-												if($a->answerID == $r->{\cfg_obo_Track::ANSWER})
+												if($a->answerID == $r->data->answer)
 												{
 													$aIndex = $key+1;
 													$answer = $a;
@@ -456,7 +506,7 @@ class LogManager extends \rocketD\db\DBEnabled
 										case 'QA':
 											foreach($question->answers AS $key => $a)
 											{
-												if($a->answer == $r->{\cfg_obo_Track::ANSWER})
+												if($a->answer == $r->data->answer)
 												{
 													$aIndex = $key+1;
 													$answer = $a;
@@ -487,11 +537,12 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
+								$r->data = $this->deserializeData($r->data);
 								// if this log is a repeat of the previous log dont store it (submitMedia is sometimes sent more then it should be)
 								if($thisVisit[count($thisVisit)-1]->itemType == 'SubmitMedia')
 								{
 									$prevLog = $thisVisit[count($thisVisit)-1];
-									if($prevLog->data->score == $r->{\cfg_obo_Track::SCORE} && $prevLog->{\cfg_obo_Track::QID} == $r->{\cfg_obo_Track::QID} && $r->{\cfg_obo_Track::TIME} == $prevLog->createTime)
+									if($prevLog->data->score == $r->data->score && $prevLog->data->questionID == $r->data->questionID && $r->{\cfg_obo_Track::TIME} == $prevLog->createTime)
 									{
 										break;
 									}
@@ -503,7 +554,7 @@ class LogManager extends \rocketD\db\DBEnabled
 								$aIndex = '?'; 
 								foreach($parentGroup AS $key => $qu)
 								{
-									if($qu->questionID == $r->{\cfg_obo_Track::QID})
+									if($qu->questionID == $r->data->questionID)
 									{
 										$question = $qu;
 										$qIndex =  $key+1; 
@@ -511,7 +562,7 @@ class LogManager extends \rocketD\db\DBEnabled
 									}
 								}
 						
-								$r->score = $r->{\cfg_obo_Track::SCORE};
+								$r->score = $r->data->score;
 								$r->page = $qIndex;
 							}
 							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
@@ -520,11 +571,13 @@ class LogManager extends \rocketD\db\DBEnabled
 						break;
 					case 'MediaRequested':
 						$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
+						$r->data = $this->deserializeData($r->data);
 						$thisVisit[] = $r;
 						break;
 					default:
 						if(isset($thisVisit)){
 							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
+							unset($r->data); // dont allow error tracing to get to the user
 							$thisVisit[] = $r;
 						}
 						break;
@@ -701,7 +754,7 @@ class LogManager extends \rocketD\db\DBEnabled
         $trackingArr = new \stdClass();
 		$trackingArr->prevScores = $SM->getAssessmentScores($instID, $userID);
 
-        $qstr = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE `".\cfg_obo_Track::TYPE."`='PageChanged' AND `".\cfg_obo_Instance::ID."` = '?' AND `".\cfg_core_User::ID."` = '?'";
+        $qstr = "SELECT UNCOMPRESS(`data`) as data FROM ".\cfg_obo_Track::TABLE." WHERE `".\cfg_obo_Track::TYPE."`='PageChanged' AND `".\cfg_obo_Instance::ID."` = '?' AND `".\cfg_core_User::ID."` = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 		    $this->DBM->rollback();
@@ -712,9 +765,10 @@ class LogManager extends \rocketD\db\DBEnabled
 		$trackingArr->contentVisited = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
-		    if($data->{\cfg_obo_Track::IN} == \obo\log\PageChanged::CONTENT)
+		    $data = $this->deserializeData($r->data);
+		    if($data->in == \obo\log\PageChanged::CONTENT)
 			{
-                $trackingArr->contentVisited[] = $data->{\cfg_obo_Track::TO};
+                $trackingArr->contentVisited[] = $data->to;
 			}
 		}
 		$trackingArr->contentVisited = array_values(array_unique($trackingArr->contentVisited));

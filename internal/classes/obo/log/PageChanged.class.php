@@ -13,8 +13,8 @@ class PageChanged extends \obo\log\Trackable
 	function __construct($userID = 0, $createTime = 0, $instID = 0, $to = -1, $in = -1)
 	{
 		parent::__construct($userID, $createTime, $instID);
-		$this->to = $to;
-		$this->in = $in;
+		$this->valueA = $this->to = $to;
+		$this->valueB = $this->in = $in;
 	}
 }
 ?>

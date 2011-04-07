@@ -305,7 +305,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$rootID = $this->getRootId($loID);
 		
-		// must be superUser OR LibararyUser && have write permissions
+		// must be SU OR (LibararyUser && have write permissions)
 		if(!$roleMan->isSuperUser())
 		{
 			if(!$roleMan->isLibraryUser())

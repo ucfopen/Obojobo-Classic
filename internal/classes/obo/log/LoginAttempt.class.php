@@ -8,8 +8,8 @@ class LoginAttempt extends \obo\log\Trackable
 	function __construct($userID = 0, $createTime = 0, $instID = 0, $userName, $code)
 	{
 		parent::__construct($userID, $createTime, $instID);
-		$this->code = $code;
-		$this->userName = $userName;
+		$this->valueA = $this->code = $code;
+		$this->valueB = $this->userName = $userName;
 	}
 }
 ?>

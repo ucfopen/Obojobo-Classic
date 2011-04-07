@@ -28,6 +28,9 @@ class DBEnabled
 	{
 		// TODO: get rid of this - its a temporary crutch to bypass actually updating the database
 		$data = base64_decode($obj);
+		$data = preg_replace('/9:"nm_los_LO/', '9:"obo\lo\LO', $data);
+		$data = preg_replace('/20:"nm_los_QuestionGroup/', '20:"obo\lo\QuestionGroup', $data);
+		
 		$data = preg_replace('/13:"nm_los_Answer/', '13:"obo\lo\Answer', $data);
 		$data = preg_replace('/15:"nm_los_Question/', '15:"obo\lo\Question', $data);
 		$data = preg_replace('/11:"nm_los_Page/', '11:"obo\lo\Page', $data);
