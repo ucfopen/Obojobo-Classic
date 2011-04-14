@@ -190,7 +190,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							$overallSectionTime['assessment'] += $sectionTime['assessment'];
 							if(!$totalsOnly && isset($lo))
 							{
-								$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->data->visitID, 'loID' => $lo->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);	
+								$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->visitID, 'loID' => $thisVisit[0]->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);	
 							}
 						}
 
@@ -381,7 +381,10 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
-								$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
+								if($r->{\cfg_obo_Attempt::ID} > 0)
+								{
+									$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
+								}
 								if(isset($prevPageView) && is_object($prevPageView))
 								{
 									$prevPageView->viewTime = $r->{\cfg_obo_Track::TIME} - $prevPageView->createTime;
@@ -389,7 +392,7 @@ class LogManager extends \rocketD\db\DBEnabled
 								}
 								
 								// if this is the assessment section AND the assessment uses randomization or alternate questions, get the questions in order
-								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) )
+								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Attempt::ID} > 0 )
 								{
 									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Attempt::ID});
 								}
@@ -552,7 +555,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			$pageViews['unique'] = $pageViews['content']['unique'] + $pageViews['practice']['unique'] + $pageViews['assessment']['unique'];
 			if(!$totalsOnly && isset($lo))
 			{
-				$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->data->visitID, 'loID' => $lo->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);
+				$visits[] = array('instID' => $curInst, 'userID' => $tmpUID, 'visitID' => $thisVisit[0]->visitID, 'loID' => $thisVisit[0]->loID , 'createTime' => $thisVisit[0]->createTime, 'sectionTime' => $sectionTime, 'pageViews' => $pageViews, 'logs' => $thisVisit);
 			}
 			
 		}
@@ -597,97 +600,92 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	public function trackDeleteInstance($instID)
 	{
-		$this->track(new \obo\log\DeleteInstance(0, 0, $instID));
+		$this->track(new \obo\log\Trackable(0,0,$instID));
 	}
 
 	public function trackDeleteLO($loID, $numDeleted)
 	{
-		$this->track(new \obo\log\DeleteLO(0, 0, 0, $loID, $numDeleted));
+		$this->track(new \obo\log\Trackable(0,0,0, $loID, $numDeleted));
 	}
 
 	public function trackVisit()
 	{
-		$this->track(new \obo\log\Visited(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID']));
+		$this->track(new \obo\log\Trackable());
 	}
 	
 	public function trackStartAttempt()
 	{
-		$this->track(new \obo\log\StartAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 	
 	public function trackEndAttempt()
 	{
-		$this->track(new \obo\log\EndAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}	
 	
 	public function trackImportScore()
 	{
-		$this->track(new \obo\log\ImportScore(0,0,0,$GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 
 	public function trackResumeAttempt()
 	{
-		$this->track(new \obo\log\ResumeAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 
 	public function trackSubmitQuestion($qGroupID, $questionID, $answer)
 	{
-		$this->track(new \obo\log\SubmitQuestion(0, 0, 0, (int)$qGroupID, $questionID, $answer));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, $answer, (int)$qGroupID));
 	}
 	
 	public function trackMergeUser($userIDFrom, $userIDTo)
 	{
-		$this->track(new \obo\log\MergeUser($userIDTo, 0, 0, $userIDFrom, $userIDTo));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $userIDFrom, $userIDTo));
 	}
 	
 	public function trackSubmitMedia($qGroupID, $questionID, $score)
 	{
-		$this->track(new \obo\log\SubmitMedia(0, 0, 0, (int)$qGroupID, $questionID, (int)$score));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, (int)$score, (int)$qGroupID));
 	}
 	
 	public function trackPageChanged($pageID, $section)
 	{
-		$this->track(new \obo\log\PageChanged(0, 0, 0, $pageID, $section));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $pageID, $section));
 	}
 	
 	public function trackSectionChanged($section)
 	{
-		$this->track(new \obo\log\SectionChanged(0, 0, 0, $section));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $section));
 	}
 	
 	public function trackMediaDownloaded($mediaID)
 	{
-		$this->track(new \obo\log\MediaDownloaded(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequested($mediaID)
 	{
-		$this->track(new \obo\log\MediaRequested(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequestCompleted($mediaID)
 	{
-		$this->track(new \obo\log\MediaRequestedCompleted(0, 0, 0, $mediaID));
-	}
-	
-	public function trackNextPreviousUsed($dir)
-	{
-	    $this->track(new \obo\log\NextPreviousUsed(0, 0, 0, $dir));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
 	}
 	
 	public function trackLoggedIn()
 	{
-		$this->track(new \obo\log\LoggedIn(0, 0, 0));
+		$this->track(new \obo\log\Trackable(0, 0, 0));
 	}
 	
 	public function trackLogInAttempt($userID, $userName, $code)
 	{
-		$this->trace(new \obo\log\LoginAttempt($userID,0,0,$userName,$code));
+		$this->track(new \obo\log\Trackable(0, 0, 0, $code, $userName));
 	}
 	
     public function trackLoggedOut()
 	{
-		$this->track(new \obo\log\LoggedOut(0, 0, 0));
+		$this->track(new \obo\log\Trackable(0, 0, 0));
 	}
 
 

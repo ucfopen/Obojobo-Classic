@@ -9,7 +9,6 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 }
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
-//if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');
 
 
 $stats = array();
@@ -25,33 +24,11 @@ $stats = array();
    //Average Score for all Questions
    $stats[] = array ('name' => '3_AverageScoreForAllQuestions', 'value'=>"SELECT AVG(".\cfg_obo_Score::SCORE.") AS AVG_SCORE FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Answer::ID." !=0 AND ".\cfg_obo_Answer::TEXT." != '' AND ".\cfg_obo_Attempt::ID." IN (SELECT ".\cfg_obo_Attempt::ID." FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.") AND ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." >   1214193600 )");
 
-   //Percent of Content Pages With Media
-   // TODO: Fix this, changes to media requires some changes
-   //$stats[] = array ('name' => '4_PercentOfContentPagesWithMedia', 'value'=>"SELECT  (SELECT COUNT(*) FROM lo_map_media WHERE item_type ='i') / (SELECT COUNT(*) FROM lo_pages WHERE q_id=0 ) * 100 AS PERCENT_WITH_MEDIA");
-
-   //count of content pages with media
-   // TODO: FIx
-   //$stats[] = array ('name' => '5_CountOfContentPagesWithMedia', 'value'=>"SELECT COUNT(*) AS PAGES_WITH_MEDIA FROM lo_map_media WHERE item_type ='i'");
-
    // Average file Size
    $stats[] = array ('name' => '6_AverageFileSize', 'value'=>"SELECT AVG(".\cfg_obo_Media::SIZE.") as SIZE_IN_BYTES  FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::SIZE." !=0");
 
-   // Answers with Feedback
-//   $stats[] = array ('name' => '7_AnswersWithFeedback', 'value'=>"SELECT COUNT(*) AS Q_WITH_FEEDBACK FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_FEEDBACK." != ''");
-
-   //Ave length of feedback (in characters)
-//   $stats[] = array ('name' => '8_AveCharLengthOfFeedback', 'value'=>"SELECT AVG(len) AS AV_FEEDBACK_LENGTH FROM (SELECT CHAR_LENGTH(".\cfg_obo_Question::MAP_ANS_FEEDBACK.") AS len  FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_FEEDBACK." != '') AS LENGTHS");
-
-   //Percent of answers with partial values
-//   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
-
    // Total Page Views (content and questions)
    $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS, YEAR(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS YEAR, MONTH(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS MONTH FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH");
-
-   // Count of next/prev button used in content;
-   //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM obo_logs WHERE type='\obo\log\NextPreviousUsed' AND time > 1214193600";
-   // Media Views
-   // $stats[] = array ('name' => '12_MediaViews', 'value'=>"SELECT COUNT(".\cfg_core_User::ID.") AS MEDIA_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE."='MediaRequested' AND ".\cfg_obo_Track::TIME." > 1214193600");
 
    // Percent of Assessment Attempts not completed
    $stats[] = array ('name' => '13_PercentOfAssessmentAttemptsNotCompleted', 'value'=>"SELECT COUNT(*) / (SELECT COUNT(*) FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")) * 100  AS PERCENT FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::END_TIME." = 0 AND ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")");
@@ -77,9 +54,6 @@ $stats = array();
    // Total number of users
    $stats[] = array ('name' => '20_TotalNumberOfUsers', 'value'=>"SELECT COUNT(*) AS NUM_USERS FROM ".\cfg_core_User::TABLE."");
 
-   //Question Type Usage
-   // $stats[] = array ('name' => '21_QuestionTypeUsage', 'value'=>"SELECT ".\cfg_obo_Question::TYPE." AS QUESTION_TYPE, COUNT(*) AS COUNT FROM ".\cfg_obo_Question::TABLE." GROUP BY QUESTION_TYPE");
-
    // Instances Per User
    $stats[] = array ('name' => '22_InstancesPerUser', 'value'=>"SELECT CONCAT(U.last, ', ' , U.first) AS USER_NAME, COUNT(I.".\cfg_core_User::ID.") as NUM_INSTANCES FROM ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_core_User::TABLE." AS U WHERE U.".\cfg_core_User::ID." = I.".\cfg_core_User::ID." GROUP BY I.".\cfg_core_User::ID." ORDER BY U.".\cfg_core_User::LAST);
 
@@ -91,12 +65,6 @@ $stats = array();
 
    //Keyword Popularity
    $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".\cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".\cfg_obo_Keyword::MAP_ITEM.") as COUNT FROM ".\cfg_obo_Keyword::MAP_TABLE." AS M, ".\cfg_obo_Keyword::TABLE." AS K WHERE M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID." GROUP BY K.".\cfg_obo_Keyword::ID." ORDER BY KEYWORD");
-
-   //Page Layouts use in Masters
-//   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".\cfg_obo_Page::ID.") as COUNT FROM ".\cfg_obo_Page::TABLE." AS P, ".\cfg_obo_Layout::TABLE." AS L WHERE P.".\cfg_obo_Page::ID." IN (SELECT ".\cfg_obo_Page::ID." FROM ".\cfg_obo_Page::MAP_TABLE." WHERE ".\cfg_obo_LO::ID." IN (SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER." != '0' AND ".\cfg_obo_LO::SUB_VER." ='0')) AND L.".\cfg_obo_Layout::ID." = P.".\cfg_obo_Layout::ID."  Group By LAYOUT");
-
-   //Page Layouts use in Masters
-//   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".\cfg_obo_Layout::ID." AS LAYOUT, count(".\cfg_obo_Page::ID.") as COUNT FROM ".\cfg_obo_Page::TABLE." Group By ".\cfg_obo_Layout::ID."");
 
    //Resolution by Views
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".\cfg_obo_ComputerData::TIME.") as COUNT  FROM ".\cfg_obo_ComputerData::TABLE." WHERE ".\cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT);
