@@ -7,7 +7,7 @@ $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCf
 
 
 // sync visits with visitIDs
-$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs ORDER BY instID, userID, createTime");
+$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE instID > 0 ORDER BY instID, userID, createTime");
 
 
 $lastUserID = 0;
@@ -18,33 +18,46 @@ $curUserID = 0;
 
 while($r = $DBM->fetch_obj($q))
 {
-
+	// echo "[{$r->trackingID}]{$r->itemType}<br>";
 	// if this is a visit log, keep track of the visit id, and set the visit IDs of the the previous visit
 	if($r->itemType == 'Visited')
 	{
+
 		$data = deserializeData($r->data);
+		// echo "Visit Found: {$data->visitID}<br>";
+		flush();
 		if($data->visitID > 0) 
 		{
-			// update visit IDs of the previous visit
-			$DBM->query("UPDATE obo_logs SET visitID = '".$data->visitID."' WHERE trackingID IN (" . implode(',', $trackingIDsToUpdate) . ")");	
+			// echo "vist {$r->data->visitID}<br>";
+			flush();
+			if(count($trackingIDsToUpdate) > 0 )
+			{
+				echo "updating... {$curVisitID} -> " . implode(',', $trackingIDsToUpdate) . "<Br>";
+				flush();
+				// update visit IDs of the previous visit
+				$DBM->query("UPDATE obo_logs SET visitID = '".$curVisitID."' WHERE trackingID IN (" . implode(',', $trackingIDsToUpdate) . ")");
+			}
 			// reset the trackingIDs
 			$trackingIDsToUpdate = array();
 			// now keep track of this log's visit id 
 			$curVisitID = $data->visitID;
+			$curUserID = $r->userID;
 		}
 	}
-	if($curUserID = $r->userID)
+	// make sure the log is for this same user - otherwise it couldnt be part of this visit
+	if($curUserID == $r->userID)
 	{
 		$trackingIDsToUpdate[] = $r->trackingID; // keep tracking ids
 	}
 	else
 	{
-		echo "$r->trackingID Problem\n";
+		echo "$r->trackingID Problem<br>";
+		flush();
 	}
 }
 
 // the visit for this log had no id or something - falls through the cracks of the above query
-$DBM->query("UPDATE obo_logs SET visitID = '66813' WHERE userID = 7318 AND instID = 1888");
+//$DBM->query("UPDATE obo_logs SET visitID = '66813' WHERE userID = 7318 AND instID = 1888");
 
 
 function deserializeData($data)
@@ -58,6 +71,15 @@ function fixObject($matches)
 {
 	return ($matches[0]-7) . ':"\\obo\\log\\';
 }
+
+// process the last trackingIDs
+if(count($trackingIDsToUpdate) > 0 )
+{
+	$DBM->query("UPDATE obo_logs SET visitID = '".$curVisitID."' WHERE trackingID IN (" . implode(',', $trackingIDsToUpdate) . ")");
+}
+
+
+$DBM->query("UPDATE obo_logs SET visitID = '".$curVisitID."' WHERE trackingID IN (" . implode(',', $trackingIDsToUpdate) . ")");
 
 exit('done');
 ?>
