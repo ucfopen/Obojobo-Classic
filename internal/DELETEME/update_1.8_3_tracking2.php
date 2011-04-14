@@ -6,7 +6,7 @@ $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCf
 
 
 
-$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE trackingID > 1993025");
+$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE itemType = 'SubmitQuestion'");
 
 while($r = $DBM->fetch_obj($q))
 {
@@ -76,7 +76,7 @@ while($r = $DBM->fetch_obj($q))
 
 
 function deserializeData($data)
-{
+{	
 	$data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', 'fixObject', $data);
 	$data = unserialize($data);
 	return $data;
