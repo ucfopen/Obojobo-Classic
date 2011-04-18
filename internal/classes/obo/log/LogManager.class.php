@@ -68,29 +68,30 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	}
 	
-	public function getInteractionLogByInstance($instID=0)
+	public function getInteractionLogByInstance($instID=0, $skipPerms=false)
 	{
-		
-		$roleMan = \obo\perms\RoleManager::getInstance();
-		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
+		if($skipPerms!==true)  // needed for the cron job to execute this function
 		{
-			if(!$roleMan->isLibraryUser())
+			$roleMan = \obo\perms\RoleManager::getInstance();
+			if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
 			{
-				return \rocketD\util\Error::getError(4);
-			}
-			$permman = \obo\perms\PermissionsManager::getInstance();
-			if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $_SESSION['userID']) )
-			{
-				// check 2nd Perms system to see if they have write or own
-				$pMan = \obo\perms\PermManager::getInstance();
-				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
-				if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
+				if(!$roleMan->isLibraryUser())
 				{
 					return \rocketD\util\Error::getError(4);
 				}
+				$permman = \obo\perms\PermissionsManager::getInstance();
+				if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $_SESSION['userID']) )
+				{
+					// check 2nd Perms system to see if they have write or own
+					$pMan = \obo\perms\PermManager::getInstance();
+					$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
+					if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
+					{
+						return \rocketD\util\Error::getError(4);
+					}
+				}
 			}
 		}
-		
 		
 		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'	ORDER BY ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		return $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID));
