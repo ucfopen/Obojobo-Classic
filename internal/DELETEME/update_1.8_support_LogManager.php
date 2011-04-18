@@ -1,5 +1,4 @@
 <?php
-namespace obo\log;
 class LogManager extends \rocketD\db\DBEnabled
 {
 	private static $instance;
@@ -68,30 +67,29 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	}
 	
-	public function getInteractionLogByInstance($instID=0, $skipPerms=false)
+	public function getInteractionLogByInstance($instID=0)
 	{
-		if($skipPerms!==true)  // needed for the cron job to execute this function
+		
+		$roleMan = \obo\perms\RoleManager::getInstance();
+		if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
 		{
-			$roleMan = \obo\perms\RoleManager::getInstance();
-			if(!$roleMan->isSuperUser()) // if the current user is not SuperUser
+			if(!$roleMan->isLibraryUser())
 			{
-				if(!$roleMan->isLibraryUser())
+				return \rocketD\util\Error::getError(4);
+			}
+			$permman = \obo\perms\PermissionsManager::getInstance();
+			if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $_SESSION['userID']) )
+			{
+				// check 2nd Perms system to see if they have write or own
+				$pMan = \obo\perms\PermManager::getInstance();
+				$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
+				if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
 				{
 					return \rocketD\util\Error::getError(4);
 				}
-				$permman = \obo\perms\PermissionsManager::getInstance();
-				if( ! $permman->getUserPerm($instID, \cfg_obo_Perm::TYPE_INSTANCE, \cfg_obo_Perm::WRITE, $_SESSION['userID']) )
-				{
-					// check 2nd Perms system to see if they have write or own
-					$pMan = \obo\perms\PermManager::getInstance();
-					$perms = $pMan->getPermsForUserToItem($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, $instID);
-					if(!is_array($perms) && !in_array(\cfg_core_Perm::P_READ, $perms) && !in_array(\cfg_core_Perm::P_OWN, $perms) )
-					{
-						return \rocketD\util\Error::getError(4);
-					}
-				}
 			}
 		}
+		
 		
 		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'	ORDER BY ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		return $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID));
@@ -382,10 +380,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
-								if($r->{\cfg_obo_Attempt::ID} > 0)
-								{
-									$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
-								}
+								$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
 								if(isset($prevPageView) && is_object($prevPageView))
 								{
 									$prevPageView->viewTime = $r->{\cfg_obo_Track::TIME} - $prevPageView->createTime;
@@ -393,7 +388,7 @@ class LogManager extends \rocketD\db\DBEnabled
 								}
 								
 								// if this is the assessment section AND the assessment uses randomization or alternate questions, get the questions in order
-								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Attempt::ID} > 0 )
+								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) )
 								{
 									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Attempt::ID});
 								}
@@ -601,92 +596,97 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	public function trackDeleteInstance($instID)
 	{
-		$this->track(new \obo\log\Trackable(0,0,$instID));
+		$this->track(new \obo\log\DeleteInstance(0, 0, $instID));
 	}
 
 	public function trackDeleteLO($loID, $numDeleted)
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $loID, $numDeleted));
+		$this->track(new \obo\log\DeleteLO(0, 0, 0, $loID, $numDeleted));
 	}
 
 	public function trackVisit()
 	{
-		$this->track(new \obo\log\Trackable());
+		$this->track(new \obo\log\Visited(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID']));
 	}
 	
 	public function trackStartAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\StartAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 	
 	public function trackEndAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\EndAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}	
 	
 	public function trackImportScore()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\ImportScore(0,0,0,$GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 
 	public function trackResumeAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\ResumeAttempt(0, 0, 0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 
 	public function trackSubmitQuestion($qGroupID, $questionID, $answer)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, $answer, (int)$qGroupID));
+		$this->track(new \obo\log\SubmitQuestion(0, 0, 0, (int)$qGroupID, $questionID, $answer));
 	}
 	
 	public function trackMergeUser($userIDFrom, $userIDTo)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $userIDFrom, $userIDTo));
+		$this->track(new \obo\log\MergeUser($userIDTo, 0, 0, $userIDFrom, $userIDTo));
 	}
 	
 	public function trackSubmitMedia($qGroupID, $questionID, $score)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, (int)$score, (int)$qGroupID));
+		$this->track(new \obo\log\SubmitMedia(0, 0, 0, (int)$qGroupID, $questionID, (int)$score));
 	}
 	
 	public function trackPageChanged($pageID, $section)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $pageID, $section));
+		$this->track(new \obo\log\PageChanged(0, 0, 0, $pageID, $section));
 	}
 	
 	public function trackSectionChanged($section)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $section));
+		$this->track(new \obo\log\SectionChanged(0, 0, 0, $section));
 	}
 	
 	public function trackMediaDownloaded($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\MediaDownloaded(0, 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequested($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\MediaRequested(0, 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequestCompleted($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\MediaRequestedCompleted(0, 0, 0, $mediaID));
+	}
+	
+	public function trackNextPreviousUsed($dir)
+	{
+	    $this->track(new \obo\log\NextPreviousUsed(0, 0, 0, $dir));
 	}
 	
 	public function trackLoggedIn()
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0));
+		$this->track(new \obo\log\LoggedIn(0, 0, 0));
 	}
 	
 	public function trackLogInAttempt($userID, $userName, $code)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $code, $userName));
+		$this->trace(new \obo\log\LoginAttempt($userID,0,0,$userName,$code));
 	}
 	
     public function trackLoggedOut()
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0));
+		$this->track(new \obo\log\LoggedOut(0, 0, 0));
 	}
 
 

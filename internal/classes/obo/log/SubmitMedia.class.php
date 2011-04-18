@@ -9,10 +9,10 @@ class SubmitMedia extends \obo\log\Trackable
 	
 	function __construct($userID = 0, $createTime = 0, $instID = 0, $qGroupID, $questionID, $score)
 	{
-		parent::__construct($userID, $createTime, $instID);
-		$this->qGroupID = $qGroupID;
+		parent::__construct($userID, $createTime, $instID, $questionID, $score, $qGroupID);
 		$this->questionID = $questionID;
 		$this->score = $score;
+		$this->qGroupID = $qGroupID;
 	}
 }
 ?>

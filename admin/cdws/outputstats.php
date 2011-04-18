@@ -9,7 +9,6 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 }
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
-//if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');
 
 
 $stats = array();
@@ -18,41 +17,18 @@ $stats = array();
    $stats[] = array ('name' => '0_TotalSecondsInAssessment', 'value' => "SELECT SUM(".\cfg_obo_Attempt::END_TIME."-".\cfg_obo_Attempt::START_TIME.") AS TOTAL_SECONDS FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::END_TIME." != '0' AND ".\cfg_obo_Attempt::START_TIME." > 1214193600");
 
    // Count completed Assessments
-   $stats[] = array ('name' => '1_CountCompletedAssessments', 'value'=>"SELECT COUNT(*) AS COMPLETED_ASSESSMENTS FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.") AND ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." > 1214193600");
-	$stats[] = array ('name' => '1a_CountCompletedAssessments', 'value'=>"SELECT COUNT(DISTINCT A.".\cfg_obo_Attempt::ID.") AS COMPLETED_ASSESSMENTS FROM ".\cfg_obo_Attempt::TABLE." AS A JOIN ".\cfg_obo_LO::TABLE." AS O ON  O.".\cfg_obo_LO::AGROUP." = A.".\cfg_obo_QGroup::ID." WHERE ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." > 1214193600");
+	$stats[] = array ('name' => '1_CountCompletedAssessments', 'value'=>"SELECT COUNT(DISTINCT A.".\cfg_obo_Attempt::ID.") AS COMPLETED_ASSESSMENTS FROM ".\cfg_obo_Attempt::TABLE." AS A JOIN ".\cfg_obo_LO::TABLE." AS O ON  O.".\cfg_obo_LO::AGROUP." = A.".\cfg_obo_QGroup::ID." WHERE ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." > 1214193600");
    // Number of scored Questions
    $stats[] = array ('name' => '2_NumberOfScoredQuestions', 'value'=>"SELECT COUNT(*) AS ANSWERED_QUESTIONS FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Answer::ID." !=0 AND ".\cfg_obo_Answer::TEXT." != '' AND ".\cfg_obo_Attempt::ID." IN (SELECT ".\cfg_obo_Attempt::ID." FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.") AND ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." >   1214193600 )");
 
    //Average Score for all Questions
    $stats[] = array ('name' => '3_AverageScoreForAllQuestions', 'value'=>"SELECT AVG(".\cfg_obo_Score::SCORE.") AS AVG_SCORE FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Answer::ID." !=0 AND ".\cfg_obo_Answer::TEXT." != '' AND ".\cfg_obo_Attempt::ID." IN (SELECT ".\cfg_obo_Attempt::ID." FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.") AND ".\cfg_obo_Attempt::END_TIME." !='0' AND ".\cfg_obo_Attempt::START_TIME." >   1214193600 )");
 
-   //Percent of Content Pages With Media
-   // TODO: Fix this, changes to media requires some changes
-   //$stats[] = array ('name' => '4_PercentOfContentPagesWithMedia', 'value'=>"SELECT  (SELECT COUNT(*) FROM lo_map_media WHERE item_type ='i') / (SELECT COUNT(*) FROM lo_pages WHERE q_id=0 ) * 100 AS PERCENT_WITH_MEDIA");
-
-   //count of content pages with media
-   // TODO: FIx
-   //$stats[] = array ('name' => '5_CountOfContentPagesWithMedia', 'value'=>"SELECT COUNT(*) AS PAGES_WITH_MEDIA FROM lo_map_media WHERE item_type ='i'");
-
    // Average file Size
    $stats[] = array ('name' => '6_AverageFileSize', 'value'=>"SELECT AVG(".\cfg_obo_Media::SIZE.") as SIZE_IN_BYTES  FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::SIZE." !=0");
 
-   // Answers with Feedback
-//   $stats[] = array ('name' => '7_AnswersWithFeedback', 'value'=>"SELECT COUNT(*) AS Q_WITH_FEEDBACK FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_FEEDBACK." != ''");
-
-   //Ave length of feedback (in characters)
-//   $stats[] = array ('name' => '8_AveCharLengthOfFeedback', 'value'=>"SELECT AVG(len) AS AV_FEEDBACK_LENGTH FROM (SELECT CHAR_LENGTH(".\cfg_obo_Question::MAP_ANS_FEEDBACK.") AS len  FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_FEEDBACK." != '') AS LENGTHS");
-
-   //Percent of answers with partial values
-//   $stats[] = array ('name' => '9_PercentOfAnswersWithPartialValues', 'value'=>"SELECT ((SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE." WHERE ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 0 AND ".\cfg_obo_Question::MAP_ANS_WEIGHT." != 100) / (SELECT COUNT(*) FROM ".\cfg_obo_Question::MAP_ANS_TABLE.") )*100 AS PERCENT_PARTIAL_SCORE");
-
    // Total Page Views (content and questions)
    $stats[] = array ('name' => '10_TotalContentAndQuestionPageViews', 'value'=>"SELECT COUNT(*) AS TOTAL_PAGE_VIEWS, YEAR(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS YEAR, MONTH(FROM_UNIXTIME(".\cfg_obo_Track::TIME.")) AS MONTH FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE." ='PageChanged' AND ".\cfg_obo_Track::TIME." > 1214193600 GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH");
-
-   // Count of next/prev button used in content;
-   //$stats['11_CountOfNextPrevButtonUsedInContent'] = "SELECT COUNT(uid) AS NEXT_PREV_USED FROM obo_logs WHERE type='\obo\log\NextPreviousUsed' AND time > 1214193600";
-   // Media Views
-   // $stats[] = array ('name' => '12_MediaViews', 'value'=>"SELECT COUNT(".\cfg_core_User::ID.") AS MEDIA_VIEWS FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::TYPE."='MediaRequested' AND ".\cfg_obo_Track::TIME." > 1214193600");
 
    // Percent of Assessment Attempts not completed
    $stats[] = array ('name' => '13_PercentOfAssessmentAttemptsNotCompleted', 'value'=>"SELECT COUNT(*) / (SELECT COUNT(*) FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")) * 100  AS PERCENT FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::END_TIME." = 0 AND ".\cfg_obo_Attempt::START_TIME." > 1214193600 AND ".\cfg_obo_QGroup::ID." IN (SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE.")");
@@ -78,9 +54,6 @@ $stats = array();
    // Total number of users
    $stats[] = array ('name' => '20_TotalNumberOfUsers', 'value'=>"SELECT COUNT(*) AS NUM_USERS FROM ".\cfg_core_User::TABLE."");
 
-   //Question Type Usage
-   // $stats[] = array ('name' => '21_QuestionTypeUsage', 'value'=>"SELECT ".\cfg_obo_Question::TYPE." AS QUESTION_TYPE, COUNT(*) AS COUNT FROM ".\cfg_obo_Question::TABLE." GROUP BY QUESTION_TYPE");
-
    // Instances Per User
    $stats[] = array ('name' => '22_InstancesPerUser', 'value'=>"SELECT CONCAT(U.last, ', ' , U.first) AS USER_NAME, COUNT(I.".\cfg_core_User::ID.") as NUM_INSTANCES FROM ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_core_User::TABLE." AS U WHERE U.".\cfg_core_User::ID." = I.".\cfg_core_User::ID." GROUP BY I.".\cfg_core_User::ID." ORDER BY U.".\cfg_core_User::LAST);
 
@@ -92,12 +65,6 @@ $stats = array();
 
    //Keyword Popularity
    $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".\cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".\cfg_obo_Keyword::MAP_ITEM.") as COUNT FROM ".\cfg_obo_Keyword::MAP_TABLE." AS M, ".\cfg_obo_Keyword::TABLE." AS K WHERE M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID." GROUP BY K.".\cfg_obo_Keyword::ID." ORDER BY KEYWORD");
-
-   //Page Layouts use in Masters
-//   $stats[] = array ('name' => '26_PageLayoutsUseInMasters', 'value'=>"SELECT L.name AS LAYOUT, count(P.".\cfg_obo_Page::ID.") as COUNT FROM ".\cfg_obo_Page::TABLE." AS P, ".\cfg_obo_Layout::TABLE." AS L WHERE P.".\cfg_obo_Page::ID." IN (SELECT ".\cfg_obo_Page::ID." FROM ".\cfg_obo_Page::MAP_TABLE." WHERE ".\cfg_obo_LO::ID." IN (SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER." != '0' AND ".\cfg_obo_LO::SUB_VER." ='0')) AND L.".\cfg_obo_Layout::ID." = P.".\cfg_obo_Layout::ID."  Group By LAYOUT");
-
-   //Page Layouts use in Masters
-//   $stats[] = array ('name' => '27_PageLayoutsAll', 'value'=>"SELECT ".\cfg_obo_Layout::ID." AS LAYOUT, count(".\cfg_obo_Page::ID.") as COUNT FROM ".\cfg_obo_Page::TABLE." Group By ".\cfg_obo_Layout::ID."");
 
    //Resolution by Views
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".\cfg_obo_ComputerData::TIME.") as COUNT  FROM ".\cfg_obo_ComputerData::TABLE." WHERE ".\cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT);
@@ -257,9 +224,9 @@ $stats[] = array ('name' => '77_AssessmentCompletionByMonth', 'value'=> "SELECT 
 $stats[] = array ('name' => '78_InstancesCreatedByMonth', 'value'=> "SELECT COUNT(InstID) AS INSTANCES, MONTH(FROM_UNIXTIME(createTime)) AS MONTH, YEAR(FROM_UNIXTIME(createTime)) AS YEAR FROM obo_lo_instances GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH ");
 
 
-$startTime = 1259647200;
+$startTime = 1291183200;
 $endTime = time();
-$loIDs = implode(',', array(7841, 7820, 7819, 7814, 7802, 7801, 7792, 7711, 13810, 13832, 13848,13849,13851,13830,13853 ));
+$loIDs = implode(',', array(13836, 13830, 13832, 14427, 13810, 13848, 13849, 14303, 13851, 13853, 13887, 14315 ));
 
 $stats[] = array ('name' => '9999_StudentVisitContactList', 'value'=>"SELECT U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST.", U.".\cfg_core_User::EMAIL.", GROUP_CONCAT(DISTINCT L.".\cfg_obo_LO::TITLE." ORDER BY L.".\cfg_obo_LO::TITLE." ASC SEPARATOR ', ') AS master_titles, count(DISTINCT I.".\cfg_obo_LO::ID.") AS unique_masters_visited, count(*) AS raw_total_visits, FROM_UNIXTIME(MIN(T.".\cfg_obo_Track::TIME.")) AS first_log, FROM_UNIXTIME(MAX(T.".\cfg_obo_Track::TIME.")) AS last_log  FROM ".\cfg_core_User::TABLE." AS U, ".\cfg_obo_Instance::TABLE." AS I, ".\cfg_obo_Track::TABLE." AS T, ".\cfg_obo_LO::TABLE." AS L WHERE L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID." AND U.".\cfg_core_User::ID." = T.".\cfg_core_User::ID." AND I.".\cfg_obo_Instance::ID." = T.".\cfg_obo_Instance::ID." AND T.".\cfg_obo_Track::TYPE." = 'Visited' AND I.".\cfg_obo_LO::ID." IN ($loIDs) AND T.".\cfg_obo_Track::TIME." >= '$startTime' AND T.".\cfg_obo_Track::TIME." <= '$endTime' AND U.".\cfg_core_User::ID." NOT IN ( SELECT DISTINCT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." )  GROUP BY U.".\cfg_core_User::LAST.", U.".\cfg_core_User::FIRST);
 
@@ -436,14 +403,14 @@ function buildOutput($DBM,  &$statsArray)
 		// 46 needs a temp table
 		if($item['name'] == '46_StudentsScoresByInstance'){
 
-			$DBM->query("create temporary table tmp_visit (
+			$DBM->queryTrace("create temporary table tmp_visit (
 				".\cfg_obo_Instance::ID." bigint,
 				".\cfg_core_User::ID." bigint,
 				hits int,
 				INDEX (".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.")
 			)");
 
-			$DBM->query("insert into tmp_visit (".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", hits)
+			$DBM->queryTrace("insert into tmp_visit (".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", hits)
 				select a.".\cfg_obo_Instance::ID.", a.".\cfg_core_User::ID.", COUNT(*)
 				FROM  ".\cfg_obo_Visit::TABLE." AS a
 				GROUP BY a.".\cfg_core_User::ID.", a.".\cfg_obo_Instance::ID."");
@@ -559,15 +526,15 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 	
 	$instances = implode(',', $instances);
 	
-	$q = $DBM->querySafeTrace("SELECT *, UNCOMPRESS(".\cfg_obo_Track::DATA.") as data FROM ".\cfg_obo_Track::TABLE." WHERE (".\cfg_obo_Track::TYPE." = 'SubmitQuestion' OR ".\cfg_obo_Track::TYPE." = 'StartAttempt' OR ".\cfg_obo_Track::TYPE." = 'SubmitMedia')  AND ".\cfg_obo_Instance::ID." IN ($instances) ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME);
+	$q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE (".\cfg_obo_Track::TYPE." = 'SubmitQuestion' OR ".\cfg_obo_Track::TYPE." = 'StartAttempt' OR ".\cfg_obo_Track::TYPE." = 'SubmitMedia')  AND ".\cfg_obo_Instance::ID." IN ($instances) ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME);
 	$userAttempts = array();
 	while($r = $DBM->fetch_obj($q))
 	{
 			if($r->{\cfg_obo_Track::TYPE} == 'StartAttempt')
 			{
-				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
-				$r->data = unserialize($r->data);
-				if(isset($attempts[$r->data->attemptID]))
+				$logAttemptID = $r->valueA;
+				
+				if(isset($attempts[$logAttemptID]))
 				{
 					if(isset($userAttempts[$r->{\cfg_core_User::ID}]))
 					{
@@ -582,9 +549,12 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 			}
 			elseif($r->{\cfg_obo_Track::TYPE} == 'SubmitQuestion')
 			{
-				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
-				$r->data = unserialize($r->data);
-				if($lo->aGroup->qGroupID == $r->data->qGroupID)
+				$logQuestionID = $r->valueA;
+				$logAnswer = $r->valueB;
+				$logQGroupID = $r->valueC;
+				
+
+				if($lo->aGroup->qGroupID == $logQGroupID)
 				{
 					$parentGroup = $lo->aGroup->kids;
 				}
@@ -598,7 +568,7 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 				$aIndex = '?';
 				foreach($parentGroup AS $key => $qu)
 				{
-					if($qu->{\cfg_obo_Question::ID} == $r->data->questionID)
+					if($qu->{\cfg_obo_Question::ID} == $logQuestionID)
 					{
 						$question = $qu;
 						$qIndex =  $key+1; 
@@ -615,7 +585,7 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 						case 'MC':
 							foreach($question->answers AS $key=> $a)
 							{
-								if($a->{\cfg_obo_Answer::ID} == $r->data->answer)
+								if($a->{\cfg_obo_Answer::ID} == $logAnswer)
 								{
 									$aIndex = $key+1;
 									$answer = $a;
@@ -626,7 +596,7 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 						case 'QA':
 							foreach($question->answers AS $a)
 							{
-								if($a->{\cfg_obo_Answer::TEXT} == $r->data->answer)
+								if($a->{\cfg_obo_Answer::TEXT} == $logAnswer)
 								{
 									$aIndex = $key+1;
 									$answer = $a;
@@ -648,10 +618,10 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 							. $r->{\cfg_core_User::ID}.'","'
 							. date("n/j/Y\",\"G:i:s",$r->{cfg_obo_Track::TIME}).'","'
 							. (isset($userAttempts[$r->{\cfg_core_User::ID}]) ? $userAttempts[$r->{\cfg_core_User::ID}] : 1) .'","'
-							. $r->data->questionID . '","'
+							. $logQuestionID . '","'
 							. $r->page.'","'
 							. $r->answerIndex.'","'
-							. strip_tags($r->data->answer).'","'
+							. strip_tags($logAnswer).'","'
 							. $r->score.'","'
 							. ($r->score == 100 ? 'correct' : strip_tags($answer->{\cfg_obo_Answer::TEXT}))."\"\n";
 				}
@@ -659,9 +629,12 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 			}
 			else if($r->{\cfg_obo_Track::TYPE} == 'SubmitMedia')
 			{
-				$r->data = preg_replace_callback('/(\d+):"(nm_los_tracking_)/', "fixObject", $r->data);
-				$r->data = unserialize($r->data);
-				if($lo->aGroup->qGroupID == $r->data->qGroupID)
+				
+				$logQuestionID = $r->valueA;
+				$logScore = $r->valueB;
+				$logQGroupID = $r->valueC;
+				
+				if($lo->aGroup->qGroupID == $logQGroupID)
 				{
 					$parentGroup = $lo->aGroup->kids;
 				}
@@ -672,10 +645,10 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 
 				$question = 0;
 				$qIndex =  '?';
-				$aIndex = '?'; 			
+				$aIndex = '?';
 				foreach($parentGroup AS $key => $qu)
 				{
-					if($qu->{\cfg_obo_Question::ID} == $r->data->questionID)
+					if($qu->{\cfg_obo_Question::ID} == $logQuestionID)
 					{
 						$question = $qu;
 						$qIndex =  $key+1; 
@@ -687,9 +660,9 @@ function getQuestionAnswersByMaster($lo_id, $DBM)
 							. $r->{\cfg_core_User::ID} . '","'
 							. date("n/j/Y\",\"G:i:s",$r->{\cfg_obo_Track::TIME}).'","'
 							. (isset($userAttempts[$r->{\cfg_core_User::ID}]) ? $userAttempts[$r->{\cfg_core_User::ID}] : 1).'","'
-							. $r->data->questionID . '","'
+							. $logQuestionID . '","'
 							. $r->page . '","M","M","'
-							. $r->data->score.'","M"'."\n";
+							. $logScore.'","M"'."\n";
 			}
 
 

@@ -37,7 +37,6 @@ class VisitManager extends \rocketD\db\DBEnabled
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}		
 		// locate the correct session
@@ -71,19 +70,13 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 		if($visitID == 0) // for shorter code, instead of getVisit($_SESSION['visitID']), use getVisit()
 		{
-			if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
-			{
-				return false;
-			}
-			$visitID = $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'];
+			$visitID = $thi->getCurrentVisitID();
 		}
 		$qstr = "SELECT * FROM ".\cfg_obo_Visit::TABLE." WHERE ".\cfg_obo_Visit::ID."='?' LIMIT 1";
 		
 		if( !($q = $this->DBM->querySafe($qstr, $visitID)) )
 		{
 			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 
@@ -95,6 +88,15 @@ class VisitManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
+	}
+	
+	public function getCurrentVisitID()
+	{
+		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
+		{
+			return false;
+		}
+		return $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'];
 	}
 
     public function resumeVisit($instID = 0)
@@ -192,10 +194,41 @@ class VisitManager extends \rocketD\db\DBEnabled
 		$_SESSION['OPEN_INSTANCE_DATA'][$instID]['VIEW_KEY'] = md5(uniqid(rand(), true));
 		// place this view in the current data slot
 		$GLOBALS['CURRENT_INSTANCE_DATA'] = $_SESSION['OPEN_INSTANCE_DATA'][$instID];
-
 	}
 	
-	
+	public function calculateVisitTimes()
+	{
+		$LM = \obo\log\LogManager::getInstance();
+		$prev_instID = 0;
+		$count = 0;
+		$time = time() - 21600; 
+		// get all the visits that have not been calculated yet AND are over 6 hours old
+		$sql = "SELECT * FROM obo_log_visits WHERE overviewTime IS NULL AND createTime < $time LIMIT 50";
+		$q = $this->DBM->query($sql);
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$visit = $r;
+			if($prev_instID != $visit->instID)
+			{
+				$track = $LM->getInteractionLogByInstance($visit->instID, true);
+			}
+			$prev_instID = $visit->instID;
+			
+			if(is_array($track))
+			{
+				foreach($track['visitLog'] AS $vLog)
+				{
+					if($vLog['visitID'] == $visit->visitID)
+					{
+						// update the db
+						$count++;
+						$this->DBM->querySafe("UPDATE obo_log_visits SET overviewTime = '?', contentTime = '?', practiceTime = '?', assessmentTime = '?' WHERE visitID = '?'", $vLog['sectionTime']['overview'], $vLog['sectionTime']['content'], $vLog['sectionTime']['practice'], $vLog['sectionTime']['assessment'], $visit->visitID);
+						break;
+					}
+				}
+			}
+		}
+		return $count;
+	}
 }
-
 ?>

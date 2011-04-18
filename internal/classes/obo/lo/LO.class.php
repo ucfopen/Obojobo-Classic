@@ -334,10 +334,10 @@ class LO
 				
 				/******** MOVE PERMISSIONS **********/
 				$PM = \obo\perms\PermissionsManager::getInstance();
-				$PM->movePermsToItem($rootDraftLoID, $this->loID, \cfg_obo_Perm::TYPE_LO);
+				$PM->movePermsToItem($rootDraftLoID, $this->loID, \cfg_obo_Perm::TYPE_LO); // MUST BE BEFORE destroyDrafts
 				
 				/********* REMOVE DRAFTS *************/
-				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID);
+				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID); // note - MUST BE AFTER MOVE PERMS - this will delete perms if not run AFTER move perms!!!!!!!
 				
 				/************* KEEP TRACK OF MEDIA USED IN LO *******************/
 				$this->associateMediaUsedInLO();
@@ -399,14 +399,14 @@ class LO
 	
 	/**
 	 * Remove drafts when publishing a master, Note that this does not remove orphaned qGroups, questions, or pages.
-	 *
+	 * This function cannot delete MASTER versions, only drafts
 	 * @param string $DBM 
 	 * @param string $delRootID 
-	 * @param string $newLoID 
+	 * @param string $newLoID - if you are deleting drafts to replace them with a master, set this value to the new master's loid, it is used to re-associate authors
 	 * @return boolean success
 	 * @author Ian Turgeon
 	 */
-	private function destroyDrafts($DBM, $delRootID, $newLoID)
+	public function destroyDrafts($DBM, $delRootID, $newLoID=0)
 	{
 		/************ GATHER DRAFTS TO DELETE **************/
 		$qstr = "SELECT ".\cfg_obo_LO::ID.", ".\cfg_obo_LO::VER.", ".\cfg_obo_LO::AGROUP.", ".\cfg_obo_LO::PGROUP." FROM ".\cfg_obo_LO::TABLE." WHERE (".\cfg_obo_LO::ROOT_LO." = '?' OR ".\cfg_obo_LO::ID." = '?' ) AND ".\cfg_obo_LO::SUB_VER." > 0 ORDER BY ".\cfg_obo_LO::SUB_VER." ASC";
@@ -424,15 +424,19 @@ class LO
 
 		if(count($drafts) > 0)
 		{
-			//**************** ASSOCIATE ALL DRAFT AUTHORS WITH NEW MASTER ***************************
 			//Generate a string of draft numbers SQL can use
 			$draftstr = implode(',', $drafts);  // 1,3,5,7,9...
-			//Change lo_id of existing author entries to the new master $loID
-			$qstr = "UPDATE IGNORE `".\cfg_obo_LO::MAP_AUTH_TABLE."` SET ".\cfg_obo_LO::ID."='?' WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
-			if( !($q = $DBM->querySafe($qstr, $loID)))
+			
+			
+			//**************** ASSOCIATE ALL DRAFT AUTHORS WITH NEW MASTER ***************************
+			if($newLoID > 0)
 			{
-                $DBM->rollback();
-				return false;
+				$qstr = "UPDATE IGNORE `".\cfg_obo_LO::MAP_AUTH_TABLE."` SET ".\cfg_obo_LO::ID."='?' WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
+				if( !($q = $DBM->querySafe($qstr, $newLoID)))
+				{
+	                $DBM->rollback();
+					return false;
+				}
 			}
 			
 			//************** DELETE DRAFTS *************************
@@ -444,13 +448,64 @@ class LO
 			}
 			
 			
-			//************** DELETE MEDIA ASSOCIATIONS *********************
+			//************** DELETE MEDIA MAPPING *********************
 			$qstr = "DELETE FROM ".\cfg_obo_Media::MAP_TABLE." WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
                 $DBM->rollback();
 				return false;
 			}
+			
+			
+			//************** DELETE PERMISSIONS MAPPING *********************
+			$PM = \obo\perms\PermissionsManager::getInstance();
+			foreach($draft AS $draftID)
+			{
+				$PM->removeAllPermsForItem($draftID, \cfg_obo_Perm::TYPE_LO);
+			}
+			
+			
+			//************** DELETE PAGE MAPPING *********************
+			$qstr = "DELETE FROM obo_map_pages_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
+			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
+			{
+                $DBM->rollback();
+				return false;
+			}
+			
+			//************** DELETE ORPHANED PAGES *******************
+			$qstr = "DELETE P.* FROM  ".\cfg_obo_Page::TABLE." AS P
+			LEFT JOIN ".\cfg_obo_Page::MAP_TABLE." AS M
+			ON M.".\cfg_obo_Page::ID." = P.".\cfg_obo_Page::ID."
+			WHERE M.".\cfg_obo_Page::ID." IS NULL;";
+			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
+			{
+	            $DBM->rollback();
+				return false;
+			}
+			
+			
+			//************** DELETE KEYWORD MAPPINGS *******************
+			$qstr = "DELETE FROM obo_map_keywords_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
+			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
+			{
+                $DBM->rollback();
+				return false;
+			}
+
+			//************** DELETE ORPHANED KEYWORD *******************
+			$qstr = "DELETE K.* FROM
+			".\cfg_obo_Keyword::TABLE." AS K
+			LEFT JOIN ".\cfg_obo_Keyword::MAP_TABLE." AS M
+			ON M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID."
+			WHERE M.".\cfg_obo_Keyword::ID." IS NULL;";
+			if(!$this->DBM->query($qstr))
+			{
+				$this->DBM->rollback();
+				return false;
+			}
+			
+			
 		}
 		return true;
 	}

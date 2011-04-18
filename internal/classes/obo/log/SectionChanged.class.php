@@ -12,7 +12,7 @@ class SectionChanged extends \obo\log\Trackable
 
 	function __construct($userID = 0, $createTime = 0, $instID = 0, $to = -1)
 	{
-		parent::__construct($userID, $createTime, $instID);
+		parent::__construct($userID, $createTime, $instID, $to);
 		$this->to = $to;
 	}
 }
