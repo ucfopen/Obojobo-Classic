@@ -21,12 +21,9 @@ if($verifyReturn)// verify login
 		$q = $DBM->querySafe("SELECT ".\cfg_obo_Media::ID.", ".\cfg_obo_Media::URL.", ".\cfg_obo_Media::SIZE.", ".\cfg_obo_Media::TIME."  FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1", $mediaID);
 		if(($r = $DBM->fetch_obj($q)))
 		{
-			//\rocketD\util\Log::trace("media found!");
-			
 		   $file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::URL};
 		   $fileinfo = pathinfo($file);
            $file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::ID} . "." .strtolower($fileinfo['extension']);
-
 		}
 	    else{
 			\rocketD\util\Log::trace('media file not found: '.$file);

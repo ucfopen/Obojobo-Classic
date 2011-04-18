@@ -621,6 +621,12 @@ class RoleManager extends \rocketD\db\DBEnabled
 		return $success;
 	}
 	
+	public function setCronRole()
+	{
+		$_SESSION['oboCronRole'] = true;
+	}
+	
+	
 	/**
 	 * 
 	 * 
