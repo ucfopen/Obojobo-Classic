@@ -55,7 +55,6 @@ function deserializationAction(&$body)
 		}
 		$actualArgs[] = $value;
 	}
-	
 	$body->setValue($actualArgs);
 }
 
@@ -83,7 +82,11 @@ function serializationAction(& $body)
 	
 	//Now serialize it
 	$encodedResponse = json_encode($rawResponse);
-	
+	if($body->jsonCallback != '')
+	{
+		$encodedResponse = $body->jsonCallback.'('.$encodedResponse.')';
+	}
+	//print_r($body->_jsonCallback);
 	$body->setResults($encodedResponse);
 }
 
