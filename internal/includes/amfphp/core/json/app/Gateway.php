@@ -14,6 +14,12 @@ class Gateway extends BasicGateway
 		$body = new MessageBody();
 		
 		$uri = __setUri();
+		if(strrpos($uri, '?callback='))
+		{
+			$i = strrpos($uri, '?callback=');
+			$body->jsonCallback = substr($uri, $i + 10);
+			$uri = substr($uri, 0, $i);
+		}
 		$elements = explode('/json.php', $uri);
 		
 		if(strlen($elements[1]) == 0)
@@ -22,6 +28,7 @@ class Gateway extends BasicGateway
 			exit();
 		}
 		$args = substr($elements[1], 1);
+		
 		$rawArgs = explode('/', $args);
 		
 		if(isset($GLOBALS['HTTP_RAW_POST_DATA']))
