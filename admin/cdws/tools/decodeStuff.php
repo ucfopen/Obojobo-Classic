@@ -17,7 +17,6 @@
 	<label for="base_64_decode">base 64 decode?</label><input type="checkbox" name="base_64_decode" id="base_64_decode"><br>
 	<label for="unserialize">unserialize?</label><input type="checkbox" name="unserialize"  id="unserialize"><br>
 	<label for="json_encode">Encode in JSON</label><input type="checkbox" name="json_encode" id="json_encode"><br><hr>
-	<label for="get_tracking_value">Retrieve a Log by ID</label><input type="text" name="get_tracking_value" value="" id="get_tracking_value"><br>
 	<label for="page_id">Retrieve a Page by ID</label><input type="text" name="page_id" value="" id="page_id"><br>
 	<label for="question_id">Retrieve a Question by ID</label><input type="text" name="question_id" value="" id="question_id"><br>
 	<label for="loid">Retrieve a LO by ID</label><input type="text" name="loid" value="" id="loid"><br>
@@ -37,23 +36,6 @@
 		$data = $_POST['rawinput'];
 	}
 	
-	if($_POST['get_tracking_value'])
-	{
-		require_once(dirname(__FILE__)."/../../../internal/app.php");
-		
-		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
-		if($q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Track::ID." = '?'", $_POST['get_tracking_value']))
-		{
-			if($r = $DBM->fetch_obj($q))
-			{
-				$data = $r->{\cfg_obo_Track::DATA};
-				$_POST['base_64_decode'] = 0;
-				$_POST['mysql_decompress'] = 1;
-				$_POST['unserialize'] = 1;
-			}
-		}
-		
-	}
 	if($_POST['page_id'])
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");

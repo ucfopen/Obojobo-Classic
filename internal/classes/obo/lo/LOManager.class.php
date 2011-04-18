@@ -218,9 +218,6 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
-		$system = new \obo\LOSystem();
-		$system->cleanOrphanData();
 
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		
@@ -276,8 +273,6 @@ class LOManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		$system = new \obo\LOSystem();
-		$system->cleanOrphanData();
 		
 		if($lo = $this->getLO($loID))
 		{
@@ -304,13 +299,13 @@ class LOManager extends \rocketD\db\DBEnabled
 	 * @param $loID (LO) learning object id
 	 * @return (bool) true or false if not deleteable
 	 */
-	public function delTree($loID)
+	public function deleteLO($loID)
 	{
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$rootID = $this->getRootId($loID);
 		
-		// must be superUser OR LibararyUser && have write permissions
+		// must be SU OR (LibararyUser && have write permissions)
 		if(!$roleMan->isSuperUser())
 		{
 			if(!$roleMan->isLibraryUser())
@@ -336,7 +331,6 @@ class LOManager extends \rocketD\db\DBEnabled
 		}
 		
 		//User is trying to delete a Master (1.0, 2.0 3.0) check for existing instances
-		
 		if( $lo->rootID == $loID && $lo->subVersion == 0)
 		{
 			$instMan = \obo\lo\InstanceManager::getInstance();
@@ -344,48 +338,25 @@ class LOManager extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(6003);
 			}
-			// No Instances found
 			// remove all perms for this MASTER since there are no instances
 			$permMan = \obo\perms\PermissionsManager::getInstance();
 			if($permMan->removeAllPermsForItem($loID, \cfg_obo_Perm::TYPE_LO))
 			{
 				\rocketD\util\Cache::getInstance()->clearLO($loID);
-				$system = new \obo\LOSystem();
 				$tracking = \obo\log\LogManager::getInstance();
 				$tracking->trackDeleteLO($loID, 1);
-				$system->cleanOrphanData();
+				// mark LO as deleted
+				$this->DBM->querySafe("UPDATE ".\cfg_obo_LO::TABLE." SET ".\cfg_obo_LO::DELETED." = '1' WHERE ".\cfg_obo_LO::ID." = '?' ", $loID);
+				
 			}
 			return true;
 		}
 		else
 		{
 			// delete all draft objects
-			$qstr = "DELETE FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ROOT_LO."='?' OR ".\cfg_obo_LO::ID." = '?' ";
-			if(!($q = $this->DBM->querySafe($qstr, $lo->rootID, $lo->rootID)))
-			{
-				$this->DBM->rollback();
-				return false;
-			}
-			$losDeleted = $this->DBM->affected_rows();
-			if($losDeleted > 0)
-			{
-				
-				$permMan = \obo\perms\PermissionsManager::getInstance();
-				if(!$permMan->removeAllPermsForItem($loID, \cfg_obo_Perm::TYPE_LO))
-				{
-					$this->DBM->rollback();
-					return false;
-				}
-				
-				
-				\rocketD\util\Cache::getInstance()->clearLO($loID);
-				$tracking = \obo\log\LogManager::getInstance();
-				$tracking->trackDeleteLO($loID, $losDeleted);
-			}   
-			return true;
+			return $lo->destroyDrafts($this->DBM, $lo->rootID);
 		}
 	}
-	
 	
 	
 	/**
@@ -489,8 +460,6 @@ class LOManager extends \rocketD\db\DBEnabled
 	 */
 	public function shareLO($loID, $permObj)
 	{
-		$system = new \obo\LOSystem();
-		$system->cleanOrphanData();
 		
 		if(!is_numeric($loID) || $loID <= 0)
 		{

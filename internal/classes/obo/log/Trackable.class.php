@@ -6,8 +6,11 @@ class Trackable
 	public $userID;
 	public $createTime;
 	public $instID;
+	public $valueA;
+	public $valueB;
+	public $valueC;
 	
-	public function __construct($userID = 0, $createTime = 0, $instID = 0)
+	public function __construct($userID = 0, $createTime = 0, $instID = 0, $valueA='', $valueB='', $valueC='')
 	{
 		if($userID < 1)
 		{

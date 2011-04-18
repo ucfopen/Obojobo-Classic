@@ -14,7 +14,8 @@ ini_set('error_log', AppCfg::DIR_BASE.AppCfg::DIR_LOGS.'php_cron_'. date('m_d_y'
 $t = microtime(1);
 $PM = \rocketD\plugin\PluginManager::getInstance();
 $result = $PM->callAPI('UCFCourses', 'sendFailedScoreSetRequests', array(), true);
-core_util_Log::profile('cron', "'sendFailedScoreSetRequests','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'\n");
+\rocketD\util\Log::profile('cron', "'sendFailedScoreSetRequests','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'\n");
+
 
 //******************************** NID UPDATES ****************************
 $t = microtime(1);
@@ -28,5 +29,12 @@ foreach($authMods AS $curAuthMod)
 		\rocketD\util\Log::profile('cron', "'updateNIDChanges','".time()."','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'\n");
 	}
 }
+
+//******************************** CALCULATE VISIT LOGS ****************************
+$t = microtime(1);
+$VM = \obo\VisitManager::getInstance();
+$count = $VM->calculateVisitTimes();
+\rocketD\util\Log::profile('cron', "'calculateVisitLogs','".time()."','".round((microtime(true) - $t),5)."','{$count}','{$count}'\n");
+
 
 ?>
