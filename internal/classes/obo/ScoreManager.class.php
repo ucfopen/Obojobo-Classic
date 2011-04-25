@@ -113,9 +113,36 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			$qstr = "DELETE FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Score::ITEM_ID."='?' AND `".\cfg_obo_Score::TYPE."`='$itemType' AND ".\cfg_obo_Attempt::ID." ='?'";
 			$this->DBM->querySafe($qstr, $questionID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
 			
-			// Store the answer in the score table
-			$qstr = "INSERT INTO ".\cfg_obo_Score::TABLE." SET ".\cfg_obo_Attempt::ID."='?', ".\cfg_obo_QGroup::ID."='?', ".\cfg_obo_Score::ITEM_ID."='?', `".\cfg_obo_Score::TYPE."`='$itemType', ".\cfg_obo_Answer::ID."='?', ".\cfg_obo_Score::ANSWER."='?',	".\cfg_obo_Score::SCORE."='?'";
-			if( !($q = $this->DBM->querySafe($qstr, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], $qGroupID, $questionID, $checkArr['answerID'], $answer, $checkArr['weight'])) )
+			// Store the answer in the score table, getting the attempt data from the associated attempt table
+			$qstr = "INSERT INTO ".\cfg_obo_Score::TABLE." 
+			(".\cfg_obo_Visit::ID.",
+			".\cfg_obo_LO::ID.",
+			".\cfg_obo_Instance::ID.",
+			".\cfg_obo_Score::TIME.",
+			".\cfg_obo_Attempt::ID.",
+			".\cfg_core_User::ID.",
+			".\cfg_obo_QGroup::ID.",
+			".\cfg_obo_Score::ITEM_ID.",
+			".\cfg_obo_Score::TYPE.",
+			".\cfg_obo_Answer::ID.",
+			".\cfg_obo_Score::ANSWER.",
+			".\cfg_obo_Score::SCORE.")
+			SELECT
+			".\cfg_obo_Visit::ID.",
+			".\cfg_obo_LO::ID.",
+			".\cfg_obo_Instance::ID.",
+			'?' AS ".\cfg_obo_Score::TIME.",
+			".\cfg_obo_Attempt::ID.",
+			".\cfg_core_User::ID.",
+			".\cfg_obo_QGroup::ID.",
+			'?' AS ".\cfg_obo_Score::ITEM_ID.",
+			'?' AS ".\cfg_obo_Score::TYPE.",
+			'?' AS ".\cfg_obo_Answer::ID.",
+			'?' AS ".\cfg_obo_Score::ANSWER.",
+			'?' AS ".\cfg_obo_Score::SCORE."
+			FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::ID." = '?'";
+			// $qstr = "INSERT INTO ".\cfg_obo_Score::TABLE." SET ".\cfg_obo_Visit::ID."='?', ".\cfg_obo_LO::ID."='?', ".\cfg_obo_Instance::ID."='?', ".\cfg_obo_Score::TIME."='?', ".\cfg_obo_Attempt::ID."='?', ".\cfg_obo_QGroup::ID."='?', ".\cfg_obo_Score::ITEM_ID."='?', `".\cfg_obo_Score::TYPE."`='$itemType', ".\cfg_obo_Answer::ID."='?', ".\cfg_obo_Score::ANSWER."='?',	".\cfg_obo_Score::SCORE."='?'";
+			if( !($q = $this->DBM->querySafe($qstr, time(), $itemType, $questionID, $checkArr['answerID'], $answer, $checkArr['weight'], $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'])) )
 			{
  				$this->DBM->rollback();
 				trace(mysql_error(), true);
