@@ -489,12 +489,11 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function createDraft($loObj)
 	{
-
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
 			$loman = \obo\lo\LOManager::getInstance();
-			$loObj = $loman->newDraft($loObj);	
+			$loObj = $loman->newDraft($loObj);
 			$this->DBM->commit();
 		}
 		else

@@ -49,7 +49,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		}
 		$qstr = "SELECT ".\cfg_obo_Keyword::NAME." FROM ".\cfg_obo_Keyword::TABLE." AS K
 					LEFT JOIN ".\cfg_obo_Keyword::MAP_TABLE." AS kmap ON kmap.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID."
-					WHERE kmap.".\cfg_obo_Keyword::MAP_TYPE." = '?' AND kmap.".\cfg_obo_Keyword::MAP_ITEM." = '?'";
+					WHERE kmap.".\cfg_obo_Keyword::MAP_TYPE." = '?' AND kmap.".\cfg_obo_LO::ID." = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype, $itmid)))
 		{
 		    $this->DBM->rollback();
@@ -77,7 +77,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		    return false;
 		}
 
-		$qstr = "SELECT ".\cfg_obo_Keyword::MAP_ITEM." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_Keyword::ID." IN (
+		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_Keyword::ID." IN (
 					SELECT ".\cfg_obo_Keyword::ID." FROM ".\cfg_obo_Keyword::TABLE." WHERE ".\cfg_obo_Keyword::NAME." IN (";
 		//loop through array to generate comma seperated list of item id's
 		$numkeys = count($keyArr);
@@ -104,7 +104,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		$itmarr = array();
 		do
 		{
-			$itmarr[] = $r->{\cfg_obo_Keyword::MAP_ITEM};
+			$itmarr[] = $r->{\cfg_obo_LO::ID};
 		} while($r = $this->DBM->fetch_obj($q));
 		
 		//Order the array by how often each id number occurs (from high to low)
@@ -189,7 +189,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		    return false;
 		}
 		    
-		$qstr = "SELECT ".\cfg_obo_Keyword::MAP_ITEM." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_Keyword::MAP_ITEM."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' LIMIT 1";
+		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_LO::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $keyid, $itmid, $itmtype)))
 		{
 		    $this->DBM->rollback();
@@ -247,7 +247,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!$this->linkedAlready($keyid, $itmid, $itmtype))
 		{
 			//Create entry in mapping table
-			$qstr = "INSERT INTO ".\cfg_obo_Keyword::MAP_TABLE." SET ".\cfg_obo_Keyword::ID."='?', ".\cfg_obo_Keyword::MAP_TYPE."='?', ".\cfg_obo_Keyword::MAP_ITEM."='?'";
+			$qstr = "INSERT INTO ".\cfg_obo_Keyword::MAP_TABLE." SET ".\cfg_obo_Keyword::ID."='?', ".\cfg_obo_Keyword::MAP_TYPE."='?', ".\cfg_obo_LO::ID."='?'";
 			if( !($q = $this->DBM->querySafe($qstr, $keyid, $itmtype, $itmid)) )
 			{
 				$this->DBM->rollback();
@@ -277,7 +277,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		    return false;
 	    }
 		//Create entry in mapping table
-		$qstr = "DELETE FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_Keyword::MAP_ITEM."='?' LIMIT 1";
+		$qstr = "DELETE FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_LO::ID."='?' LIMIT 1";
 		if( !($q = $this->DBM->querySafe($qstr, $keyid, $itmtype, $itmid)) )
 		{
 			$this->DBM->rollback();
@@ -300,7 +300,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		$qstr = "DELETE FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::MAP_ITEM."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?'";
+		$qstr = "DELETE FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_LO::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $itemid, $itemtype)))
 		{
 			$this->DBM->rollback();
