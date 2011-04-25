@@ -64,7 +64,7 @@ $stats = array();
    $stats[] = array ('name' => '24_MediaTypeCount', 'value'=>"SELECT ".\cfg_obo_Media::TYPE." AS TYPE, COUNT(*) AS NUMBER  FROM ".\cfg_obo_Media::TABLE." GROUP BY ".\cfg_obo_Media::TYPE);
 
    //Keyword Popularity
-   $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".\cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".\cfg_obo_Keyword::MAP_ITEM.") as COUNT FROM ".\cfg_obo_Keyword::MAP_TABLE." AS M, ".\cfg_obo_Keyword::TABLE." AS K WHERE M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID." GROUP BY K.".\cfg_obo_Keyword::ID." ORDER BY KEYWORD");
+   $stats[] = array ('name' => '25_KeywordPopularity', 'value'=>"SELECT K.".\cfg_obo_Keyword::NAME." AS KEYWORD, count(M.".\cfg_obo_LO::ID.") as COUNT FROM ".\cfg_obo_Keyword::MAP_TABLE." AS M, ".\cfg_obo_Keyword::TABLE." AS K WHERE M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID." GROUP BY K.".\cfg_obo_Keyword::ID." ORDER BY KEYWORD");
 
    //Resolution by Views
    $stats[] = array ('name' => '28_ResolutionByViews', 'value'=>"SELECT CONCAT_WS('x', ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT.") As SCREEN_RESOLUTION, COUNT(".\cfg_obo_ComputerData::TIME.") as COUNT  FROM ".\cfg_obo_ComputerData::TABLE." WHERE ".\cfg_core_User::ID." !='0' Group By SCREEN_RESOLUTION ORDER BY ".\cfg_obo_ComputerData::RES_WIDTH.", ".\cfg_obo_ComputerData::RES_HEIGHT);
@@ -224,7 +224,7 @@ $stats[] = array ('name' => '77_AssessmentCompletionByMonth', 'value'=> "SELECT 
 $stats[] = array ('name' => '78_InstancesCreatedByMonth', 'value'=> "SELECT COUNT(InstID) AS INSTANCES, MONTH(FROM_UNIXTIME(createTime)) AS MONTH, YEAR(FROM_UNIXTIME(createTime)) AS YEAR FROM obo_lo_instances GROUP BY YEAR, MONTH ORDER BY YEAR, MONTH ");
 
 
-$startTime = 1291183200;
+$startTime = 0;
 $endTime = time();
 $loIDs = implode(',', array(13836, 13830, 13832, 14427, 13810, 13848, 13849, 14303, 13851, 13853, 13887, 14315 ));
 

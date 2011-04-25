@@ -605,6 +605,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			return $this->getLO($r->{\cfg_obo_LO::ID}, $amount);
 		}
 		// none found, assume it to be the latest draft
+		$this->getLO($rootID);
 		return $this->getLO($rootID);
 	}
 

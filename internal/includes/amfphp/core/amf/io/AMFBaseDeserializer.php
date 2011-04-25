@@ -359,8 +359,8 @@ class AMFBaseDeserializer {
 		// AMFPHP CUSTOMIZATION FOR ROCKETDUCK FRAMEWORK INTEGRATION KOGNEATO OBOJOBO
 		/*
 			Allows flash classes to be exact same name as the RocketDuck Classes. ie: 'nm_lo_PageItem'
+			This will allow you to use namespaces by using names like namespace.className in AS, and namespace\className in php
 		*/
-		trace($typeIdentifier);
 		$typeIdentifier = str_replace(".", "\\", $typeIdentifier);
 		if(class_exists($typeIdentifier))
 		{
