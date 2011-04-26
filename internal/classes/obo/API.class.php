@@ -172,11 +172,14 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getUser($username = false )
 	{
+		trace('go');
 		if($this->getSessionValid())
 		{
+			trace('go1');
 			$UM = \rocketD\auth\AuthManager::getInstance();
 			if($username === false)
 			{
+				trace('go2');
 				$result = $UM->fetchUserByID($_SESSION['userID']);
 
 			}

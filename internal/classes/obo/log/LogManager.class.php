@@ -27,9 +27,8 @@ class LogManager extends \rocketD\db\DBEnabled
 			$VM = \obo\VisitManager::getInstance();
 			$visitID = $VM->getCurrentVisitID();
 			
-			
-			$qstr = "INSERT INTO `".\cfg_obo_Track::TABLE."` (`".\cfg_core_User::ID."`, `".\cfg_obo_Track::TYPE."`, `".\cfg_obo_Track::TIME."`, `".\cfg_obo_Instance::ID."`, visitID, valueA, valueB, valueC) VALUES ('?', '?', '?', '?', '?', '?', '?', '?')";
-			if(!($q = $this->DBM->querySafe($qstr, $trackable->userID, substr(get_class($trackable), strrpos(get_class($trackable), '\\')+1), $trackable->createTime, $trackable->instID, $visitID, $trackable->valueA, $trackable->valueB, $trackable->valueC)))
+			$qstr = "INSERT INTO `".\cfg_obo_Track::TABLE."` (`".\cfg_core_User::ID."`, `".\cfg_obo_Track::TYPE."`, `".\cfg_obo_Track::TIME."`, ".\cfg_obo_LO::ID.", `".\cfg_obo_Instance::ID."`, visitID, valueA, valueB, valueC) VALUES ('?', '?', '?', '?', '?', '?', '?', '?', '?')";
+			if(!($q = $this->DBM->querySafe($qstr, $trackable->userID, $trackable->logType, $trackable->createTime, $GLOBALS['CURRENT_INSTANCE_DATA']['loID'], $trackable->instID, $visitID, $trackable->valueA, $trackable->valueB, $trackable->valueC)))
 			{
 				$this->DBM->rollback();
 				return false;
@@ -601,92 +600,92 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	public function trackDeleteInstance($instID)
 	{
-		$this->track(new \obo\log\Trackable(0,0,$instID));
+		$this->track(new \obo\log\Trackable('DeleteInstance',0,$instID));
 	}
 
 	public function trackDeleteLO($loID, $numDeleted)
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $loID, $numDeleted));
+		$this->track(new \obo\log\Trackable('DeleteLO',0,0, $loID, $numDeleted));
 	}
 
 	public function trackVisit()
 	{
-		$this->track(new \obo\log\Trackable());
+		$this->track(new \obo\log\Trackable('Visited'));
 	}
 	
 	public function trackStartAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable('StartAttempt',0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 	
 	public function trackEndAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable('EndAttempt',0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}	
 	
-	public function trackImportScore()
+	public function trackImportScore(/*$currentAttemptID, $linkedAttemptID*/)
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable('ImportScore',0,0/* , $currentAttemptID, $linkedAttemptID*/));
 	}
 
 	public function trackResumeAttempt()
 	{
-		$this->track(new \obo\log\Trackable(0,0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
+		$this->track(new \obo\log\Trackable('ResumeAttempt',0,0, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']));
 	}
 
 	public function trackSubmitQuestion($qGroupID, $questionID, $answer)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, $answer, (int)$qGroupID));
+		$this->track(new \obo\log\Trackable('SubmitQuestion', 0, 0, $questionID, $answer, (int)$qGroupID));
 	}
 	
 	public function trackMergeUser($userIDFrom, $userIDTo)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $userIDFrom, $userIDTo));
+		$this->track(new \obo\log\Trackable('MergeUser', 0, 0, $userIDFrom, $userIDTo));
 	}
 	
 	public function trackSubmitMedia($qGroupID, $questionID, $score)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $questionID, (int)$score, (int)$qGroupID));
+		$this->track(new \obo\log\Trackable('SubmitMedia', 0, 0, $questionID, (int)$score, (int)$qGroupID));
 	}
 	
 	public function trackPageChanged($pageID, $section)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $pageID, $section));
+		$this->track(new \obo\log\Trackable('PageChanged', 0, 0, $pageID, $section));
 	}
 	
 	public function trackSectionChanged($section)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $section));
+		$this->track(new \obo\log\Trackable('SectionChanged', 0, 0, $section));
 	}
 	
 	public function trackMediaDownloaded($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\Trackable('MediaDownloaded', 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequested($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\Trackable('MediaRequest', 0, 0, $mediaID));
 	}
 	
 	public function trackMediaRequestCompleted($mediaID)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $mediaID));
+		$this->track(new \obo\log\Trackable('MediaRequestCompleted', 0, 0, $mediaID));
 	}
 	
 	public function trackLoggedIn()
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0));
+		$this->track(new \obo\log\Trackable('LoggedIn', 0, 0));
 	}
 	
 	public function trackLogInAttempt($userID, $userName, $code)
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0, $code, $userName));
+		$this->track(new \obo\log\Trackable('LoginAttempt', 0, 0, $code, $userName));
 	}
 	
     public function trackLoggedOut()
 	{
-		$this->track(new \obo\log\Trackable(0, 0, 0));
+		$this->track(new \obo\log\Trackable('LoggedOut', 0, 0));
 	}
 
 
