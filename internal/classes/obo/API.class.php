@@ -553,6 +553,7 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function removeLO($loID)
     {
+		trace('removeLO');
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -1367,7 +1368,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			trace('uploadMedia', true);
 			$this->DBM->startTransaction();
-			$mediaMan = nm_los_MediaManager::getInstance();
+			$mediaMan = \obo\lo\MediaManager::getInstance();
 			$result = $mediaMan->handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length);
 			$this->DBM->commit();
 		}

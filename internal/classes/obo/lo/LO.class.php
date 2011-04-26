@@ -459,7 +459,7 @@ class LO
 			
 			//************** DELETE PERMISSIONS MAPPING *********************
 			$PM = \obo\perms\PermissionsManager::getInstance();
-			foreach($draft AS $draftID)
+			foreach($drafts AS $draftID)
 			{
 				$PM->removeAllPermsForItem($draftID, \cfg_obo_Perm::TYPE_LO);
 			}
@@ -499,9 +499,10 @@ class LO
 			LEFT JOIN ".\cfg_obo_Keyword::MAP_TABLE." AS M
 			ON M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID."
 			WHERE M.".\cfg_obo_Keyword::ID." IS NULL;";
-			if(!$this->DBM->query($qstr))
+			trace($qstr);
+			if(!$DBM->query($qstr))
 			{
-				$this->DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 			
@@ -601,10 +602,18 @@ class LO
 			
 			//********* Build Summary Object **************/
 			// build summary object
+			$indices = array();
+			foreach($this->aGroup->kids as $kid)
+			{
+				$indices[] = $kid->questionIndex;
+			}
+			$indices = array_unique($indices);
+			
 			$this->summary = array(
 				'contentSize' => count($this->pages),
 				'practiceSize' => count($this->pGroup->kids),
-				'assessmentSize' => count($this->aGroup->kids)
+				'assessmentSize' => count($this->aGroup->kids),
+				'assessmentSizeGrouped' => count($indices)
 			);
 			
 			
