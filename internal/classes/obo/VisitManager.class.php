@@ -179,16 +179,16 @@ class VisitManager extends \rocketD\db\DBEnabled
 		return $GLOBALS['CURRENT_INSTANCE_DATA']['instID'];
 	}
 	
-	public function startInstanceView($instID)
+	public function startInstanceView($instID, $loID)
 	{
-		
-		if(!is_array($_SESSION['OPEN_INSTANCE_DATA'])){
+		if(!is_array($_SESSION['OPEN_INSTANCE_DATA']))
+		{
 			$_SESSION['OPEN_INSTANCE_DATA'] = array();
 		}
 		
 		if(!is_array($_SESSION['OPEN_INSTANCE_DATA'][$instID]))
 		{
-			$_SESSION['OPEN_INSTANCE_DATA'][$instID] = array('instID' => $instID, 'VIEW_KEY' => -1, 'attemptID' => -1, 'visitID' => -1);
+			$_SESSION['OPEN_INSTANCE_DATA'][$instID] = array('instID' => $instID, 'VIEW_KEY' => -1, 'attemptID' => -1, 'visitID' => -1, 'loID' => $loID);
 		}
 		// store new key
 		$_SESSION['OPEN_INSTANCE_DATA'][$instID]['VIEW_KEY'] = md5(uniqid(rand(), true));
