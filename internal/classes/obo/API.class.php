@@ -1361,6 +1361,23 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
+	public function uploadMedia($fileData, $filename, $title, $description, $copyright, $length=0)
+	{
+		if($this->getSessionValid())
+		{
+			trace('uploadMedia', true);
+			$this->DBM->startTransaction();
+			$mediaMan = nm_los_MediaManager::getInstance();
+			$result = $mediaMan->handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length);
+			$this->DBM->commit();
+		}
+		else
+		{
+			$result = core_util_Error::getError(1);
+		}
+		return $result;
+	}
+	
 	public function removeRole($roleName)
 	{
 		if(\obo\util\Validator::isRoleName($roleName))
