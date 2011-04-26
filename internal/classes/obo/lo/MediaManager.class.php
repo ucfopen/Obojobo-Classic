@@ -259,6 +259,129 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 	}
 	
+	public function handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length=0)
+	{
+		// TODO: Make sure file is less than or equal to max size, and a title has been sent
+
+		$roleMan = nm_los_RoleManager::getInstance();
+		if(!$roleMan->isLibraryUser())
+		{
+			core_util_Error::getError(4);
+			return false;
+		}
+		
+		//explode it by . and then combine to compare
+		$fileNameArr =  explode('.', $filename);
+		$baseName = $filename;
+		$lastDot = strrpos($baseName, '.');
+		$fileName = substr($baseName, 0, $lastDot);
+		$extension = strtolower(substr($baseName, $lastDot+1));
+		
+		switch($extension)
+		{
+			case 'jpg':
+			case 'jpeg':
+				$extension = 'jpg'; // fallthrough
+			case 'png':
+			case 'gif':
+				$fileType = 'pic';
+				break;
+			case 'swf':
+				$fileType = 'swf';
+				break;
+			case 'flv':
+				$fileType = 'flv';
+				break;
+			case 'mp3':
+				$fileType = 'mp3';
+				break;
+			default:
+				// no other file types allowed
+				break;
+		}
+		
+		if($fileType != false)
+		{
+			$newFileLocation = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA . md5($fileName);
+			
+			try
+			{
+				trace('file put contents');
+				trace($newFileLocation);
+				trace(sizeof($fileData));
+				trace(sizeof($fileData->data));
+				trace($fileData);
+				
+				trace($GLOBALS['amfphp']['encoding']);
+				
+				file_put_contents($newFileLocation, $fileData->data);
+				//$fp = fopen($newFileLocation, "w");
+				//fwrite($fp, $fileData);
+				//fclose($fp);
+				
+				$size = filesize($newFileLocation);
+				
+				
+				if(file_exists($newFileLocation))
+				{
+					$media = new nm_los_Media();
+					// get swf dimensions and size
+					if($fileType == 'swf')
+					{
+						$swf = new nm_los_media_SWF();
+						$swf->getDimensions($newFileLocation);
+						$media->width = $swf->width;
+						$media->height = $swf->height;
+						$media->version = $swf->version;
+					}
+					// get the image dimensions
+					else if($fileType == 'pic')
+					{
+						$data = getimagesize($newFileLocation);
+						$media->width = $data[0];
+						$media->height = $data[1];
+					}
+					@chmod($testName, 0755);
+
+					$media->title = $title;
+					$media->auth = $_SESSION['userID'];
+					$media->descText = $description;
+					$media->copyright = $copyright;
+					$media->itemType = $fileType;
+					$media->thumb = 0;
+					$media->url = $fileName.".".$extension; // same as basename?
+					//$media->size = $fileData['size'];
+					$media->size = $size;
+					$media->length = $length;
+					$lor = nm_los_API::getInstance();
+					$result = $this->newMedia($media);
+					
+					trace($media);
+					trace('=====');
+					trace($result);
+					
+					if( !($result instanceof nm_los_Media) )
+					{
+						return false;
+					}
+					
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			catch(Exception $e)
+			{
+				trace($e);
+				trace($e->getMessage());
+			}
+		}
+		
+		return false;
+	}
+	
 	public function handleMediaUpload($fileData, $title, $description, $copyright, $length=0)
 	{
 		// TODO: Make sure file is less than or equal to max size, and a title has been sent
