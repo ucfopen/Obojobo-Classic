@@ -172,11 +172,14 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getUser($username = false )
 	{
+		trace('go');
 		if($this->getSessionValid())
 		{
+			trace('go1');
 			$UM = \rocketD\auth\AuthManager::getInstance();
 			if($username === false)
 			{
+				trace('go2');
 				$result = $UM->fetchUserByID($_SESSION['userID']);
 
 			}
@@ -330,6 +333,16 @@ class API extends \rocketD\db\DBEnabled
 			{
 				$result = \rocketD\util\Error::getError(1);
 			}
+			return $result;
+		}
+	}
+	
+	public function getUsersMatchingUsername($searchString)
+	{
+		if($this->getSessionValid())
+		{
+			$UM = \rocketD\auth\AuthManager::getInstance();
+			$result = $UM->getUsersMatchingUsername($searchString);
 		}
 		else
 		{
@@ -479,12 +492,11 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function createDraft($loObj)
 	{
-
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
 			$loman = \obo\lo\LOManager::getInstance();
-			$loObj = $loman->newDraft($loObj);	
+			$loObj = $loman->newDraft($loObj);
 			$this->DBM->commit();
 		}
 		else

@@ -172,23 +172,25 @@
 <h2>Choose Stat</h2>
 <fieldset>
     <legend>Instances Data:</legend>
-	<input type="radio" name="stat" value="1" id="instance_count"><label for="instance_count">Instances Created</label><br>
-	<input type="radio" name="stat" value="2" id="student_count"><label for="student_count">Student Views [slow!]</label><br>
-	<input type="radio" name="stat" value="3" id="derivative_count"><label for="derivative_count">Derivatives Created [x]</label><br>
-	<input type="radio" name="stat" value="4" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
-	<input type="radio" name="stat" value="5" id="import_scores"><label for="import_scores">Score Import Usage</label><br>
+	<input type="radio" name="stat" value="10" id="instance_count"><label for="instance_count">Instances Created</label><br>
+	<input type="radio" name="stat" value="20" id="student_count"><label for="student_count">Views <span style="color:red;">[slow]</span></label><br>
+	<input type="radio" name="stat" value="30" id="derivative_count"><label for="derivative_count">View Time by Section</label><br>
+	<input type="radio" name="stat" value="90" id="content_views"><label for="content_views">Page &amp; Question Views <span style="color:red;">[slow]</span></label><br>
+	<input type="radio" name="stat" value="40" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
+	<input type="radio" name="stat" value="50" id="import_scores"><label for="import_scores">Score Import Usage</label><br>
 </fieldset>
 <fieldset>
     <legend>Owner Data:</legend>
-	<input type="radio" name="stat" value="6" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
-	<input type="radio" name="stat" value="7" id="which_courses"><label for="which_courses">Which Courses</label><br>
+	<input type="radio" name="stat" value="60" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
+	<input type="radio" name="stat" value="65" id="who_created_los"><label for="who_created_los">Learning Object Authors <span style="color:red;">[review needed]</span></label><br>
+	<input type="radio" name="stat" value="70" id="which_courses"><label for="which_courses">Which Courses</label><br>
 </fieldset>
 <fieldset>
     <legend>Student Data:</legend>
-	<input type="radio" name="stat" value="8" id="question_answers"><label for="question_answers">Question Answer Values [x]</label><br>
-	<input type="radio" name="stat" value="9" id="content_views"><label for="content_views">Question and Content Page Views</label><br>
-	<input type="radio" name="stat" value="10" id="scores"><label for="scores">Scores [x]</label><br>
-	<input type="radio" name="stat" value="11" id="attempt"><label for="attempt">Attempt [x]</label><br>
+	<input type="radio" name="stat" value="75" id="who_visited"><label for="who_visited">Individual Visitors  <span style="color:red;">[slow]</span></label><br>
+	<input type="radio" name="stat" value="80" id="question_answers"><label for="question_answers"><s>Question Answer Values</s></label><br>
+	<input type="radio" name="stat" value="100" id="scores"><label for="scores"><s>Scores</s></label><br>
+	<input type="radio" name="stat" value="110" id="attempt"><label for="attempt"><s>Attempt</s></label><br>
 </fieldset>
 <h2>Choose Timeframe</h2>
 

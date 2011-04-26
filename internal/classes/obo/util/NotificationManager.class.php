@@ -70,7 +70,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 		$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
 		
 		// load up email template
-		$smarty = new Smarty();
+		$smarty = new \Smarty();
 
 		$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
 		
@@ -107,7 +107,6 @@ class NotificationManager extends \rocketD\db\DBEnabled
 
 		
 		$sent = $this->mail($student->email, $subject, $body, $headers);
-		
 		\rocketD\util\Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
 
 		return $sent;
