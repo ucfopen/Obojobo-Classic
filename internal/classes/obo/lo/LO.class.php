@@ -499,7 +499,6 @@ class LO
 			LEFT JOIN ".\cfg_obo_Keyword::MAP_TABLE." AS M
 			ON M.".\cfg_obo_Keyword::ID." = K.".\cfg_obo_Keyword::ID."
 			WHERE M.".\cfg_obo_Keyword::ID." IS NULL;";
-			trace($qstr);
 			if(!$DBM->query($qstr))
 			{
 				$DBM->rollback();

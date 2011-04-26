@@ -19,6 +19,7 @@ class MessageBody {
 	var $methodName = "";
 	var $responseTarget = "null";
 	var $noExec = false;
+	var $jsonCallback = "";
 	
 	var $_value = NULL;
 	var $_results = NULL;
