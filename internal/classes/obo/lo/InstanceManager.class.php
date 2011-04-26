@@ -208,12 +208,12 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			if($r->{\cfg_obo_Instance::START_TIME} <= $curtime)
 			{
 				$lom = \obo\lo\LOManager::getInstance();
-				$rootID = $lom->getRootId($r->{\cfg_obo_LO::ID});
+				// $rootID = $lom->getRootId($r->{\cfg_obo_LO::ID});
 				$permman = \obo\perms\PermissionsManager::getInstance();
 				$roleMan = \obo\perms\RoleManager::getInstance();
 				
 				$visitMan = \obo\VisitManager::getInstance();
-				$visitMan->startInstanceView($instID);
+				$visitMan->startInstanceView($instID, $r->{\cfg_obo_LO::ID});
 				$visitMan->createVisit($instID);
 
 				// getinstance, only get content if its past the assessment end time
