@@ -70,7 +70,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 		if($visitID == 0) // for shorter code, instead of getVisit($_SESSION['visitID']), use getVisit()
 		{
-			$visitID = $thi->getCurrentVisitID();
+			$visitID = $this->getCurrentVisitID();
 		}
 		$qstr = "SELECT * FROM ".\cfg_obo_Visit::TABLE." WHERE ".\cfg_obo_Visit::ID."='?' LIMIT 1";
 		

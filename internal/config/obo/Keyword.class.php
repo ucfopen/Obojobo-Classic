@@ -7,7 +7,7 @@ class cfg_obo_Keyword
 
 	const MAP_TABLE = 'obo_map_keywords_to_lo';
 	const MAP_TYPE  = 'itemType';
-	const MAP_ITEM = 'itemID';
+	const MAP_ITEM = 'loID';
 	
 }
 ?>

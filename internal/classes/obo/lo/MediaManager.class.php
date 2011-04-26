@@ -55,8 +55,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 		
 		$r = $this->DBM->fetch_obj($q);
-
-		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER});
+		
+		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER}, $r->{\cfg_obo_Media::ATTRIBUTION});
 		\rocketD\util\Cache::getInstance()->setMedia($media);
 		return $media;
 	}
@@ -191,7 +191,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::LENGTH."='?',
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
-				".\cfg_obo_Media::VER."='?'";
+				".\cfg_obo_Media::VER."='?',
+				".\cfg_obo_Media::ATTRIBUTION."='?'";
 		trace($qstr);
 		trace($media->height);
 		trace($media->width);
@@ -199,7 +200,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		trace('dones');
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
-		$media->size, $media->length, $media->height, $media->width, $media->version)) )
+		$media->size, $media->length, $media->height, $media->width, $media->version, $media->attribution)) )
 		{
 		    $this->DBM->rollback();
 			return false;
@@ -262,11 +263,12 @@ class MediaManager extends \rocketD\db\DBEnabled
 	public function handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length=0)
 	{
 		// TODO: Make sure file is less than or equal to max size, and a title has been sent
-
-		$roleMan = nm_los_RoleManager::getInstance();
+		
+		$roleMan = \obo\perms\RoleManager::getInstance();
 		if(!$roleMan->isLibraryUser())
 		{
-			core_util_Error::getError(4);
+			trace('1');
+			\rocketD\util\Error::getError(4);
 			return false;
 		}
 		
@@ -276,7 +278,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		$lastDot = strrpos($baseName, '.');
 		$fileName = substr($baseName, 0, $lastDot);
 		$extension = strtolower(substr($baseName, $lastDot+1));
-		
+		trace('2');
 		switch($extension)
 		{
 			case 'jpg':
@@ -302,7 +304,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		
 		if($fileType != false)
 		{
-			$newFileLocation = AppCfg::DIR_BASE.AppCfg::DIR_MEDIA . md5($fileName);
+			$newFileLocation = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA . md5($fileName);
 			
 			try
 			{
@@ -324,11 +326,12 @@ class MediaManager extends \rocketD\db\DBEnabled
 				
 				if(file_exists($newFileLocation))
 				{
-					$media = new nm_los_Media();
+					$media = new \obo\lo\Media();
+					$media->attribution = 1; //@TODO
 					// get swf dimensions and size
 					if($fileType == 'swf')
 					{
-						$swf = new nm_los_media_SWF();
+						$swf = new \obo\lo\media\SWF();
 						$swf->getDimensions($newFileLocation);
 						$media->width = $swf->width;
 						$media->height = $swf->height;
@@ -353,7 +356,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 					//$media->size = $fileData['size'];
 					$media->size = $size;
 					$media->length = $length;
-					$lor = nm_los_API::getInstance();
+					$lor = \obo\API::getInstance();
 					$result = $this->newMedia($media);
 					
 					trace($media);
@@ -378,7 +381,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 				trace($e->getMessage());
 			}
 		}
-		
+		trace('oh no');
 		return false;
 	}
 	

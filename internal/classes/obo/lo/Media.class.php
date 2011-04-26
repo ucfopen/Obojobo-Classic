@@ -26,8 +26,9 @@ class Media
 	public $height;			//height in pixels of the media (works for swf and images)
 	public $width;			//width in pixels of media
 	public $version;		//version of the file (swf version for instance)
+	public $attribution;	//Tinyint: If true (1), the image requires CC attribution
 
-	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='')
+	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='', $attribution=0)
 	{
 	    if(func_num_args() == 1)
         {   	
@@ -45,6 +46,7 @@ class Media
 			$this->width = $mediaObj['width'];
 			$this->height = $mediaObj['height'];
 			$this->version = $mediaObj['version'];
+			$this->attribution = $mediaObj['attribution'];
         }
         else
         {	
@@ -63,6 +65,7 @@ class Media
 			$this->width = $width;
 			$this->height = $height;
 			$this->version = $version;
+			$this->attribution = $attribution;
         }
 	}
 }
