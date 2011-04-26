@@ -916,6 +916,9 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
+		// keep the attemptID
+		// $curAttempt = $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'];
+		
 		// end the attempt
 		if($this->endAttempt($lo->aGroup->qGroupID, $equivalent) != true)
 		{
@@ -923,7 +926,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		
 		$TM = \obo\log\LogManager::getInstance();
-		$TM->trackImportScore();
+		$TM->trackImportScore(/* $curAttempt, $equivalent->attemptID*/);
 		return true;
 	}
 	

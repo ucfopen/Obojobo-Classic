@@ -75,8 +75,9 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $qgroup->rand, $qgroup->allowAlts, $qgroup->altMethod)) )
 		{
 			$this->DBM->rollback();
-			return false;	
+			return false;
 		}
+		
 		$qgroup->qGroupID = $this->DBM->insertID;
 
 		//Fill in the mapping table for the questions in the group, creating new questions as needed
