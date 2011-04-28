@@ -1745,26 +1745,18 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
-	public function getLOStats($los, $stats, $start, $end, $resolution)
+	public function getLOStats($los, $stats, $start, $end, $resolution, $preveiw=true)
 	{
 		if($this->getSessionValid())
 		{
 			$UM = \rocketD\auth\AuthManager::getInstance();
-			if($username === false)
-			{
-				$result = $UM->fetchUserByID($_SESSION['userID']);
 
-			}
-			else
+			$RM = \obo\perms\RoleManager::getInstance();
+			if($RM->isAdministrator())
 			{
-				$RM = \obo\perms\RoleManager::getInstance();
-				if($RM->isAdministrator())
-				{
-					
-					$AM = \obo\util\Analytics::getInstance();
-					return $AM->getLOStat($los, $stats, $start, $end, $resolution);
-					
-				}
+				$AM = \obo\util\Analytics::getInstance();
+				return $AM->getLOStat($los, $stats, $start, $end, $resolution, $preview);
+				
 			}
 		}
 		else

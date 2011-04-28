@@ -126,7 +126,7 @@
 				});
 			
 				// Enable the table sorter
-				$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+				// $("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
 			
 			}
 			
@@ -172,18 +172,18 @@
 <h2>Choose Stat</h2>
 <fieldset>
     <legend>Instances Data:</legend>
-	<input type="radio" name="stat" value="10" id="instance_count"><label for="instance_count">Instances Created</label><br>
-	<input type="radio" name="stat" value="20" id="student_count"><label for="student_count">Views <span style="color:red;">[slow]</span></label><br>
-	<input type="radio" name="stat" value="30" id="derivative_count"><label for="derivative_count">View Time by Section</label><br>
-	<input type="radio" name="stat" value="90" id="content_views"><label for="content_views">Page &amp; Question Views <span style="color:red;">[slow]</span></label><br>
-	<input type="radio" name="stat" value="40" id="assessment_count"><label for="assessment_count">Assessments Completed</label><br>
-	<input type="radio" name="stat" value="50" id="import_scores"><label for="import_scores">Score Import Usage</label><br>
+	<input type="radio" name="stat" value="10" id="instance_count"><label for="instance_count">Total Instances Created</label><br>
+	<input type="radio" name="stat" value="20" id="student_count"><label for="student_count">Total Views <span style="color:red;">[slow]</span></label><br>
+	<input type="radio" name="stat" value="30" id="derivative_count"><label for="derivative_count">Total View Time by Section</label><br>
+	<input type="radio" name="stat" value="90" id="content_views"><label for="content_views">Total Page &amp; Question Views <span style="color:red;">[slow]</span></label><br>
+	<input type="radio" name="stat" value="40" id="assessment_count"><label for="assessment_count">Total Assessments Completed</label><br>
+	<input type="radio" name="stat" value="50" id="import_scores"><label for="import_scores">Total Score Import Usage</label><br>
 </fieldset>
 <fieldset>
     <legend>Owner Data:</legend>
-	<input type="radio" name="stat" value="60" id="who_created_instances"><label for="who_created_instances">Who Created Instances</label><br>
-	<input type="radio" name="stat" value="65" id="who_created_los"><label for="who_created_los">Learning Object Authors <span style="color:red;">[review needed]</span></label><br>
-	<input type="radio" name="stat" value="70" id="which_courses"><label for="which_courses">Which Courses</label><br>
+	<input type="radio" name="stat" value="60" id="who_created_instances"><label for="who_created_instances">List Who Created Instances</label><br>
+	<input type="radio" name="stat" value="65" id="who_created_los"><label for="who_created_los">List Learning Object Authors <span style="color:red;">[review needed]</span></label><br>
+	<input type="radio" name="stat" value="70" id="which_courses"><label for="which_courses">List Which Courses</label><br>
 </fieldset>
 <fieldset>
     <legend>Student Data:</legend>
@@ -208,7 +208,8 @@
 <input type="radio" name="resolution" value="hour" id="resolution_hour"><label for="resolution_hour">Hours</label><br>
 
 
-	<p><input id="submit" type="submit" value="Generate &rarr;"></p>
+	<p><input id="submit" type="submit" value="PREVIEW &rarr;"></p>
+	<a href="http://obo/assets/csv.php?function=stats&los[]=10347&stat=10&start=1199163600&end=1304049600&resolution=all">Download</a>
 </form>
 
 <div id="results"></div>
@@ -227,6 +228,8 @@
 		</select>
 	</form>
 </div>
+
+<textarea id="csvoutput"></textarea>
 
 </body>
 </html>
