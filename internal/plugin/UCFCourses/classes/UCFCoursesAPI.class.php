@@ -27,7 +27,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		trace('Sending HTTPRequest', true);
 		try
 		{
-			$request = new HttpRequest($url, HTTP_METH_POST);
+			$request = new \HttpRequest($url, HTTP_METH_POST);
 			if(is_array($postVars))
 			{
 				$request->addPostFields($postVars);
@@ -105,7 +105,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	
 	public function getInstanceCourseData($insID)
 	{
-		$courseData = new stdClass();
+		$courseData = new \stdClass();
 		
 		$qstr = "SELECT * FROM ". \cfg_plugin_UCFCourses::MAP_TABLE . " WHERE ". \cfg_obo_Instance::ID . " = '?'";
 		$q = $this->DBM->querySafe($qstr, $insID);
