@@ -662,6 +662,14 @@ class RoleManager extends \rocketD\db\DBEnabled
 		return $_SESSION['isSuperUser'];
 	}
 	
+	public function isSuperStats()
+	{
+		if(!isset($_SESSION['isSuperStats']))
+		{
+			$_SESSION['isSuperStats'] = $this->doesUserHaveRole(array(\obo\perms\Role::SUPER_STATS, \obo\perms\Role::SUPER_USER));
+		}
+		return $_SESSION['isSuperStats'];
+	}
 	/**
 	 * 
 	 * 
