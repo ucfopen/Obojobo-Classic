@@ -437,7 +437,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			{
 				trace(mysql_error(), true);
 				$this->DBM->rollback();
-				//die();
 				return false;
 			}
 
@@ -468,8 +467,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	 */
 	public function setGlobalPerms($itemID=0, $itemType='l', $permObj)
 	{
-		trace('begin set global perm change ');
-		trace($permObj);
 		$userID = $_SESSION['userID'];
 		if($itemID != 0 && $this->getUserPerm($itemID, $itemType, 'giveGlobal', $userID))
 		{

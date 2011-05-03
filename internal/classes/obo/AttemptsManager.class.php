@@ -766,7 +766,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		{
 			$trackingMan = \obo\log\LogManager::getInstance();
 			$trackingMan->trackStartAttempt();
-			trace('starting new attempt: ' . $this->DBM->insertID);
 		}
 		return true;
 	}

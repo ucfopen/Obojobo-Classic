@@ -53,13 +53,11 @@ else
 	{
 		// change ownership
 		$qstr = "UPDATE ".\cfg_obo_Instance::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' ";
-		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numInstances = $DBM->affected_rows();
 	
 		// change sharing options
 		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_INSTANCE."'";
-		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numInstances += $DBM->affected_rows();
 	}
@@ -69,7 +67,6 @@ else
 	{
 		// update all ownership/sharing permissions for los
 		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_LO."'";
-		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numLOs = $DBM->affected_rows();
 	}
@@ -79,13 +76,11 @@ else
 	{
 		// change ownership
 		$qstr = "UPDATE ".\cfg_obo_Media::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' ";
-		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numMedia = $DBM->affected_rows();
 		
 		// update all ownership/sharing permissions for los
 		$qstr = "UPDATE IGNORE ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID." = '?' WHERE ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::TYPE." =  '".\cfg_obo_Perm::TYPE_MEDIA."'";
-		trace($qstr);
 		$DBM->querySafe($qstr, $_REQUEST['to_user'], $_REQUEST['from_user']);
 		$numMedia += $DBM->affected_rows();
 	}
