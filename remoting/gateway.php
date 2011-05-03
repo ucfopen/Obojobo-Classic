@@ -6,7 +6,6 @@
 
 	$gateway = new Gateway();
 	$gateway->setClassPath(\AppCfg::DIR_BASE.\AppCfg::DIR_AMFPHP."services/");
-//	$gateway->setCharsetHandler("utf8_decode", "ISO-8859-1", "ISO-8859-1");
 	$gateway->setCharsetHandler("mbstring","UTF-8","UTF-8");
 	$gateway->setErrorHandling(E_ALL ^ E_NOTICE);
 	$gateway->enableGzipCompression(25*1024);

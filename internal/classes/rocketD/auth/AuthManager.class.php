@@ -422,7 +422,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	public function requestPasswordReset($username, $email, $returnURL)
 	{
 		$username = trim($username);
-		trace('looking to reset, finding authmod for user '. $username);
 		$authMod = $this->getAuthModuleForUsername($username);
 		if($authMod)
 		{
@@ -472,7 +471,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		{
 			foreach($authModList AS $authMod)
 			{
-				trace('authenticating ');
 				// attempt to authenticate each in order
 				if($authMod->authenticate($requestVars))
 				{
@@ -524,7 +522,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	
 	public function getUsersMatchingUsername($searchString)
 	{
-		trace($searchString);
 		/*select * from obo_users where lower(concat_ws(' ',first,last)) like '%jag%'*/
 		$this->defaultDBM();
 		$users = array();

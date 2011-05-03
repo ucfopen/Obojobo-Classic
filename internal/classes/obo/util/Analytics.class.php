@@ -51,8 +51,6 @@ class Analytics extends \rocketD\db\DBEnabled
 			$hour = "HOUR(FROM_UNIXTIME(%)) AS hour";
 			
 			$limit = $preview ? ' LIMIT 10' : '';
-			trace($preview);
-			trace($limit);
 			switch($resolution)
 			{
 				case 'month':
@@ -96,7 +94,7 @@ class Analytics extends \rocketD\db\DBEnabled
 					$select = str_replace('%', 'createTime', $select);
 					$los = implode(',', $los);
 					$sql = "SELECT COUNT(createTime) AS VISITS, COUNT(DISTINCT userID) AS VISITORS, COUNT(DISTINCT instID) AS INSTANCES, COUNT(DISTINCT loID) AS MASTERS $select FROM obo_logs WHERE loID IN (?) AND itemType = 'Visited' AND createTime > '?' and createTime < '?' ".(strlen($group) ? " GROUP BY $group" : '' ) . (strlen($order) ? " ORDER BY $order" : '') . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
 					return $results;
 					break;
@@ -117,7 +115,7 @@ class Analytics extends \rocketD\db\DBEnabled
 					$select = str_replace('%', 'createTime', $select);
 					$los = implode(',', $los);
 					$sql = "SELECT COUNT(*) AS VISITS, COUNT(DISTINCT instID) AS INSTANCES, COUNT(DISTINCT userID) AS USERS, COUNT(DISTINCT loID) AS MASTERS,  SEC_TO_TIME(SUM(overviewTime)) AS OVERVIEW_TOTAL_HMS, SEC_TO_TIME(AVG(overviewTime)) AS OVERVIEW_AVG, SEC_TO_TIME(STD(overviewTime)) AS OVERVIEW_STD, SEC_TO_TIME(SUM(contentTime)) AS CONTENT_TOTAL_HMS, SEC_TO_TIME(AVG(contentTime)) AS CONTENT_AVG, SEC_TO_TIME(STD(contentTime)) AS CONTENT_STD, SEC_TO_TIME(SUM(practiceTime)) AS PRACTICE_TOTAL_HMS, SEC_TO_TIME(AVG(practiceTime)) AS PRACTICE_AVE, SEC_TO_TIME(STD(practiceTime)) AS PRACTICE_STD, SEC_TO_TIME(SUM(assessmentTime)) AS ASSESSMENT_TOTAL_HMS, SEC_TO_TIME(AVG(assessmentTime)) AS ASSESSMENT_AVE, SEC_TO_TIME(STD(assessmentTime)) AS ASSESSMENT_STD $select FROM obo_log_visits  WHERE loID in (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '' ) . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los);
+					$q = $this->DBM->querySafe($sql, $los);
 					$results = $this->DBM->getAllRows($q);
 					return $results;
 					break;
@@ -149,7 +147,7 @@ class Analytics extends \rocketD\db\DBEnabled
 					$los = implode(',', $los);
 					$select = str_replace('%', 'L.createTime', $select);
 					$sql = "SELECT U.login AS USERNAME, U.last AS LAST, U.first AS First, U.email AS EMAIL $select FROM obo_map_authors_to_lo AS MA JOIN obo_users AS U ON U.userID = MA.userID JOIN obo_los L ON L.loID = MA.loID WHERE L.loID IN (?) AND L.createTime > '?' AND L.createTime < '?' ".(strlen($group) ? " GROUP BY MA.userID, $group" : ' GROUP BY MA.userID') . (strlen($order) ? " ORDER BY $order, MA.userID " : ' ORDER BY MA.userID') . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
 					return $results;
 					break;
@@ -166,7 +164,7 @@ class Analytics extends \rocketD\db\DBEnabled
 					$select = str_replace('%', 'V.createTime', $select);
 					$sql = "SELECT U.login AS USERNAME, U.last AS LAST, U.first AS First, U.email AS EMAIL, GROUP_CONCAT( DISTINCT R.name) AS ROLES,  COUNT(DISTINCT V.visitID) AS VISITS, COUNT(DISTINCT V.instID) AS INSTANCES $select FROM obo_log_visits AS V JOIN obo_users AS U ON U.userID = V.userID LEFT JOIN obo_map_roles_to_user MR ON MR.userID = V.userID LEFT JOIN obo_user_roles R ON R.roleID = MR.roleID  WHERE  V.loID IN (?) AND V.createTime > '?' AND V.createTime < '?' ".(strlen($group) ? " GROUP BY V.userID, $group" : ' GROUP BY V.userID') . (strlen($order) ? " ORDER BY $order, V.userID " : ' ORDER BY V.userID') . $limit;
 					// $sql = "SELECT U.login AS USERNAME, U.last AS LAST, U.first AS First, U.email AS EMAIL, GROUP_CONCAT( DISTINCT R.name) AS ROLES,  COUNT(DISTINCT V.visitID) AS VISITS, COUNT(DISTINCT V.instID) AS INSTANCES, COUNT( DISTINCT A.attemptID) AS COMPLETED_ASSESSMENT $select FROM obo_log_visits AS V JOIN obo_users AS U ON U.userID = V.userID LEFT JOIN obo_log_attempts AS A ON A.loID = V.loID AND A.userID = V.userID LEFT JOIN obo_map_roles_to_user MR ON MR.userID = V.userID LEFT JOIN obo_user_roles R ON R.roleID = MR.roleID  WHERE A.endTime != 0 AND V.loID IN (?) AND V.createTime > '?' AND V.createTime < '?' ".(strlen($group) ? " GROUP BY V.userID, $group" : ' GROUP BY V.userID') . (strlen($order) ? " ORDER BY $order, V.userID " : ' ORDER BY V.userID');
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
 					return $results;
 					break;
@@ -174,16 +172,15 @@ class Analytics extends \rocketD\db\DBEnabled
 					$los = implode(',', $los);
 					$select = str_replace('%', 'V.createTime', $select);
 					$sql = "SELECT * FROM obo_log_qscores S WHERE S.loID IN (?) GROUP BY attemptID ORDER BY attemptID" . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
-					trace(microtime(1) - $t);
 					return $results;
 					break;
 				case 90: // Content Page Views
 					$los = implode(',', $los);
 					$select = str_replace('%', 'createTime', $select);
 					$sql = "SELECT COUNT(*) AS TOTAL_PAGE_VIEWS, SUM(IF(valueB = 1, 1, 0)) AS CONTENT_PAGE_VIEWS, SUM(IF(valueB = 2, 1, 0)) AS PRACTICE_PAGE_VIEWS,SUM(IF(valueB = 3, 1, 0)) AS ASSESSMENT_PAGE_VIEWS $select FROM obo_logs WHERE loID IN (?) AND itemType ='PageChanged' AND createTime > '?' AND createTime < '?' ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '') . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
 					return $results;
 					break;
@@ -191,9 +188,8 @@ class Analytics extends \rocketD\db\DBEnabled
 					$los = implode(',', $los);
 					$select = str_replace('%', 'V.createTime', $select);
 					$sql = "SELECT * FROM obo_log_qscores S WHERE S.loID IN (?) GROUP BY attemptID ORDER BY attemptID" . $limit;
-					$q = $this->DBM->querySafeTrace($sql, $los, $start, $end);
+					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
-					trace(microtime(1) - $t);
 					return $results;
 					break;
 				case 110:
