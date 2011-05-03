@@ -63,7 +63,7 @@ class LO
 		// whitelist input
 		if(!$DBM)
 		{
-			\rocketD\util\Log::trace('no DBM sent.', true);
+			trace('no DBM sent.', true);
 			return false;
 		}
 		if(!is_numeric($loID) || $loID <= 0)
