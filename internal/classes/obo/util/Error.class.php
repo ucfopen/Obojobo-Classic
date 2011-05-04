@@ -8,7 +8,7 @@ class Error extends \rocketD\util\Error
 		
 		if(isset($_SESSION['userID']))
 		{
-			//\rocketD\util\Log::trace('ERROR ' . $this->getErrorString($this->errorID), true, 2);
+			//trace('ERROR ' . $this->getErrorString($this->errorID), true, 2);
 			$trackingMan = \obo\log\LogManager::getInstance();
 		}
 		parent::logError();
