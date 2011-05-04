@@ -260,7 +260,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 	}
 	
-	public function handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length=0)
+	public function handleFileDataUpload($fileData, $filename, $title, $description, $copyright, $length=0)
 	{
 		// TODO: Make sure file is less than or equal to max size, and a title has been sent
 		
