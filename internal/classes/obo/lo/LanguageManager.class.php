@@ -44,7 +44,7 @@ class LanguageManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->query("SELECT * FROM ".\cfg_obo_Language::TABLE)) ) // no need for querySae
 		{
 			$this->DBM->rollback();
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			return false;
 		}
 		

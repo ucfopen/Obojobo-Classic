@@ -154,7 +154,7 @@ class LO
 			$this->perms = $permman->getMergedPerms((int)$this->rootID, \cfg_obo_Perm::TYPE_LO);
 			return true;
 		}
-		\rocketD\util\Log::trace('unable to locate LO: ' . $loID, true);
+		trace('unable to locate LO: ' . $loID, true);
 		return false;
 	}
 	
