@@ -569,6 +569,7 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function removeLO($loID)
     {
+		trace('removeLO');
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -1373,6 +1374,24 @@ class API extends \rocketD\db\DBEnabled
 		else
 		{
 			$result = \rocketD\util\Error::getError(1);
+		}
+		return $result;
+	}
+	
+	//@TODO: Consider renaming to uploadMedia and funnel all media uploads through here.
+	public function uploadMedia($fileData, $filename, $title, $description, $copyright, $length=0)
+	{
+		if($this->getSessionValid())
+		{
+			trace('uploadMedia', true);
+			$this->DBM->startTransaction();
+			$mediaMan = \obo\lo\MediaManager::getInstance();
+			$result = $mediaMan->handleFileDataUpload($fileData, $filename, $title, $description, $copyright, $length);
+			$this->DBM->commit();
+		}
+		else
+		{
+			$result = core_util_Error::getError(1);
 		}
 		return $result;
 	}
