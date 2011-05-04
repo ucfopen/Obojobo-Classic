@@ -600,11 +600,28 @@ class LO
 			$qgm->newGroup($this->aGroup);
 			
 			//********* Build Summary Object **************/
-			// build summary object
+			// count the number of questions taking question alternates into account
+			// Note that questionIndex = 0 if there are no alternates, then they count up
+			// TODO: change the alt mapping - get rid of the alt map table and just use the question order
+			$ungroupedQuestionCount = 0; // questions w/o alternates
+			$groupedQuestionArray = array(); // questions w/ alternates
+			foreach($this->aGroup->kids as $kid)
+			{
+				if($kid->questionIndex > 0)
+				{
+					$groupedQuestionArray[$kid->questionIndex] = 1;
+				}
+				else
+				{
+					$ungroupedQuestionCount ++;
+				}
+			}
+			$assessmentSize = count($groupedQuestionArray) + $ungroupedQuestionCount;
+			
 			$this->summary = array(
 				'contentSize' => count($this->pages),
 				'practiceSize' => count($this->pGroup->kids),
-				'assessmentSize' => count($this->aGroup->kids)
+				'assessmentSize' => $assessmentSize
 			);
 			
 			
