@@ -9,82 +9,20 @@ $qGroups = array();
 //$DBM->startTransaction();
 
 echo "set ?run=1 to commit!";
-
-$sql = "
-	SELECT A.qGroupID, A.questionID, A.questionIndex, B.itemOrder
-	FROM  `obo_map_qalts_to_qgroup` AS A, `obo_map_questions_to_qgroup` AS B
-	WHERE questionIndex < 0
-	AND A.questionID = B.childID
-	AND A.qGroupID = B.qGroupID
-	ORDER BY A.qGroupID, B.itemOrder";
-	
-$q = $DBM->query($sql);
-while($r = $DBM->fetch_obj($q))
-{
-	if(count($qGroups[$r->qGroupID]) == 0)
-	{
-		$qGroups[$r->qGroupID] = array();
-	}
-	$qGroups[$r->qGroupID][] = $r;
-}
-
-foreach($qGroups as $qGroup)
-{
-	//print_r($qGroup);
-	
-	$firstItemOrder = $qGroup[0]->itemOrder;
-	$lastQuestionIndex = $qGroup[0]->questionIndex;
-	$toChange = array();
-	$numCompressed = 0;
-	for($i = 0; $i < count($qGroup); $i++)
-	{
-		if($lastQuestionIndex != $qGroup[$i]->questionIndex)
-		{
-			for($j = 0; $j < count($toChange); $j++)
-			{
-			//	echo 'set qGroup['.$j.']->newQuestionIndex = '.$firstItemOrder;
-				$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
-			}
-			$firstItemOrder = $qGroup[$i]->itemOrder;
-			$numCompressed += count($toChange) - 1;
-			$toChange = array();
-		}
-		//echo 'push '.$i.' to toChange  ';
-		$toChange[] = $i;
-		
-		$lastQuestionIndex = $qGroup[$i]->questionIndex;
-	}
-	
-	for($j = 0; $j < count($toChange); $j++)
-	{
-		$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
-	}
-}
-
 echo '<pre>';
-//////print_r($qGroups);
-//exit();
-$DBM->startTransaction();
-
-foreach($qGroups as $qGroup)
-{
-	foreach($qGroup as $mapping)
-	{
-		$qStr = 'UPDATE obo_map_qalts_to_qgroup SET questionIndex='.$mapping->newQuestionIndex.' WHERE qGroupID='.$mapping->qGroupID.' AND questionID='.$mapping->questionID;
-		echo $qStr;
-		echo "\n";
-		$DBM->query($qStr);
-	}
-}
-
-//Now we want to make sure that the orders are correct
-$qStr = "
-SELECT obo_map_questions_to_qgroup.qGroupID, obo_map_questions_to_qgroup.childID, obo_map_questions_to_qgroup.itemOrder, obo_map_qalts_to_qgroup.questionIndex
-FROM obo_map_questions_to_qgroup
-LEFT JOIN obo_map_qalts_to_qgroup
-ON obo_map_questions_to_qgroup.childID = obo_map_qalts_to_qgroup.questionID
-AND obo_map_questions_to_qgroup.qGroupID = obo_map_qalts_to_qgroup.qGroupID
-ORDER BY obo_map_questions_to_qgroup.qGroupID, obo_map_questions_to_qgroup.itemOrder";
+//9846
+//Get all the questions from each qGroup:
+$qStr = "SELECT Q.qGroupID, Q.childID, Q.itemOrder, A.questionIndex
+FROM obo_map_questions_to_qgroup Q
+LEFT JOIN obo_map_qalts_to_qgroup A
+ON A.qGroupID = Q.qGroupID
+AND Q.childID = A.questionID
+WHERE Q.qGroupID IN
+(
+ SELECT DISTINCT L.aGroupID
+ FROM obo_los L
+)
+ORDER BY Q.itemOrder";
 $qGroups = array();
 $q = $DBM->query($qStr);
 while($r = $DBM->fetch_obj($q))
@@ -96,59 +34,60 @@ while($r = $DBM->fetch_obj($q))
 	$qGroups[$r->qGroupID][] = $r;
 }
 
-////////print_r($qGroups);
+//print_r($qGroups);
 
-$num = 0;
-echo count($qGroups);
-$numErrors = 0;
+$newTotals = array();
 
 foreach($qGroups as $qGroup)
 {
-	$correctQuestionIndex = 0;
-	$lastQuestionIndex = -999;
-	$correctData = true;
-	
+	$total = 0;
+	$lastIndex = -1;
 	foreach($qGroup as $mapping)
 	{
-		if($mapping->questionIndex < 0)
+		/*
+		if(!$mapping->questionIndex)
 		{
-				echo "ERROR\n";
-				echo "Negative index for:\n";
-				print_r($mapping);
-				echo "For QGroup:\n";
-				print_r($qGroup);
-
-				echo 'QUITTING';
-				$numErrors++;
-				exit();
-				// 
+			echo '';
 		}
-		
-		if($mapping->questionIndex == 0 || $mapping->questionIndex != $lastQuestionIndex)
+		else
 		{
-			$correctQuestionIndex++;
+			echo 'no';
 		}
-		
-		if($mapping->questionIndex > 0 && $mapping->questionIndex != $correctQuestionIndex)
+		//exit();*/
+		if($mapping->questionIndex == 0)
 		{
-			echo "ERROR\n";
-			echo "Incorrect index for:\n";
-			print_r($mapping);
-			echo "It should be ".$correctQuestionIndex."\n";
-			echo "For QGroup:\n";
-			print_r($qGroup);
-			
-			echo 'QUITTING';
-			$numErrors++;
-			exit();
+			//echo('hey');
+			$total++;
 		}
-		
-		$lastQuestionIndex = $mapping->questionIndex;
+		else
+		{
+			if($mapping->questionIndex != $lastIndex)
+			{
+				$total++;
+			}
+		}
+		$lastIndex = $mapping->questionIndex;
 	}
+	
+	if($mapping->questionIndex && ($mapping->questionIndex != $lastIndex))
+	{
+		$total++;
+	}
+	
+	$newTotals[$mapping->qGroupID] = $total;
 }
 
-echo "\n\n\n";
-echo $numErrors;
+//print_r($newTotals);
+
+
+$DBM->startTransaction();
+foreach($newTotals as $key=>$val)
+{
+	$qStr = 'UPDATE obo_los SET numAQuestions = '.$val.' WHERE aGroupID = '.$key;
+	echo $qStr."\n";
+	$DBM->query($qStr);
+}
+
 
 if($_GET['run'] == 1)
 {
