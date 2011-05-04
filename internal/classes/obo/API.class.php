@@ -447,7 +447,7 @@ class API extends \rocketD\db\DBEnabled
 	 * Returns both drafts and masters.
 	 * @author Zachary Berry
 	 */
-	public function getLOs($optLoIDArray=false)
+	public function getLOs($optLoIDArray=false, $getLOsForStats=false)
 	{
 		if($this->getSessionValid())
 		{
@@ -455,6 +455,11 @@ class API extends \rocketD\db\DBEnabled
 			if( is_array($optLoIDArray) )
 			{
 				$result = $loMan->getLO($optLoIDArray);
+			}
+			else if($getLOsForStats)
+			{
+				$AN = \obo\util\Analytics::getInstance();
+				$result = $AN->getMyStatMasters();
 			}
 			else
 			{
@@ -1764,27 +1769,12 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
-	public function getLOStats($los, $stats, $start, $end, $resolution)
+	public function getLOStats($los, $stats, $start, $end, $resolution, $preview=true)
 	{
 		if($this->getSessionValid())
 		{
-			$UM = \rocketD\auth\AuthManager::getInstance();
-			if($username === false)
-			{
-				$result = $UM->fetchUserByID($_SESSION['userID']);
-
-			}
-			else
-			{
-				$RM = \obo\perms\RoleManager::getInstance();
-				if($RM->isAdministrator())
-				{
-					
-					$AM = \obo\util\Analytics::getInstance();
-					return $AM->getLOStat($los, $stats, $start, $end, $resolution);
-					
-				}
-			}
+			$AM = \obo\util\Analytics::getInstance();
+			$result = $AM->getLOStat($los, $stats, $start, $end, $resolution, $preview);
 		}
 		else
 		{
