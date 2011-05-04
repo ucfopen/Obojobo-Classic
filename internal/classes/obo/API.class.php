@@ -1374,6 +1374,7 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
+	//@TODO: Consider renaming to uploadMedia and funnel all media uploads through here.
 	public function uploadMedia($fileData, $filename, $title, $description, $copyright, $length=0)
 	{
 		if($this->getSessionValid())
@@ -1381,7 +1382,7 @@ class API extends \rocketD\db\DBEnabled
 			trace('uploadMedia', true);
 			$this->DBM->startTransaction();
 			$mediaMan = \obo\lo\MediaManager::getInstance();
-			$result = $mediaMan->handleMediaUpload2($fileData, $filename, $title, $description, $copyright, $length);
+			$result = $mediaMan->handleFileDataUpload($fileData, $filename, $title, $description, $copyright, $length);
 			$this->DBM->commit();
 		}
 		else
