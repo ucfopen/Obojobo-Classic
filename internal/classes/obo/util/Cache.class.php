@@ -54,7 +54,7 @@ class Cache extends \rocketD\util\Memcache
 				// expire tomorrow
 				$expire = mktime(2, 0, 0, date('m'), date('d') + 1, date('Y'));
 			}
-			$this->set($this->ns.'nm_auth_ModUCFAuth:getUserFromExternalDB:'.$username, $userData, false, $expire) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'nm_auth_ModUCFAuth:getUserFromExternalDB:'.$username, $userData, false, $expire) or trace('Memcache Failed to write', true);
 		}
 	}
 	public function getModUCFExternalUser($username)
@@ -82,7 +82,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\rocketD\auth\AuthManager:getAuthModuleForUserID:'.$userID, $class, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\rocketD\auth\AuthManager:getAuthModuleForUserID:'.$userID, $class, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -90,7 +90,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\lo\InstanceData:'.$instData->instID, $instData, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\obo\lo\InstanceData:'.$instData->instID, $instData, false, 0) or trace('Memcache Failed to write', true);
 		}		
 	}
 	
@@ -114,7 +114,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'nm_los_PermItem:'.$itemID.$itemType.$optUserID, $perms, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'nm_los_PermItem:'.$itemID.$itemType.$optUserID, $perms, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -138,7 +138,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\Lock:'.$lock->lockID, $lock, false, $lock->unlockTime-time() ) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\obo\Lock:'.$lock->lockID, $lock, false, $lock->unlockTime-time() ) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -162,7 +162,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\ScoreManager:getScores:'.$instID, $scores, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\obo\ScoreManager:getScores:'.$instID, $scores, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -194,7 +194,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\rocketD\auth\AuthManager:getAllUsers', $allUsers, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\rocketD\auth\AuthManager:getAllUsers', $allUsers, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	public function clearAllUsers()
@@ -209,7 +209,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\rocketD\auth\AuthManager:getAuthModuleForUsername:'.$userName, $authClass, false, 0) or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\rocketD\auth\AuthManager:getAuthModuleForUsername:'.$userName, $authClass, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -225,7 +225,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\rocketD\auth\AuthModule:fetchUserByID:'.$userID, $user, false, 0)  or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\rocketD\auth\AuthModule:fetchUserByID:'.$userID, $user, false, 0)  or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -258,7 +258,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\lo\LanguageManager:getAllLanguages', $langs, false, 0)  or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\obo\lo\LanguageManager:getAllLanguages', $langs, false, 0)  or trace('Memcache Failed to write', true);
 		}		
 	}
 
@@ -267,7 +267,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\lo\Media:ID'.$media->mediaID, $media, false, 0)  or \rocketD\util\Log::trace('Memcache Failed to write', true);
+			$this->set($this->ns.'\obo\lo\Media:ID'.$media->mediaID, $media, false, 0)  or trace('Memcache Failed to write', true);
 		}		
 	}
 	
@@ -296,7 +296,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return; // memcache worked, skip the db cache even if it is on
 			}
-			\rocketD\util\Log::trace('Memcache Failed to write ');
+			trace('Memcache Failed to write ');
 		}
 	}
 	
@@ -336,7 +336,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return; // memcache worked, skip the db cache even if it is on
 			}
-			\rocketD\util\Log::trace('Memcache Failed to write ');
+			trace('Memcache Failed to write ');
 		}
 	}
 	
@@ -384,7 +384,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\perms\RoleManager:getUsersInRole:'.$roleID, $usersIndexes, false, 0) or \rocketD\util\Log::trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\perms\RoleManager:getUsersInRole:'.$roleID, $usersIndexes, false, 0) or trace('failure writing memcache', true);
 		}
 	}
 	
@@ -401,7 +401,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\log\LogManager:getInteractionLogByUserAndInstance:'.$instID.':'.$userID, $interactions, false, 3600) or \rocketD\util\Log::trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\log\LogManager:getInteractionLogByUserAndInstance:'.$instID.':'.$userID, $interactions, false, 3600) or trace('failure writing memcache', true);
 		}
 	}
 	
@@ -417,7 +417,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\rocketD\auth\AuthModule:getUIDforUsername'.$userName, $userID, false, 0) or \rocketD\util\Log::trace('failure writing memcache', true);
+			$this->set($this->ns.'\rocketD\auth\AuthModule:getUIDforUsername'.$userName, $userID, false, 0) or trace('failure writing memcache', true);
 		}
 
 	}
@@ -442,7 +442,7 @@ class Cache extends \rocketD\util\Memcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\perms\RoleManager:getRoleID:'.$roleName, $roleID, false, 0) or \rocketD\util\Log::trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\perms\RoleManager:getRoleID:'.$roleName, $roleID, false, 0) or trace('failure writing memcache', true);
 		}		
 	}
 	
@@ -468,7 +468,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return; // if memcache works, return, if it fails, failover to db caching
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
@@ -488,7 +488,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return; // if memcache works, return, if it fails, failover to db caching
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
@@ -514,7 +514,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return;
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
@@ -557,7 +557,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return;
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
@@ -586,7 +586,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return;
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
@@ -611,7 +611,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return;
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	
 	}
@@ -642,7 +642,7 @@ class Cache extends \rocketD\util\Memcache
 			{
 				return;
 			}
-			\rocketD\util\Log::trace('failure writing memcache', true);
+			trace('failure writing memcache', true);
 		}
 	}
 	
