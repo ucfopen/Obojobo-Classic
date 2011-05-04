@@ -13,11 +13,12 @@ class Role
 	public $roleID;			//Number:
 	public $name;		//String:  the name of the role
 
-	const SUPER_USER = "SuperUser";
-	const SUPER_VIEWER = "SuperViewer";
-	const CONTENT_CREATOR = "ContentCreator";
-	const ADMINISTRATOR = "Administrator";
-	const LIBRARY_USER = "LibraryUser";
+	const SUPER_USER = 'SuperUser';
+	const SUPER_VIEWER = 'SuperViewer';
+	const CONTENT_CREATOR = 'ContentCreator';
+	const ADMINISTRATOR = 'Administrator';
+	const LIBRARY_USER = 'LibraryUser';
+	const SUPER_STATS = 'SuperStats';
 	
 	function __construct($roleID = 0, $name = "")
 	{
