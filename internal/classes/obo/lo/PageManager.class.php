@@ -131,7 +131,7 @@ class PageManager extends \rocketD\db\DBEnabled
 		    return false; // error: page does not exist
 		}
 		$page = $this->db_unserialize($r->{\cfg_obo_Page::PAGE_DATA});
-		trace($page);
+		///trace($page);
 		$page->pageID = $r->{\cfg_obo_Page::ID};
 		
 		return $page;
