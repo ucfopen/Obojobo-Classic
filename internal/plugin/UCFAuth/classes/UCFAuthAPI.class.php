@@ -1,5 +1,5 @@
 <?php
-class plg_UCFAuthMod_UCFAuthModAPI extends core_plugin_PluginAPI
+class plg_UCFAuthMod_UCFAuthModAPI extends \rocketD\plugin\PluginAPI
 {
 	// Block all API calls directly referencing this api
 

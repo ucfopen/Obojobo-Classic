@@ -29,7 +29,6 @@ if($_GET['action'] == 'vote')
 	{
 		exit;
 	}
-	trace('one');
 	$ip	= sprintf('%u',ip2long($_SERVER['REMOTE_ADDR']));
 	// The id, ip and day fields are set as a primary key.
 	// The query will fail if we try to insert a duplicate key,
@@ -53,8 +52,6 @@ if($_GET['action'] == 'vote')
 			WHERE id = $id
 		");
 	}
-	
-trace('trhe');
 	
 }
 else if($_GET['action'] == 'submit')
