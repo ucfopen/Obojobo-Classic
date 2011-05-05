@@ -5,11 +5,11 @@ switch($_GET['function'])
 	case 'scores':
 		if ($_GET['instID'] > 0 && strlen($_GET['filename']) > 0)
 		{
-			$lor = nm_los_API::getInstance();
+			$lor = \obo\API::getInstance();
 			$scores = $lor->getScoresForInstance($_GET['instID']);
-			$UM = core_auth_AuthManager::getInstance();
 			if (is_array($scores))
 			{
+				$UM = \rocketD\auth\AuthManager::getInstance();
 				session_write_close();
 				header("Pragma: public");
 				header("Expires: 0"); // set expiration time
@@ -31,7 +31,29 @@ switch($_GET['function'])
 				exit ();
 			}
 		}
-	break;
+		break;
+	case 'stats':
+
+			$API = \obo\API::getInstance();
+			$stats = $API->getLOStats($_GET['los'], $_GET['stat'], $_GET['start'], $_GET['end'], $_GET['resolution'], false);
+			if(is_array($stats))
+			{
+				session_write_close();
+				header("Pragma: public");
+				header("Expires: 0"); // set expiration time
+				header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+				header("Content-Type: application/force-download");
+				header("Content-Type: application/octet-stream");
+				header("Content-Type: application/download");
+				header("Content-Disposition: attachment; filename=\"Obojobo_Stat{$_GET['stat']}_".date('m-d-y',$_GET['start'])."_to_".date('m-d-y',$_GET['end']).".csv\"");
+				echo implode(',', array_keys((array)$stats[0])) . "\r\n";
+				foreach($stats AS $row)
+				{
+					echo implode(',', (array)$row) . "\r\n";
+				}
+			}
+			exit();
+		break;
 	default:
 		break;
 }

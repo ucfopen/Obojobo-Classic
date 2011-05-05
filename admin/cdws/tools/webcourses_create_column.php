@@ -1,9 +1,9 @@
 <?php
 require_once(dirname(__FILE__)."/../../../internal/app.php");
 // Check for super user
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 
-if(!$API->getSessionValid(cfg_obo_Role::EMPLOYEE_ROLE))
+if(!$API->getSessionValid(\cfg_obo_Role::EMPLOYEE_ROLE))
 {
 	header('HTTP/1.0 404 Not Found');
 	exit();
@@ -47,7 +47,7 @@ if(!$API->getSessionValid(cfg_obo_Role::EMPLOYEE_ROLE))
 		$t = microtime(true);
 		flush();
 		
-		$PM = core_plugin_PluginManager::getInstance();
+		$PM = \rocketD\plugin\PluginManager::getInstance();
 		$column = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $sectionID, $columnTitle), true);
 
 		$t = (microtime(true) - $t);
