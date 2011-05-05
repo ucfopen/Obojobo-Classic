@@ -63,7 +63,7 @@ class LO
 		// whitelist input
 		if(!$DBM)
 		{
-			\rocketD\util\Log::trace('no DBM sent.', true);
+			trace('no DBM sent.', true);
 			return false;
 		}
 		if(!is_numeric($loID) || $loID <= 0)
@@ -154,7 +154,7 @@ class LO
 			$this->perms = $permman->getMergedPerms((int)$this->rootID, \cfg_obo_Perm::TYPE_LO);
 			return true;
 		}
-		\rocketD\util\Log::trace('unable to locate LO: ' . $loID, true);
+		trace('unable to locate LO: ' . $loID, true);
 		return false;
 	}
 	
@@ -600,19 +600,28 @@ class LO
 			$qgm->newGroup($this->aGroup);
 			
 			//********* Build Summary Object **************/
-			// build summary object
-			$indices = array();
+			// count the number of questions taking question alternates into account
+			// Note that questionIndex = 0 if there are no alternates, then they count up
+			// TODO: change the alt mapping - get rid of the alt map table and just use the question order
+			$ungroupedQuestionCount = 0; // questions w/o alternates
+			$groupedQuestionArray = array(); // questions w/ alternates
 			foreach($this->aGroup->kids as $kid)
 			{
-				$indices[] = $kid->questionIndex;
+				if($kid->questionIndex > 0)
+				{
+					$groupedQuestionArray[$kid->questionIndex] = 1;
+				}
+				else
+				{
+					$ungroupedQuestionCount ++;
+				}
 			}
-			$indices = array_unique($indices);
+			$assessmentSize = count($groupedQuestionArray) + $ungroupedQuestionCount;
 			
 			$this->summary = array(
 				'contentSize' => count($this->pages),
 				'practiceSize' => count($this->pGroup->kids),
-				'assessmentSize' => count($this->aGroup->kids),
-				'assessmentSizeGrouped' => count($indices)
+				'assessmentSize' => $assessmentSize
 			);
 			
 			

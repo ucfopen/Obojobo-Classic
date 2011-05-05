@@ -36,7 +36,6 @@ switch($_GET['function'])
 
 			$API = \obo\API::getInstance();
 			$stats = $API->getLOStats($_GET['los'], $_GET['stat'], $_GET['start'], $_GET['end'], $_GET['resolution'], false);
-			trace($stats);
 			if(is_array($stats))
 			{
 				session_write_close();
@@ -50,12 +49,10 @@ switch($_GET['function'])
 				echo implode(',', array_keys((array)$stats[0])) . "\r\n";
 				foreach($stats AS $row)
 				{
-					trace((array)$row);
 					echo implode(',', (array)$row) . "\r\n";
 				}
 			}
-
-		exit();
+			exit();
 		break;
 	default:
 		break;

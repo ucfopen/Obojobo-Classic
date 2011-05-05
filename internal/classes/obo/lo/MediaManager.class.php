@@ -191,13 +191,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::LENGTH."='?',
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
-				".\cfg_obo_Media::VER."='?',
 				".\cfg_obo_Media::ATTRIBUTION."='?'";
-		trace($qstr);
-		trace($media->height);
-		trace($media->width);
-		trace($media->version);
-		trace('dones');
+
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
 		$media->size, $media->length, $media->height, $media->width, $media->version, $media->attribution)) )
@@ -419,7 +414,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 			{
 				$swf = new \obo\lo\media\SWF();
 				$swf->getDimensions($newFileLocation);
-				trace($swf);
 				$media->width = $swf->width;
 				$media->height = $swf->height;
 				$media->version = $swf->version;
@@ -442,7 +436,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			$media->url = $fileName.".".$extension; // same as basename?
 			$media->size = $fileData['size'];
 			$media->length = $length;
-			trace($media);
+			
 			$lor = \obo\API::getInstance();
 			$result = $this->newMedia($media);
 			if( !($result instanceof \obo\lo\Media) )
@@ -558,7 +552,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 	 */
 	public function associateMediaWithLO($mediaID, $loID)
 	{
-		trace('associating media with lo: ' . $mediaID . ' ' . $loID);
 		if(!\obo\util\Validator::isPosInt($mediaID))
 		{
             return false;

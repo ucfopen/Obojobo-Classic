@@ -19,7 +19,7 @@ while($r = $DBM->fetch_obj($q))
 	$pGroupID = isset($lo->pGroup->id) ? $lo->pGroup->id : $lo->pGroup->qGroupID;
 	$aGroupID = isset($lo->aGroup->id) ? $lo->aGroup->id : $lo->aGroup->qGroupID;
 	
-	trace($lo);
+
 	$DBM->querySafe($inSQL, $r->loID, 0, $r->title, 1, '', is_object($lo->objective) ? $lo->objective->text : $lo->objective, $lo->learnTime, $pGroupID, $aGroupID, isset($lo->vers_whole) ? $lo->vers_whole : $lo->version, isset($lo->vers_part) ? $lo->vers_part : $lo->subVersion, isset($lo->root) ? $lo->root : $lo->rootID, isset($lo->parent) ? $lo->parent : $lo->parentID, isset($lo->datec) ? $lo->datec : $lo->createTime, '', count($lo->pages), count($lo->pGroup->kids), count($lo->aGroup->kids), 1 );
 	checkandMakePages($DBM, $lo->pages, $r->loID);
 	checkQGroup($DBM, $lo->aGroup);
