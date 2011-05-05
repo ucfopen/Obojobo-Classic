@@ -389,7 +389,7 @@ class LogManager extends \rocketD\db\DBEnabled
 									//$r->data = array('attemptID' => $r->valueA);
 									$r->attemptData = $AM->getAttemptDetails($r->valueA);
 									//$r->attemptID = $r->valueA;
-									trace($r);
+									//trace($r);
 								}
 								if(isset($prevPageView) && is_object($prevPageView))
 								{
