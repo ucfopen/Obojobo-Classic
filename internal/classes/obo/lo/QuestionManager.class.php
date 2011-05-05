@@ -113,11 +113,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		
 		$question = $this->getQuestion($questionID);
-		
-		trace($question->itemType);
-		trace($userAnswer);
 		// if the answer is numeric and the question is a Multiple choice, check using the id
 		switch($question->itemType)
 		{

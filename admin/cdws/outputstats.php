@@ -441,7 +441,7 @@ function buildOutput($DBM,  &$statsArray)
 		}
 		$output .=  "complete (". (microtime(1) - $starttime )."s)\n";
 	}
-	\rocketD\util\Log::trace($output);
+	trace($output);
 	return $output;
 }
 

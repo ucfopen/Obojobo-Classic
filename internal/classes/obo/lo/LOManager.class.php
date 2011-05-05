@@ -152,14 +152,14 @@ class LOManager extends \rocketD\db\DBEnabled
 		//******** Permisssion requirements Passed *************
 		
 		$lo = new \obo\lo\LO($loID);
-		if(!$lo->saveAs($this->DBM, 'master'))
+		$saved = $lo->saveAs($this->DBM, 'master');
+		if(is_int($saved) && $saved > 0 )
 		{
-			return false;
+			return $saved;
 		}
 		
-		
 		// TODO: return the id of the new lo
-		return true;
+		return false;
 	}
 	
 	
@@ -316,7 +316,6 @@ class LOManager extends \rocketD\db\DBEnabled
 			trace(2);
 			$lo = $this->getLO($loID);
 			 // Didn't do this at the same time as the check above to save these lines from executing if not a lib user
-			trace($lo->rootID . ' ' . $_SESSION['userID']);
 			$perms = $permMan->getMergedPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO);
 			if($perms instanceof \obo\perms\Permissions)
 			{

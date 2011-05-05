@@ -53,7 +53,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype, $itmid)))
 		{
 		    $this->DBM->rollback();
-		    \rocketD\util\Log::trace(mysql_error(), true);
+		    trace(mysql_error(), true);
 		    //die();
 			return false;
 		}
@@ -94,7 +94,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype)))
 		{
 		    $this->DBM->rollback();
-		    \rocketD\util\Log::trace(mysql_error(), true);
+		    trace(mysql_error(), true);
 		    //die();
 			return false;
 		}
@@ -128,7 +128,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $keyname)) )
 		{
 			$this->DBM->rollback();
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			return false;
 		}
 		
@@ -166,7 +166,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			if( !($q = $this->DBM->querySafe($qstr, $keyname)) )
 			{
 				$this->DBM->rollback();
-				\rocketD\util\Log::trace(mysql_error(), true);
+				trace(mysql_error(), true);
 				return false;	
 			}
 			unset($key);
@@ -193,7 +193,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $keyid, $itmid, $itmtype)))
 		{
 		    $this->DBM->rollback();
-		    \rocketD\util\Log::trace(mysql_error(), true);
+		    trace(mysql_error(), true);
 		    //die();
 			return false;
 		}
@@ -251,7 +251,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			if( !($q = $this->DBM->querySafe($qstr, $keyid, $itmtype, $itmid)) )
 			{
 				$this->DBM->rollback();
-				\rocketD\util\Log::trace(mysql_error(), true);
+				trace(mysql_error(), true);
 				//die();
 				return false;	
 			}
@@ -281,7 +281,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $keyid, $itmtype, $itmid)) )
 		{
 			$this->DBM->rollback();
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			return false;	
 		}
 		return true;
@@ -304,7 +304,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $itemid, $itemtype)))
 		{
 			$this->DBM->rollback();
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			//die();
 			return false;
 		}
@@ -319,7 +319,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->query($qstr)))
 		{
             $this->DBM->rollback();
-            \rocketD\util\Log::trace(mysql_error(), true);
+            trace(mysql_error(), true);
             //die();
 			return false;
 		}
