@@ -26,7 +26,7 @@ if($verifyReturn)// verify login
            $file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::ID} . "." .strtolower($fileinfo['extension']);
 		}
 	    else{
-			\rocketD\util\Log::trace('media file not found: '.$file);
+			trace('media file not found: '.$file);
 	        header('HTTP/1.0 404 Not Found');
 		}
 	}
@@ -101,7 +101,7 @@ if($verifyReturn)// verify login
 		exit();
 	}
 	else{
-		\rocketD\util\Log::trace('file doesnt exist: '.$file);
+		trace('file doesnt exist: '.$file);
 		header('HTTP/1.0 404 Not Found');
 	} 
 

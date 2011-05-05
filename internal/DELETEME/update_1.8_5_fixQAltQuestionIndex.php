@@ -11,12 +11,14 @@ $qGroups = array();
 echo "set ?run=1 to commit!";
 
 $sql = "
-	SELECT A.qGroupID, A.questionID, A.questionIndex, B.itemOrder
-	FROM  `obo_map_qalts_to_qgroup` AS A, `obo_map_questions_to_qgroup` AS B
-	WHERE questionIndex < 0
-	AND A.questionID = B.childID
-	AND A.qGroupID = B.qGroupID
-	ORDER BY A.qGroupID, B.itemOrder";
+	SELECT B.qGroupID, B.childID, A.questionIndex, B.itemOrder
+	FROM obo_map_questions_to_qgroup AS B
+	LEFT JOIN
+		obo_map_qalts_to_qgroup AS A
+		ON A.questionID = B.childID
+		AND A.qGroupID = B.qGroupID
+
+	ORDER BY B.qGroupID, B.itemOrder";
 	
 $q = $DBM->query($sql);
 while($r = $DBM->fetch_obj($q))
@@ -31,38 +33,111 @@ while($r = $DBM->fetch_obj($q))
 foreach($qGroups as $qGroup)
 {
 	//print_r($qGroup);
-	
-	$firstItemOrder = $qGroup[0]->itemOrder;
+	/*
+	$firstItemOrder = -999;
 	$lastQuestionIndex = $qGroup[0]->questionIndex;
 	$toChange = array();
 	$numCompressed = 0;
 	for($i = 0; $i < count($qGroup); $i++)
 	{
-		if($lastQuestionIndex != $qGroup[$i]->questionIndex)
+		if(!empty($qGroup[$i]->questionIndex))
 		{
-			for($j = 0; $j < count($toChange); $j++)
+			if($firstItemOrder == -999)
 			{
-			//	echo 'set qGroup['.$j.']->newQuestionIndex = '.$firstItemOrder;
-				$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
+				$firstItemOrder = $qGroup[$i]->itemOrder;
 			}
-			$firstItemOrder = $qGroup[$i]->itemOrder;
-			$numCompressed += count($toChange) - 1;
-			$toChange = array();
-		}
-		//echo 'push '.$i.' to toChange  ';
-		$toChange[] = $i;
+			if($lastQuestionIndex != $qGroup[$i]->questionIndex )
+			{
+				for($j = 0; $j < count($toChange); $j++)
+				{
+				//	echo 'set qGroup['.$j.']->newQuestionIndex = '.$firstItemOrder;
+					$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
+				}
+				$firstItemOrder = $qGroup[$i]->itemOrder;
+				$numCompressed += count($toChange) - 1;
+				$toChange = array();
+			}
+			//echo 'push '.$i.' to toChange  ';
+			$toChange[] = $i;
 		
-		$lastQuestionIndex = $qGroup[$i]->questionIndex;
+			$lastQuestionIndex = $qGroup[$i]->questionIndex;
+		}
 	}
-	
-	for($j = 0; $j < count($toChange); $j++)
+	if(!empty($lastQuestionIndex))
 	{
-		$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
+		for($j = 0; $j < count($toChange); $j++)
+		{
+			$qGroup[$toChange[$j]]->newQuestionIndex = $firstItemOrder + 1 - $numCompressed;
+		}
+	}
+	unset($lastQuestionIndex);*/
+	
+	
+	/*
+	$foundQuestionIndexToChange = false;
+	$startIndexToChange = -1;
+	$indexCounter = 0;
+	$lastQuestionIndex = $qGroup[0]->questionIndex;
+	
+	for($i = 0; $i < count($qGroup); $i++)
+	{
+		$qIndex = $qGroup[$i]->questionIndex;
+		
+		
+		
+		if($lastQuestionIndex != $qIndex && $foundQuestionIndexToChange)
+		{
+			$foundQuestionIndexToChange = false;
+			//chage everything from startIndexToChange to $i - 1
+			for($j = $startIndexToChange; $j < $i; $j++)
+			{
+				$qGroup[$j]->newQuestionIndex = $indexCounter;
+			}
+		}
+		
+		
+		if($qIndex <= -1 && !$foundQuestionIndexToChange)
+		{
+			$foundQuestionIndexToChange = true;
+			$startIndexToChange = $i;
+			$indexCounter++;
+		}
+		else if(empty($qIndex))
+		{
+			$indexCounter++;
+		}
+		
+		$lastQuestionIndex = $qIndex;
+	}*/
+	
+	$indexCounter = 0;
+	$shouldIncrement = true;
+	for($i = 0; $i < count($qGroup); $i++)
+	{
+		$qIndex = $qGroup[$i]->questionIndex;
+		if(empty($qIndex))
+		{
+			$indexCounter++;
+			$shouldIncrement = true;
+		}
+		else
+		{
+			if($shouldIncrement)
+			{
+				$indexCounter++;
+			}
+			elseif($qGroup[$i-1]->questionIndex != $qIndex)
+			{
+				$indexCounter++;
+			}
+			$shouldIncrement = false;
+			$qGroup[$i]->newQuestionIndex = $indexCounter;
+		}
 	}
 }
 
 echo '<pre>';
-//////print_r($qGroups);
+// print_r($qGroups);
 //exit();
 $DBM->startTransaction();
 
@@ -70,10 +145,15 @@ foreach($qGroups as $qGroup)
 {
 	foreach($qGroup as $mapping)
 	{
-		$qStr = 'UPDATE obo_map_qalts_to_qgroup SET questionIndex='.$mapping->newQuestionIndex.' WHERE qGroupID='.$mapping->qGroupID.' AND questionID='.$mapping->questionID;
-		echo $qStr;
-		echo "\n";
-		$DBM->query($qStr);
+		if(!empty($mapping->questionIndex))
+		{
+			//print_r($mapping);
+			///exit();
+			$qStr = 'UPDATE obo_map_qalts_to_qgroup SET questionIndex='.$mapping->newQuestionIndex.' WHERE qGroupID='.$mapping->qGroupID.' AND questionID='.$mapping->childID;
+			echo $qStr;
+			echo "\n";
+			$DBM->query($qStr);
+		}
 	}
 }
 
@@ -140,7 +220,7 @@ foreach($qGroups as $qGroup)
 			
 			echo 'QUITTING';
 			$numErrors++;
-			exit();
+			 exit();
 		}
 		
 		$lastQuestionIndex = $mapping->questionIndex;

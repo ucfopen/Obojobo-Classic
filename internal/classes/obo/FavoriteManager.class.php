@@ -45,7 +45,7 @@ class FavoriteManager extends \rocketD\db\DBEnabled
 	    $qstr = "INSERT INTO ".self::table." SET `uid`='?', loid='?'";
 		if( !($q = $this->DBM->querySafe($qstr, $_SESSION['UID'], $loid)) )
 		{
-		    \rocketD\util\Log::trace(mysql_error(), true);
+		    trace(mysql_error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;
@@ -69,7 +69,7 @@ class FavoriteManager extends \rocketD\db\DBEnabled
         $qstr = "DELETE FROM `".self::table."` WHERE `uid`='?' AND `loid`='?' LIMIT 1";
 	    if( !($q = $this->DBM->querySafe($qstr, $_SESSION['UID'], $loid)) )
 	    {
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;	
@@ -83,7 +83,7 @@ class FavoriteManager extends \rocketD\db\DBEnabled
 	    $qstr = "SELECT `loid` FROM `".self::table."` WHERE `uid`='?'";
 		if( !($q = $this->DBM->querySafe($qstr, $_SESSION['UID'])) )
 	    {
-			\rocketD\util\Log::trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;	

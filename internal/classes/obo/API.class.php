@@ -172,16 +172,12 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getUser($username = false )
 	{
-		trace('go');
 		if($this->getSessionValid())
 		{
-			trace('go1');
 			$UM = \rocketD\auth\AuthManager::getInstance();
 			if($username === false)
 			{
-				trace('go2');
 				$result = $UM->fetchUserByID($_SESSION['userID']);
-
 			}
 			else
 			{
@@ -514,6 +510,9 @@ class API extends \rocketD\db\DBEnabled
 	/**
 	 * Makes the draft into the final LO, and removes all drafts previous to it
 	 * @param $loID (number) learning object id
+	 * @return (int) LOID if successful
+	 * @return (bool) false on failure
+	 * @return (error) on error
 	 */
 	public function createMaster($loID)
 	{

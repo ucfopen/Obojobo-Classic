@@ -47,14 +47,12 @@ if($_GET['NID'])
 			if(method_exists($authMod, 'syncExternalUser'))
 			{
 				$user = $authMod->syncExternalUser($_GET['NID']);
-				trace($user);
 			}
 		}
 	}
 	if(isset($user) && $user instanceof \rocketD\auth\User)
 	{
 		$success = $API->editUsersRoles(array($user->userID), array(cfg_obo_Role::CONTENT_CREATOR) );
-		trace($success);
 	}
 	echo $success ? $_GET['NID'] . ' Now has Content Creator Role.' : 'Unable to grant role';
 	

@@ -202,7 +202,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	protected function storeLogin($userID)
 	{
-		trace('start session');
 		// validate arguments
 		if(!$this->validateUID($userID))
 		{

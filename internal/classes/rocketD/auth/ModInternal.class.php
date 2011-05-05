@@ -335,18 +335,15 @@ class ModInternal extends AuthModule {
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($username) > self::MAX_USERNAME_LENGTH)
 		{
-			trace('User name maximum length is '.self::MAX_USERNAME_LENGTH.' characters.');
 			return 'User name maximum length is 255 characters.';
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($username) < self::MIN_USERNAME_LENGTH)
 		{
-			trace('User name minimum length is '.self::MIN_USERNAME_LENGTH.' characters.');
 			return 'User name minimum length is 2 characters.';
 		}
 		if(preg_match("/^~{1}[[:alnum:]]{".self::MIN_USERNAME_LENGTH.",".self::MAX_USERNAME_LENGTH."}$/i", $username) == false)
 		{
-			trace('Username not formatted like: ~AA3333a1');
 			return 'User name can only contain alpha numeric characters (in addition to the tilda).';
 		}	
 		return true;
@@ -358,7 +355,6 @@ class ModInternal extends AuthModule {
 		// password is an md5 hash of an empty string
 		if($pass == 'd41d8cd98f00b204e9800998ecf8427e')
 		{
-			trace('password is empty');
 			return 'Password is an empty string';
 		}
 		return true;
