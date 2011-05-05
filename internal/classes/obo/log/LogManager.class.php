@@ -381,9 +381,15 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
-								if($r->{\cfg_obo_Attempt::ID} > 0)
+								//@ZACH: This is my hack attack to get repository code to work
+								//for the 1.8 release!
+								//I changed Attempt::ID to valueA and added a few things!
+								if($r->valueA > 0)
 								{
-									$r->attemptData = $AM->getAttemptDetails($r->{\cfg_obo_Attempt::ID});
+									//$r->data = array('attemptID' => $r->valueA);
+									$r->attemptData = $AM->getAttemptDetails($r->valueA);
+									//$r->attemptID = $r->valueA;
+									trace($r);
 								}
 								if(isset($prevPageView) && is_object($prevPageView))
 								{
@@ -482,6 +488,7 @@ class LogManager extends \rocketD\db\DBEnabled
 							}
 							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
 							$thisVisit[] = $r;
+							trace($r);
 						}
 						break;
 

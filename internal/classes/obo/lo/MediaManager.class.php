@@ -262,7 +262,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		if(!$roleMan->isLibraryUser())
 		{
-			trace('1');
 			\rocketD\util\Error::getError(4);
 			return false;
 		}
@@ -273,7 +272,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 		$lastDot = strrpos($baseName, '.');
 		$fileName = substr($baseName, 0, $lastDot);
 		$extension = strtolower(substr($baseName, $lastDot+1));
-		trace('2');
 		switch($extension)
 		{
 			case 'jpg':
@@ -303,13 +301,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 			
 			try
 			{
-				trace('file put contents');
-				trace($newFileLocation);
-				trace(sizeof($fileData));
-				trace(sizeof($fileData->data));
-				trace($fileData);
-				
-				trace($GLOBALS['amfphp']['encoding']);
 				
 				file_put_contents($newFileLocation, $fileData->data);
 				//$fp = fopen($newFileLocation, "w");
@@ -354,10 +345,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 					$lor = \obo\API::getInstance();
 					$result = $this->newMedia($media);
 					
-					trace($media);
-					trace('=====');
-					trace($result);
-					
 					if( !($result instanceof nm_los_Media) )
 					{
 						return false;
@@ -372,11 +359,9 @@ class MediaManager extends \rocketD\db\DBEnabled
 			}
 			catch(Exception $e)
 			{
-				trace($e);
 				trace($e->getMessage());
 			}
 		}
-		trace('oh no');
 		return false;
 	}
 	
