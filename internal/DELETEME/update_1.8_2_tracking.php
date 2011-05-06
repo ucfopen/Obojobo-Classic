@@ -25,15 +25,15 @@ while($r = $DBM->fetch_obj($q))
 
 		$data = deserializeData($r->data);
 		// echo "Visit Found: {$data->visitID}<br>";
-		flush();
+		// flush();
 		if($data->visitID > 0) 
 		{
 			// echo "vist {$r->data->visitID}<br>";
-			flush();
+			// flush();
 			if(count($trackingIDsToUpdate) > 0 )
 			{
-				echo "updating... {$curVisitID} -> " . implode(',', $trackingIDsToUpdate) . "<Br>";
-				flush();
+				echo "updating... {$curVisitID} -> <Br>";
+				// flush();
 				// update visit IDs of the previous visit
 				$DBM->query("UPDATE obo_logs SET visitID = '".$curVisitID."' WHERE trackingID IN (" . implode(',', $trackingIDsToUpdate) . ")");
 			}
@@ -52,7 +52,7 @@ while($r = $DBM->fetch_obj($q))
 	else
 	{
 		echo "$r->trackingID Problem<br>";
-		flush();
+		// flush();
 	}
 }
 

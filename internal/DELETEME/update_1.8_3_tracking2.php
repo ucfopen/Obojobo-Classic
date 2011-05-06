@@ -6,7 +6,7 @@ $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCf
 
 
 
-$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs WHERE itemType = 'SubmitQuestion'");
+$q = $DBM->query("SELECT *, UNCOMPRESS(data) AS data FROM obo_logs");
 
 while($r = $DBM->fetch_obj($q))
 {
