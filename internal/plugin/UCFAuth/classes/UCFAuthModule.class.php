@@ -20,7 +20,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if(!$this->oDBM) // if DBM isnt set use the default
 		{ 
 			// load this module's config
-			$this->oDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE));
+			$this->oDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE));
 			if(!$this->oDBM->connected)
 			{
 				$NM = \obo\util\NotificationManager::getInstance();

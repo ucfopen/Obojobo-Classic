@@ -289,7 +289,7 @@ class API extends \rocketD\db\DBEnabled
 			$RM = \obo\perms\RoleManager::getInstance();
 			if($RM->isAdministrator())
 			{
-				$cmsDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
+				$cmsDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
 				$qstr = "SELECT * FROM modx_web_users AS U JOIN modx_web_user_attributes AS A ON U.id = A.internalKey  WHERE U.username = '?'";
 				$q = $cmsDBM->querySafe($qstr, $username);
 				$exists = false;

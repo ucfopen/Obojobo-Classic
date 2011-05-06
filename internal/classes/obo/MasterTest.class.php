@@ -13,7 +13,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 	{
 		
 		$config->writeErrorsToLog = true;
-		$config->dbConnData = new \rocketD\db\dbConnectData('localhost' , 'root', 'root', 'los_UnitTest');
+		$config->dbConnData = new \rocketD\db\DBConnectData('localhost' , 'root', 'root', 'los_UnitTest');
 		
 	}
 	
