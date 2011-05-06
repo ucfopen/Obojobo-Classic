@@ -3,7 +3,7 @@
  *	MODx Configuration file MODIFIED FOR KOGNEATO
  */
 require_once(dirname(__FILE__)."/../../internal/app.php");
-new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST, \AppCfg::DB_MODX_USER, \AppCfg::DB_MODX_PASS, \AppCfg::DB_MODX_NAME, \AppCfg::DB_MODX_TYPE);
+new \rocketD\db\DBConnectData(\AppCfg::DB_MODX_HOST, \AppCfg::DB_MODX_USER, \AppCfg::DB_MODX_PASS, \AppCfg::DB_MODX_NAME, \AppCfg::DB_MODX_TYPE);
 $database_type = \AppCfg::DB_MODX_TYPE;
 $database_server = \AppCfg::DB_MODX_HOST;
 $database_user = \AppCfg::DB_MODX_USER;

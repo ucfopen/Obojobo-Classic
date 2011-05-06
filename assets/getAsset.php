@@ -17,7 +17,7 @@ if($verifyReturn)// verify login
 	if(true || $roleMan->isSuperUser() || $roleMan->isSuperViewer())
 	{
 		
-        $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+        $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 		$q = $DBM->querySafe("SELECT ".\cfg_obo_Media::ID.", ".\cfg_obo_Media::URL.", ".\cfg_obo_Media::SIZE.", ".\cfg_obo_Media::TIME."  FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1", $mediaID);
 		if(($r = $DBM->fetch_obj($q)))
 		{
