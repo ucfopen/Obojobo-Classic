@@ -59,7 +59,7 @@
 	if($_POST['loid'])
 	{
 		require_once(dirname(__FILE__)."/../../../internal/app.php");
-		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 		$data = new \obo\lo\LO();
 		$data->dbGetFull($DBM, $_POST['loid']);
 		$_POST['base_64_decode'] = 0;

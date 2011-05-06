@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../app.php");
 
-$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
 $DBE = new \rocketD\db\DBEnabled();
 
 $sql = "SELECT *, UNCOMPRESS(cache) AS unc FROM obo_deleted_los";
