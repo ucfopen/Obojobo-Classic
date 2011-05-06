@@ -7,5 +7,6 @@ class cfg_obo_Score
 	const ITEM_ID = 'itemID';
 	const ANSWER = 'answer';
 	const SCORE = 'score';
+	const TIME = 'createTime';
 }
 ?>

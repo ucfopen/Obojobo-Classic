@@ -2,7 +2,7 @@
 /**
 * 
 */
-class plugins_sets_cfg_Sets
+class plugins_sets_\cfg_Sets
 {
 	
 

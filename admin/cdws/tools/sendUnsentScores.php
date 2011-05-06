@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../../internal/app.php");
 // Check for super user
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
@@ -31,7 +31,7 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 
 if(!empty($_GET['nid']) )
 {
-	$PM = core_plugin_PluginManager::getInstance();
+	$PM = \rocketD\plugin\PluginManager::getInstance();
 	$result = $PM->callAPI('UCFCourses', 'sendFailedScoreSetRequests', array(), true);
 	print_r($result);
 }

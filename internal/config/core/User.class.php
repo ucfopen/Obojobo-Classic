@@ -4,6 +4,8 @@ class cfg_core_User
 	const TABLE = 'obo_users';
 	
 	const ID = 'userID';
+	const LOGIN = 'login';
+	const AUTH_MODULE = 'auth_module';
 	const FIRST = 'first';
 	const LAST = 'last';
 	const MIDDLE = 'mi';

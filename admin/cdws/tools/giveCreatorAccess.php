@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../../internal/app.php");
 // ================ REQUIRE SU STATUS
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 
 if(!$API->getSessionValid(cfg_obo_Role::ADMIN))
 {
@@ -36,7 +36,7 @@ if(!$API->getSessionValid(cfg_obo_Role::ADMIN))
 if($_GET['NID'])
 {
 	$success = false;
-	$AM = core_auth_AuthManager::getInstance();
+	$AM = \rocketD\auth\AuthManager::getInstance();
 	// locate nid or create account
 	if(!( $user = $AM->fetchUserByUserName($_GET['NID']) ) )
 	{
@@ -47,14 +47,12 @@ if($_GET['NID'])
 			if(method_exists($authMod, 'syncExternalUser'))
 			{
 				$user = $authMod->syncExternalUser($_GET['NID']);
-				trace($user);
 			}
 		}
 	}
-	if(isset($user) && $user instanceof core_auth_User)
+	if(isset($user) && $user instanceof \rocketD\auth\User)
 	{
 		$success = $API->editUsersRoles(array($user->userID), array(cfg_obo_Role::CONTENT_CREATOR) );
-		trace($success);
 	}
 	echo $success ? $_GET['NID'] . ' Now has Content Creator Role.' : 'Unable to grant role';
 	
