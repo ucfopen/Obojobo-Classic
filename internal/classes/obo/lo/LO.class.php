@@ -367,7 +367,7 @@ class LO
 				return false;
 				break;
 		}
-		return true;
+		return $this->loID;
 	}
 	
 	/**
