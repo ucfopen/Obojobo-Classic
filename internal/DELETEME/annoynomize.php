@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/../app.php");
-$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
 $firsts = array('Ringo', 'Paul', 'John', 'Yoko', 'George', 'Mick', 'Keith', 'Ian', 'Ian', 'Brian', 'Andre', 'Neil', 'David', 'Steven', 'Graham' );
 $lasts = array('Starr', 'McCartney', 'Lennon', 'Ono', 'Harrison', 'Jagger', 'Richards', 'Stewart', 'Anderson' , 'Jones', '3000', 'Young', 'Crosby', 'Stills', 'Nash');
