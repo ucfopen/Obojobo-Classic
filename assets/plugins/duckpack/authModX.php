@@ -7,25 +7,25 @@ switch($e->name)
 	
 	case 'OnWebAuthentication':
 		duckPack_loadAPI();
-		$oboAPI = nm_los_API::getInstance();
+		$oboAPI = \obo\API::getInstance();
 		if($oboAPI->getSessionValid() === true) $e->_output = true;
 		break;
 
 	case 'OnManagerAuthentication':
 		duckPack_loadAPI();
-		$oboAPI = nm_los_API::getInstance();
-		if($oboAPI->getSessionValid(nm_los_Role::SUPER_USER)) $e->_output = true;
+		$oboAPI = \obo\API::getInstance();
+		if($oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER)) $e->_output = true;
 		break;
 
 	case 'OnBeforeManagerLogin':
 		duckPack_loadAPI();
-		$oboAPI = nm_los_API::getInstance();
-		$validSession = $oboAPI->getSessionValid(nm_los_Role::SUPER_USER);
+		$oboAPI = \obo\API::getInstance();
+		$validSession = $oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER);
 		if($validSession != true) // no session yet
 		{
 			if($oboAPI->doLogin($e->params['username'], $e->params['userpassword']) === true) // log in
 			{
-				$validSession = $oboAPI->getSessionValid(nm_los_Role::SUPER_USER); // make sure user is SU
+				$validSession = $oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER); // make sure user is SU
 			}
 		}
 		if($validSession == true) // already has a session
@@ -48,13 +48,13 @@ switch($e->name)
 	case 'OnManageLogout':
 	case 'OnWebLogout':
 		duckPack_loadAPI();
-		$oboAPI = nm_los_API::getInstance();
+		$oboAPI = \obo\API::getInstance();
 		$oboAPI->doLogout();
 		break;
 
 	case 'OnBeforeWebLogin':
 		duckPack_loadAPI();
-		$oboAPI = nm_los_API::getInstance();
+		$oboAPI = \obo\API::getInstance();
 		$validSession = $oboAPI->getSessionValid();
 		if($validSession != true) // no session yet
 		{
@@ -83,7 +83,7 @@ switch($e->name)
 		if( !isset($_SESSION['webValidated']) || !isset($_SESSION['mgrValidated']) )
 		{
 			duckPack_loadAPI();
-			$oboAPI = nm_los_API::getInstance();
+			$oboAPI = \obo\API::getInstance();
 			if($oboAPI->getSessionValid())
 			{
 				// // valid session, get user info
@@ -95,7 +95,7 @@ switch($e->name)
 				// {
 				// 	foreach($roles AS $role)
 				// 	{
-				// 		if($role->name == nm_los_Role::SUPER_USER)
+				// 		if($role->name == \obo\perms\Role::SUPER_USER)
 				// 		{
 				// 			$isSU = true;
 				// 			break;

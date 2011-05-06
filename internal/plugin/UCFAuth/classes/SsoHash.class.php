@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 	Single Signon Hash Utility
 	

@@ -2,9 +2,9 @@
 <?php
 require_once(dirname(__FILE__)."/../../../internal/app.php");
 
-$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
-$TM = new nm_los_TrackingManager();
+$TM = new \obo\log\LogManager();
 $time = microtime(1);
 if($_REQUEST['uid'])
 {

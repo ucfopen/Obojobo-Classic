@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__)."/../internal/app.php");
 
 $rssurl="http://twitter.com/statuses/user_timeline/14709413.rss";
-$localfile = AppCfg::DIR_BASE.AppCfg::DIR_SCRIPTS.'rssCache/' . urlencode($rssurl); //Name cache file based on RSS URL
+$localfile = \AppCfg::DIR_BASE.\AppCfg::DIR_SCRIPTS.'rssCache/' . urlencode($rssurl); //Name cache file based on RSS URL
 $cacheminutes=30; //typecast "cachetime" parameter as integer (0 or greater)
 
 
