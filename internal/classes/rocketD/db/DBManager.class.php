@@ -64,7 +64,7 @@ class DBManager
 		return $this->loadConnectObj($dbcd);
 	}
 	
-	// load a connection object by passing a dbConnectData object reference
+	// load a connection object by passing a DBConnectData object reference
 	public function loadConnectObj($conObj)
 	{
 		if($conn = $this->locateConnection($conObj->host, $conObj->user, $conObj->pass, $conObj->type, $conObj->db))

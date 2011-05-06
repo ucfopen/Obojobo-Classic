@@ -43,7 +43,7 @@ if(!$_REQUEST['from_user'] || !$_REQUEST['to_user'])
 else
 {
 
-	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
+	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
 	if($_REQUEST['doit'] != 1) $DBM->startTransaction();
 	
