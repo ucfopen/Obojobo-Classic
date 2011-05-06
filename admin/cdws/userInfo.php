@@ -1,14 +1,14 @@
 <?php
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-$API = nm_los_API::getInstance();
+$API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
-	exit();
+	// exit();
 }
 
-$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_HOST, AppCfg::DB_USER, AppCfg::DB_PASS, AppCfg::DB_NAME, AppCfg::DB_TYPE));
+$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
 //if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');
 
 $nid = $_GET['nid'];
@@ -27,7 +27,7 @@ if(is_numeric($uid) && $uid > 0)
 {
 	echo '<h1>Data for user '.$uid.':</h1>';
 	
-	$UM = core_auth_AuthManager::getInstance();
+	$UM = \rocketD\auth\AuthManager::getInstance();
 	$result = $UM->fetchUserByID($uid);
 	$lastLogin = $result->lastLogin;
 	
@@ -75,7 +75,7 @@ if(is_numeric($uid) && $uid > 0)
 	writeData($roles);
 	writeHelp('If the user is Faculty/Staff and they are attempting to use the Repository they should have the "LibraryUser" and/or "ContentCreator" roles listed above.  "LibraryUser" provides Basic access to the Repository. "ContentCreator" provides Pro access to the Repository.  Students most likely won\'t have any roles');
 	
-	$DBM = core_db_DBManager::getConnection(new core_db_dbConnectData(AppCfg::DB_MODX_HOST, AppCfg::DB_MODX_USER, AppCfg::DB_MODX_PASS, AppCfg::DB_MODX_NAME, AppCfg::DB_MODX_TYPE));
+	$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\dbConnectData(\AppCfg::DB_MODX_HOST,\AppCfg::DB_MODX_USER,\AppCfg::DB_MODX_PASS,\AppCfg::DB_MODX_NAME,\AppCfg::DB_MODX_TYPE));
 	
 	//if(!$DBM->db_select('los_modx'))
 	//{

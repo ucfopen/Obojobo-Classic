@@ -39,9 +39,9 @@ if(isset($cfgVars))
 	foreach($v AS $varName)
 	{
 		
-		if(substr($varName, 0,2) != 'DB' &&  defined('AppCfg::'.$varName))
+		if(substr($varName, 0,2) != 'DB' &&  defined('\AppCfg::'.$varName))
 		{
-			$output .= 'flashvars.'.$varName.' = "'. constant('AppCfg::'.$varName). '"; ';
+			$output .= 'flashvars.'.$varName.' = "'. constant('\AppCfg::'.$varName). '"; ';
 		}
 	}
 }
