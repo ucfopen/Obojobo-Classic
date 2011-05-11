@@ -46,10 +46,10 @@ switch($_GET['function'])
 				header("Content-Type: application/octet-stream");
 				header("Content-Type: application/download");
 				header("Content-Disposition: attachment; filename=\"Obojobo_Stat{$_GET['stat']}_".date('m-d-y',$_GET['start'])."_to_".date('m-d-y',$_GET['end']).".csv\"");
-				echo implode(',', array_keys((array)$stats[0])) . "\r\n";
+				echo '"' . implode('","', array_keys((array)$stats[0])) . '"' . "\r\n";
 				foreach($stats AS $row)
 				{
-					echo implode(',', (array)$row) . "\r\n";
+					echo '"' . implode('","', (array)$row) . '"' . "\r\n";
 				}
 			}
 			exit();
