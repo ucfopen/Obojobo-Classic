@@ -191,8 +191,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::LENGTH."='?',
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
+				".\cfg_obo_Media::VER."='?',
 				".\cfg_obo_Media::ATTRIBUTION."='?'";
-
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
 		$media->size, $media->length, $media->height, $media->width, $media->version, $media->attribution)) )

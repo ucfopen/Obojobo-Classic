@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__)."/../../../internal/app.php");
+require_once(dirname(__FILE__)."/../../internal/app.php");
 // ================ REQUIRE SU STATUS
 $API = \obo\API::getInstance();
 
