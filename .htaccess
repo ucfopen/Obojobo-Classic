@@ -10,12 +10,23 @@ RewriteRule ^(manager|assets) - [L]
 RewriteRule ^media/([0-9]*)$ assets/getAsset.php?id=$1 [L,QSA]
 
 # Preview LO links
-RewriteRule ^preview/([0-9]*)$ index.php?q=viewer&newest=true&preview=$1 [L,QSA]
+# RewriteRule ^preview/([0-9]*)$ index.php?q=viewer&newest=true&preview=$1 [L,QSA]
 
 # View LO links
-RewriteRule ^view/([0-9]*)$ index.php?q=viewer&view=$1 [L,QSA]
+# RewriteRule ^view/([0-9]*)$ index.php?q=viewer&view=$1 [L,QSA]
 
 # For Friendly URLs for modx (forward everything to index.php except real files)
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
