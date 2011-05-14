@@ -81,7 +81,7 @@ class AppCfgDefault
 	const URL_ACCOUNT_FORM = 'https://formmanager.ucf.edu/formsubmit.cfm';
 	
 	// Define the relative location for the remoting gateway
-	const AMF_GATEWAY  = 'remoting/gateway.php';
+	const AMF_GATEWAY  = 'assets/gateway-amf.php';
 
 	// Define the Form Manager form ID
 	const ACCOUNT_FORM_ID = '27373';
