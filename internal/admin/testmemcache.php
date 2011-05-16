@@ -1,7 +1,4 @@
 <?php
-echo 1;
-require_once(dirname(__FILE__)."/../../internal/app.php");
-
 
 // $API = \obo\API::getInstance();
 // $los = $API->getLOs();

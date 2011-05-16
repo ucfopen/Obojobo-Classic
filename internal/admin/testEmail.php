@@ -1,5 +1,4 @@
 <?php
-	require_once(dirname(__FILE__)."/../../internal/app.php");
 
 	$API = \obo\API::getInstance();
 	include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');

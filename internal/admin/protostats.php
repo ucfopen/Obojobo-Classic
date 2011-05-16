@@ -1,12 +1,6 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 // Check for super user
 $API = \obo\API::getInstance();
-$result = $API->getSessionRoleValid(array(\obo\perms\Role::SUPER_STATS));
-if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
-{
-	exit();
-}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
