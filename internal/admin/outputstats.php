@@ -1,5 +1,4 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 
 $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
@@ -307,7 +306,7 @@ if(count($_REQUEST['statSelect']) < 1 || !isset($_REQUEST['num_stats_to_run']) |
 {
 	?>
 	<h1>Select the Stat items you want</h1>
-	<form id="frm1" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
+	<form id="frm1" action="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"]; ?>" method="get" accept-charset="utf-8">
 		<script type="text/javascript" charset="utf-8">
 			function checkedAll (setVal) {
 				var aa= document.getElementById('frm1');
@@ -366,7 +365,7 @@ $output = buildOutput($DBM, $statsToProcess);
 				if( count($_REQUEST['statSelect']) > 0 )
 				{
 					$selected = '&statSelect[]=' . implode('&statSelect[]=', $_REQUEST['statSelect']);
-					echo '<meta http-equiv="refresh" content="'.$_REQUEST['delay'].';'.$_SERVER['PHP_SELF'].'?&num_stats_to_run='.$_REQUEST['num_stats_to_run'].'&delay='.$_REQUEST['delay'].$selected.'" />';
+					echo '<meta http-equiv="refresh" content="'.$_REQUEST['delay'].';'.$_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"].'&num_stats_to_run='.$_REQUEST['num_stats_to_run'].'&delay='.$_REQUEST['delay'].$selected.'" />';
 				}
 			?>
 			
@@ -378,7 +377,7 @@ $output = buildOutput($DBM, $statsToProcess);
 			if( count($_REQUEST['statSelect']) > 0 )
 			{
 				?>
-					<a href="<?php echo $_SERVER['PHP_SELF']; ?>">STOP NOW</a>
+					<a href="<?php echo $_SERVER['PHP_SELF'];?>">STOP NOW</a>
 				<?php
 			}
 			else

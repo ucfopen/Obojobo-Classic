@@ -1,7 +1,5 @@
 <pre>
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
-
 echo "Before:";
 print_r(\rocketD\util\Cache::getInstance()->getExtendedStats());
 \rocketD\util\Cache::getInstance()->clearAllCache();

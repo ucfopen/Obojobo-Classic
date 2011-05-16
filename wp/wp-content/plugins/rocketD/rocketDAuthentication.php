@@ -97,52 +97,78 @@ function rocketD_auth_check_password($user, $username, $password)
 {
 	require_once(dirname(__FILE__)."/../../../../internal/app.php");
 	$API = \obo\API::getInstance();
-	$result = $API->doLogin($username, $password);
-	if($result === true)
+	
+	// no crudentials sent - likely to be just checking to see if the user is logged in
+	if(empty($username) && empty($password))
 	{
-		$user = $API->getUser();
-		
-		// look for an existing user
-		$sanitizedUsername = sanitize_user(esc_sql($username), true);
-		$wp_user_id = username_exists($sanitizedUsername);
-
-		// create one if it doesnt exist
-		if(!$wp_user_id)
+		// If already logged in - then just jump strait to linking to their wordpress user
+		$alreadyLoggedIn = $API->getSessionValid();
+		if($alreadyLoggedIn === true)
 		{
-			$random_password = wp_generate_password(100,false);
-			$wp_user_id = wp_create_user($user->login, $random_password, $user->email);
-		}
+			$user = $API->getUser();
+			// look for an existing user
+			$sanitizedUsername = sanitize_user(esc_sql($user->login), true);
+			$wp_user_id = username_exists($sanitizedUsername);
 		
-		// update the user info
-		wp_update_user(array('ID' => $wp_user_id, 'display_name' => $user->first . ' ' . $user->last));
-		// add_user_meta($wp_user_id, 'first_name', $user->first, true);
-		// add_user_meta($wp_user_id, 'last_name', $user->last, true);
-		$wpUser = new WP_User($wp_user_id);
-
-		$roles = $API->getUserRoles();
-		
-		$groups = array();
-		foreach($roles as $role)
-		{
-			$groups[] = $role->name;
+			// create one if it doesnt exist
+			if(!$wp_user_id)
+			{
+				$random_password = wp_generate_password(100,false);
+				$wp_user_id = wp_create_user($user->login, $random_password, $user->email);
+			}
+			$wpUser = new WP_User($wp_user_id);
+			return $wpUser;
 		}
-		
-		if(in_array('Administrator', $groups))
-		{
-			$wpUser->set_role('administrator');
-		}
-		else
-		{
-			$wpUser->set_role('');
-		}
-		
-		return $wpUser;
 	}
+	// crudentials sent - lets look to see if the authenticate in the app
 	else
 	{
-		remove_action('authenticate', 'wp_authenticate_username_password', 20); // prevent any other authentication from working
-		return new WP_Error('invalid_username', __('<strong>Obojobo Login Failure</strong> Your NID and NID password did not authenticate.'));
+		$result = $API->doLogin($username, $password);
+		if($result === true)
+		{
+			$user = $API->getUser();
+		
+			// look for an existing user
+			$sanitizedUsername = sanitize_user(esc_sql($user->login ), true);
+			$wp_user_id = username_exists($sanitizedUsername);
+
+			// create one if it doesnt exist
+			if(!$wp_user_id)
+			{
+				$random_password = wp_generate_password(100,false);
+				$wp_user_id = wp_create_user($user->login, $random_password, $user->email);
+			}
+		
+			// update the user info
+			wp_update_user(array('ID' => $wp_user_id, 'display_name' => $user->first . ' ' . $user->last));
+			// add_user_meta($wp_user_id, 'first_name', $user->first, true);
+			// add_user_meta($wp_user_id, 'last_name', $user->last, true);
+			$wpUser = new WP_User($wp_user_id);
+
+			$roles = $API->getUserRoles();
+		
+			$groups = array();
+			foreach($roles as $role)
+			{
+				$groups[] = $role->name;
+			}
+		
+			if(in_array('Administrator', $groups))
+			{
+				$wpUser->set_role('administrator');
+			}
+			else
+			{
+				$wpUser->set_role('');
+			}
+		
+			return $wpUser;
+		}
 	}
+
+	remove_action('authenticate', 'wp_authenticate_username_password', 20); // prevent any other authentication from working
+	return new WP_Error('invalid_username', __('<strong>Obojobo Login Failure</strong> Your NID and NID password did not authenticate.'));
+	
 }
 
 // Log the user out of the RocketD application
@@ -154,6 +180,37 @@ function rocketD_auth_logout()
 	$API->doLogout();
 }
 
+
+
+
+// create custom plugin settings menu
+add_action('admin_menu', 'rocketD_plugin_menu');
+
+function rocketD_plugin_menu() {
+	//create custom post type menu
+	add_menu_page('Obojobo', 'Obojobo', 'administrator', 'rocketD_main_menu', 'rocketD_settings');
+
+	//create submenu items
+	add_submenu_page('rocketD_main_menu', 'Tools and Scripts', 'Tools and Scripts', 'administrator', 'rocketD_sub_add_new', 'rocketD_tools_scripts');
+//	add_submenu_page('rocketD_main_menu', 'TODO', 'Manage Post Types', 'administrator', 'rocketD_sub_manage_cpt', 'rocketD_manage_cpt');
+//	add_submenu_page('rocketD_main_menu', 'TODO', 'Manage Taxonomies', 'administrator', 'rocketD_sub_manage_taxonomies', 'rocketD_manage_taxonomies');
+}
+
+function rocketD_tools_scripts() {
+	include(dirname( __FILE__ ) . "/admin/page-scripts-list.php");
+}
+
+function rocketD_manage_cpt() {
+	echo 'TODO';
+}
+
+function rocketD_manage_taxonomies() {
+	echo 'TODO';
+}
+
+function rocketD_settings() {
+	echo 'TODO';
+}
 
 /*********************** DEBUGGING CODE ****************************/
 
@@ -195,6 +252,7 @@ function writeLog($output, $fileName=false)
 	fclose($fh);
 	
 }
+
 
 
 
