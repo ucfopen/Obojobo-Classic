@@ -24,6 +24,8 @@ class AppCfgDefault
 	//--------------------   DIRECTORYS & PATHS  -----------------------//
 	// Define output of all php errors
 	const DIR_LOGS = 'internal/logs/';
+	
+	const DIR_ADMIN = 'internal/admin/';
 
 	const DIR_CLASSES = 'internal/classes/';
 
