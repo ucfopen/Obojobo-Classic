@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__)."/../../../internal/app.php");
+require_once(dirname(__FILE__)."/../../internal/app.php");
 // Check for super user
 $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array(\obo\perms\Role::SUPER_STATS));

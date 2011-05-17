@@ -1,11 +1,10 @@
 <?php
 namespace obo\util;
-class Cache extends \rocketD\util\Memcache
+class Cache extends \rocketD\util\RDMemcache
 {
 
 	static private $instance = NULL;
 	private $ns = 'oBo_';
-	private $memEnabled = false;
 	private $dbCache = false;
 	private $DBM;
 
@@ -22,9 +21,6 @@ class Cache extends \rocketD\util\Memcache
 	public function __construct()
 	{
 		parent::__construct();
-		
-		$this->memEnabled = \AppCfg::CACHE_MEMCACHE;
-
 	}
 
 	public function clearAllCache()
