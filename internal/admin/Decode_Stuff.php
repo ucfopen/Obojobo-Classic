@@ -1,15 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Decode value or Tracking Log</title>
-	<meta name="generator" content="TextMate http://macromates.com/">
-	<meta name="author" content="Ian Turgeon">
-	<!-- Date: 2010-11-17 -->
-</head>
-<body>
 
 <form action="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"]; ?>" method="post" accept-charset="utf-8">
 	<h1>Decode a pasted value</h1>
@@ -88,5 +76,3 @@
 
 
 	?>
-</body>
-</html>

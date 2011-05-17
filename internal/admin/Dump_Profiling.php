@@ -1,4 +1,3 @@
-<pre>
 <?php
 \rocketD\util\Log::dumpProfile('amfphp_Filters');
 \rocketD\util\Log::dumpProfile('amfphp_Methods');

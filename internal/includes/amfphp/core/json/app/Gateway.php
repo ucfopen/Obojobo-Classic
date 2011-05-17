@@ -20,7 +20,7 @@ class Gateway extends BasicGateway
 			$body->jsonCallback = substr($uri, $i + 10);
 			$uri = substr($uri, 0, $i);
 		}
-		$elements = explode('/json.php', $uri);
+		$elements = explode('json.php', $uri);
 		
 		if(strlen($elements[1]) == 0)
 		{
