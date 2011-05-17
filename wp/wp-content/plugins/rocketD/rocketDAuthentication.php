@@ -181,6 +181,11 @@ function rocketD_auth_logout()
 }
 
 
+function rocketD_admin_tool_get_form_page_input()
+{
+	return '<input type="hidden" name="page" value="'.$_REQUEST['page'].'">';
+	
+}
 
 
 // create custom plugin settings menu
@@ -188,30 +193,52 @@ add_action('admin_menu', 'rocketD_plugin_menu');
 
 function rocketD_plugin_menu() {
 	//create custom post type menu
-	add_menu_page('Obojobo', 'Obojobo', 'administrator', 'rocketD_main_menu', 'rocketD_settings');
-
-	//create submenu items
-	add_submenu_page('rocketD_main_menu', 'Tools and Scripts', 'Tools and Scripts', 'administrator', 'rocketD_sub_add_new', 'rocketD_tools_scripts');
-//	add_submenu_page('rocketD_main_menu', 'TODO', 'Manage Post Types', 'administrator', 'rocketD_sub_manage_cpt', 'rocketD_manage_cpt');
-//	add_submenu_page('rocketD_main_menu', 'TODO', 'Manage Taxonomies', 'administrator', 'rocketD_sub_manage_taxonomies', 'rocketD_manage_taxonomies');
+	add_menu_page('Obo Admin Tools', 'Obo Admin Tools', 'administrator', 'rocketD_admin_tools_menu', 'rocketD_tools_scripts');	
+	
+	require_once(dirname(__FILE__)."/../../../../internal/app.php");
+	if( $handle = opendir(\AppCfg::DIR_BASE . \AppCfg::DIR_ADMIN) )
+	{
+		while( false !== ( $file = readdir($handle) ) )
+		{
+			if(substr($file, -4) == '.php')
+			{
+				$toolName = preg_replace('/_/', ' ', substr($file, 0, -4));
+				$toolsPage = add_submenu_page('rocketD_admin_tools_menu', $toolName, $toolName, 'administrator', 'rocketD_admin_tool_'.$file, 'rocketD_admin_tool_run');
+				add_action( "admin_print_scripts-$toolsPage", 'rocketD_admin_tool_head' );
+			}
+		}
+		closedir($handle);
+	}
 }
 
-function rocketD_tools_scripts() {
-	include(dirname( __FILE__ ) . "/admin/page-scripts-list.php");
+function rocketD_admin_tool_run() {
+	if(strpos($_REQUEST['page'], 'rocketD_admin_tool_') !== false )
+	{
+		$page = explode('rocketD_admin_tool_', $_REQUEST['page']);
+		include(\AppCfg::DIR_BASE . \AppCfg::DIR_ADMIN . $page[1]);
+	}
 }
 
-function rocketD_manage_cpt() {
-	echo 'TODO';
+function rocketD_admin_tool_head()
+{
+	$plugindir = get_settings('siteurl').'/wp-content/plugins/'.dirname(plugin_basename(__FILE__));
+
+	wp_enqueue_script('datepicker', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js', array('jquery'));  
+	wp_enqueue_script( 'tablesorter', $plugindir.'/js/jquery.tablesorter.min.js' , array('jquery'));
+	wp_enqueue_script( 'tablesorter-pager', $plugindir.'/js/jquery.tablesorter.pager.js' , array('jquery'));
+
+	wp_enqueue_style( 'datepicker', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/base/jquery-ui.css');
 }
 
-function rocketD_manage_taxonomies() {
-	echo 'TODO';
-}
 
-function rocketD_settings() {
-	echo 'TODO';
-}
+add_action( 'admin_init', 'establish_header' );
 
+function establish_header()
+{
+	require_once(dirname(__FILE__)."/../../../../internal/app.php");
+	$API = \obo\API::getInstance();
+	$API->getSessionValid();
+}
 /*********************** DEBUGGING CODE ****************************/
 
 

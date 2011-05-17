@@ -1,28 +1,16 @@
 <?php
 // Check for super user
 $API = \obo\API::getInstance();
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+$gateway = \AppCfg::URL_WEB . \AppCfg::JSON_GATEWAY;
 
-<html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Prototype Stats</title>
-	<meta name="generator" content="TextMate http://macromates.com/">
-	<meta name="author" content="Ian Turgeon">
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/base/jquery-ui.css" type="text/css" media="all" /> 
-	<link rel="stylesheet" href="images/style.css" type="text/css" media="all" /> 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
-	<script src="js/jquery.tablesorter.min.js"></script>
-	<script src="js/jquery.tablesorter.pager.js"></script>
+?>
+
 	<script type="text/javascript" charset="utf-8">
-		$(window).load(function()
+		jQuery(window).load(function()
 		{
 			// REMOTE - GET USER
-			$.ajax({
-				url: "/remoting/json.php/loRepository.getUser",
+			jQuery.ajax({
+				url: "<?php echo $gateway; ?>/loRepository.getUser/",
 				context: document.body,
 				dataType: 'json',
 				success: function(msg)
@@ -33,19 +21,19 @@ $API = \obo\API::getInstance();
 					}
 			});
 			
-			$("#button-preview").click(function(){
-				$('#protostats').submit();
+			jQuery("#button-preview").click(function(){
+				jQuery('#protostats').submit();
 			});
 		
-			$("#button-download").click(function(){
+			jQuery("#button-download").click(function(){
 				downloadCSV();
 			});
 			
 			// REMOTE - GET LEARNING OBJECTS
 			function getMyLOs()
 			{
-				$.ajax({
-					url: "/remoting/json.php/loRepository.getLOs/false/true",
+				jQuery.ajax({
+					url: "<?php echo $gateway; ?>/loRepository.getLOs/false/true",
 					context: document.body,
 					dataType: 'json',
 					success: onGetMyLOs
@@ -55,11 +43,11 @@ $API = \obo\API::getInstance();
 			// PLACE RESULTS INTO THE SELECT BOX
 			function onGetMyLOs(los)
 			{
-				var loBox = $('#mylos');
+				var loBox = jQuery('#mylos');
 				var options = loBox.attr('options');
 
 				// sort alphabetically
-				los = $(los).sort(function(a,b){
+				los = jQuery(los).sort(function(a,b){
 					if(a.title.toLowerCase() > b.title.toLowerCase())
 					{
 						return 1
@@ -74,7 +62,7 @@ $API = \obo\API::getInstance();
 					}
 				});
 			
-				$.each(los, function(text, lo)
+				jQuery.each(los, function(text, lo)
 				{
 					if(lo.version > 0 && lo.subVersion == 0)
 					{
@@ -85,81 +73,81 @@ $API = \obo\API::getInstance();
 			}
 		
 			// ON SUBMIT
-			$('#protostats').submit(function(){
+			jQuery('#protostats').submit(function(){
 			
 				var los = new Array();
-				$("#mylos option:selected").each(function(index,val){
-					los.push($(this).val());
+				jQuery("#mylos option:selected").each(function(index,val){
+					los.push(jQuery(this).val());
 				});
 				los = '['+los.join()+']';
 			
-				var s = $('#start_date').datepicker('getDate').getTime()/1000;
-				var e = $('#end_date').datepicker('getDate').getTime()/1000;
+				var s = jQuery('#start_date').datepicker('getDate').getTime()/1000;
+				var e = jQuery('#end_date').datepicker('getDate').getTime()/1000;
 			
-				getStats(los, $('input:radio[name=stat]:checked').val(), s, e, $('input:radio[name=resolution]:checked').val());
+				getStats(los, jQuery('input:radio[name=stat]:checked').val(), s, e, jQuery('input:radio[name=resolution]:checked').val());
 				return false;
 			});
 		
 			function getStats(los, statID, startDate, endDate, resolution)
 			{
-				$.ajax({
-					url: "/remoting/json.php/loRepository.getLOStats/"+los+'/'+ statID + '/'+ startDate +'/' + endDate + '/' + resolution,
+				jQuery.ajax({
+					url: "<?php echo $gateway; ?>/loRepository.getLOStats/"+los+'/'+ statID + '/'+ startDate +'/' + endDate + '/' + resolution,
 					context: document.body,
 					dataType: 'json',
 					success: onGetStats
 				});
-				$('#results-table').remove();
+				jQuery('#results-table').remove();
 			}
 		
 			// PLACE RESULTS IN A TABLE
 			function onGetStats(results)
 			{
 				// Clear previous results
-				$('#results-table').remove();
+				jQuery('#results-table').remove();
 				
 				// build the table
-				$('#results').append('<table id="results-table" class="tablesorter"><thead><tr class="table-header"></tr></thead><tbody></tbody></table>');
+				jQuery('#results').append('<table id="results-table" class="tablesorter"><thead><tr class="table-header"></tr></thead><tbody></tbody></table>');
 
 				// Build the header row
 				for(index in results[0])
 				{
-					$('#results-table tr.table-header').append('<th>'+index+'</th>');
+					jQuery('#results-table tr.table-header').append('<th>'+index+'</th>');
 				};
 			
 				// Place each data row
-				$(results).each(function(index,val){
+				jQuery(results).each(function(index,val){
 					var row = '<tr>'
 					for(index in val)
 					{
 						row += '<td>'+ val[index] +'</td>';
 					}
 					row += '</tr>'
-					$('#results-table tbody').append(row);
+					jQuery('#results-table tbody').append(row);
 				});
 			
 				// Enable the table sorter
-				$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+				jQuery("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: jQuery("#pager")});
 			
 			}
 			
 			// Listen to time radio button clicks
-			$("input[name=time]").change(function(){
-				if($(this).val() == 'all')
+			jQuery("input[name=time]").change(function(){
+				if(jQuery(this).val() == 'all')
 				{
-					$("#start_date").datepicker('setDate', new Date(2008, 1 - 1, 1)); // set to obojobo epoch
-					$("#end_date").datepicker('setDate', new Date("+1D")); // set to now
-					$('#custom-time').hide();
+					jQuery("#start_date").datepicker('setDate', new Date(2008, 1 - 1, 1)); // set to obojobo epoch
+					jQuery("#end_date").datepicker('setDate', new Date("+1D")); // set to now
+					jQuery('#custom-time').hide();
 				}
 				else
 				{
 					// Ok, show everything
-					$('#custom-time').show();
+					jQuery('#custom-time').show();
 				}
 
 			});
 			
 			// SET UP THE DATE PICKERS
-			var dates = $( "#start_date, #end_date" ).datepicker({
+			var dates = jQuery( "#start_date, #end_date" ).datepicker({
 				defaultDate: "+1w",
 				changeMonth: true,
 				numberOfMonths: 3,
@@ -167,33 +155,33 @@ $API = \obo\API::getInstance();
 				maxDate: "+1D",
 				onSelect: function( selectedDate ) {
 					var option = this.id == "start_date" ? "minDate" : "maxDate",
-						instance = $( this ).data( "datepicker" ),
-						date = $.datepicker.parseDate(
+						instance = jQuery( this ).data( "datepicker" ),
+						date = jQuery.datepicker.parseDate(
 							instance.settings.dateFormat ||
-							$.datepicker._defaults.dateFormat,
+							jQuery.datepicker._defaults.dateFormat,
 							selectedDate, instance.settings );
 					dates.not( this ).datepicker( "option", option, date );
 				}
 			});
-			$("#start_date").datepicker( "option", "defaultDate", new Date(2008, 1 - 1, 1) );
-			$("#end_date").datepicker( "option", "defaultDate", "+1D");
-			$("#start_date").datepicker('setDate', new Date(2008, 1 - 1, 1)); // set to obojobo epoch
-			$("#end_date").datepicker('setDate', new Date('+1D')); // set to now
+			jQuery("#start_date").datepicker( "option", "defaultDate", new Date(2008, 1 - 1, 1) );
+			jQuery("#end_date").datepicker( "option", "defaultDate", "+1D");
+			jQuery("#start_date").datepicker('setDate', new Date(2008, 1 - 1, 1)); // set to obojobo epoch
+			jQuery("#end_date").datepicker('setDate', new Date('+1D')); // set to now
 		});
 		
 		function downloadCSV()
 		{
 			
 			var los = new Array();
-			$("#mylos option:selected").each(function(index,val){
-				los.push($(this).val());
+			jQuery("#mylos option:selected").each(function(index,val){
+				los.push(jQuery(this).val());
 			});
 			los = '&los[]='+los.join('&los[]=');
-			var statValue = $("input[name=stat]:checked").val();
-			var s = $('#start_date').datepicker('getDate').getTime()/1000;
-			var e = $('#end_date').datepicker('getDate').getTime()/1000;
-			var r = $('input:radio[name=resolution]:checked').val()
-			window.open('assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
+			var statValue = jQuery("input[name=stat]:checked").val();
+			var s = jQuery('#start_date').datepicker('getDate').getTime()/1000;
+			var e = jQuery('#end_date').datepicker('getDate').getTime()/1000;
+			var r = jQuery('input:radio[name=resolution]:checked').val()
+			window.open('/assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
 		}
 		
 	</script>
@@ -263,13 +251,15 @@ $API = \obo\API::getInstance();
 		{
 			padding:20px;
 		}
+		select#mylos
+		{
+			height:200px;
+		}
 	</style>
-</head>
-<body>
 <h2>Choose Learning Object(s)</h2>
 <form id="protostats" action="protostats_submit" method="get" accept-charset="utf-8">
 
-<select name="some_name" id="mylos" multiple onchange="" size="15"></select><br>
+<select name="mylos" id="mylos" multiple onchange="" size="15"></select><br>
 
 <h2>Choose Stat</h2>
 	<input type="radio" name="stat" value="10" id="instance_count" CHECKED><label for="instance_count">10. Total Instances Created</label><br>
@@ -309,5 +299,3 @@ $API = \obo\API::getInstance();
 	<div id="button-download" href="#"  class="myButton">Download CSV</div>
 </div>
 <div id="results"></div>
-</body>
-</html>
