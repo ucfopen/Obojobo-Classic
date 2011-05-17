@@ -40,6 +40,7 @@ class API extends \rocketD\db\DBEnabled
 	public function getSessionValid($roleName='')
 	{
 		$UM = \rocketD\auth\AuthManager::getInstance();
+		trace($UM->verifySession($roleName)); 
 		return $UM->verifySession($roleName);
 	}
 
