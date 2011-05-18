@@ -5,7 +5,7 @@ $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array(\obo\perms\Role::SUPER_STATS));
 if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 {
-	exit();
+	exit('please log in to Obojobo first');
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -199,7 +199,7 @@ if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 			var s = $('#start_date').datepicker('getDate').getTime()/1000;
 			var e = $('#end_date').datepicker('getDate').getTime()/1000;
 			var r = $('input:radio[name=resolution]:checked').val()
-			window.open('assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
+			window.open('/assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
 		}
 		
 	</script>
