@@ -14,7 +14,7 @@ $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCf
 $nid = $_GET['nid'];
 $uid = 0;
 $email = '';
-$result = $DBM->query("SELECT userID FROM `obo_user_auth_ucf` WHERE login = '$nid'");
+$result = $DBM->query("SELECT userID FROM `obo_users` WHERE login = '$nid'");
 $r = $DBM->fetch_assoc($result);
 $uid = $r['userID'];
 
