@@ -665,14 +665,18 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$IM = \obo\lo\InstanceManager::getInstance();
 		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 		
+		
 		$scoreman = \obo\ScoreManager::getInstance();
 		$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
+		$scores = $scores[0];
 		
 		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
-		
+
 		if($submittableScore !== false)
 		{
-			if($scores['syncedScore'] != $submittableScore)
+			// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
+
+			if($scores['syncedScore'] != $submittableScore || !$scores['synced'])
 			{
 				// TODO: NEED TO USE SYSTEM EVENTS
 				// Send the score to webcourses
