@@ -21,7 +21,7 @@ switch($e->name)
 		duckPack_loadAPI();
 		$oboAPI = \obo\API::getInstance();
 		$validSession = $oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER);
-		if($validSession != true) // no session yet
+		if($validSession !== true) // no session yet
 		{
 			if($oboAPI->doLogin($e->params['username'], $e->params['userpassword']) === true) // log in
 			{
@@ -56,7 +56,7 @@ switch($e->name)
 		duckPack_loadAPI();
 		$oboAPI = \obo\API::getInstance();
 		$validSession = $oboAPI->getSessionValid();
-		if($validSession != true) // no session yet
+		if($validSession !== true) // no session yet
 		{
 			if($oboAPI->doLogin($e->params['username'], $e->params['userpassword']) === true)
 			{
