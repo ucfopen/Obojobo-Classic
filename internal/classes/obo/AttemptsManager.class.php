@@ -667,15 +667,14 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		
 		$scoreman = \obo\ScoreManager::getInstance();
-		$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
-		$scores = $scores[0];
+		$allScores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
+		$scores = $allScores[0]; // this returns an array of users, we just want the first one since we only asked for one
 		
 		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
-
+		
+		// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
 		if($submittableScore !== false)
 		{
-			// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
-
 			if($scores['syncedScore'] != $submittableScore || !$scores['synced'])
 			{
 				// TODO: NEED TO USE SYSTEM EVENTS
@@ -688,34 +687,25 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		// Send email responce to student
 		if(\AppCfg::NOTIFY_SCORE == true)
 		{
-			$IM = \obo\lo\InstanceManager::getInstance();
-			if($instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
+			$attempts = $scores['attempts'];
+			
+			// filter out incomplete attempts
+			if(count($attempts) > 0)
 			{
-				
-				$scoreman = \obo\ScoreManager::getInstance();
-				$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
-
-				
-				$attempts = $scores[0]['attempts'];
-				
-				// filter out incomplete attempts
-				if(count($attempts) > 0)
+				foreach($attempts AS &$attempt)
 				{
-					foreach($attempts AS &$attempt)
+					if($attempt['submitted'] != true)
 					{
-						if($attempt['submitted'] != true)
-						{
-							unset($attempt);
-						}
+						unset($attempt);
 					}
 				}
-				else
-				{
-					$attempts = array();
-				}
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 			}
+			else
+			{
+				$attempts = array();
+			}
+			$NM = \obo\util\NotificationManager::getInstance();
+			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 	
 		}
 		
