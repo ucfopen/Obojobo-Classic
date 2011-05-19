@@ -145,7 +145,8 @@ class QuestionManager extends \rocketD\db\DBEnabled
 					{
 						// answer found
 						return array(
-							'weight' => $answer->weight,
+							//'weight' => $answer->weight,
+							'weight' => 100, // correct = 100%
 							'answerID' => 0,
 							'feedback' => $question->feedback['correct'],
 							'type' => $question->itemType
