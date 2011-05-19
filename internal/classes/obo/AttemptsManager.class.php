@@ -661,11 +661,25 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		$this->unRegisterCurrentAttempt();
 		
-		// TODO: NEED TO USE SYSTEM EVENTS
-		// Send the score to webcourses
-
-		$PM = \rocketD\plugin\PluginManager::getInstance();
-		$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		// check to see if we need to update the score externally
+		$IM = \obo\lo\InstanceManager::getInstance();
+		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		
+		$scoreman = \obo\ScoreManager::getInstance();
+		$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
+		
+		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
+		
+		if($submittableScore !== false)
+		{
+			if($scores['syncedScore'] != $submittableScore)
+			{
+				// TODO: NEED TO USE SYSTEM EVENTS
+				// Send the score to webcourses
+				$PM = \rocketD\plugin\PluginManager::getInstance();
+				$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $submittableScore), true);
+			}
+		}
 		
 		// Send email responce to student
 		if(\AppCfg::NOTIFY_SCORE == true)
