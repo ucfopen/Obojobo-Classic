@@ -730,6 +730,85 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	}
 
 	
+	public function calculateUserOverallScoreForInstance($instData, $scores)
+	{
+		if( !($instData instanceof \obo\lo\InstanceData) )
+		{
+			return false;
+		}
+		if( !is_array($scores) || !is_array($scores['attempts']) || count($scores['attempts']) == 0 )
+		{
+			return 0;
+		}
+		
+		// just return the first one
+		if(count($scores['attempts']) == 1)
+		{
+			if($scores['attempts']['submitted'])
+			{
+				return $scores['attempts']['score']; // submitted score
+			}
+			else
+			{
+				return 0; // not a submitted score
+			}
+		}
+		
+		switch($instData->scoreMethod)
+		{
+			case 'r':
+				// return the latest submitted score
+				$score = 0;
+				foreach($scores['attempts'] AS $attempt)
+				{
+					if($attempt['submitted']) $score = $attempt['score'];
+				}
+				return $score;
+				break;
+				
+			case 'm':
+				// return the average submitted score
+				$score = 0;
+				$submitCount = 0;
+				foreach($scores['attempts'] AS $attempt)
+				{
+					if($attempt['submitted'])
+					{
+						$submitCount++;
+						$score += $attempt['score'];
+					}
+				}
+				if($submitCount == 0)
+				{
+					return 0;
+				}
+				else
+				{
+					return round($score / $submitCount );
+				}
+				break;
+				
+			case 'h':
+				$score = 0;
+				foreach($scores['attempts'] AS $attempt)
+				{
+					if($attempt['submitted'] && $attempt['score'] > $score)
+					{
+						$score = $attempt['score'];
+					}
+				}
+				return $score;
+				break;
+			default:
+				trace('error - score method not supported', true);
+				trace($instData);
+				break;
+		}
+		
+		return 0;
+	}
+	
+	
 	/********************************************************************/
 	
 	/**
