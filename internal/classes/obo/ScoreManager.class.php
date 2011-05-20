@@ -744,9 +744,9 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		// just return the first one
 		if(count($scores['attempts']) == 1)
 		{
-			if($scores['attempts']['submitted'])
+			if($scores['attempts'][0]['submitted'])
 			{
-				return $scores['attempts']['score']; // submitted score
+				return $scores['attempts'][0]['score']; // submitted score
 			}
 			else
 			{
