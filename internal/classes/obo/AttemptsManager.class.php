@@ -779,7 +779,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 	}
 	
 	// TODO: FIX RETURN FOR DB ABSTRACTION
-    public function getAttemptDetails($attemptID = 0)
+    public function getAttemptDetails($attemptID = 0, $includeScores = true )
     {
 		trace('get attempt details for attempt'.$attemptID);
 		if(!\obo\util\Validator::isPosInt($attemptID))
@@ -796,18 +796,21 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$r = $this->DBM->fetch_obj($q);
 		$result = array();
 		$result['attempt'] = $r;
-			
-    	$qstr = "SELECT `".\cfg_obo_Score::TYPE."`, ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
-		{
-		    trace(mysql_error(), true);
-			return false;
-		}
 		
 		$details = array();
-        while( $r = $this->DBM->fetch_obj($q) )
-        {
-            $details[] = $r;
+		if($includeScores)
+		{	
+			$qstr = "SELECT `".\cfg_obo_Score::TYPE."`, ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
+			if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
+			{
+				trace(mysql_error(), true);
+				return false;
+			}
+		
+			while( $r = $this->DBM->fetch_obj($q) )
+			{
+				$details[] = $r;
+			}
 		}
 		
 		$result['scores'] = $details;
