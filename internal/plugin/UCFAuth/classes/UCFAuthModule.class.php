@@ -221,6 +221,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		
 		// begin authentication
 		
+		$time = time();
 		// create/update the user with the external database
 		$user = $this->syncExternalUser($requestVars['userName']);
 		
