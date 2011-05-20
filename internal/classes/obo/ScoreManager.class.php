@@ -45,6 +45,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	 */
 	public function submitQuestion($qGroupID, $questionID, $answer)
 	{
+		// $questionID = 99999;
 		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
 		{
 			trace('visitid invalid', true);
@@ -71,20 +72,64 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false; // error: invalid questionID
 		}
 
-		// Make Sure the question is part of this qGroup
-		$qstr = "SELECT * FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' AND ".\cfg_obo_QGroup::MAP_CHILD."='?' LIMIT 1";
-		if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $questionID)))
-		{
-		    $this->DBM->rollback();
-			return false; // query error
-		}
+		// // Make Sure the question is part of this qGroup
+		// $qstr = "SELECT * FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' AND ".\cfg_obo_QGroup::MAP_CHILD."='?' LIMIT 1";
+		// if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $questionID)))
+		// {
+		//     $this->DBM->rollback();
+		// 	return false; // query error
+		// }
+		// 
+		// if($this->DBM->fetch_num($q) == 0)
+		// {
+		// 	trace('question id not a child of this qgroup', true);
+		// 	return false; // question isnt part of this qgroup
+		// }
 		
-		if($this->DBM->fetch_num($q) == 0)
-		{
-			trace('question id not a child of this qgroup', true);
-			return false; // question isnt part of this qgroup
-		}
 		
+		// ---- Make sure the question is in the current attempt ----
+		$AM = \obo\AttemptsManager::getInstance();
+		$curAttemptID = $AM->getCurrentAttemptID();
+		
+		$details = $AM->getAttemptDetails($curAttemptID, false);
+		
+		if($details['attempt']->qGroupID != $qGroupID)
+		{
+			// error qgroup isnt this attempt's qgroup
+			trace('A question score was submitted for a qgroup it doesnt belong to', true);
+			trace("qgroupID: $qGroupID, questionID: $questionID, answer: $answer {$_SESSION['userID']}", true);
+			return true;
+		}
+		if(strlen($details['attempt']->qOrder) > 1 && strpos($details['attempt']->qOrder, $questionID) === false )
+		{
+			// error we are using qalts and it wasnt selected for the current attempt
+			trace('A question score was submitted for an attempt with question banks that it doesnt belong to', true);
+			trace("attemptID: $curAttemptID, questionOrder: {$details['attempt']->qOrder},  qgroupID: $qGroupID, questionID: $questionID, answer: $answer {$_SESSION['userID']}", true);
+			return true;
+		}
+		else
+		{
+			// TODO: alternate way to do this?
+			$QGM = \obo\lo\QuestionGroupManager::getInstance();
+			$qGroup = $QGM->getGroup($qGroupID, true);
+
+			$found = false;
+			foreach($qGroup->kids AS $question)
+			{
+				if($question->questionID == $questionID)
+				{
+					$found = true;
+				}
+				
+			}
+			if(!$found)
+			{
+				trace('A question score was submitted for an attempt that it doesnt belong to', true);
+				trace("attemptID: $curAttemptID, qgroupID: $qGroupID, questionID: $questionID, answer: $answer {$_SESSION['userID']}", true);
+				return true;
+			}
+			
+		}
 			
 		// check answer and save score
 		$qman = \obo\lo\QuestionManager::getInstance();

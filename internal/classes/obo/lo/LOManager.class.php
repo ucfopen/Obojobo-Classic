@@ -305,7 +305,6 @@ class LOManager extends \rocketD\db\DBEnabled
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$rootID = $this->getRootId($loID);
-		trace(1);
 		// must be SU OR (LibararyUser && have write permissions)
 		if(!$roleMan->isSuperUser())
 		{
@@ -313,7 +312,6 @@ class LOManager extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(4);
 			}
-			trace(2);
 			$lo = $this->getLO($loID);
 			 // Didn't do this at the same time as the check above to save these lines from executing if not a lib user
 			$perms = $permMan->getMergedPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO);
@@ -328,9 +326,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		// if its not already fetched above.. do so now
 		if(!isset($lo))
 		{
-			trace(3);
 			$lo = $this->getLO($loID);
-			trace(4);
 		}
 		
 		//User is trying to delete a Master (1.0, 2.0 3.0) check for existing instances
