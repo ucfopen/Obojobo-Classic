@@ -98,22 +98,9 @@ class Analytics extends \rocketD\db\DBEnabled
 					$results = $this->DBM->getAllRows($q);
 					break;
 				case 30: // View Time by Section
-					// $LM = new \obo\log\LogManager();
-					// $output = array('OVERVIEW_TIME' => 0, 'CONTENT_TIME' => 0, 'PRACTICE_TIME' => 0, 'ASSESSMENT_TIME' => 0);
-					// 
-					// foreach($los AS $lo)
-					// {
-					// 	$logs = $LM->getInteractionLogByMaster($lo, true);
-					// 	$output['OVERVIEW_TIME'] += $logs['sectionTime']['overview'];
-					// 	$output['CONTENT_TIME'] += $logs['sectionTime']['content'];
-					// 	$output['PRACTICE_TIME'] += $logs['sectionTime']['practice'];
-					// 	$output['ASSESSMENT_TIME'] += $logs['sectionTime']['assessment'];
-					// }
-					// trace((object)$output);
-					// return array((object)$output);
 					$select = str_replace('%', 'createTime', $select);
 					$los = implode(',', $los);
-					$sql = "SELECT COUNT(*) AS VISITS, COUNT(DISTINCT instID) AS INSTANCES, COUNT(DISTINCT userID) AS USERS, COUNT(DISTINCT loID) AS MASTERS,  SEC_TO_TIME(SUM(overviewTime)) AS OVERVIEW_TOTAL_HMS, SEC_TO_TIME(AVG(overviewTime)) AS OVERVIEW_AVG, SEC_TO_TIME(STD(overviewTime)) AS OVERVIEW_STD, SEC_TO_TIME(SUM(contentTime)) AS CONTENT_TOTAL_HMS, SEC_TO_TIME(AVG(contentTime)) AS CONTENT_AVG, SEC_TO_TIME(STD(contentTime)) AS CONTENT_STD, SEC_TO_TIME(SUM(practiceTime)) AS PRACTICE_TOTAL_HMS, SEC_TO_TIME(AVG(practiceTime)) AS PRACTICE_AVE, SEC_TO_TIME(STD(practiceTime)) AS PRACTICE_STD, SEC_TO_TIME(SUM(assessmentTime)) AS ASSESSMENT_TOTAL_HMS, SEC_TO_TIME(AVG(assessmentTime)) AS ASSESSMENT_AVE, SEC_TO_TIME(STD(assessmentTime)) AS ASSESSMENT_STD $select FROM obo_log_visits  WHERE loID in (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '' ) . $limit;
+					$sql = "SELECT COUNT(*) AS VISITS, COUNT(DISTINCT instID) AS INSTANCES, COUNT(DISTINCT userID) AS USERS, COUNT(DISTINCT loID) AS MASTERS, SEC_TO_TIME(AVG(overviewTime) + AVG(contentTime) + AVG(practiceTime) + AVG(assessmentTime) ) AS OVERALL_AVG, SEC_TO_TIME(SUM(overviewTime)) AS OVERVIEW_TOTAL_HMS, SEC_TO_TIME(AVG(overviewTime)) AS OVERVIEW_AVG, SEC_TO_TIME(STD(overviewTime)) AS OVERVIEW_STD, SEC_TO_TIME(SUM(contentTime)) AS CONTENT_TOTAL_HMS, SEC_TO_TIME(AVG(contentTime)) AS CONTENT_AVG, SEC_TO_TIME(STD(contentTime)) AS CONTENT_STD, SEC_TO_TIME(SUM(practiceTime)) AS PRACTICE_TOTAL_HMS, SEC_TO_TIME(AVG(practiceTime)) AS PRACTICE_AVE, SEC_TO_TIME(STD(practiceTime)) AS PRACTICE_STD, SEC_TO_TIME(SUM(assessmentTime)) AS ASSESSMENT_TOTAL_HMS, SEC_TO_TIME(AVG(assessmentTime)) AS ASSESSMENT_AVE, SEC_TO_TIME(STD(assessmentTime)) AS ASSESSMENT_STD $select FROM obo_log_visits  WHERE loID in (?) ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '' ) . $limit;
 					$q = $this->DBM->querySafe($sql, $los);
 					$results = $this->DBM->getAllRows($q);
 
@@ -185,7 +172,7 @@ class Analytics extends \rocketD\db\DBEnabled
 				case 110:
 					break;
 			}
-			\rocketD\util\Log::profile('analytics', "'$stat','$preview','$t','{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'\n");
+			\rocketD\util\Log::profile('analytics', "'$stat','$preview',".time().",'{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'\n");
 			return $results;
 		}
 		return false;
