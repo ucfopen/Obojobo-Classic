@@ -221,6 +221,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		
 		// begin authentication
 		
+		$time = time();
 		// create/update the user with the external database
 		$user = $this->syncExternalUser($requestVars['userName']);
 		
@@ -240,6 +241,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				$this->internalUser = $user;
 				return true;
 			}
+		}
+		else
+		{
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','".round((microtime(true) - $time),5)."','".time().",'0'\n");
 		}
 		return false;
 	}

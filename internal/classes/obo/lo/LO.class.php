@@ -250,6 +250,9 @@ class LO
 					// copy the permissions from the master object to the new draft
 					$PM = \obo\perms\PermissionsManager::getInstance();
 					$PM->copyPermsToItem($this->parentID, $this->loID, \cfg_obo_Perm::TYPE_LO);
+					//Need to remove global perms (if this is version X.1 of a library object)
+					$PM->removeUserPerms($this->rootID, \cfg_obo_Perm::TYPE_LO, 0);
+					
 					return $success;
 				}
 
@@ -355,8 +358,8 @@ class LO
 
 				$this->parentID = $this->loID; // link parent to previous root id (only case where a 1.0 object has a parent id)
 				$this->loID = 0;// force it to save a copy
-				$this->version = 1; // reset
-				$this->subVersion = 0; // reset
+				$this->version = 0; // reset
+				$this->subVersion = 1; // reset
 				$this->rootID = 0; // mark as a new LO
 				
 				$this->dbStore($DBM);
