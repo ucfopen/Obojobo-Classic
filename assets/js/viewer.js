@@ -1,20 +1,102 @@
+
+// 'constants' for each section
+var S_OVERVIEW = 0;
+var S_CONTENT = 1;
+var S_PRACTICE = 2;
+var S_ASSESSMETN = 3;
+var S_REVIEW = 4;
+
+var SESSION_TIMEOUT = 1000;
+
+var sectionHashes =  new Array('Overview', 'Content', 'Practice', 'Assessment', 'Review');
+var sectionIDs =  new Array('section-overview', 'section-content', 'section-practice', 'section-assessment', 'section-review');
+
+var currentSection = -1;
+var currentContentPage = -1;
+var currentPracticePage = -1;
+var currentAssessmentPage = -1;
+
+var curHash;
+
+var lastSessionCheck;
+var loginOptions;
+var instData;
+var lo;
+
 $(window).load(function()
 {
 	$.history.init(onURLChange, { unescape: ",/" }); // register URL history plugin callback
 });
 
-// URL navigation callback
-function onURLChange(hash){
-	if(hash == '')
-	{		
-		makeCall('getLOMeta', onGetLOMeta, [loID]);
-		makeCall('getLoginOptions', onGetLoginOptions , []);
-		makeCall('getSessionValid', onGetSessionValidInit, []);
-	}
-	else if(hash == 'Content')
+function changePage(section, page)
+{
+	console.log('change page ' + page);
+	if(section != currentSection)
 	{
-		//makeCall('getLO', onGetLO, [loID]);
+		changeSection(section);
 	}
+	switch(currentSection)
+	{
+		case S_OVERVIEW:
+			break;
+		case S_CONTENT:
+			$('#' + sectionIDs[currentSection]).append( buildContentPage(page, lo.pages[page]) );
+			break;
+		case S_PRACTICE:
+			break;
+		case S_ASSESSMETN:
+			break;
+	}
+}
+
+function changeSection(section)
+{
+	console.log('change section ' +section);
+	switch(section)
+	{
+		case S_OVERVIEW:
+			showOverviewPage();
+			break;
+		case S_CONTENT:
+			showContentPageNav();
+			break;
+		case S_PRACTICE:
+			break;
+		case S_ASSESSMETN:
+			break;
+	}
+	cleanSection(currentSection); // clean previous 
+	currentSection = section;
+	$.history.load(sectionHashes[currentSection]);
+}
+
+function cleanSection(section)
+{
+	$('#' + sectionIDs[section]).empty();	
+}
+
+function showContentPageNav (argument) 
+{
+	$(lo.pages).each(function(index, page){
+		$('#navigation').append('<a href="#Content-Page' + index + '">Page ' + index +'</a> ');
+	});
+	
+}
+
+
+function showOverviewPage()
+{	
+	$('#section-overview').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p> <a href="#Content">Load Content</a>');
+	$("#title").text(lo.title);
+	$("#version").text(lo.version + '.' + lo.subVersion);
+	$("#language").text(lo.languageID);
+	$("#objective").append(cleanFlashHTML(lo.objective));
+	$("#learn-time").text(lo.learnTime);
+	$("#key-words").text(lo.keywords.join(", "));
+	$("#content-size").text(lo.summary.contentSize);
+	$("#practice-size").text(lo.summary.practiceSize);
+	$("#assessment-size").text(lo.summary.assessmentSize);
+
 }
 
 function makeCall(method, callback, arguments)
@@ -25,35 +107,34 @@ function makeCall(method, callback, arguments)
 		context: document.body,
 		dataType: 'json',
 		success: callback
-	});		
+	});
 }
 
 
 // PLACE RESULTS INTO THE SELECT BOX
 function onGetLOMeta(metaLO)
 {
-	// console.log(metaLO);
-	$("#title").text(metaLO.title);
-	$("#version").text(metaLO.version + '.' + metaLO.subVersion);
-	$("#language").text(metaLO.languageID);
-	$("#objective").append(cleanFlashHTML(metaLO.objective));
-	$("#learn-time").text(metaLO.learnTime);
-	$("#key-words").text(metaLO.keywords.join(", "));
-	$("#content-size").text(metaLO.summary.contentSize);
-	$("#practice-size").text(metaLO.summary.practiceSize);
-	$("#assessment-size").text(metaLO.summary.assessmentSize);
+
+
 }
 
-function onGetLoginOptions(result){}
+// function onGetLoginOptions(result){}
 
-function onGetSessionValidInit(result)
+function onGetSessionValid(result)
 {
+	lastSessionCheck = new Date().UTC();
 	// just go ahead and get the full lo
-	makeCall('getLO', onGetLO, [loID]);
 }
 
 function onGetLO(result)
 {
+	
+	lo = result;
+	changeSection(S_OVERVIEW);
+	//changeSection(S_OVERVIEW);
+	
+	return
+	
 	$(result.pages).each(function(index, page){
 		$('#section-content').append( buildContentPage(index, page) );
 	});
@@ -250,30 +331,62 @@ function cleanFlashHTML(input)
 	return input;
 }
 
+function checkSession()
+{
+	var now = new Date().UTC();
+	console.log(now)
+	if(lastSessionCheck + SESSION_TIMEOUT < now)
+	{
+		makeCall('getSessionValid', onGetSessionValid , []);
+		return 3;
+	}
+	else
+	{
+		// if(
+	}
+}
 
-var currentAnchor = null;
-//Function which chek if there are anchor changes, if there are, sends the ajax petition
-function checkAnchor(){
-	//Check if it has changes
-	if(currentAnchor != document.location.hash){
-		currentAnchor = document.location.hash;
-		//if there is not anchor, the loads the default section
-		if(!currentAnchor)
-			query = "section=home";
-		else
+
+// URL navigation callback
+function onURLChange(hash)
+{
+	if(curHash != hash)
+	{
+		curHash = hash;
+		console.log('url change ' + hash)
+		if(hash == '')
 		{
-			//Creates the  string callback. This converts the url URL/#main&id=2 in URL/?section=main&id=2
-			var splits = currentAnchor.substring(1).split('&');
-			//Get the section
-			var section = splits[0];
-			delete splits[0];
-			//Create the params string
-			var params = splits.join('&');
-			var query = "section=" + section + params;
+			if(!lo)
+			{
+				makeCall('getLO', onGetLO, [loID]);
+			}
 		}
-		//Send the petition
-		$.get("callbacks.php",query, function(data){
-			$("#content").html(data);
-		});
+		else if(hash == 'Overview')
+		{
+			if(!lo)
+			{
+				makeCall('getLO', onGetLO, [loID]);
+			}
+			else
+			{
+				changeSection(S_OVERVIEW);
+			}
+		}
+		else if(hash == 'Content')
+		{
+			changePage(S_CONTENT, 0);
+		}
+		else if(hash == 'Practice')
+		{
+			//makeCall('getLO', onGetLO, [loID]);
+		}
+		else if(hash == 'Assessment')
+		{
+		
+		}
+		else if(hash == 'Review')
+		{
+		
+		}
 	}
 }
