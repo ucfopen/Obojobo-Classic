@@ -32,7 +32,7 @@ function rocketD_modify_rewrite_rules($rules)
 
 function rocketD_flush_rewrite_rules(){
 	$rules = get_option('rewrite_rules');
-	if(!isset( $rules['view/(.+?)/?$'] ) ) 
+	if(!isset( $rules['view/(\d+?)/?$'] ) ) 
 	{
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();

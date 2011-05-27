@@ -7,7 +7,7 @@ RewriteBase /
 RewriteRule ^(manager|assets) - [L]
 
 # OBOJOBO media
-RewriteRule ^media/([0-9]*)$ assets/getAsset.php?id=$1 [L,QSA]
+RewriteRule ^media/([0-9]*)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
 
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
