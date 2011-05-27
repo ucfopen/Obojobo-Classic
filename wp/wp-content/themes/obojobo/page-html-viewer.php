@@ -4,7 +4,7 @@ Template Name: HTML Viewe
 */
 
 get_header('html-viewer'); ?>
-<div id="lo-preview">
+<div id="section-overview" class="section section-active">
 	<h1><span id="title">title</span> <span id="version">version</span></h1>
 	Learn Time: <span id="learn-time">learn time</span> minutes.
 	<h2>Objective:</h2>
@@ -17,15 +17,15 @@ get_header('html-viewer'); ?>
 	<p>Content Pages: <span id="content-size">content-size</span></p>
 	<p>Practice Questions: <span id="practice-size">practice-size</span></p>
 	<p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>
+	<a href="#Content">Load Content</a>
 </div>
 
-<h2>Content</h2>
-<div id="content-pages"></div>
+<div id="section-content" class="section"></div>
 
-<h2>Practice</h2>
-<div id="practice-pages"></div>
+<div id="section-practice" class="section"></div>
 
-<h2>Assessment</h2>
-<div id="assessment-pages"></div>
+<div id="section-assessment" class="section"></div>
+
+<div id="section-feedback" class="section"></div>
 
 <?php get_footer('html-viewer'); ?>
