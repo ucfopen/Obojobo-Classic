@@ -18,6 +18,9 @@ var currentAssessmentPage = -1;
 
 var curHash;
 
+
+var baseURL;
+var instID;
 var lastSessionCheck;
 var loginOptions;
 var instData;
@@ -25,7 +28,15 @@ var lo;
 
 $(window).load(function()
 {
-	$.history.init(onURLChange, { unescape: ",/" }); // register URL history plugin callback
+	baseURL = $(location).attr('href');
+	
+	$('#navigation a').each(function(index, link){
+		rewRouteLink(link);
+	});
+	
+	// $.history.init(onURLChange, { unescape: ",/" }); // register URL history plugin callback
+	makeCall('getLO', onGetLO, [loID]);
+
 });
 
 function changePage(section, page)
@@ -56,6 +67,7 @@ function changeSection(section)
 	{
 		case S_OVERVIEW:
 			showOverviewPage();
+			history.pushState(null, null, 'overview/');
 			break;
 		case S_CONTENT:
 			showContentPageNav();
@@ -67,7 +79,7 @@ function changeSection(section)
 	}
 	cleanSection(currentSection); // clean previous 
 	currentSection = section;
-	$.history.load(sectionHashes[currentSection]);
+	// $.history.load(sectionHashes[currentSection]);
 }
 
 function cleanSection(section)
@@ -78,7 +90,7 @@ function cleanSection(section)
 function showContentPageNav (argument) 
 {
 	$(lo.pages).each(function(index, page){
-		$('#navigation').append('<a href="#Content-Page' + index + '">Page ' + index +'</a> ');
+		$('#navigation').append('<a href="/page/' + index + '">Page ' + index +'</a> ');
 	});
 	
 }
@@ -86,7 +98,7 @@ function showContentPageNav (argument)
 
 function showOverviewPage()
 {	
-	$('#section-overview').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p> <a href="#Content">Load Content</a>');
+	$('#section-overview').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
 	$("#title").text(lo.title);
 	$("#version").text(lo.version + '.' + lo.subVersion);
 	$("#language").text(lo.languageID);
@@ -130,8 +142,8 @@ function onGetLO(result)
 {
 	
 	lo = result;
+	// changeSection(S_OVERVIEW);
 	changeSection(S_OVERVIEW);
-	//changeSection(S_OVERVIEW);
 	
 	return
 	
@@ -331,6 +343,22 @@ function cleanFlashHTML(input)
 	return input;
 }
 
+function rewRouteLink(link)
+{
+	console.log(link.href);
+	console.log(link)
+	
+	
+	// pattern = "/<\/ul><ul>/gi";
+	// console.log(link.replace(pattern, "");
+
+	
+	
+	
+
+	
+}
+
 function checkSession()
 {
 	var now = new Date().UTC();
@@ -343,50 +371,5 @@ function checkSession()
 	else
 	{
 		// if(
-	}
-}
-
-
-// URL navigation callback
-function onURLChange(hash)
-{
-	if(curHash != hash)
-	{
-		curHash = hash;
-		console.log('url change ' + hash)
-		if(hash == '')
-		{
-			if(!lo)
-			{
-				makeCall('getLO', onGetLO, [loID]);
-			}
-		}
-		else if(hash == 'Overview')
-		{
-			if(!lo)
-			{
-				makeCall('getLO', onGetLO, [loID]);
-			}
-			else
-			{
-				changeSection(S_OVERVIEW);
-			}
-		}
-		else if(hash == 'Content')
-		{
-			changePage(S_CONTENT, 0);
-		}
-		else if(hash == 'Practice')
-		{
-			//makeCall('getLO', onGetLO, [loID]);
-		}
-		else if(hash == 'Assessment')
-		{
-		
-		}
-		else if(hash == 'Review')
-		{
-		
-		}
 	}
 }

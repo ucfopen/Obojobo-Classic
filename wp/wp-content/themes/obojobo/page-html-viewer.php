@@ -4,7 +4,7 @@ Template Name: HTML Viewe
 */
 
 get_header('html-viewer'); ?>
-<div id="navigation"><a href="#Overview">Ovierview</a> <a href="#Content">Content</a> <a href="#Practice">Practice</a> <a href="#Assessment">Assessment</a></div>
+<div id="navigation"><a href="overview">Ovierview</a> <a href="page">Content</a> <a href="practice">Practice</a> <a href="assessment">Assessment</a></div>
 
 <div id="section-overview" class="section"></div>
 
