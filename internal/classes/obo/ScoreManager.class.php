@@ -100,7 +100,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			trace("qgroupID: $qGroupID, questionID: $questionID, answer: $answer {$_SESSION['userID']}", true);
 			return true;
 		}
-		if(strlen($details['attempt']->qOrder) > 1 && strpos($details['attempt']->qOrder, $questionID) === false )
+		if(strlen($details['attempt']->qOrder) > 1 && strpos($details['attempt']->qOrder, (string)$questionID) === false )
 		{
 			// error we are using qalts and it wasnt selected for the current attempt
 			trace('A question score was submitted for an attempt with question banks that it doesnt belong to', true);
