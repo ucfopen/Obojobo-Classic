@@ -182,11 +182,13 @@ function changePage(section, page)
 	{
 		changeSection(section);
 	}
+	var selectedLinkID = ''; // used for assigning 'selected' class the clicked link
 	switch(currentSection)
 	{
 		case S_OVERVIEW:
 			break;
 		case S_CONTENT:
+			selectedLinkID = '#nav-P-' + page;
 			$('#content').empty();
 			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
 			curPage = lo.pages[page-1]
@@ -197,6 +199,7 @@ function changePage(section, page)
 			prevContentPage = page;
 			break;
 		case S_PRACTICE:
+			selectedLinkID = '#nav-PQ-' + page;
 			$('#content').empty();
 			$('#content').append( buildQuestionPage('PQ', page, lo.pGroup.kids[page-1]) );
 			curPage = lo.pGroup.kids[page-1]
@@ -207,7 +210,7 @@ function changePage(section, page)
 			prevPracticePage = page
 			break;
 		case S_ASSESSMENT:
-			
+			selectedLinkID = '#nav-AQ-' + page;
 			var altIndex = 0;
 			var pageRequested = page
 			page = parseInt(page);
@@ -215,10 +218,8 @@ function changePage(section, page)
 			// test to see if the page has alternates in it
 			if(pageRequested != page)
 			{
-				console.log('looking for an alt for page ' + page);
 				// map the alphabetic letter to an index
 				altIndex = pageRequested.charCodeAt(pageRequested.length-1) - 96
-				console.log(altIndex);
 			}
 			
 			$('#content').empty();
@@ -233,7 +234,7 @@ function changePage(section, page)
 			break;
 	}
 	$('#nav-list ul.subnav-list li a').removeClass('selected'); // reset the class for page links
-	$('.subnav-list li:nth-child(' + page + ') a').addClass('selected'); // reset the class for page links
+	$(selectedLinkID).addClass('selected'); // reset the class for page links
 
 }
 
@@ -423,8 +424,8 @@ function buildQuestionPage(baseid, index, question)
 		case 'MC':
 			page.append(buildMCAnswers(question.questionID, question.answers));
 			// listen to answer clicks
-			$('.answers-list :input').die('click', answerClicked);
-			$('.answers-list :input').live('click', answerClicked);
+			$('.answer-list :input').die('click', answerClicked);
+			$('.answer-list :input').live('click', answerClicked);
 			
 			break;
 		case 'Media':
@@ -438,7 +439,6 @@ function answerClicked(event)
 	switch(currentSection)
 	{
 		case S_PRACTICE:
-			break;
 		case S_ASSESSMENT:
 			$(curPage.answers).each(function(itemIndex, answer)
 			{
