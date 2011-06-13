@@ -1,12 +1,14 @@
 // ------------------------ SETUP and INITIALIZATION ------------------------------//
-var S_OVERVIEW = 0;
-var S_CONTENT = 1;
-var S_PRACTICE = 2;
-var S_ASSESSMENT = 3;
+var S_OVERVIEW = 'nav-overview';
+var S_CONTENT = 'nav-content';
+var S_PRACTICE = 'nav-practice';
+var S_ASSESSMENT = 'nav-assessment';
 var S_REVIEW = 4;
 var MODE_PREVIEW = 0;
 var MODE_INSTANCE = 1;
 
+var USE_OPEN_DATABASE = false;
+var USE_LOCAL_STORAGE = true;
 var SESSION_TIMEOUT = 1000;
 
 var sectionHashes =  new Array('Overview', 'Content', 'Practice', 'Assessment', 'Review');
@@ -16,6 +18,8 @@ var currentSection = -1;
 var currentContentPage = -1;
 var currentPracticePage = -1;
 var currentAssessmentPage = -1;
+
+var curPage
 
 var curHash;
 
@@ -33,62 +37,56 @@ var assessmentQuestions
 var viewerMode = MODE_INSTANCE;
 
 $(window).load(function()
-{
+{	
 	// TODO: testing debug code
 	viewerMode = MODE_PREVIEW
 	
 	baseURL = $(location).attr('href');
-		
-	$('#nav-overview').click(function(event)
-	{
-		event.preventDefault();
-		changePage(S_OVERVIEW)
-	});
+	
+	$('#navigation').append('<ul id="nav-list"><li><a class="nav-item" id="'+S_OVERVIEW+'" href="#">Ovierview</a></li><li><a class="nav-item" id="'+S_CONTENT+'" href="#">Content</a></li><li><a class="nav-item" id="'+S_PRACTICE+'" href="#">Practice</a></li><li><a class="nav-item" id="'+S_ASSESSMENT+'" href="#">Assessment</a></li></ul>');
+	
+	$('#nav-list li a').click(onNavSectionLinkClick);
+	
 	$('#nav-overview')[0].href = baseURL + 'overview/';
-	
-
-	$('#nav-content').click(function(event)
-	{
-		event.preventDefault();
-		changePage(S_CONTENT, prevContentPage)
-		
-	});
 	$('#nav-content')[0].href = baseURL + 'page/1/';
-	
-	$('#nav-practice').click(function(event)
-	{
-		event.preventDefault();
-		changePage(S_PRACTICE, prevPracticePage)
-	});
 	$('#nav-practice')[0].href = baseURL + 'practice/1/';
-	
-	$('#nav-assessment').click(function(event)
-	{
-		event.preventDefault();
-		changePage(S_ASSESSMENT, prevAssessmentPage);
-	});
 	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';
 	
-	// lets set up the db and see if the lo we're looking for is already stored
-	var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
-	db.transaction(function (tx)
+	
+	if(USE_OPEN_DATABASE)
 	{
-		tx.executeSql('CREATE TABLE IF NOT EXISTS los (id unique, loJSON)');
-		
-		tx.executeSql('SELECT * FROM los WHERE id = ?', [loID], function (tx, results)
+		// lets set up the db and see if the lo we're looking for is already stored
+		var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
+		db.transaction(function (tx)
 		{
-			var len = results.rows.length, i;
-			if(results.rows.length)
+			tx.executeSql('CREATE TABLE IF NOT EXISTS los (id unique, loJSON)');
+		
+			tx.executeSql('SELECT * FROM los WHERE id = ?', [loID], function (tx, results)
 			{
-				//console.log(results.rows.item(0).loJSON)
-				onGetLO(results.rows.item(0).loJSON);
-			}
-			else
-			{
-				makeCall('getLO', onGetLO, [loID]);
-			}
+				var len = results.rows.length, i;
+				if(results.rows.length)
+				{
+					//console.log(results.rows.item(0).loJSON)
+					onGetLO(results.rows.item(0).loJSON);
+				}
+				else
+				{
+					makeCall('getLO', onGetLO, [loID]);
+				}
+			});
 		});
-	});
+	}
+	if(USE_LOCAL_STORAGE)
+	{
+		if(localStorage['lo'+loID])
+		{
+			onGetLO(localStorage['lo'+loID])
+		}
+		else
+		{
+			makeCall('getLO', onGetLO, [loID]);
+		}	
+	}
 	
 
 });
@@ -118,12 +116,18 @@ function onGetSessionValid(result)
 function onGetLO(result)
 {
 	lo = $.parseJSON(result);
-	//console.log(lo)
-	var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
-	db.transaction(function (tx)
+	if(USE_OPEN_DATABASE)
 	{
-		tx.executeSql('INSERT INTO los (id, loJSON) VALUES (?, ?)', [lo.loID, result]);
-	});
+		var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
+		db.transaction(function (tx)
+		{
+			tx.executeSql('INSERT INTO los (id, loJSON) VALUES (?, ?)', [lo.loID, result]);
+		});
+	}
+	if(USE_LOCAL_STORAGE)
+	{
+		localStorage['lo'+lo.loID] = result;
+	}
 	
 	// process the question banks
 	processAssessment();
@@ -140,8 +144,6 @@ function processAssessment()
 	$(lo.aGroup.kids).each(function(index, page)
 	{
 		index++;
-		
-		console.log(curQIndex + ' ' + page.questionIndex )
 		if(curQIndex != page.questionIndex || page.questionIndex == 0)
 		{
 			curQIndex++
@@ -185,8 +187,9 @@ function changePage(section, page)
 		case S_OVERVIEW:
 			break;
 		case S_CONTENT:
-			$('#' + sectionIDs[currentSection]).empty();
-			$('#' + sectionIDs[currentSection]).append( buildContentPage(page, lo.pages[page-1]) );
+			$('#content').empty();
+			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
+			curPage = lo.pages[page-1]
 			activateFLVs();
 			activateSWFs();
 			updateHistory('page/'+page+'/');
@@ -194,8 +197,9 @@ function changePage(section, page)
 			prevContentPage = page;
 			break;
 		case S_PRACTICE:
-			$('#' + sectionIDs[currentSection]).empty();
-			$('#' + sectionIDs[currentSection]).append( buildQuestionPage('practice', page, lo.pGroup.kids[page-1]) );
+			$('#content').empty();
+			$('#content').append( buildQuestionPage('PQ', page, lo.pGroup.kids[page-1]) );
+			curPage = lo.pGroup.kids[page-1]
 			activateFLVs();
 			activateSWFs();
 			updateHistory('practice/'+page+'/');
@@ -207,7 +211,7 @@ function changePage(section, page)
 			var altIndex = 0;
 			var pageRequested = page
 			page = parseInt(page);
-			
+			currentAssessmentPage = page-1
 			// test to see if the page has alternates in it
 			if(pageRequested != page)
 			{
@@ -217,8 +221,9 @@ function changePage(section, page)
 				console.log(altIndex);
 			}
 			
-			$('#' + sectionIDs[currentSection]).empty();
-			$('#' + sectionIDs[currentSection]).append( buildQuestionPage('assessment', page, assessmentQuestions[page-1][altIndex]) );
+			$('#content').empty();
+			$('#content').append( buildQuestionPage('AQ', page, assessmentQuestions[page-1][altIndex]) );
+			curPage = assessmentQuestions[page-1][altIndex]
 			
 			activateFLVs();
 			activateSWFs();
@@ -227,91 +232,111 @@ function changePage(section, page)
 			prevAssessmentPage = page
 			break;
 	}
+	$('#nav-list ul.subnav-list li a').removeClass('selected'); // reset the class for page links
+	$('.subnav-list li:nth-child(' + page + ') a').addClass('selected'); // reset the class for page links
+
 }
 
 function changeSection(section)
 {
 	console.log('change section ' +section);
-	$('#sub-navigation').empty();
+	$('#content').empty(); // clear previous content
+	$('.subnav-list').remove(); // clear previous subnav
+	$('#nav-list li a').removeClass('selected'); // reset the class for nav links
 	switch(section)
 	{
 		case S_OVERVIEW:
 			showOverviewPage();
 			updateHistory('overview/');
+			$('#nav-overview').addClass('selected');
 			break;
 		case S_CONTENT:
 			showContentPageNav();
+			$('#nav-content').addClass('selected');
 			break;
 		case S_PRACTICE:
 			showPracticePageNav();
+			$('#nav-practice').addClass('selected');
 			break;
 		case S_ASSESSMENT:
 			showAssessmentPageNav();
+			$('#nav-assessment').addClass('selected');
 			break;
 	}
-	cleanSection(currentSection); // clean previous 
 	currentSection = section;
+	
 	// $.history.load(sectionHashes[currentSection]);
 }
 
 // ------------------------ BUILDING CONTENT ------------------------------//
-function cleanSection(section)
-{
-	$('#' + sectionIDs[section]).empty();	
-}
 
 function showContentPageNav() 
 {
 	var pList = $('<ul class="subnav-list content"></ul>');
-	$('#sub-navigation').append(pList);
+	$('#nav-content').parent().append(pList);
 	
 	$(lo.pages).each(function(index, page){
 		index++
-		var pageHTML = $('<li><a class="subnav-item" id="P-'+index+'" href="'+ baseURL +'page/' + index + '">Page ' + index +'</a></li>');
+		var pageHTML = $('<li><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
 		pList.append(pageHTML);
-		
-		pageHTML.children('a').click(function(event){
-			event.preventDefault();
-			changePage(S_CONTENT, index)
-		});
+		pageHTML.children('a').click(onNavPageLinkClick);
 	});
 }
+
+function onNavSectionLinkClick(event)
+{
+	event.preventDefault();
+	changePage(event.currentTarget.id, 1)
+}
+
+function onNavPageLinkClick(event)
+{
+	event.preventDefault();
+	
+	// get the page number and section from the id
+	pattern = /^nav-(\w*)-(\d*)(\w?)$/gi;
+	event.currentTarget.id.match(pattern);
+	
+	switch(RegExp.$1)
+	{
+		case 'P':
+			changePage(S_CONTENT, RegExp.$2);
+			break;
+		case 'PQ':
+			changePage(S_PRACTICE, RegExp.$2);
+			break
+		case 'AQ':
+			changePage(S_ASSESSMENT, RegExp.$2+RegExp.$3);
+			break;
+	}
+}
+
 
 function showPracticePageNav() 
 {
 	var qListHTML = $('<ul class="subnav-list practice"></ul>');
-	$('#sub-navigation').append(qListHTML)
+	$('#nav-practice').parent().append(qListHTML)
 	
 	$(lo.pGroup.kids).each(function(index, page)
 	{
 		index++;
-		
-		var qLink = $('<li><a class="subnav-item" id="PQ-'+index+'" href="'+ baseURL +'practice/' + index + '">Question ' + index +'</a></li>');
+		var qLink = $('<li><a class="subnav-item" id="nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 		qListHTML.append(qLink)
-		
-		qLink.children('a').click(function(event)
-		{
-			event.preventDefault();
-			changePage(S_PRACTICE, index)
-		});
+		qLink.children('a').click(onNavPageLinkClick);
 	});
 }
 
 function showAssessmentPageNav() 
 {
 	var qListHTML = $('<ul class="subnav-list assessment"></ul>');
-	$('#sub-navigation').append(qListHTML)
+	$('#nav-assessment').parent().append(qListHTML)
 
 	$(assessmentQuestions).each(function(qIndex, pageGroup)
 	{
 		qIndex++;
-		var qLink = $('<li><a class="subnav-item" id="AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '">Question ' + qIndex +'</a></li>');
+		var qLink = $('<li><a class="subnav-item" id="nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a></li>');
 		qListHTML.append(qLink);
-		qLink.children('a').click(function(event)
-		{
-			event.preventDefault();
-			changePage(S_ASSESSMENT, qIndex)
-		});
+		qLink.children('a').click(onNavPageLinkClick);
 		// add nav for preview mode to show alts
 		if(viewerMode == MODE_PREVIEW && pageGroup.length > 1 )
 		{
@@ -326,20 +351,16 @@ function showAssessmentPageNav()
 				}
 				
 				var altVersion = String.fromCharCode(altIndex + 96);
-				var altLink = $('<li><a class="subnav-item-alt" id="AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'">' + qIndex + altVersion +'</a></li>');
+				var altLink = $('<li><a class="subnav-item-alt" id="nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">' + qIndex + altVersion +'</a></li>');
 				altListHTML.append(altLink);
-				altLink.click(function(event)
-				{
-					event.preventDefault();
-					changePage(S_ASSESSMENT, qIndex + altVersion)
-				});
+				altLink.children('a').click(onNavPageLinkClick);
 			});
 		}
 	});
 }
 function showOverviewPage()
 {	
-	$('#section-overview').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
+	$('#content').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
 	$("#title").text(lo.title);
 	$("#version").text(lo.version + '.' + lo.subVersion);
 	$("#language").text(lo.languageID);
@@ -377,9 +398,12 @@ function buildContentPage(index, page)
 function buildQuestionPage(baseid, index, question)
 {
 	console.log('questionID: ' +question.questionID);
-	var page = $('<div id="'+baseid+'-'+index+'" class="question-page"></div>');
-	page.append('<h3>Question ' + index + '</h3>');
 	
+	// init container
+	var page = $('<div id="'+baseid+'-'+index+'" class="question-page question-type-'+ question.itemType +'"></div>');
+	page.append('<h3>Question ' + index + '</h3>'); // title
+	
+	// build page components
 	$(question.items).each(function(itemIndex, item)
 	{
 		switch(item.component)
@@ -393,26 +417,55 @@ function buildQuestionPage(baseid, index, question)
 		}
 	});
 	
+	// build answer form input
 	switch(question.itemType)
 	{
 		case 'MC':
 			page.append(buildMCAnswers(question.questionID, question.answers));
+			// listen to answer clicks
+			$('.answers-list :input').die('click', answerClicked);
+			$('.answers-list :input').live('click', answerClicked);
+			
 			break;
 		case 'Media':
 			break;
-		
 	}
-		
 	return page;
+}
+
+function answerClicked(event)
+{
+	switch(currentSection)
+	{
+		case S_PRACTICE:
+			break;
+		case S_ASSESSMENT:
+			$(curPage.answers).each(function(itemIndex, answer)
+			{
+				if(answer.answerID == event.currentTarget.value)
+				{
+					console.log(answer.weight);
+				}
+			});
+			break;
+		default:
+			break;
+		}
 }
 
 function buildMCAnswers(questionID, answers)
 {
-	var answersHTML = $('<div class="answers multiplechoice"></div>');
+	var answersHTML = $('<ul class="answer-list multiplechoice"></ul>');
 	$(answers).each(function(itemIndex, answer)
 	{
-		var myID = 'Q'+questionID+'A'+answer.answerID;
-		answersHTML.append('<div class="answer"><input id="'+myID+'" type="radio" name="QID'+questionID+'" value="'+answer.answerID+'"><label for="'+myID+'">' + cleanFlashHTML(answer.answer) + '</label></div>');
+		var answerText = $.trim(cleanFlashHTML(answer.answer));
+		
+		// take extra step to remove containing p tags from answer text
+		// convert lone <p>blah</p> tags to 'blah'
+		pattern = /^<p.*>(.*)<\/p>$/gi;
+		answerText = answerText.replace(pattern, '$1');		
+		
+		answersHTML.append('<li class="answer"><input id="'+answer.answerID+'" type="radio" name="QID-'+questionID+'" value="'+answer.answerID+'"><label for="'+answer.answerID+'">' + answerText + '</label></li>');
 	});
 	return answersHTML;
 }
