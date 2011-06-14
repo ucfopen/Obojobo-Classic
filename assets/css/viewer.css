@@ -1,0 +1,86 @@
+.section-active{}
+	
+.section-content
+{
+	display:block;
+	border:1px solid #333;
+	margin:10px;
+}
+
+#navigation{}
+#nav-list{}
+
+#section-feedback{}
+
+#navigation a { text-decoration: none; }
+
+/* ----------- 1st level elements ----------- */
+#nav-list
+{
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	position: relative;
+	padding: 2px 0;
+	margin-bottom: 2em;
+}
+
+#nav-list li
+{
+	display: inline;
+	margin: 0 0 0px;
+}
+
+#nav-list a,#nav-list a:link,#nav-list a:visited
+{
+	padding: 0px 5px;
+}
+
+#nav-list a:hover,#nav-list a:focus{}
+
+/* ----------- Second and subsequent levels ----------- */
+.subnav-list
+{
+	position: absolute;
+	top: 23px;
+	left: 0;
+	width: 100%;
+	border-top: none;
+	padding:0px;
+}
+
+.subnav-list li { display: inline; }
+/*.subnav-list a,.subnav-list a:link,.subnav-list a:visited{}*/
+/*.subnav-list a:hover,.subnav-list a:focus{}*/
+
+/* ----------- current Link ----------- */
+#nav-list a.selected,#nav-list a.selected:link,#nav-list a.selected:visited { font-weight: bold; }
+
+/* ----------- Second and subsequent levels -------------- */
+.subnav-list-alts
+{
+	border-top: none;
+	display:inline;
+	padding:0px;
+}
+
+.subnav-list-alts li { display: inline; }
+/*.subnav-list-alts a,.subnav-list-alts a:link,.subnav-list-alts a:visited{}*/
+/*.subnav-list-alts a:hover,.subnav-list-alts a:focus{}*/
+
+
+/* ----------- QUESTIONS ----------- */
+/*.question-page{}*/
+.answer-list
+{
+	list-style-type: none;
+}
+.answer
+{
+	padding:5px;
+}
+.answer input
+{
+	margin-left:-23px;
+	margin-right:10px;
+}
