@@ -16,7 +16,7 @@ class Validator extends \rocketD\util\Validator
 	static function isRoleName($var)
 	{
 		// use relection to get a list of all class constants
-		$oClass = new ReflectionClass('\cfg_obo_Role');
+		$oClass = new \ReflectionClass('\cfg_obo_Role');
 		$consts = array_values($oClass->getConstants());
 		return in_array($var, $consts);
 	}
