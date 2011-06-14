@@ -87,7 +87,7 @@ function duckPack_createLocalManager($username, $password, $fullname, $email)
 	return true;
 }
 
-function duckPack_updateLocalManager($username, $password, $isBlocked, $fullname, $email)
+function duckPack_updateLocalManager($username, $password, $fullname, $email)
 {
 	global $modx;
 	
@@ -98,7 +98,7 @@ function duckPack_updateLocalManager($username, $password, $isBlocked, $fullname
 	}
 	$row = $modx->fetchRow($ds);
 	
-	$sql = "UPDATE ".$modx->getFullTableName('user_attributes')." SET fullname='', email='', blocked=" . ($isBlocked ? 0 : 1) . " WHERE id='".$row['id']. "'";
+	$sql = "UPDATE ".$modx->getFullTableName("user_attributes")." SET fullname='".$modx->db->escape($fullname)."', email='".$modx->db->escape($email)."' WHERE internalKey='".$row['id']."'";
 	if($modx->db->query($sql))
 	{
 		return true;
@@ -234,7 +234,7 @@ function duckPack_syncGroups($modxUserID)
 }
 
 
-function duckPack_updateLocalWebUser($username, $password, $isBlocked, $fullname, $email)
+function duckPack_updateLocalWebUser($username, $password, $fullname, $email)
 {
 	global $modx;
 	// check for valid user name
@@ -246,7 +246,8 @@ function duckPack_updateLocalWebUser($username, $password, $isBlocked, $fullname
 	$row = $modx->fetchRow($rs);
 	duckPack_syncGroups($row['id']);
 	
-	$sql = "UPDATE ".$modx->getFullTableName("web_user_attributes")." SET fullname='', email='', blocked=" . ($isBlocked ? 0 : 1) . " WHERE id='".$row['id']."'";
+	$sql = "UPDATE ".$modx->getFullTableName("web_user_attributes")." SET fullname='".$modx->db->escape($fullname)."', email='".$modx->db->escape($email)."' WHERE internalKey='".$row['id']."'";
+	
 	if($modx->db->query($sql))
 	{
 		return true;

@@ -413,6 +413,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{	
+			
 			// get the course data for the selected instance
 			$sql = "SELECT * FROM ".\cfg_plugin_UCFCourses::MAP_TABLE." WHERE ".\cfg_obo_Instance::ID." = '?'";
 			$q = $this->DBM->querySafe($sql, $instID);
@@ -456,9 +457,19 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 						return \rocketD\util\Error::getError(4);
 					}
 				}
-				
+/* START FIX CODE */
+	// if($studentNID == 'zberry' && $instID == 1977)
+	// {
+	// 	$result = $this->sendScoreSetRequest($instructorNID, 'jbuckner', $sectionID, $columnID, $score);
+	// 	
+	// }
+	// else{
+/* END FIX CODE	*/
 				// Send the score set request
 				$result = $this->sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score);
+/* START FIX CODE */
+	// }
+/* END FIX CODE */
 				// log the result
 				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 				
@@ -483,6 +494,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 			return array('scoreSent' => false, 'errors' => array());
 		}
 		// Begin the service request
+		
 		$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
 		
 		$postVars = array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score);

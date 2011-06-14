@@ -661,43 +661,51 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		$this->unRegisterCurrentAttempt();
 		
-		// TODO: NEED TO USE SYSTEM EVENTS
-		// Send the score to webcourses
-
-		$PM = \rocketD\plugin\PluginManager::getInstance();
-		$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $score), true);
+		// check to see if we need to update the score externally
+		$IM = \obo\lo\InstanceManager::getInstance();
+		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		
+		
+		$scoreman = \obo\ScoreManager::getInstance();
+		$allScores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
+		$scores = $allScores[0]; // this returns an array of users, we just want the first one since we only asked for one
+		
+		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
+		
+		// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
+		if($submittableScore !== false)
+		{
+			if($scores['syncedScore'] != $submittableScore || !$scores['synced'])
+			{
+				// TODO: NEED TO USE SYSTEM EVENTS
+				// Send the score to webcourses
+				$PM = \rocketD\plugin\PluginManager::getInstance();
+				$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $submittableScore), true);
+			}
+		}
 		
 		// Send email responce to student
 		if(\AppCfg::NOTIFY_SCORE == true)
 		{
-			$IM = \obo\lo\InstanceManager::getInstance();
-			if($instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
+			$attempts = $scores['attempts'];
+			
+			// filter out incomplete attempts
+			if(count($attempts) > 0)
 			{
-				
-				$scoreman = \obo\ScoreManager::getInstance();
-				$scores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
-
-				
-				$attempts = $scores[0]['attempts'];
-				
-				// filter out incomplete attempts
-				if(count($attempts) > 0)
+				foreach($attempts AS &$attempt)
 				{
-					foreach($attempts AS &$attempt)
+					if($attempt['submitted'] != true)
 					{
-						if($attempt['submitted'] != true)
-						{
-							unset($attempt);
-						}
+						unset($attempt);
 					}
 				}
-				else
-				{
-					$attempts = array();
-				}
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 			}
+			else
+			{
+				$attempts = array();
+			}
+			$NM = \obo\util\NotificationManager::getInstance();
+			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 	
 		}
 		
@@ -771,7 +779,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 	}
 	
 	// TODO: FIX RETURN FOR DB ABSTRACTION
-    public function getAttemptDetails($attemptID = 0)
+    public function getAttemptDetails($attemptID = 0, $includeScores = true )
     {
 		trace('get attempt details for attempt'.$attemptID);
 		if(!\obo\util\Validator::isPosInt($attemptID))
@@ -788,18 +796,21 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$r = $this->DBM->fetch_obj($q);
 		$result = array();
 		$result['attempt'] = $r;
-			
-    	$qstr = "SELECT `".\cfg_obo_Score::TYPE."`, ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
-		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
-		{
-		    trace(mysql_error(), true);
-			return false;
-		}
 		
 		$details = array();
-        while( $r = $this->DBM->fetch_obj($q) )
-        {
-            $details[] = $r;
+		if($includeScores)
+		{	
+			$qstr = "SELECT `".\cfg_obo_Score::TYPE."`, ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
+			if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
+			{
+				trace(mysql_error(), true);
+				return false;
+			}
+		
+			while( $r = $this->DBM->fetch_obj($q) )
+			{
+				$details[] = $r;
+			}
 		}
 		
 		$result['scores'] = $details;
