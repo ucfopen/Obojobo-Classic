@@ -1,40 +1,48 @@
 // ------------------------ SETUP and INITIALIZATION ------------------------------//
+
+// Constant Section ids
 var S_OVERVIEW = 'nav-overview';
 var S_CONTENT = 'nav-content';
 var S_PRACTICE = 'nav-practice';
 var S_ASSESSMENT = 'nav-assessment';
 var S_REVIEW = 4;
+
+// Constant Viewer Mode Flags
 var MODE_PREVIEW = 0;
 var MODE_INSTANCE = 1;
+var viewerMode = MODE_INSTANCE; // default to instance mode
 
+// Constant Local Storage Flags
 var USE_OPEN_DATABASE = false;
 var USE_LOCAL_STORAGE = true;
+
 var SESSION_TIMEOUT = 1000;
 
 var sectionHashes =  new Array('Overview', 'Content', 'Practice', 'Assessment', 'Review');
 var sectionIDs =  new Array('section-overview', 'section-content', 'section-practice', 'section-assessment', 'section-review');
 
+// Keeps track of the currently open section
 var currentSection = -1;
-var currentContentPage = -1;
-var currentPracticePage = -1;
-var currentAssessmentPage = -1;
 
+// Keeps track of the current page thats open
 var curPage
 
-var curHash;
-
+// Keeps track of the previously viewed pages for each section so that the user returns to the same page when switching sections
 var prevContentPage = 1;
 var prevPracticePage = 1;
 var prevAssessmentPage = 1
 
+// Keeps track of the base url to build the links from
 var baseURL;
-var instID;
+
+// timestamp of the last session check
 var lastSessionCheck;
-var loginOptions;
-var instData;
+
+// the loaded learning object
 var lo;
+
+// array of assessment questions
 var assessmentQuestions
-var viewerMode = MODE_INSTANCE;
 
 $(window).load(function()
 {	
@@ -44,14 +52,11 @@ $(window).load(function()
 	baseURL = $(location).attr('href');
 	
 	$('#navigation').append('<ul id="nav-list"><li><a class="nav-item" id="'+S_OVERVIEW+'" href="#">Ovierview</a></li><li><a class="nav-item" id="'+S_CONTENT+'" href="#">Content</a></li><li><a class="nav-item" id="'+S_PRACTICE+'" href="#">Practice</a></li><li><a class="nav-item" id="'+S_ASSESSMENT+'" href="#">Assessment</a></li></ul>');
-	
 	$('#nav-list li a').click(onNavSectionLinkClick);
-	
 	$('#nav-overview')[0].href = baseURL + 'overview/';
 	$('#nav-content')[0].href = baseURL + 'page/1/';
 	$('#nav-practice')[0].href = baseURL + 'practice/1/';
-	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';
-	
+	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';	
 	
 	if(USE_OPEN_DATABASE)
 	{
@@ -87,7 +92,6 @@ $(window).load(function()
 			makeCall('getLO', onGetLO, [loID]);
 		}	
 	}
-	
 
 });
 
@@ -102,17 +106,16 @@ function makeCall(method, callback, arguments)
 		success: callback
 	});
 }
+
 // PLACE RESULTS INTO THE SELECT BOX
-function onGetLOMeta(metaLO)
-{
+function onGetLOMeta(metaLO){}
 
-
-}
 function onGetSessionValid(result)
 {
 	lastSessionCheck = new Date().UTC();
 	// just go ahead and get the full lo
 }
+
 function onGetLO(result)
 {
 	lo = $.parseJSON(result);
@@ -188,6 +191,7 @@ function changePage(section, page)
 		case S_OVERVIEW:
 			break;
 		case S_CONTENT:
+			if(page == 0 ) page = prevContentPage;
 			selectedLinkID = '#nav-P-' + page;
 			$('#content').empty();
 			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
@@ -199,6 +203,7 @@ function changePage(section, page)
 			prevContentPage = page;
 			break;
 		case S_PRACTICE:
+			if(page == 0 ) page = prevPracticePage;
 			selectedLinkID = '#nav-PQ-' + page;
 			$('#content').empty();
 			$('#content').append( buildQuestionPage('PQ', page, lo.pGroup.kids[page-1]) );
@@ -210,11 +215,11 @@ function changePage(section, page)
 			prevPracticePage = page
 			break;
 		case S_ASSESSMENT:
+			if(page == 0 ) page = prevAssessmentPage;
 			selectedLinkID = '#nav-AQ-' + page;
 			var altIndex = 0;
 			var pageRequested = page
 			page = parseInt(page);
-			currentAssessmentPage = page-1
 			// test to see if the page has alternates in it
 			if(pageRequested != page)
 			{
@@ -269,25 +274,12 @@ function changeSection(section)
 	// $.history.load(sectionHashes[currentSection]);
 }
 
-// ------------------------ BUILDING CONTENT ------------------------------//
-
-function showContentPageNav() 
-{
-	var pList = $('<ul class="subnav-list content"></ul>');
-	$('#nav-content').parent().append(pList);
-	
-	$(lo.pages).each(function(index, page){
-		index++
-		var pageHTML = $('<li><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
-		pList.append(pageHTML);
-		pageHTML.children('a').click(onNavPageLinkClick);
-	});
-}
+// ------------------------ CLICK LISTENER CALLBACKS ------------------------------//
 
 function onNavSectionLinkClick(event)
 {
 	event.preventDefault();
-	changePage(event.currentTarget.id, 1)
+	changePage(event.currentTarget.id, 0)
 }
 
 function onNavPageLinkClick(event)
@@ -310,6 +302,42 @@ function onNavPageLinkClick(event)
 			changePage(S_ASSESSMENT, RegExp.$2+RegExp.$3);
 			break;
 	}
+}
+
+function onAnswerRadioClicked(event)
+{
+	switch(currentSection)
+	{
+		case S_PRACTICE:
+		case S_ASSESSMENT:
+			$(curPage.answers).each(function(itemIndex, answer)
+			{
+				if(answer.answerID == event.currentTarget.value)
+				{
+					console.log(answer.weight);
+				}
+			});
+			break;
+		default:
+			break;
+		}
+}
+
+// ======================== BUILDING CONTENT ======================== //
+
+
+// ------------------------ Navigation Lists -------------------------//
+function showContentPageNav() 
+{
+	var pList = $('<ul class="subnav-list content"></ul>');
+	$('#nav-content').parent().append(pList);
+	
+	$(lo.pages).each(function(index, page){
+		index++
+		var pageHTML = $('<li><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
+		pList.append(pageHTML);
+		pageHTML.children('a').click(onNavPageLinkClick);
+	});
 }
 
 
@@ -359,6 +387,8 @@ function showAssessmentPageNav()
 		}
 	});
 }
+
+// ------------------------ Page Content Displays -------------------------//
 function showOverviewPage()
 {	
 	$('#content').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
@@ -424,33 +454,14 @@ function buildQuestionPage(baseid, index, question)
 		case 'MC':
 			page.append(buildMCAnswers(question.questionID, question.answers));
 			// listen to answer clicks
-			$('.answer-list :input').die('click', answerClicked);
-			$('.answer-list :input').live('click', answerClicked);
+			$('.answer-list :input').die('click', onAnswerRadioClicked);
+			$('.answer-list :input').live('click', onAnswerRadioClicked);
 			
 			break;
 		case 'Media':
 			break;
 	}
 	return page;
-}
-
-function answerClicked(event)
-{
-	switch(currentSection)
-	{
-		case S_PRACTICE:
-		case S_ASSESSMENT:
-			$(curPage.answers).each(function(itemIndex, answer)
-			{
-				if(answer.answerID == event.currentTarget.value)
-				{
-					console.log(answer.weight);
-				}
-			});
-			break;
-		default:
-			break;
-		}
 }
 
 function buildMCAnswers(questionID, answers)
