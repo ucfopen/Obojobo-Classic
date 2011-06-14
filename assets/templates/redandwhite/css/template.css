@@ -353,7 +353,7 @@
 		border-left: 1px solid #FFFFFF;
 		border-right: 1px solid #FFFFFF;
 	}
-	.header {
+	.stylehead .header {
 		background-image: url(../images/header2.jpg);
 		height: 105px;
 		margin: 0;

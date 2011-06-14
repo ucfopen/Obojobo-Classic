@@ -1,28 +1,7 @@
-<?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
-// Check for super user
-$API = \obo\API::getInstance();
-$result = $API->getSessionRoleValid(array(\obo\perms\Role::SUPER_STATS));
-if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
-{
-	exit();
-}
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Prototype Stats</title>
-	<meta name="generator" content="TextMate http://macromates.com/">
-	<meta name="author" content="Ian Turgeon">
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/base/jquery-ui.css" type="text/css" media="all" /> 
-	<link rel="stylesheet" href="images/style.css" type="text/css" media="all" /> 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
-	<script src="js/jquery.tablesorter.min.js"></script>
-	<script src="js/jquery.tablesorter.pager.js"></script>
+	<script src="/assets/js/jquery.tablesorter.min.js"></script>
+	<!--script src="/assets/js/jquery.tablesorter.pager.js"></script-->
 	<script type="text/javascript" charset="utf-8">
 		$(window).load(function()
 		{
@@ -144,7 +123,8 @@ if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 				});
 			
 				// Enable the table sorter
-				$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+				// $("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")});
+				$("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']});
 			
 			}
 			
@@ -199,79 +179,15 @@ if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 			var s = $('#start_date').datepicker('getDate').getTime()/1000;
 			var e = $('#end_date').datepicker('getDate').getTime()/1000;
 			var r = $('input:radio[name=resolution]:checked').val()
-			window.open('assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
+			window.open('/assets/csv.php?function=stats'+los+'&stat='+statValue+'&start='+s+'&end='+e+'&resolution='+r,'_blank');
 		}
 		
 	</script>
-	<style type="text/css" media="screen">
-		div.ui-datepicker{
-		 font-size:10px;
-		}
-		
-		
-		#button-preview {
-			-moz-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-			-webkit-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-			box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-			background-color:#79bbff;
-			-moz-border-radius:6px;
-			-webkit-border-radius:6px;
-			border-radius:6px;
-			border:1px solid #84bbf3;
-			display:inline-block;
-			color:#ffffff;
-			font-family:arial;
-			font-size:15px;
-			font-weight:bold;
-			padding:6px 24px;
-			text-decoration:none;
-			text-shadow:1px 1px 0px #528ecc;
-		}
-		#button-preview:hover {
-			background-color:#378de5;
-		}
-		#button-preview:active {
-			position:relative;
-			top:1px;
-		}
-		
-		#button-download {
-			-moz-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
-			-webkit-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
-			box-shadow:inset 0px 1px 0px 0px #c1ed9c;
-			background-color:#9dce2c;
-			-moz-border-radius:6px;
-			-webkit-border-radius:6px;
-			border-radius:6px;
-			border:1px solid #83c41a;
-			display:inline-block;
-			color:#ffffff;
-			font-family:arial;
-			font-size:15px;
-			font-weight:bold;
-			padding:6px 24px;
-			text-decoration:none;
-			text-shadow:1px 1px 0px #689324;
-		}
-		#button-download:hover {
-			background-color:#8cb82b;
-		}
-		#button-download:active {
-			position:relative;
-			top:1px;
-		}
-		
-		#custom-time
-		{
-			display:none;
-		}
-		#form-buttons
-		{
-			padding:20px;
-		}
-	</style>
-</head>
-<body>
+
+<h2>Prerequisites</h2>
+<p>Note that this is an early implementation of a stats retrieval interface. You wield great power, so use the slow stats sparingly please.</p>
+<p>If at any point you are not able to retrieve a stat or the page appears unresponsive, please refresh the page.  It is likely your session expired.  If this happens often, log into the manager and keep it open while exporting your stats.</p>
+
 <h2>Choose Learning Object(s)</h2>
 <form id="protostats" action="protostats_submit" method="get" accept-charset="utf-8">
 
@@ -285,7 +201,7 @@ if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 	<input type="radio" name="stat" value="40" id="assessment_count"><label for="assessment_count">40. Total Assessments Completed</label><br>
 	<input type="radio" name="stat" value="50" id="import_scores"><label for="import_scores">50. Total Score Import Usage</label><br>
 	<input type="radio" name="stat" value="60" id="who_created_instances"><label for="who_created_instances">60. List Who Created Instances</label><br>
-	<input type="radio" name="stat" value="65" id="who_created_los"><label for="who_created_los">65. List Learning Object Authors <span style="color:red;">[review needed]</span></label><br>
+	<input type="radio" name="stat" value="65" id="who_created_los"><label for="who_created_los">65. List Learning Object Authors</label><br>
 	<input type="radio" name="stat" value="70" id="which_courses"><label for="which_courses">70. List Which Courses</label><br>
 	<input type="radio" name="stat" value="75" id="who_visited"><label for="who_visited">75. Individual Visitors  <span style="color:red;">[slow]</span></label><br>
 	<!-- <input type="radio" name="stat" value="80" id="question_answers"><label for="question_answers"><s>Question Answer Values</s></label><br> -->
@@ -315,5 +231,3 @@ if(! in_array(\obo\perms\Role::SUPER_STATS, $result['hasRoles']) )
 	<div id="button-download" href="#"  class="myButton">Download CSV</div>
 </div>
 <div id="results"></div>
-</body>
-</html>

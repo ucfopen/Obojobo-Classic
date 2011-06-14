@@ -21,14 +21,14 @@ switch($e->name)
 		duckPack_loadAPI();
 		$oboAPI = \obo\API::getInstance();
 		$validSession = $oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER);
-		if($validSession != true) // no session yet
+		if($validSession !== true) // no session yet
 		{
 			if($oboAPI->doLogin($e->params['username'], $e->params['userpassword']) === true) // log in
 			{
 				$validSession = $oboAPI->getSessionValid(\obo\perms\Role::SUPER_USER); // make sure user is SU
 			}
 		}
-		if($validSession == true) // already has a session
+		if($validSession === true) // already has a session
 		{
 			$externUser = $oboAPI->getUser();
 			
@@ -36,7 +36,7 @@ switch($e->name)
 			if(duckPack_externalUserIsLocalManager($externUser->login) ) 
 			{
 				// modx user exists, sync local data from external
-				duckPack_updateLocalManager($externUser->login, md5(time()), $externUser->first.' '.$externUser->last, !$isSU , $externUser->email);
+				duckPack_updateLocalManager($externUser->login, md5(time()), $externUser->first.' '.$externUser->last, $externUser->email);
 			}
 			else{
 				// no modx user, make one
@@ -56,24 +56,24 @@ switch($e->name)
 		duckPack_loadAPI();
 		$oboAPI = \obo\API::getInstance();
 		$validSession = $oboAPI->getSessionValid();
-		if($validSession != true) // no session yet
+		if($validSession !== true) // no session yet
 		{
 			if($oboAPI->doLogin($e->params['username'], $e->params['userpassword']) === true)
 			{
 				$validSession = true; // switch to true 
 			}
 		}
-		if($validSession == true) // already has a session
+		if($validSession === true) // already has a session
 		{
 			$externUser = $oboAPI->getUser();
 			if(duckPack_externalUserIsLocalWebUser($externUser->login) ) 
 			{
 				// modx user exists, sync local data from external
-				duckPack_updateLocalWebUser($externUser->login, md5(time()), $externUser->first.' '.$externUser->last, false, $externUser->email);
+				duckPack_updateLocalWebUser($externUser->login, md5(time()), $externUser->first.' '.$externUser->last, $externUser->email);
 			}
 			else{
 				// no modx user, make one
-				duckPack_createLocalWebUser($externUser->login, md5(time()) , $externUser->first.' '.$externUser->last, $externUser->email);
+				duckPack_createLocalWebUser($externUser->login, md5(time()), $externUser->first.' '.$externUser->last, $externUser->email);
 			}
 		}
 		break;
