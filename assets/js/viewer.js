@@ -16,6 +16,8 @@ var viewerMode = MODE_INSTANCE; // default to instance mode
 var USE_OPEN_DATABASE = false;
 var USE_LOCAL_STORAGE = true;
 
+var AUTOLOAD_FLASH = true;
+
 var SESSION_TIMEOUT = 1000;
 
 var sectionHashes =  new Array('Overview', 'Content', 'Practice', 'Assessment', 'Review');
@@ -43,6 +45,11 @@ var lo;
 
 // array of assessment questions
 var assessmentQuestions
+
+// array of visited pages
+var visitedPages = new Array();
+var visitedPractice = new Array();
+var visitedAssessment = new Array();
 
 $(window).load(function()
 {	
@@ -132,6 +139,8 @@ function onGetLO(result)
 		localStorage['lo'+lo.loID] = result;
 	}
 	
+	$('#lo-title').text(lo.title);
+	document.title = lo.title + ' | Obojobo Learning Object'
 	// process the question banks
 	processAssessment();
 	
@@ -195,24 +204,27 @@ function changePage(section, page)
 			selectedLinkID = '#nav-P-' + page;
 			$('#content').empty();
 			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
+			console.log('page added')
 			curPage = lo.pages[page-1]
 			activateFLVs();
 			activateSWFs();
 			updateHistory('page/'+page+'/');
 			$('#nav-content')[0].href = baseURL+'page/'+page+'/';
 			prevContentPage = page;
+			visitedPages[page] = true;
 			break;
 		case S_PRACTICE:
 			if(page == 0 ) page = prevPracticePage;
 			selectedLinkID = '#nav-PQ-' + page;
 			$('#content').empty();
-			$('#content').append( buildQuestionPage('PQ', page, lo.pGroup.kids[page-1]) );
+			$('#content').append( buildQuestionPage('Practice', 'PQ', page, lo.pGroup.kids[page-1]) );
 			curPage = lo.pGroup.kids[page-1]
 			activateFLVs();
 			activateSWFs();
 			updateHistory('practice/'+page+'/');
 			$('#nav-practice')[0].href = baseURL+'practiece/'+page+'/';
 			prevPracticePage = page
+			visitedPractice[page] = true
 			break;
 		case S_ASSESSMENT:
 			if(page == 0 ) page = prevAssessmentPage;
@@ -228,18 +240,18 @@ function changePage(section, page)
 			}
 			
 			$('#content').empty();
-			$('#content').append( buildQuestionPage('AQ', page, assessmentQuestions[page-1][altIndex]) );
+			$('#content').append( buildQuestionPage('Assessment', 'AQ', page, assessmentQuestions[page-1][altIndex]) );
 			curPage = assessmentQuestions[page-1][altIndex]
 			
-			activateFLVs();
-			activateSWFs();
 			updateHistory('assessment/'+page+'/');
 			$('#nav-assessment')[0].href = baseURL+'assessment/'+page+'/';
 			prevAssessmentPage = page
+			visitedAssessment[page] = true
 			break;
 	}
-	$('#nav-list ul.subnav-list li a').removeClass('selected'); // reset the class for page links
-	$(selectedLinkID).addClass('selected'); // reset the class for page links
+	$('#nav-list ul.subnav-list li').removeClass('selected'); // reset the class for page links
+	$(selectedLinkID).parent('li').addClass('selected'); // set the current selected
+	$(selectedLinkID).parent('li').addClass('visited'); // set the current as visited
 
 }
 
@@ -248,27 +260,24 @@ function changeSection(section)
 	console.log('change section ' +section);
 	$('#content').empty(); // clear previous content
 	$('.subnav-list').remove(); // clear previous subnav
-	$('#nav-list li a').removeClass('selected'); // reset the class for nav links
+	$('#nav-list li').removeClass('selected'); // reset the class for nav links
 	switch(section)
 	{
 		case S_OVERVIEW:
 			showOverviewPage();
 			updateHistory('overview/');
-			$('#nav-overview').addClass('selected');
 			break;
 		case S_CONTENT:
 			showContentPageNav();
-			$('#nav-content').addClass('selected');
 			break;
 		case S_PRACTICE:
 			showPracticePageNav();
-			$('#nav-practice').addClass('selected');
 			break;
 		case S_ASSESSMENT:
 			showAssessmentPageNav();
-			$('#nav-assessment').addClass('selected');
 			break;
 	}
+	$('#'+section).parent('li').addClass('selected');
 	currentSection = section;
 	
 	// $.history.load(sectionHashes[currentSection]);
@@ -334,7 +343,7 @@ function showContentPageNav()
 	
 	$(lo.pages).each(function(index, page){
 		index++
-		var pageHTML = $('<li><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
+		var pageHTML = $('<li '+(visitedPages[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
 		pList.append(pageHTML);
 		pageHTML.children('a').click(onNavPageLinkClick);
 	});
@@ -349,7 +358,7 @@ function showPracticePageNav()
 	$(lo.pGroup.kids).each(function(index, page)
 	{
 		index++;
-		var qLink = $('<li><a class="subnav-item" id="nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
+		var qLink = $('<li '+(visitedPractice[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 		qListHTML.append(qLink)
 		qLink.children('a').click(onNavPageLinkClick);
 	});
@@ -363,7 +372,7 @@ function showAssessmentPageNav()
 	$(assessmentQuestions).each(function(qIndex, pageGroup)
 	{
 		qIndex++;
-		var qLink = $('<li><a class="subnav-item" id="nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a></li>');
+		var qLink = $('<li '+(visitedAssessment[qIndex] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a></li>');
 		qListHTML.append(qLink);
 		qLink.children('a').click(onNavPageLinkClick);
 		// add nav for preview mode to show alts
@@ -391,25 +400,47 @@ function showAssessmentPageNav()
 // ------------------------ Page Content Displays -------------------------//
 function showOverviewPage()
 {	
-	$('#content').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
+	$('#content').load('/assets/templates/viewer.html #overview-page', onOverviewPageLoaded);
+	// $('#content').append('<h1><span id="title">title</span> <span id="version">version</span></h1> Learn Time: <span id="learn-time">learn time</span> minutes. <h2>Objective:</h2> <span id="objective"></span><h2>Keywords</h2> <span id="key-words">key words</span></p><h2>Pages:</h2> <p>Content Pages: <span id="content-size">content-size</span></p> <p>Practice Questions: <span id="practice-size">practice-size</span></p> <p>Assessment Questions: <span id="assessment-size">assessment-size</span></p>');
+
+}
+
+function onOverviewPageLoaded()
+{
+	$("#overview-blurb-title").text(lo.title);
 	$("#title").text(lo.title);
 	$("#version").text(lo.version + '.' + lo.subVersion);
 	$("#language").text(lo.languageID);
 	$("#objective").append(cleanFlashHTML(lo.objective));
-	$("#learn-time").text(lo.learnTime);
+	$("#learn-time").text(lo.learnTime + ' Min.');
 	$("#key-words").text(lo.keywords.join(", "));
-	$("#content-size").text(lo.summary.contentSize);
-	$("#practice-size").text(lo.summary.practiceSize);
-	$("#assessment-size").text(lo.summary.assessmentSize);
-
+	$("#content-size").text(lo.summary.contentSize + ' Pages');
+	$("#practice-size").text(lo.summary.practiceSize + ' Questions');
+	$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');	
+	
 }
+
 function buildContentPage(index, page)
 {
 	console.log('pageID: ' +page.pageID);
-	var pageHTML = $('<div id="content-'+index+'" class="page-layout-'+page.layoutID+'"></div>');
-	pageHTML.append('<h3>' + page.title+ ' (layout '+page.layoutID+')</h3>'); // add title
+	var pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
+	pageHTML.append('<h2>' + page.title + '</h2>'); // add title
+	
+	var pageItems = new Array();
+	
+	console.log('layout ' + page.layoutID)
+	switch(page.layoutID)
+	{
+		case 4:
+			pageItems[0] = page.items[1];
+			pageItems[1] = page.items[0];
+			break;
+		default:
+			pageItems = $(page.items);
+			break;
+	}
 	// loop through each page item
-	$(page.items).each(function(itemIndex, item)
+	$(pageItems).each(function(itemIndex, item)
 	{
 		switch(item.component)
 		{
@@ -426,13 +457,13 @@ function buildContentPage(index, page)
 	return pageHTML;
 }
 
-function buildQuestionPage(baseid, index, question)
+function buildQuestionPage(sectionName, baseid, index, question)
 {
 	console.log('questionID: ' +question.questionID);
 	
 	// init container
 	var page = $('<div id="'+baseid+'-'+index+'" class="question-page question-type-'+ question.itemType +'"></div>');
-	page.append('<h3>Question ' + index + '</h3>'); // title
+	page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
 	
 	// build page components
 	$(question.items).each(function(itemIndex, item)
@@ -452,6 +483,7 @@ function buildQuestionPage(baseid, index, question)
 	switch(question.itemType)
 	{
 		case 'MC':
+			page.append('<h3>Choose one of the following answers:</h3>');
 			page.append(buildMCAnswers(question.questionID, question.answers));
 			// listen to answer clicks
 			$('.answer-list :input').die('click', onAnswerRadioClicked);
@@ -483,58 +515,64 @@ function buildMCAnswers(questionID, answers)
 
 function activateSWFs()
 {
-	var flashvars = new Object();
-	
-	var params = new Object();
-	params.menu = "false";
-	params.allowScriptAccess = "sameDomain";
-	params.allowFullScreen = "true";
-	params.bgcolor = "#869ca7";
-	
-	$('.swf').each(function(index, val)
+	if(AUTOLOAD_FLASH)
 	{
-		var mediaID = val.id.split('media-')[1];	
-		swfobject.embedSWF( "/media/"+mediaID, 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
-	});
+		var flashvars = new Object();
+	
+		var params = new Object();
+		params.menu = "false";
+		params.allowScriptAccess = "sameDomain";
+		params.allowFullScreen = "true";
+		params.bgcolor = "#869ca7";
+	
+		$('.swf').each(function(index, val)
+		{
+			console.log(val)
+			var mediaID = val.id.split('media-')[1];	
+			swfobject.embedSWF( "/media/"+mediaID, 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
+		});
+	}
 }
 
 function activateFLVs()
 {
-	var params = new Object();
-	params.menu = "false";
-	params.allowScriptAccess = "sameDomain";
-	params.allowFullScreen = "true";
-	params.bgcolor = "#869ca7";
-	
-	$('.flv').each(function(index, val)
+	if(AUTOLOAD_FLASH)
 	{
-		var mediaID = val.id.split('media-')[1];
+		var params = new Object();
+		params.menu = "false";
+		params.allowScriptAccess = "sameDomain";
+		params.allowFullScreen = "true";
+		params.bgcolor = "#869ca7";
+	
+		$('.flv').each(function(index, val)
+		{
+			var mediaID = val.id.split('media-')[1];
 		
-		var flashvars = new Object();
-		flashvars.file = "/media/"+mediaID+'/video.flv';
-		flashvars.dock = true;
+			var flashvars = new Object();
+			flashvars.file = "/media/"+mediaID+'/video.flv';
+			flashvars.dock = true;
 		
-		swfobject.embedSWF( "/assets/jwplayer/player.swf", 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
-	});
+			// swfobject.embedSWF( "/assets/jwplayer/player.swf", 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
+		});
+	}
 }
 
 function formatPageItemTextArea(pageItem)
 {
-	var pageItemHTML = $('<div class="page-item"></div>');
+	var pageItemHTML = $('<div class="page-item text-item"></div>');
 	pageItemHTML.append(cleanFlashHTML(pageItem.data));
 	return pageItemHTML;
 }
 
 function formatPageItemMediaView(pageItem)
 {
-	var pageItemHTML = $('<div class="page-item"></div>');
-	pageItemHTML.append(displayMedia(pageItem.media[0]));
-	return pageItemHTML;
+
+	return displayMedia(pageItem.media[0]);
 }
 
 function displayMedia(mediaItem)
 {
-	var mediaHTML = $('<div class="mediaItem"></div>');
+	var mediaHTML = $('<div class="page-item media-item"></div>');
 	switch(mediaItem.itemType)
 	{
 		case 'pic':
@@ -542,13 +580,20 @@ function displayMedia(mediaItem)
 			break;
 		case 'swf':
 			mediaHTML.append('<div id="media-'+mediaItem.mediaID+'" class="swf" style="height:'+mediaItem.height+'px;width:'+mediaItem.width+'px;">SWF '+mediaItem.title+'</div>');
+			mediaHTML.children('#media-'+mediaItem.mediaID).load('/assets/templates/viewer.html #flash-alt-text', onFlashAltLoaded);
 			break;
 		case 'flv':
 			mediaHTML.append('<div id="media-'+mediaItem.mediaID+'" class="flv" style="height:'+mediaItem.height+'px;width:'+mediaItem.width+'px;background-color:#ccc;">FLV '+mediaItem.title+'</div>');
 			break;
-		
 	}
-	return mediaHTML
+	return mediaHTML;
+}
+
+function onFlashAltLoaded()
+{
+	console.log('alt loaded');
+	activateFLVs();
+	activateSWFs();
 }
 
 // Old learning objects were saved using flash's textfields - which suck at html
