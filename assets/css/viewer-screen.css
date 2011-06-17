@@ -1,0 +1,440 @@
+/**
+	This is the base stylesheet, designed for traditonal large desktop screens.
+	This style is global to every resolution & device.
+	Specific resolution stylesheets should override layout.
+	Theme stylesheets should override design.
+**/
+
+
+/**
+	Classic theme
+**/
+
+body, html
+{
+	color:#4f4f4f;
+	font-family: "Georgia";
+	margin:0;
+	background:#fbf6f1;
+}
+
+h2
+{
+	text-align:center;
+	color:#990000;
+	font-family: "lato";
+	text-shadow: rgba(0, 0, 0, .2) 0px 1px 1px;
+	font-weight:900;
+	font-size:1.6em;
+}
+
+h3
+{
+	text-align:center;
+	color:#990000;
+	font-family: "lato";
+	text-shadow: rgba(0, 0, 0, .2) 0px 1px 1px;
+	font-weight:900;
+	font-size:1.5em;
+}
+
+
+#overview-page p 
+{
+	margin:0 auto;
+	width:85%;
+	line-height:1.4em;
+	text-align:justify;
+
+}
+
+#overview-blurb-title
+{
+	font-weight:bold;
+}
+
+#overview-time-estimate
+{
+	display:inline-block;
+	height:270px;
+	background-color:#F5EEEE;
+	width:30%;
+	text-align:center;
+	float:left;
+	
+}
+#overview-time-estimate p
+{
+	font-size:.7em;
+	width:60%;
+	text-align:justify;
+	margin-top:50px;
+}
+
+#learn-time
+{
+	font-size:2.2em;
+	color:#666;
+	font-family:"lato";
+}
+
+
+#ovierview-learning-objective
+{
+	display:inline-block;
+	height:270px;
+	background-color:#F5EEEE;
+	width:70%;
+	text-align:center;
+	float:right;
+	font-family:"Georgia";
+	line-height:1.4em;
+}
+
+#objective
+{
+	text-align:left;
+	font-family:"Georgia";
+	padding:0 30px 0 30px;
+	display:block;
+	font-size:1em;
+}
+
+#objective p, #objective ul
+{
+	text-align:left;
+	font-family:"Georgia";
+	width:100%;
+	line-height:1.4em;
+}
+
+#objective ul
+{
+	padding-left:10px;
+/*	list-style: none;*/
+	list-style-position: inside;
+}
+
+#objective ul li:before
+{
+/*	content: "\00BB \0020";*/
+}
+
+
+#header
+{
+	width: 954px;
+	margin: 0 auto;
+	height: 69px;
+	cursor: default;
+	padding: 0 10px 0 10px;
+	position: relative;
+	
+	font-family: "lato";
+	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
+	background: url('../images/viewer/nav-bg2.png') center repeat-x;
+	background-clip:padding-box;
+				
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 7px;
+	-moz-border-radius-bottomleft: 7px;
+
+	-webkit-border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 0px;
+	-webkit-border-bottom-right-radius: 7px;
+	-webkit-border-bottom-left-radius: 7px;
+	
+	border:solid #ecd3d2 4px;
+	border-top:0px;
+	
+	-moz-box-shadow: 0px 1px 5px #AAA;
+	-webkit-box-shadow: 0px 1px 5px #AAA;
+	box-shadow: 0px 1px 5px #AAA;
+	
+}
+
+#header h1
+{
+	color:white;
+	position:absolute;
+	top:0px;
+	left:10px;
+	margin:0;
+	padding:0;
+	font-size: 1.6em;
+}
+
+#logo
+{
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	width: 144px;
+	height: 23px;
+	background-image: url('../images/viewer/logo.png');
+	text-indent:-9000px;
+}
+
+#navigation
+{
+	position:relative;
+	top:40px;
+	text-align:center;
+}
+
+#content
+{
+	width: 954px;
+	margin:0 auto;
+
+	position:relative;
+}
+
+#overview-page
+{
+	display:block;
+	padding-top:22px;
+		text-align:center;
+}
+
+#overview-page hr
+{
+	width:984px;
+	height:29px;
+	border:0;
+	background: url('../images/viewer/overview-hr.png');
+}
+
+#overview-instructions
+{
+	clear:both;
+	padding-top:10px;
+	padding-bottom:45px;
+	
+}
+
+.button {
+	-moz-box-shadow:inset 0px 1px 0px 0px #eaedf2;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #eaedf2;
+	box-shadow:inset 0px 1px 0px 0px #eaedf2;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bfcae0), color-stop(1, #849bc9) );
+	background:-moz-linear-gradient( center top, #bfcae0 5%, #849bc9 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfcae0', endColorstr='#849bc9');
+	background-color:#bfcae0;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #999;
+	display:inline-block;
+	color:#ffffff;
+	font-family:arial;
+	font-size:1.3em;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #525152;
+	-moz-box-shadow: 0px 1px 5px #AAA;
+	-webkit-box-shadow: 0px 1px 5px #AAA;
+	box-shadow: 0px 1px 5px #AAA;
+	font-family:"lato";
+	letter-spacing:.1em;
+	margin:15px;
+}.button:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #849bc9), color-stop(1, #bfcae0) );
+	background:-moz-linear-gradient( center top, #849bc9 5%, #bfcae0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#849bc9', endColorstr='#bfcae0');
+	background-color:#849bc9;
+}.button:active {
+	position:relative;
+	top:1px;
+}
+
+.content-size-display
+{
+	position: absolute;
+	top: 0px;
+	left: 369px;
+	display: block;
+	border: 1px solid #ccc;
+	border-top:0px;
+	height: 17px;
+	width: 110px;
+	font-size: .7em;
+	padding-top:7px;
+	color:#999;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 3px;
+	-moz-border-radius-bottomleft: 3px;
+
+	-webkit-border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 0px;
+	-webkit-border-bottom-right-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;	
+}
+
+#content-size {
+	left: 360px;
+}
+
+#practice-size
+{
+	left: 485px;
+}
+
+#assessment-size
+{
+	left: 609px;
+}
+
+
+/* ----------- CONTENT PAGE LAYOUTS ----------- */
+.page-layout
+{	
+}
+
+
+.page-layout h2
+{
+	text-align:left;
+	margin:25px 0 30px 0;
+	padding:0;
+	display:block;
+	width:550px;
+}
+
+
+/* ----------- Single Text ----------- */
+.page-layout-1
+{
+	
+	
+}
+
+/* ----------- Media Left, Text Right ----------- */
+.page-layout-2
+{
+	
+	
+}
+
+/* ----------- Media Top, Text Bottom ----------- */
+.page-layout-3
+{
+	
+	
+}
+
+/* ----------- Text Left, Media Right ----------- */
+.page-layout-4
+{
+	
+	
+}
+
+.page-layout-4 .media-item
+{
+	float:right;
+	margin: 0 0 10px 20px;
+}
+
+/* ----------- Media Top, Media Bottom ----------- */
+.page-layout-5
+{
+	
+	
+}
+
+/* ----------- Text Left, Text Right ----------- */
+.page-layout-6
+{
+	
+	
+}
+
+/* ----------- Single Media ----------- */
+.page-layout-7
+{
+	
+	
+}
+
+.page-layout-7 .page-item
+{
+	text-align:center;
+	margin:0 auto;
+}
+
+/* ----------- Custom Layout ----------- */
+.page-layout-8
+{
+	
+	
+}
+
+.swf
+{
+	margin:0 auto;
+}
+
+.flashlogo
+{
+	background:url('../images/viewer/flashplayer-logo.png') center center no-repeat;
+
+}
+
+#flash-alt-text
+{
+	display:block;
+	width:100%;
+	height:100%;
+	border:2px dotted #CCC;
+	background:#EEE url('../images/viewer/flashplayer-logo.png') center center no-repeat;
+	text-align:center;
+	position:relative;
+}
+
+#flash-alt-text p 
+{
+	position:absolute;
+	bottom:0px;
+	width:100%;
+}
+
+/* ----------- Question Page Layouts ----------- */
+.question-page h2
+{
+	text-align:left;
+	margin:25px 0 30px 0;
+	padding:0;
+	display:block;
+	width:550px;
+	color:#444;
+}
+
+.question-page h3
+{
+	text-align:left;
+	margin:55px 0 0 0;
+	padding:0;
+	display:block;
+	width:550px;
+	color:#666;
+}
+
+.question-page .text-item
+{
+	display: block;
+	max-width: 100%;
+	background: #FBF9EF;
+	border: 1px solid #DDD;
+	min-height: 200px;
+	padding: 20px;
+	font-size: 1.3em;
+	line-height:1.5em;
+	-moz-box-shadow: 0px 3px 6px #AAA;
+	box-shadow: 0px 3px 6px #AAA;
+	-webkit-box-shadow: 0px 3px 6px #AAA;
+	margin: 0 27px;
+}

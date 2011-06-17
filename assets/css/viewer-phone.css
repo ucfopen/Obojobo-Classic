@@ -1,0 +1,84 @@
+/**
+	This stylesheet is specifically for phones.  This stylesheet modifies netbook.css.
+	Touch specific information should be put in touch.css.
+**/
+
+body
+{
+	font-size: 16pt;
+	min-width: 1px;
+}
+/*
+#nav-container
+{
+	position: fixed;
+}*/
+
+#nav
+{
+	width: 100%;
+}
+
+#nav-left
+{
+	display: none;
+}
+
+#nav-content
+{
+	width: 100%;
+	height: 77px;
+	/*float: left;*/
+	text-align: center;
+	float: none;
+}
+
+#nav-content h1
+{
+	text-align: center;
+	float: none !important;
+	left: 0px !important;
+}
+
+#nav-right
+{
+	display: none;
+}
+
+#logo
+{
+	/*
+	position: absolute;
+	right: 10px;
+	left: auto;*/
+	display: none;
+}
+
+#content-container
+{
+	/*width: 100%;*/
+	margin: 0;
+}
+
+.content-page
+{
+	/*width: 100%;*/
+	
+}
+
+
+
+.one-column .content-page-item, .two-column .content-page-item
+{
+	width: 90%;
+	clear: left;
+	float: left;
+	margin-left: 5%;
+	/*padding-left: 10px;
+	padding-right: 10px;*/
+}
+
+.content-page-item img
+{
+	width: 100%;
+}
