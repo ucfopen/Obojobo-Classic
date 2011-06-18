@@ -319,6 +319,23 @@ h3
 	
 }
 
+.page-layout-2 .text-item
+{
+	float:right;
+	max-width:49%;
+	
+}
+.page-layout-2 .media-item
+{
+	float:left;
+	margin: 0 20px 10px 0px;
+	max-width:49%;
+}
+.page-layout-2 .media-item img
+{
+	max-width:100%;
+}
+
 /* ----------- Media Top, Text Bottom ----------- */
 .page-layout-3
 {
@@ -326,6 +343,16 @@ h3
 	
 }
 
+.page-layout-3 .media-item
+{
+	text-align:center;
+	
+}
+
+.page-layout-3 img
+{
+	max-width:100%;
+}
 /* ----------- Text Left, Media Right ----------- */
 .page-layout-4
 {
@@ -337,6 +364,18 @@ h3
 {
 	float:right;
 	margin: 0 0 10px 20px;
+	max-width:49%;
+}
+
+.page-layout-4 .text-item
+{
+	float:left;
+	max-width:49%;
+}
+
+.page-layout-4 .media-item img
+{
+	max-width:100%;
 }
 
 /* ----------- Media Top, Media Bottom ----------- */
@@ -437,4 +476,10 @@ h3
 	box-shadow: 0px 3px 6px #AAA;
 	-webkit-box-shadow: 0px 3px 6px #AAA;
 	margin: 0 27px;
+}
+
+
+.question-page .media-item
+{
+	text-align:center;
 }

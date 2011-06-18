@@ -431,9 +431,12 @@ function buildContentPage(index, page)
 	console.log('layout ' + page.layoutID)
 	switch(page.layoutID)
 	{
-		case 4:
+		case '4':
+			console.log('switching')
+			console.log(page.items)
 			pageItems[0] = page.items[1];
 			pageItems[1] = page.items[0];
+			console.log(pageItems)
 			break;
 		default:
 			pageItems = $(page.items);
