@@ -76,13 +76,9 @@
 .subnav-list li {
 	display: inline-block;
 	text-align: center;
-	margin-left: 5px;
-}
-
-#nav-list  .subnav-list  li.selected > a 
-{
-	color:#FFF !important;
-	text-shadow: rgba(0, 0, 0, .8) 0px 1px 1px !important;
+	margin:0px 2px;
+	vertical-align:top;
+	position:relative;
 }
 
 #nav-list .subnav-list li a,#nav-list .subnav-list li a:link,#nav-list .subnav-list li a:visited
@@ -99,7 +95,9 @@
 
 #nav-list .subnav-list  li.selected > a
 {
-	background-color:green;
+	background-color:#f0d08b;
+/*	color:#000 !important;*/
+/*	text-shadow: rgba(0, 0, 0, .8) 0px 1px 1px !important;*/
 }
 
 
@@ -110,6 +108,7 @@
 	width: 27px;
 	-webkit-border-radius: 13px;
 	padding: 0;
+	z-index:80;
 	
 }
 
@@ -143,26 +142,44 @@
 
 .subnav-list-alts
 {
-	border-top: none;
-	display:inline;
-	padding:0px;
+	padding: 1px;
+	border: 1px solid #DDD;
+	-webkit-border-radius: 18px;
+	padding-bottom: 4px;
+	margin-top: 5px;
+	background-color: #AAA;
+	position: absolute;
+	left: -4px;
+	-webkit-box-shadow: -1px 3px 7px #999;
+	padding-top:34px;
+	top:-10px;
+	z-index:10;
+	display:none;
+}
+
+.subnav-list > li:hover .subnav-list-alts
+{
+	display:block;
 }
 
 .subnav-list-alts li
 {
-	display: inline-block;
+	display:block;
+	margin-top:1px;
 }
 
 #navigation .subnav-list-alts > li > a
 {
 	background: #CCC;
 	display: inline-block;
-	height: 27px;
-	width: 27px;
+	height: 23px;
+	width: 23px;
 	-webkit-border-radius: 13px;
 	padding: 0;
 	font-weight:normal;
 	text-transform:lowercase;
+	margin:2px;
+	
 }
 /*.subnav-list-alts a,.subnav-list-alts a:link,.subnav-list-alts a:visited{}*/
 /*.subnav-list-alts a:hover,.subnav-list-alts a:focus{}*/
