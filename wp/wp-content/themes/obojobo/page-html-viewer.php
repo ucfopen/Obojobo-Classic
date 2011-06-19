@@ -11,8 +11,10 @@ add_filter('show_admin_bar', '__return_false');
 <title></title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> -->
+<script type="text/javascript" src="/assets/js/jquery/1.6.1/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script> -->
+<script type="text/javascript" src="/assets/js/swfobject.js"></script>
 <script type="text/javascript" src="/assets/js/viewer.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.history.js"></script>
 
