@@ -29,6 +29,9 @@ var currentSection = -1;
 // Keeps track of the current page thats open
 var curPage
 
+// Keeps track of the current question id
+var curQuestionID
+
 // Keeps track of the previously viewed pages for each section so that the user returns to the same page when switching sections
 var prevContentPage = 1;
 var prevPracticePage = 1;
@@ -50,6 +53,9 @@ var assessmentQuestions
 var visitedPages = new Array();
 var visitedPractice = new Array();
 var visitedAssessment = new Array();
+
+// array of selected answers
+var questionAnswers = new Object();
 
 $(window).load(function()
 {	
@@ -78,7 +84,6 @@ $(window).load(function()
 				var len = results.rows.length, i;
 				if(results.rows.length)
 				{
-					//console.log(results.rows.item(0).loJSON)
 					onGetLO(results.rows.item(0).loJSON);
 				}
 				else
@@ -101,6 +106,12 @@ $(window).load(function()
 	}
 
 });
+
+function onImgLoad(e)
+{
+	console.log('image loaded')
+	console.log(this)
+}
 
 // ------------------------ SERVER COMMUNICATION ------------------------------//
 function makeCall(method, callback, arguments)
@@ -139,8 +150,8 @@ function onGetLO(result)
 		localStorage['lo'+lo.loID] = result;
 	}
 	
-	$('#lo-title').text(lo.title);
-	document.title = lo.title + ' | Obojobo Learning Object'
+	$('#lo-title').text(strip(lo.title));
+	document.title = strip(lo.title) + ' | Obojobo Learning Object'
 	// process the question banks
 	processAssessment();
 	
@@ -168,7 +179,6 @@ function processAssessment()
 function checkSession()
 {
 	var now = new Date().UTC();
-	console.log(now)
 	if(lastSessionCheck + SESSION_TIMEOUT < now)
 	{
 		makeCall('getSessionValid', onGetSessionValid , []);
@@ -189,7 +199,6 @@ function updateHistory(url)
 
 function changePage(section, page)
 {
-	console.log('change page ' + page);
 	if(section != currentSection)
 	{
 		changeSection(section);
@@ -204,7 +213,7 @@ function changePage(section, page)
 			selectedLinkID = '#nav-P-' + page;
 			$('#content').empty();
 			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
-			console.log('page added')
+			$('.pic').load(onImgLoad);
 			curPage = lo.pages[page-1]
 			activateFLVs();
 			activateSWFs();
@@ -219,6 +228,7 @@ function changePage(section, page)
 			$('#content').empty();
 			$('#content').append( buildQuestionPage('Practice', 'PQ', page, lo.pGroup.kids[page-1]) );
 			curPage = lo.pGroup.kids[page-1]
+			curQuestionID = lo.pGroup.kids[page-1].questionID
 			activateFLVs();
 			activateSWFs();
 			updateHistory('practice/'+page+'/');
@@ -242,6 +252,7 @@ function changePage(section, page)
 			$('#content').empty();
 			$('#content').append( buildQuestionPage('Assessment', 'AQ', page, assessmentQuestions[page-1][altIndex]) );
 			curPage = assessmentQuestions[page-1][altIndex]
+			curQuestionID = assessmentQuestions[page-1][altIndex].questionID
 			
 			updateHistory('assessment/'+page+'/');
 			$('#nav-assessment')[0].href = baseURL+'assessment/'+page+'/';
@@ -315,21 +326,32 @@ function onNavPageLinkClick(event)
 
 function onAnswerRadioClicked(event)
 {
-	switch(currentSection)
+	$('.answer-preview').remove();
+	$(curPage.answers).each(function(itemIndex, answer)
 	{
-		case S_PRACTICE:
-		case S_ASSESSMENT:
-			$(curPage.answers).each(function(itemIndex, answer)
+		if(answer.answerID == event.target.value)
+		{
+			questionAnswers[currentSection + curQuestionID] = answer.answerID
+			var weightCSS = ''
+			switch(answer.weight)
 			{
-				if(answer.answerID == event.currentTarget.value)
-				{
-					console.log(answer.weight);
-				}
-			});
-			break;
-		default:
-			break;
+				case '100':
+				case 100:
+					weightCSS = 'answer-preview-correct';
+					break;
+				case '0':
+				case 0:
+					weightCSS = 'answer-preview-wrong';
+					break;
+				
+			}
+			if(viewerMode == MODE_PREVIEW)
+			{
+				$(event.target).parent().append('<span class="answer-preview '+ weightCSS +'">'+answer.weight+'%</span>');
+			}
+			return true;
 		}
+	});
 }
 
 // ======================== BUILDING CONTENT ======================== //
@@ -343,7 +365,7 @@ function showContentPageNav()
 	
 	$(lo.pages).each(function(index, page){
 		index++
-		var pageHTML = $('<li '+(visitedPages[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ page.title +'">' + index +'</a></li>');
+		var pageHTML = $('<li '+(visitedPages[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
 		pList.append(pageHTML);
 		pageHTML.children('a').click(onNavPageLinkClick);
 	});
@@ -407,8 +429,8 @@ function showOverviewPage()
 
 function onOverviewPageLoaded()
 {
-	$("#overview-blurb-title").text(lo.title);
-	$("#title").text(lo.title);
+	$("#overview-blurb-title").text(strip(lo.title));
+	$("#title").text(strip(lo.title));
 	$("#version").text(lo.version + '.' + lo.subVersion);
 	$("#language").text(lo.languageID);
 	$("#objective").append(cleanFlashHTML(lo.objective));
@@ -424,19 +446,15 @@ function buildContentPage(index, page)
 {
 	console.log('pageID: ' +page.pageID);
 	var pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
-	pageHTML.append('<h2>' + page.title + '</h2>'); // add title
+	pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
 	
 	var pageItems = new Array();
 	
-	console.log('layout ' + page.layoutID)
 	switch(page.layoutID)
 	{
 		case '4':
-			console.log('switching')
-			console.log(page.items)
 			pageItems[0] = page.items[1];
 			pageItems[1] = page.items[0];
-			console.log(pageItems)
 			break;
 		default:
 			pageItems = $(page.items);
@@ -462,25 +480,42 @@ function buildContentPage(index, page)
 
 function buildQuestionPage(sectionName, baseid, index, question)
 {
-	console.log('questionID: ' +question.questionID);
-	
 	// init container
 	var page = $('<div id="'+baseid+'-'+index+'" class="question-page question-type-'+ question.itemType +'"></div>');
 	page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
 	
-	// build page components
-	$(question.items).each(function(itemIndex, item)
+	// question has multiple page items
+	if(question.items.length > 1)
 	{
-		switch(item.component)
+		// media left, text right
+		if(question.items[0].component == 'MediaView' && question.items[1].component == 'TextArea')
+		{
+			page.addClass('page-layout-2');
+			page.append(formatPageItemMediaView(question.items[0]));
+			page.append(formatPageItemTextArea(question.items[1]));
+		}
+		// text left, media right
+		if(question.items[0].component == 'TextArea' && question.items[1].component == 'MediaView')
+		{
+			page.addClass('page-layout-4');
+			page.append(formatPageItemMediaView(question.items[1]));
+			page.append(formatPageItemTextArea(question.items[0]));
+		}
+	}
+	// question has a single page item
+	else
+	{
+		switch(question.items[0].component)
 		{
 			case 'MediaView':
-				page.append(formatPageItemMediaView(item));
+				page.append(formatPageItemMediaView(question.items[0]));
 				break;
 			case 'TextArea':
-				page.append(formatPageItemTextArea(item));
+				page.append(formatPageItemTextArea(question.items[0]));
 				break;
 		}
-	});
+	}
+	
 	
 	// build answer form input
 	switch(question.itemType)
@@ -488,9 +523,8 @@ function buildQuestionPage(sectionName, baseid, index, question)
 		case 'MC':
 			page.append('<h3>Choose one of the following answers:</h3>');
 			page.append(buildMCAnswers(question.questionID, question.answers));
-			// listen to answer clicks
-			$('.answer-list :input').die('click', onAnswerRadioClicked);
-			$('.answer-list :input').live('click', onAnswerRadioClicked);
+			// listen to answer clicks (resets all previous listeners first)
+			$('.answer-list :input').die('click', onAnswerRadioClicked).live('click', onAnswerRadioClicked);
 			
 			break;
 		case 'Media':
@@ -505,10 +539,9 @@ function buildMCAnswers(questionID, answers)
 	$(answers).each(function(itemIndex, answer)
 	{
 		var answerText = $.trim(cleanFlashHTML(answer.answer));
-		
 		// take extra step to remove containing p tags from answer text
 		// convert lone <p>blah</p> tags to 'blah'
-		pattern = /^<p.*>(.*)<\/p>$/gi;
+		pattern = /^<p.*?>(.*)<\/p>$/gi;
 		answerText = answerText.replace(pattern, '$1');		
 		
 		answersHTML.append('<li class="answer"><input id="'+answer.answerID+'" type="radio" name="QID-'+questionID+'" value="'+answer.answerID+'"><label for="'+answer.answerID+'">' + answerText + '</label></li>');
@@ -526,13 +559,18 @@ function activateSWFs()
 		params.menu = "false";
 		params.allowScriptAccess = "sameDomain";
 		params.allowFullScreen = "true";
-		params.bgcolor = "#869ca7";
+		params.bgcolor = "#FFFFFF";
+		params.align = 't';
+		params.salign = 't';
+		params.wmode = (viewerMode == MODE_PREVIEW ? 'opaque' : 'gpu');
+
 	
 		$('.swf').each(function(index, val)
 		{
-			console.log(val)
 			var mediaID = val.id.split('media-')[1];	
-			swfobject.embedSWF( "/media/"+mediaID, 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
+			$(val).parent('.page-item').css('height', $(val).css('height')).css('width', $(val).css('width'));
+			swfobject.embedSWF( "/media/"+mediaID, 'media-'+mediaID, '100%', '100%', "10",  "/assets/flash/expressInstall.swf", flashvars, params);
+
 		});
 	}
 }
@@ -545,7 +583,11 @@ function activateFLVs()
 		params.menu = "false";
 		params.allowScriptAccess = "sameDomain";
 		params.allowFullScreen = "true";
-		params.bgcolor = "#869ca7";
+		params.bgcolor = "#FFFFFF";
+		params.align = 't';
+		params.salign = 't';
+		params.wmode = 'direct';
+		
 	
 		$('.flv').each(function(index, val)
 		{
@@ -553,9 +595,11 @@ function activateFLVs()
 		
 			var flashvars = new Object();
 			flashvars.file = "/media/"+mediaID+'/video.flv';
+			flashvars['controlbar.idlehide'] = true;
+			flashvars['controlbar.position'] = 'over';
 			flashvars.dock = true;
-		
-			// swfobject.embedSWF( "/assets/jwplayer/player.swf", 'media-'+mediaID, parseInt($(val).css('width')), parseInt($(val).css('height')), "10",  "/assets/flash/expressInstall.swf", flashvars, params);
+			$(val).parent('.page-item').css('height', $(val).css('height')).css('width', $(val).css('width'));
+			swfobject.embedSWF( "/assets/jwplayer/player.swf", 'media-'+mediaID, '100%', '100%', "10",  "/assets/flash/expressInstall.swf", flashvars, params);
 		});
 	}
 }
@@ -583,10 +627,11 @@ function displayMedia(mediaItem)
 			break;
 		case 'swf':
 			mediaHTML.append('<div id="media-'+mediaItem.mediaID+'" class="swf" style="height:'+mediaItem.height+'px;width:'+mediaItem.width+'px;">SWF '+mediaItem.title+'</div>');
-			mediaHTML.children('#media-'+mediaItem.mediaID).load('/assets/templates/viewer.html #flash-alt-text', onFlashAltLoaded);
+			mediaHTML.children('#media-'+mediaItem.mediaID).load('/assets/templates/viewer.html #swf-alt-text', onFlashAltLoaded);
 			break;
 		case 'flv':
-			mediaHTML.append('<div id="media-'+mediaItem.mediaID+'" class="flv" style="height:'+mediaItem.height+'px;width:'+mediaItem.width+'px;background-color:#ccc;">FLV '+mediaItem.title+'</div>');
+			mediaHTML.append('<div id="media-'+mediaItem.mediaID+'" class="flv" style="height:'+mediaItem.height+'px;width:'+mediaItem.width+'px;">FLV '+mediaItem.title+'</div>');
+			mediaHTML.children('#media-'+mediaItem.mediaID).load('/assets/templates/viewer.html #flv-alt-text', onFLVAltLoaded);
 			break;
 	}
 	return mediaHTML;
@@ -594,9 +639,12 @@ function displayMedia(mediaItem)
 
 function onFlashAltLoaded()
 {
-	console.log('alt loaded');
-	activateFLVs();
 	activateSWFs();
+}
+
+function onFLVAltLoaded()
+{
+	activateFLVs();
 }
 
 // Old learning objects were saved using flash's textfields - which suck at html
@@ -643,3 +691,29 @@ function cleanFlashHTML(input)
 	
 	return input;
 }
+
+
+function strip(html)
+{
+	return html.replace(/</g,'v').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/\"/g, '');
+}
+
+$.fn.imagesLoaded = function(callback){
+  var elems = this.filter('img'),
+      len   = elems.length;
+      
+  elems.bind('load',function(){
+      if (--len <= 0){ callback.call(elems,this); }
+  }).each(function(){
+     // cached images don't fire load sometimes, so we reset src.
+     if (this.complete || this.complete === undefined){
+        var src = this.src;
+        // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+        // data uri bypasses webkit log warning (thx doug jones)
+        this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        this.src = src;
+     }  
+  }); 
+
+  return this;
+};
