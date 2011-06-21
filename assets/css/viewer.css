@@ -44,7 +44,9 @@
 				url('../images/viewer/nav-line.png') top right repeat-y;
 }
 
-#nav-list a,#nav-list a:link,#nav-list a:visited
+#nav-list a,
+#nav-list a:link,
+#nav-list a:visited
 {
 /*	padding: 0px 5px;*/
 	color:#f0d08b;
@@ -59,7 +61,7 @@
 {
 	position: absolute;
 	top: 62px;
-	width: 100%;
+	width: 50%;
 	border-top: none;
 	padding:0px;
 	right:0px;
@@ -67,11 +69,6 @@
 	z-index:100;
 }
 
-.subnav-list a
-{
-	
-	vertical-align:middle;
-}
 
 .subnav-list li {
 	display: inline-block;
@@ -81,7 +78,9 @@
 	position:relative;
 }
 
-#nav-list .subnav-list li a,#nav-list .subnav-list li a:link,#nav-list .subnav-list li a:visited
+#nav-list .subnav-list li a,
+#nav-list .subnav-list li a:link,
+#nav-list .subnav-list li a:visited
 {
 	color:#333;
 	text-shadow: rgba(255, 255, 255, .8) 0px 1px 1px;
@@ -96,25 +95,20 @@
 #nav-list .subnav-list  li.selected > a
 {
 	background-color:#f0d08b;
-/*	color:#000 !important;*/
-/*	text-shadow: rgba(0, 0, 0, .8) 0px 1px 1px !important;*/
 }
 
 
 .subnav-list > li > a {
 	background: #CCC;
 	display: inline-block;
-	height: 27px;
+	height: 24px;
 	width: 27px;
 	-webkit-border-radius: 13px;
 	padding: 0;
 	z-index:80;
+	padding-top:3px;
 	
 }
-
-
-
-/*.subnav-list a:hover,.subnav-list a:focus{}*/
 
 /* ----------- current Link ----------- */
 #nav-list > li.selected > a,
@@ -126,9 +120,16 @@
 
 #nav-list > li.selected > a
 {
-	padding-bottom:23px;
+	padding-bottom:24px;
 	height:55px;
 	background: url('../images/viewer/nav-selected-item.png') bottom center no-repeat;
+}
+
+#nav-list .subnav-list li > a:hover
+{
+	background-color:#f0d08b;
+	color:#000;
+	-webkit-box-shadow: 0px 0px 8px #000;
 }
 
 

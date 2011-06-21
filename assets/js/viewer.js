@@ -64,12 +64,14 @@ $(window).load(function()
 	
 	baseURL = $(location).attr('href');
 	
-	$('#navigation').append('<ul id="nav-list"><li><a class="nav-item" id="'+S_OVERVIEW+'" href="#">Ovierview</a></li><li><a class="nav-item" id="'+S_CONTENT+'" href="#">Content</a></li><li><a class="nav-item" id="'+S_PRACTICE+'" href="#">Practice</a></li><li><a class="nav-item" id="'+S_ASSESSMENT+'" href="#">Assessment</a></li></ul>');
+	$('nav').append('<ul id="nav-list"><li><a class="nav-item" id="'+S_OVERVIEW+'" href="#">Ovierview</a></li><li><a class="nav-item" id="'+S_CONTENT+'" href="#">Content</a></li><li><a class="nav-item" id="'+S_PRACTICE+'" href="#">Practice</a></li><li><a class="nav-item" id="'+S_ASSESSMENT+'" href="#">Assessment</a></li></ul>');
 	$('#nav-list li a').click(onNavSectionLinkClick);
 	$('#nav-overview')[0].href = baseURL + 'overview/';
 	$('#nav-content')[0].href = baseURL + 'page/1/';
 	$('#nav-practice')[0].href = baseURL + 'practice/1/';
-	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';	
+	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';
+	$('#next-page-button').live('click', onNextPressed);
+	$('#prev-page-button').live('click', onPrevPressed);
 	
 	if(USE_OPEN_DATABASE)
 	{
@@ -246,7 +248,7 @@ function changePage(section, page)
 			if(pageRequested != page)
 			{
 				// map the alphabetic letter to an index
-				altIndex = pageRequested.charCodeAt(pageRequested.length-1) - 96
+				altIndex = pageRequested.charCodeAt(pageRequested.length-1) - 97
 			}
 			
 			$('#content').empty();
@@ -354,6 +356,34 @@ function onAnswerRadioClicked(event)
 	});
 }
 
+function onNextPressed(event)
+{
+	event.preventDefault();
+	switch(currentSection)
+	{
+		case S_OVERVIEW:
+			changePage(S_CONTENT, 0)
+			break;
+		case S_CONTENT:
+			changePage(S_CONTENT, prevContentPage + 1)
+			break;
+		
+	}
+}
+
+function onPrevPressed(event)
+{
+	event.preventDefault();
+	switch(currentSection)
+	{
+
+		case S_CONTENT:
+			changePage(S_CONTENT, prevContentPage - 1)
+			break;
+		
+	}
+}
+
 // ======================== BUILDING CONTENT ======================== //
 
 
@@ -410,8 +440,8 @@ function showAssessmentPageNav()
 					return true;
 				}
 				
-				var altVersion = String.fromCharCode(altIndex + 96);
-				var altLink = $('<li><a class="subnav-item-alt" id="nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">' + qIndex + altVersion +'</a></li>');
+				var altVersion = String.fromCharCode(altIndex + 97);
+				var altLink = $('<li><a class="subnav-item-alt" id="nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
 				altListHTML.append(altLink);
 				altLink.children('a').click(onNavPageLinkClick);
 			});
@@ -474,6 +504,9 @@ function buildContentPage(index, page)
 		}
 		
 	});
+	// 
+	pageHTML.append('<div id="page-nav"><a id="prev-page-button" href="'+baseURL + 'page/' + (parseInt(index)-1) +'">&laquo; Prev</a><a id="next-page-button" href="#'+baseURL + 'page/' + (parseInt(index)+1) +'">Next &raquo;</a></div>');
+	// pageHTML.append('<img src="/assets/images/viewer/next-page-bg.png" width="79" height="40" alt="Next Page Bg">');
 	
 	return pageHTML;
 }
@@ -483,7 +516,7 @@ function buildQuestionPage(sectionName, baseid, index, question)
 	// init container
 	var page = $('<div id="'+baseid+'-'+index+'" class="question-page question-type-'+ question.itemType +'"></div>');
 	page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
-	
+	var questionPage = $('<div class="question"></div>');
 	// question has multiple page items
 	if(question.items.length > 1)
 	{
@@ -491,15 +524,15 @@ function buildQuestionPage(sectionName, baseid, index, question)
 		if(question.items[0].component == 'MediaView' && question.items[1].component == 'TextArea')
 		{
 			page.addClass('page-layout-2');
-			page.append(formatPageItemMediaView(question.items[0]));
-			page.append(formatPageItemTextArea(question.items[1]));
+			questionPage.append(formatPageItemMediaView(question.items[0]));
+			questionPage.append(formatPageItemTextArea(question.items[1]));
 		}
 		// text left, media right
 		if(question.items[0].component == 'TextArea' && question.items[1].component == 'MediaView')
 		{
 			page.addClass('page-layout-4');
-			page.append(formatPageItemMediaView(question.items[1]));
-			page.append(formatPageItemTextArea(question.items[0]));
+			questionPage.append(formatPageItemMediaView(question.items[1]));
+			questionPage.append(formatPageItemTextArea(question.items[0]));
 		}
 	}
 	// question has a single page item
@@ -508,13 +541,14 @@ function buildQuestionPage(sectionName, baseid, index, question)
 		switch(question.items[0].component)
 		{
 			case 'MediaView':
-				page.append(formatPageItemMediaView(question.items[0]));
+				questionPage.append(formatPageItemMediaView(question.items[0]));
 				break;
 			case 'TextArea':
-				page.append(formatPageItemTextArea(question.items[0]));
+				questionPage.append(formatPageItemTextArea(question.items[0]));
 				break;
 		}
 	}
+	page.append(questionPage);
 	
 	
 	// build answer form input
