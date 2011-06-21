@@ -33,16 +33,15 @@ var loID = <?php echo $wp_query->query_vars['loID']; ?>;
 <body <?php body_class(); ?>>
 
 
-<div id='header'>
+<header id='header'>
 	<h1 id="lo-title"></h1>
 	<div id='logo'>powered by Obojobo</div>
-	<div id="navigation"></div>
-</div>
-
-	
-	
-
+	<nav id="navigation"></nav>
+</header>
 
 <div id="content"></div>
+
+
+<div id="footer">footer</div>
 
 <?php get_footer('html-viewer'); ?>
