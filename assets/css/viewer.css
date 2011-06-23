@@ -64,13 +64,14 @@
 	width: 50%;
 	border-top: none;
 	padding:0px;
-	right:0px;
+	right: 35px;
 	text-align:right;
 	z-index:100;
 }
 
-
-.subnav-list li {
+.missed-pages-list li,
+.subnav-list li
+{
 	display: inline-block;
 	text-align: center;
 	margin:0px 2px;
@@ -78,6 +79,7 @@
 	position:relative;
 }
 
+.missed-pages-list li a,
 #nav-list .subnav-list li a,
 #nav-list .subnav-list li a:link,
 #nav-list .subnav-list li a:visited
@@ -98,6 +100,7 @@
 }
 
 
+.missed-pages-list > li > a,
 .subnav-list > li > a {
 	background: #CCC;
 	display: inline-block;
@@ -125,6 +128,7 @@
 	background: url('../images/viewer/nav-selected-item.png') bottom center no-repeat;
 }
 
+.missed-pages-list li > a:hover,
 #nav-list .subnav-list li > a:hover
 {
 	background-color:#f0d08b;
@@ -242,3 +246,34 @@ li > input[type="radio"]:checked+label
 	color:#222;
 }
 
+
+.missed-pages-list li a 
+{
+	font-family: "lato";
+	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
+	height: 35px;
+	width: 40px;
+	-webkit-border-radius: 40px;
+	font-size: 1.5em;
+	font-family: "lato";
+	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
+	text-decoration:none;
+}
+
+.missed-pages-list
+{
+	background: #f7e8c7;
+	display: inline-block;
+	width: auto;
+	padding: 0;
+	margin: 0;
+	min-width: 60%;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	padding: 11px 20px;
+	margin: 26px 0px 0 0px;
+	-moz-box-shadow: inset 0px 1px 3px #AAA;
+	-webkit-box-shadow: inset 0px 1px 3px #AAA;
+	box-shadow: inset 0px 1px 3px #AAA;
+}

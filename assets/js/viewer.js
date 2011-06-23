@@ -25,9 +25,11 @@ var sectionIDs =  new Array('section-overview', 'section-content', 'section-prac
 
 // Keeps track of the currently open section
 var currentSection = -1;
+var currentSectionIndex = -1;
 
 // Keeps track of the current page thats open
 var curPage
+var curPageIndex
 
 // Keeps track of the current question id
 var curQuestionID
@@ -64,18 +66,28 @@ $(window).load(function()
 	
 	baseURL = $(location).attr('href');
 	
-	$('nav').append('<ul id="nav-list"><li><a class="nav-item" id="'+S_OVERVIEW+'" href="#">Ovierview</a></li><li><a class="nav-item" id="'+S_CONTENT+'" href="#">Content</a></li><li><a class="nav-item" id="'+S_PRACTICE+'" href="#">Practice</a></li><li><a class="nav-item" id="'+S_ASSESSMENT+'" href="#">Assessment</a></li></ul>');
-	$('#nav-list li a').click(onNavSectionLinkClick);
+	// load the main template's children into the page
+	$('body').load('/assets/templates/viewer.html #template-main > *', onTemplateLoadInitial);
+});
+
+function onTemplateLoadInitial()
+{
+	// Set up all the navigation Links
+	$('#nav-list li a').click(onNavSectionLinkClick); // universal listener for nav list links
+	
+	// set the href's so the mouse-over and default click funcionality do what we want
 	$('#nav-overview')[0].href = baseURL + 'overview/';
 	$('#nav-content')[0].href = baseURL + 'page/1/';
 	$('#nav-practice')[0].href = baseURL + 'practice/1/';
 	$('#nav-assessment')[0].href = baseURL + 'assessment/1/';
-	$('#next-page-button').live('click', onNextPressed);
-	$('#prev-page-button').live('click', onPrevPressed);
+	$('#next-page-button').click(onNextPressed);
+	$('.next-section-button').live('click', onNextPressed)
 	
+	
+	// lets set up the db and see if the lo we're looking for is already stored
 	if(USE_OPEN_DATABASE)
 	{
-		// lets set up the db and see if the lo we're looking for is already stored
+		
 		var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
 		db.transaction(function (tx)
 		{
@@ -95,6 +107,7 @@ $(window).load(function()
 			});
 		});
 	}
+	// Check local storage for the LO
 	if(USE_LOCAL_STORAGE)
 	{
 		if(localStorage['lo'+loID])
@@ -106,14 +119,9 @@ $(window).load(function()
 			makeCall('getLO', onGetLO, [loID]);
 		}	
 	}
-
-});
-
-function onImgLoad(e)
-{
-	console.log('image loaded')
-	console.log(this)
+	
 }
+
 
 // ------------------------ SERVER COMMUNICATION ------------------------------//
 function makeCall(method, callback, arguments)
@@ -199,8 +207,17 @@ function updateHistory(url)
 	//history.pushState(null, null, baseURL+url);
 }
 
+function onFinalContentPageLoaded(event)
+{
+	var missedPages = $('.subnav-list > li:not(.visited)')
+	missedPages.clone().appendTo('.missed-pages-list')
+	$('.missed-pages-list a').click(onNavPageLinkClick);
+}
+
 function changePage(section, page)
 {
+	console.log(section + ' ' + page)
+	console.log(visitedPractice)
 	if(section != currentSection)
 	{
 		changeSection(section);
@@ -212,60 +229,185 @@ function changePage(section, page)
 			break;
 		case S_CONTENT:
 			if(page == 0 ) page = prevContentPage;
-			selectedLinkID = '#nav-P-' + page;
+			selectedLinkID = '.nav-P-' + page;
 			$('#content').empty();
-			$('#content').append( buildContentPage(page, lo.pages[page-1]) );
-			$('.pic').load(onImgLoad);
-			curPage = lo.pages[page-1]
-			activateFLVs();
-			activateSWFs();
-			updateHistory('page/'+page+'/');
-			$('#nav-content')[0].href = baseURL+'page/'+page+'/';
-			prevContentPage = page;
-			visitedPages[page] = true;
+			// requested page is less then the last page
+			if(lo.pages.length >= page)
+			{
+				$('#content').append( buildContentPage(page, lo.pages[page-1]) );
+				curPage = lo.pages[page-1]
+				curPageIndex = page-1
+				activateFLVs();
+				activateSWFs();
+				updateHistory('page/'+page+'/');
+				$('#nav-content')[0].href = baseURL+'page/'+page+'/';
+				prevContentPage = page;
+				visitedPages[page-1] = true;
+				$('#next-page-button').removeClass('hide')
+			}
+			// requested page is beyond the last page - show the final content page
+			else
+			{
+				
+				// check the number of visited pages vs the number of pages
+				if(visitedPages.join('').split('true').length - 1 == lo.pages.length)
+				{
+					// all content pages seen
+					$('#content').load('/assets/templates/viewer.html #template-final-content-page-complete');
+				}
+				else
+				{
+					// some content pages missed
+					$('#content').load('/assets/templates/viewer.html #template-final-content-page-incomplete', onFinalContentPageLoaded);
+				}
+				curPageIndex = page-1
+				$('#next-page-button').addClass('hide')
+			}
 			break;
 		case S_PRACTICE:
-			if(page == 0 ) page = prevPracticePage;
-			selectedLinkID = '#nav-PQ-' + page;
-			$('#content').empty();
-			$('#content').append( buildQuestionPage('Practice', 'PQ', page, lo.pGroup.kids[page-1]) );
-			curPage = lo.pGroup.kids[page-1]
-			curQuestionID = lo.pGroup.kids[page-1].questionID
-			activateFLVs();
-			activateSWFs();
-			updateHistory('practice/'+page+'/');
-			$('#nav-practice')[0].href = baseURL+'practiece/'+page+'/';
-			prevPracticePage = page
-			visitedPractice[page] = true
-			break;
-		case S_ASSESSMENT:
-			if(page == 0 ) page = prevAssessmentPage;
-			selectedLinkID = '#nav-AQ-' + page;
-			var altIndex = 0;
-			var pageRequested = page
-			page = parseInt(page);
-			// test to see if the page has alternates in it
-			if(pageRequested != page)
+			// show the practice overview if the requested page is 0 and no practice pages have been seen
+			if(page == 0 && visitedPractice.length == 0)
 			{
-				// map the alphabetic letter to an index
-				altIndex = pageRequested.charCodeAt(pageRequested.length-1) - 97
+				$('#content').load('/assets/templates/viewer.html #practice-overview', onTemplateLoadPracticeOverview);
+				$('.subnav-list').addClass('hide')
+				$('#next-page-button').addClass('hide')
+				curPageIndex = -1
+			}
+			// show the practice question
+			else
+			{
+				$('.subnav-list').removeClass('hide')
+				$('#next-page-button').removeClass('hide')
+				if(page == 0 ) page = prevPracticePage;
+				selectedLinkID = '.nav-PQ-' + page;
+				$('#content').empty();
+				$('#content').append( buildQuestionPage('Practice', 'PQ', page, lo.pGroup.kids[page-1]) );
+				curPage = lo.pGroup.kids[page-1]
+				curPageIndex = page-1
+				curQuestionID = lo.pGroup.kids[page-1].questionID
+				activateFLVs();
+				activateSWFs();
+				updateHistory('practice/'+page+'/');
+				$('#nav-practice')[0].href = baseURL+'practiece/'+page+'/';
+				prevPracticePage = page
+				visitedPractice[page-1] = true
+				$('#next-page-button').removeClass('hide')
 			}
 			
-			$('#content').empty();
-			$('#content').append( buildQuestionPage('Assessment', 'AQ', page, assessmentQuestions[page-1][altIndex]) );
-			curPage = assessmentQuestions[page-1][altIndex]
-			curQuestionID = assessmentQuestions[page-1][altIndex].questionID
+			break;
+		case S_ASSESSMENT:
+			// show the assessment overview if the requested page is 0 and no practice pages have been seen
+			if(page == 0 && visitedAssessment.length == 0)
+			{
+				$('#content').load('/assets/templates/viewer.html #assessment-overview', onTemplateLoadAssessmentOverview);
+				$('.subnav-list').addClass('hide')
+				$('#next-page-button').addClass('hide')
+				curPageIndex = -1
+			}
+			else
+			{
+				if(page == 0 ) page = prevAssessmentPage;
+				selectedLinkID = '.nav-AQ-' + page;
+				var altIndex = 0;
+				var pageRequested = page
+				page = parseInt(page);
+				// test to see if the page has alternates in it
+				if(pageRequested != page)
+				{
+					// map the alphabetic letter to an index
+					altIndex = pageRequested.charCodeAt(pageRequested.length-1) - 97
+				}
 			
-			updateHistory('assessment/'+page+'/');
-			$('#nav-assessment')[0].href = baseURL+'assessment/'+page+'/';
-			prevAssessmentPage = page
-			visitedAssessment[page] = true
+				$('#content').empty();
+				$('#content').append( buildQuestionPage('Assessment', 'AQ', page, assessmentQuestions[page-1][altIndex]) );
+				curPage = assessmentQuestions[page-1][altIndex]
+				curPageIndex = page-1
+				curQuestionID = assessmentQuestions[page-1][altIndex].questionID
+			
+				updateHistory('assessment/'+page+'/');
+				$('#nav-assessment')[0].href = baseURL+'assessment/'+page+'/';
+				prevAssessmentPage = page
+				visitedAssessment[page] = true
+				$('.subnav-list').removeClass('hide')
+				$('#next-page-button').removeClass('hide')
+			}
 			break;
 	}
 	$('#nav-list ul.subnav-list li').removeClass('selected'); // reset the class for page links
 	$(selectedLinkID).parent('li').addClass('selected'); // set the current selected
 	$(selectedLinkID).parent('li').addClass('visited'); // set the current as visited
 
+}
+
+function onTemplateLoadPracticeOverview(event)
+{
+	$('.icon-dynamic-background').text(lo.pGroup.kids.length).next().prepend(lo.pGroup.kids.length)
+}
+
+
+function onTemplateLoadAssessmentOverview(event)
+{
+	// set the dynamic icons
+	$('.icon-dynamic-background:eq(0)').text(assessmentQuestions.length).next().prepend(assessmentQuestions.length) // number of questions
+	$('.icon-dynamic-background:eq(1)').text(3).next().prepend(3) // number of assessments remaining
+	
+	var hidePages = true;
+	var hidePractice = true;
+	
+	// determine which content pages weren't seen
+	var contentPagesVisited = visitedPages.join('').split('true').length - 1
+	if(contentPagesVisited < lo.pages.length)
+	{
+		var pListHTML = $('#assessment-overview .missed-pages-list:eq(0)');
+		$(lo.pages).each(function(index, page)
+		{
+			if(!visitedPages[index])
+			{
+				hidePages = false;
+				index++
+				var pageHTML = $('<li><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
+				pListHTML.append(pageHTML);
+				pageHTML.children('a').click(onNavPageLinkClick);
+			}
+		});
+	}
+	
+	// determine which practice pages weren't seen
+	var practiceVisited = visitedPractice.join('').split('true').length - 1
+	if(practiceVisited < lo.pGroup.kids.length)
+	{
+		var qListHTML = $('#assessment-overview .missed-pages-list:eq(1)');
+		$(lo.pGroup.kids).each(function(index, question)
+		{
+			if(!visitedPractice[index])
+			{
+				hidePractice = false;
+				index++;
+				var qLink = $('<li><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
+				qListHTML.append(qLink)
+				qLink.children('a').click(onNavPageLinkClick);
+			}
+		});
+	}
+	
+	if(hidePages && hidePractice)
+	{
+		$('#assessment-overview section:eq(1)').remove();
+	}
+	else
+	{
+		if(hidePages)
+		{
+			$('#assessment-overview .missed-section:eq(0)').remove();
+		}
+		if(hidePractice)
+		{
+			$('#assessment-overview .missed-section:eq(1)').remove();
+		}
+	}
+	
+
+	
 }
 
 function changeSection(section)
@@ -277,21 +419,27 @@ function changeSection(section)
 	switch(section)
 	{
 		case S_OVERVIEW:
+			$('#next-page-button').addClass('hide')
+			currentSectionIndex = 0
 			showOverviewPage();
 			updateHistory('overview/');
 			break;
 		case S_CONTENT:
+			currentSectionIndex = 1
 			showContentPageNav();
 			break;
 		case S_PRACTICE:
+			currentSectionIndex = 2
 			showPracticePageNav();
 			break;
 		case S_ASSESSMENT:
+			currentSectionIndex = 3
 			showAssessmentPageNav();
 			break;
 	}
 	$('#'+section).parent('li').addClass('selected');
 	currentSection = section;
+	
 	
 	// $.history.load(sectionHashes[currentSection]);
 }
@@ -307,23 +455,28 @@ function onNavSectionLinkClick(event)
 function onNavPageLinkClick(event)
 {
 	event.preventDefault();
+
+	// get the page number and section from the id	
+	var pattern = /.*nav-(\w{1,2})-(\d{1,2})([a-zA-Z]*).*/gi; // pattern matching stuff like 'nav-P-2' for content page 2
 	
-	// get the page number and section from the id
-	pattern = /^nav-(\w*)-(\d*)(\w?)$/gi;
-	event.currentTarget.id.match(pattern);
-	
-	switch(RegExp.$1)
+	// check for a matching class
+	if($(event.target).attr('class').match(pattern))
 	{
-		case 'P':
-			changePage(S_CONTENT, RegExp.$2);
-			break;
-		case 'PQ':
-			changePage(S_PRACTICE, RegExp.$2);
-			break
-		case 'AQ':
-			changePage(S_ASSESSMENT, RegExp.$2+RegExp.$3);
-			break;
+		switch(RegExp.$1)
+		{
+			case 'P':
+				changePage(S_CONTENT, parseInt(RegExp.$2));
+				break;
+			case 'PQ':
+				changePage(S_PRACTICE, parseInt(RegExp.$2));
+				break
+			case 'AQ':
+				changePage(S_ASSESSMENT, RegExp.$2+RegExp.$3);
+				break;
+		}
+		
 	}
+
 }
 
 function onAnswerRadioClicked(event)
@@ -359,30 +512,46 @@ function onAnswerRadioClicked(event)
 function onNextPressed(event)
 {
 	event.preventDefault();
+	console.log('next')
 	switch(currentSection)
 	{
 		case S_OVERVIEW:
 			changePage(S_CONTENT, 0)
 			break;
 		case S_CONTENT:
-			changePage(S_CONTENT, prevContentPage + 1)
+			console.log(curPageIndex + 2)
+			console.log(lo.pages.length)
+			if(curPageIndex + 1 > lo.pages.length)
+			{
+				changePage(S_PRACTICE, 0)
+			}
+			else
+			{
+				changePage(S_CONTENT, curPageIndex + 2)
+			}
+			break;
+		case S_PRACTICE:
+			console.log(curPageIndex + ' '+ lo.pGroup.kids.length)
+			if(curPageIndex + 2 > lo.pGroup.kids.length)
+			{
+				changePage(S_ASSESSMENT, 0)
+			}
+			else
+			{
+				changePage(S_PRACTICE, curPageIndex + 2)
+			}
+			
+			break;
+		case S_ASSESSMENT:
+			if(curPageIndex + 2 <= assessmentQuestions.length)
+			{
+				changePage(S_ASSESSMENT, curPageIndex + 2)
+			}
 			break;
 		
 	}
 }
 
-function onPrevPressed(event)
-{
-	event.preventDefault();
-	switch(currentSection)
-	{
-
-		case S_CONTENT:
-			changePage(S_CONTENT, prevContentPage - 1)
-			break;
-		
-	}
-}
 
 // ======================== BUILDING CONTENT ======================== //
 
@@ -395,10 +564,11 @@ function showContentPageNav()
 	
 	$(lo.pages).each(function(index, page){
 		index++
-		var pageHTML = $('<li '+(visitedPages[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-P-'+index+'" href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
+		var pageHTML = $('<li '+(visitedPages[index-1] == true ? 'class="visited"' : '')+'><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
 		pList.append(pageHTML);
 		pageHTML.children('a').click(onNavPageLinkClick);
-	});
+	});	
+	
 }
 
 
@@ -410,7 +580,7 @@ function showPracticePageNav()
 	$(lo.pGroup.kids).each(function(index, page)
 	{
 		index++;
-		var qLink = $('<li '+(visitedPractice[index] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
+		var qLink = $('<li '+(visitedPractice[index-1] == true ? 'class="visited"' : '')+'><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 		qListHTML.append(qLink)
 		qLink.children('a').click(onNavPageLinkClick);
 	});
@@ -424,7 +594,7 @@ function showAssessmentPageNav()
 	$(assessmentQuestions).each(function(qIndex, pageGroup)
 	{
 		qIndex++;
-		var qLink = $('<li '+(visitedAssessment[qIndex] == true ? 'class="visited"' : '')+'><a class="subnav-item" id="nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a></li>');
+		var qLink = $('<li '+(visitedAssessment[qIndex] == true ? 'class="visited"' : '')+'><a class="subnav-item nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a></li>');
 		qListHTML.append(qLink);
 		qLink.children('a').click(onNavPageLinkClick);
 		// add nav for preview mode to show alts
@@ -441,7 +611,7 @@ function showAssessmentPageNav()
 				}
 				
 				var altVersion = String.fromCharCode(altIndex + 97);
-				var altLink = $('<li><a class="subnav-item-alt" id="nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
+				var altLink = $('<li><a class="subnav-item-alt nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
 				altListHTML.append(altLink);
 				altLink.children('a').click(onNavPageLinkClick);
 			});
@@ -504,9 +674,6 @@ function buildContentPage(index, page)
 		}
 		
 	});
-	// 
-	pageHTML.append('<div id="page-nav"><a id="prev-page-button" href="'+baseURL + 'page/' + (parseInt(index)-1) +'">&laquo; Prev</a><a id="next-page-button" href="#'+baseURL + 'page/' + (parseInt(index)+1) +'">Next &raquo;</a></div>');
-	// pageHTML.append('<img src="/assets/images/viewer/next-page-bg.png" width="79" height="40" alt="Next Page Bg">');
 	
 	return pageHTML;
 }
@@ -575,8 +742,8 @@ function buildMCAnswers(questionID, answers)
 		var answerText = $.trim(cleanFlashHTML(answer.answer));
 		// take extra step to remove containing p tags from answer text
 		// convert lone <p>blah</p> tags to 'blah'
-		pattern = /^<p.*?>(.*)<\/p>$/gi;
-		answerText = answerText.replace(pattern, '$1');		
+		var pattern = /^<p.*?>(.*)<\/p>$/gi;
+		answerText = answerText.replace(pattern, '$1');
 		
 		answersHTML.append('<li class="answer"><input id="'+answer.answerID+'" type="radio" name="QID-'+questionID+'" value="'+answer.answerID+'"><label for="'+answer.answerID+'">' + answerText + '</label></li>');
 	});
@@ -731,23 +898,3 @@ function strip(html)
 {
 	return html.replace(/</g,'v').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/\"/g, '');
 }
-
-$.fn.imagesLoaded = function(callback){
-  var elems = this.filter('img'),
-      len   = elems.length;
-      
-  elems.bind('load',function(){
-      if (--len <= 0){ callback.call(elems,this); }
-  }).each(function(){
-     // cached images don't fire load sometimes, so we reset src.
-     if (this.complete || this.complete === undefined){
-        var src = this.src;
-        // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
-        // data uri bypasses webkit log warning (thx doug jones)
-        this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-        this.src = src;
-     }  
-  }); 
-
-  return this;
-};
