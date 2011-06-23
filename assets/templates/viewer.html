@@ -11,6 +11,45 @@
 
 </head>
 <body>
+
+<span id="template-main">
+	<header id='header'>
+		<h1 id="lo-title"></h1>
+		<div id='logo'>powered by Obojobo</div>
+		<nav id="navigation">
+			<ul id="nav-list">
+				<li><a class="nav-item" id="nav-overview" href="#" title="Learning Object Overview">Ovierview</a></li>
+				<li><a class="nav-item" id="nav-content" href="#" title="Content Pages">Content</a></li>
+				<li><a class="nav-item" id="nav-practice" href="#" title="Practice Questions">Practice</a></li>
+				<li><a class="nav-item" id="nav-assessment" href="#" title="Assessment">Assessment</a></li>
+			</ul>
+			<a id="next-page-button" href="#" title="Next Page">Next</a>
+			<a id="settings-button" href="#" title="Settings Menu">Settings</a>
+			<a id="log-out-button" href="#" title="Log Out of Obojobo">Log Out</a></div>
+		</nav>
+	</header>
+	
+	<section id="content"></section>
+
+	<footer id="footer">footer</footer>
+</span>
+
+
+<div class="page-centered" id="template-final-content-page-complete">
+	<h2>Content Section Complete</h2>
+	<p>You can return to any page if you wish to review its contents.</p>
+	<a class="next-section-button" href="#" title="Next Sextion" >Next Section <span class="triange-right"></span></a>
+</div>
+
+
+<div class="page-centered" id="template-final-content-page-incomplete">
+	<h2>You Missed a Page or Two</h2>
+	<ul class="missed-pages-list"></ul>
+	<p>You can visit those pages now or continue to the Practice Section.</p>
+	<a class="next-section-button" href="#">Next Section</a>
+</div>
+
+	
 	
 <span id="overview-page">
 	<h2>Overview:</h2>
@@ -38,7 +77,7 @@
 	<span id="practice-size" class="content-size-display">practice-size</span>
 	<span id="assessment-size" class="content-size-display">assessment-size</span>
 	
-	<a id="next-page-button">Next Section &#187;</a>
+	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
 </span>
 
 <div id="swf-alt-text">
@@ -48,6 +87,51 @@
 <div id="flv-alt-text">
 	<p>This video requires a version of Adobe Flash Plugin you don't have installed.<br><a class="button" href="http://get.adobe.com/flashplayer/" target="_blank">Download Flash</a></p>
 </div>
+
+
+<div id="practice-overview">
+	<h2>Practice Your Knowledge</h2>
+	<p>Welcome to the Practice Section.  This section is optional but recommended to help you prepare for the questions in the Assessment Section.</p>
+	<ul class="overview-feature-list">
+		<li><figure><span class="icon-dynamic-background"></span><figcaption> questions</figcaption></figure></li>
+		<li><figure><img src="/assets/images/viewer/icon-unlimited-attempts.png"><figcaption>Unlimited attempts</figcaption></figure></li>
+		<li><figure><img src="/assets/images/viewer/icon-scores-not-recorded.png"><figcaption>Scores not recorded</figcaption></figure></li>
+	</ul>
+	 <h3>How Practice Works</h3>
+	<p>Welcome to the Assessment section.  This section is required and will be scored.  Please review this overview before you begin.</p>
+	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+</div>
+
+<div id="assessment-overview">
+	<section>
+		<h2>It's Time to Test Your Knowledge</h2>
+		<!-- <p>Its serious now. This is the final assessment for this learning object.  Make sure you're ready to begin because you cant go back.</p> -->
+		<ul class="overview-feature-list">
+			<li><figure><span class="icon-dynamic-background"></span><figcaption> Questions</figcaption></figure></li>
+			<li><figure><span class="icon-dynamic-background"></span><figcaption> Attempts remaining</figcaption></figure></li>
+			<li><figure><img src="/assets/images/viewer/icon-scores-are-recorded.png"><figcaption>Your highest attempt score counts</figcaption></figure></li>
+			<li><figure><img src="/assets/images/viewer/icon-cant-review-content.png"><figcaption>Content section closed</figcaption></figure></li>
+		</ul>
+		<h3>How Assessment Works</h3>
+		<p>You will receive two attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
+	</section>
+	<section>
+		<h3>You Missed a Page or Two</h3>
+		<p>You can proceed to the Assessment at any time, however reviewing any content you missed may help you achieve a higher score.  Click any of the page icons below to jump directly to a page you missed.</p>
+		<section class="missed-section">
+			<h4>Missed Content Pages:</h4>
+			<ul class="missed-pages-list assessment"></ul>
+		</section>
+		<section class="missed-section">
+			<h4>Missed Practice Questions:</h4>
+			<ul class="missed-pages-list assessment"></ul>
+		</section>
+	</section>
+	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+	
+</div>
+
+
 
 
 </body>
