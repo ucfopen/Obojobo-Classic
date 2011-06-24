@@ -31,7 +31,13 @@
 	
 	<section id="content"></section>
 
-	<footer id="footer">footer</footer>
+	<footer id="footer">
+		<div class="footer-container">
+			<h5>Content created using Obojobo™<br> © 2011 University of Central Florida</h5>
+			<p>Some content is used under Creative Commons.  <a href="#">View license details</a>.</p>
+			<p>Learning object created by: Ian Turgeon, Zach Berry, Francisca Yonekura, and Keegan Berry</p>
+		</div>
+	</footer>
 </span>
 
 
@@ -46,37 +52,33 @@
 	<h2>You Missed a Page or Two</h2>
 	<ul class="missed-pages-list"></ul>
 	<p>You can visit those pages now or continue to the Practice Section.</p>
-	<a class="next-section-button" href="#">Next Section</a>
+	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
 </div>
 
 	
 	
 <span id="overview-page">
-	<h2>Overview:</h2>
+	<h2>Overview</h2>
 	<p>Welcome to the '<span id="overview-blurb-title">Title</span>' learning object.  This object has four sections - this overview page, a content section to teach you about this topic, a self-paced practice quiz to test yourself on your knowledge of the topic, and finally a recorded assessment quiz to prove your mastery of the subject.<p>
-	
 	<hr>
-	
-	<div id="overview-time-estimate">
-		<h3>Time Estimate:</h3>
-		<span id="learn-time">10 Min.</span>
-		<p>This is how long the author has estimated it will take to complete this learning object.</p>
+	<div class="overview-details">
+		<section id="overview-time-estimate">
+			<h3>Time Estimate</h3>
+			<span id="learn-time">10 Min.</span>
+			<p>This is how long the author has estimated it will take to complete this learning object.</p>
+		</section>
+		<section id="ovierview-learning-objective">
+			<h3>Learning Objective - What you will learn</h3>
+			<span id="objective"></span>
+		</section>
+		<span id="content-size" class="content-size-display">content-size</span>
+		<span id="practice-size" class="content-size-display">practice-size</span>
+		<span id="assessment-size" class="content-size-display">assessment-size</span>
 	</div>
-	
-	<div id="ovierview-learning-objective">
-		<h3>Learning Objective - What you will learn:</h3>
-		<span id="objective"></span>
-	</div>
-	
-	<div id="overview-instructions">
-		<h3>How to navigate:</h3>
+	<section id="overview-instructions">
+		<h3>How to navigate</h3>
 		<p>Click '<em>Next Section</em>' below to move on to the '<em>Content</em>' section and start learning more about this topic.  You can also select a section from the bar at the top to move freely between this section, the 'Lesson' and the '<em>Practice</em>' sections.  When you feel you are prepared, move to the '<em>Assessment</em>' section and take the Assessment quiz.</p>
-	</div>
-	
-	<span id="content-size" class="content-size-display">content-size</span>
-	<span id="practice-size" class="content-size-display">practice-size</span>
-	<span id="assessment-size" class="content-size-display">assessment-size</span>
-	
+	</section>
 	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
 </span>
 
@@ -90,18 +92,17 @@
 
 
 <div id="practice-overview">
-	<h2>Practice Your Knowledge</h2>
+	<h2>Practice What You Learned</h2>
 	<hr>
-	<p>Welcome to the Practice Section.  This section is optional but recommended to help you prepare for the questions in the Assessment Section.</p>
 	<ul class="overview-feature-list">
 		<li><figure><span class="icon-dynamic-background"></span><figcaption> questions</figcaption></figure></li>
 		<li><figure><img src="/assets/images/viewer/icon-unlimited-attempts.png"><figcaption>Unlimited attempts</figcaption></figure></li>
 		<li><figure><img src="/assets/images/viewer/icon-scores-not-recorded.png"><figcaption>Scores not recorded</figcaption></figure></li>
 	</ul>
 	 <h3>How Practice Works</h3>
-	<p>Welcome to the Assessment section.  This section is required and will be scored.  Please review this overview before you begin.</p>
+	<p>This section is optional but recommended to help you prepare for the questions in the Assessment Section. Unlike the Assessment, you are free to review the content at any time.  You will also receive feedback on your answers when available.</p>
 		<hr>
-	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+	<a class="next-section-button" href="#">Begin Practice <span class="triange-right"></span></a>
 </div>
 
 <div id="assessment-overview">
@@ -110,7 +111,7 @@
 		<hr>
 		<ul class="overview-feature-list">
 			<li><figure><span class="icon-dynamic-background"></span><figcaption> Questions</figcaption></figure></li>
-			<li><figure><span class="icon-dynamic-background"></span><figcaption> Attempts remaining</figcaption></figure></li>
+			<li><figure><span class="icon-dynamic-background assessment-attempt-count"></span><figcaption class="assessment-attempt-count"> Attempts remaining</figcaption></figure></li>
 			<li><figure><img src="/assets/images/viewer/icon-scores-are-recorded.png"><figcaption>Your highest attempt score counts</figcaption></figure></li>
 			<li><figure><img src="/assets/images/viewer/icon-cant-review-content.png"><figcaption>Content section closed</figcaption></figure></li>
 		</ul>
@@ -119,16 +120,16 @@
 			<h4>You Missed a Page or Two</h4>
 			<p>You can proceed to the Assessment at any time, however reviewing any content you missed may help you achieve a higher score.  <a href="#">You can review those pages here</a>.</p>
 			<ul>
-				<li><figure><span class="icon-missed-count">6</span><figcaption>Content Pages</figcaption></figure></li>
-				<li><figure><span class="icon-missed-count">2</span><figcaption>Practice Questions</figcaption></figure></li>
+				<li><figure><span class="icon-missed-count"></span><figcaption>Content Pages</figcaption></figure></li>
+				<li><figure><span class="icon-missed-count"></span><figcaption>Practice Questions</figcaption></figure></li>
 			</ul>
 		</section>
 		
 		<h3>How Assessment Works</h3>
-		<p>You will receive two attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
+		<p>You will receive <span class="assessment-attempt-count"></span> attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
 	</section>
 	<hr>
-	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+	<a class="next-section-button" href="#">Start Assessment <span class="triange-right"></span></a>
 	
 </div>
 
