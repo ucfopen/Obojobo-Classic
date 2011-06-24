@@ -59,15 +59,22 @@ var visitedAssessment = new Array();
 // array of selected answers
 var questionAnswers = new Object();
 
+var loID;
+
 $(window).load(function()
 {	
 	// TODO: testing debug code
 	viewerMode = MODE_PREVIEW
-	
 	baseURL = $(location).attr('href');
+	
+	// TODO: do this differently
+	// Get the loid from the url variable
+	loID = getURLParam('loid');
+	console.log(loID)
 	
 	// load the main template's children into the page
 	$('body').load('/assets/templates/viewer.html #template-main > *', onTemplateLoadInitial);
+	
 });
 
 function onTemplateLoadInitial()
@@ -637,6 +644,7 @@ function buildContentPage(index, page)
 	
 	switch(page.layoutID)
 	{
+		case 4:
 		case '4':
 			pageItems[0] = page.items[1];
 			pageItems[1] = page.items[0];
@@ -882,4 +890,25 @@ function cleanFlashHTML(input)
 function strip(html)
 {
 	return html.replace(/</g,'v').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/\"/g, '');
+}
+
+function getURLParam(strParamName)
+{
+	var strReturn = "";
+	var strHref = window.location.href;
+	if ( strHref.indexOf("?") > -1 )
+	{
+		var strQueryString = strHref.substr(strHref.indexOf("?")).toLowerCase();
+		var aQueryString = strQueryString.split("&");
+		for ( var iParam = 0; iParam < aQueryString.length; iParam++ )
+		{
+			if ( aQueryString[iParam].indexOf(strParamName.toLowerCase() + "=") > -1 )
+			{
+				var aParam = aQueryString[iParam].split("=");
+				strReturn = aParam[1];
+				break;
+			}
+		}
+	}
+	return unescape(strReturn);
 }
