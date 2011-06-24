@@ -107,6 +107,8 @@
 	height: 24px;
 	width: 27px;
 	-webkit-border-radius: 13px;
+	-moz-border-radius: 13px;
+	border-radius: 13px;
 	padding: 0;
 	z-index:80;
 	padding-top:3px;
@@ -133,7 +135,10 @@
 {
 	background-color:#f0d08b;
 	color:#000;
+	
+	-moz-box-shadow: 0px 0px 8px #000;
 	-webkit-box-shadow: 0px 0px 8px #000;
+	box-shadow: 0px 0px 8px #000;
 }
 
 
@@ -150,12 +155,16 @@
 	padding: 1px;
 	border: 1px solid #DDD;
 	-webkit-border-radius: 18px;
+	-moz-border-radius: 18px;
+	border-radius: 18px;
 	padding-bottom: 4px;
 	margin-top: 5px;
 	background-color: #AAA;
 	position: absolute;
 	left: -4px;
+	-moz-box-shadow: -1px 3px 7px #999;
 	-webkit-box-shadow: -1px 3px 7px #999;
+	box-shadow: -1px 3px 7px #999;
 	padding-top:34px;
 	top:-10px;
 	z-index:10;
@@ -181,6 +190,8 @@
 	height: 23px;
 	width: 23px;
 	-webkit-border-radius: 13px;
+	-moz-border-radius: 13px;
+	border-radius: 13px;
 	padding: 0;
 	font-weight:normal;
 	text-transform:lowercase;
@@ -227,6 +238,7 @@
 	padding:8px 8px 8px 31px;
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
+	border-radius:7px;
 	z-index:40;
 }
 
@@ -254,6 +266,8 @@ li > input[type="radio"]:checked+label
 	height: 35px;
 	width: 40px;
 	-webkit-border-radius: 40px;
+	-mox-border-radius:40px;
+	border-radius:40px;
 	font-size: 1.5em;
 	font-family: "lato";
 	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
@@ -268,7 +282,7 @@ li > input[type="radio"]:checked+label
 	padding: 0;
 	margin: 0;
 	min-width: 60%;
-	-moz-border-radius: 6px;
+	-moz-border-radius: 20px;
 	-webkit-border-radius: 20px;
 	border-radius: 20px;
 	padding: 11px 20px;
