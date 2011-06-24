@@ -41,11 +41,16 @@ h2
 h3
 {
 	text-align:center;
-	color:#990000;
+	color:#555;
 	font-family: "lato";
 	text-shadow: rgba(0, 0, 0, .2) 0px 1px 1px;
-	font-weight:900;
+	font-weight:bold;
 	font-size:1.5em;
+}
+
+#overview-page h3
+{
+	color: #990000;
 }
 
 
@@ -122,7 +127,6 @@ h3
 #objective ul
 {
 	padding-left:10px;
-/*	list-style: none;*/
 	list-style-position: inside;
 }
 
@@ -759,6 +763,67 @@ h3
 	padding-top: 2px;
 	margin: 0 auto;
 }
+
+.icon-missed-count
+{
+	background: #f0d08b;
+	display: block;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	height: 50px;
+	width: 60px;
+	color: #333;
+	text-align: center;
+	padding-top: 8px;
+	font-size: 2.7em;
+	margin: 0 auto;
+	margin-bottom: 10px;
+}
+
+.assessment-missed-section h4
+{
+	width: 50%;
+	margin-left: 250px;
+	font-family: "lato";
+	font-size:1.2em;
+}
+#content .assessment-missed-section p
+{
+	width: 50%;
+	margin-left: 259px;
+	margin-bottom: 20px;
+}
+
+.assessment-missed-section figure
+{
+	display: inline-block;
+	margin: 0;
+	padding: 0 7px;
+	font-size: .8em;
+	width: 73px;
+	margin-top: 27px;
+}
+
+.assessment-missed-section ul
+{
+	padding: 0;
+	list-style: none;
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0px;
+	border-right: 2px solid #fbf6f1;
+	height: 100%;
+	margin: 0;
+	width: 219px;
+	padding: 0;
+}
+.assessment-missed-section li
+{
+	display: inline;
+}
+
 #assessment-overview,
 #practice-overview
 {
@@ -770,10 +835,22 @@ h3
 #practice-overview p
 {
 	margin: 0 auto;
-	width: 85%;
+	width: 65%;
 	line-height: 1.4em;
 	text-align: justify;
 }
+
+#practice-overview hr,
+#assessment-overview hr
+{
+	width:70%;
+	margin-top: 21px;
+	margin-bottom: 14px;
+	border:0px;
+	background-color:#CCC;
+	height:1px;
+}
+
 
 
 .missed-section .missed-pages-list li
@@ -786,7 +863,9 @@ h3
 {
 	height: 21px;
 	width: 22px;
+	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
+	border-radius: 15px;
 	font-size: 0.8em;
 }
 
