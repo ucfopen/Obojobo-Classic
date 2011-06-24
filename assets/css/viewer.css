@@ -277,3 +277,24 @@ li > input[type="radio"]:checked+label
 	-webkit-box-shadow: inset 0px 1px 3px #AAA;
 	box-shadow: inset 0px 1px 3px #AAA;
 }
+
+.assessment-missed-section
+{
+	background: #f7e8c7;
+	display: inline-block;
+	width: auto;
+	width: 60%;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	-moz-box-shadow: inset 0px 1px 3px #AAA;
+	-webkit-box-shadow: inset 0px 1px 3px #AAA;
+	box-shadow: inset 0px 1px 3px #AAA;
+	position: relative;
+}
+
+.assessment-missed-section p
+{
+	width:50%;
+	font-size:.8em;
+}
