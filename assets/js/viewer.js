@@ -217,7 +217,6 @@ function onFinalContentPageLoaded(event)
 function changePage(section, page)
 {
 	console.log(section + ' ' + page)
-	console.log(visitedPractice)
 	if(section != currentSection)
 	{
 		changeSection(section);
@@ -349,67 +348,48 @@ function onTemplateLoadAssessmentOverview(event)
 {
 	// set the dynamic icons
 	$('.icon-dynamic-background:eq(0)').text(assessmentQuestions.length).next().prepend(assessmentQuestions.length) // number of questions
-	$('.icon-dynamic-background:eq(1)').text(3).next().prepend(3) // number of assessments remaining
+	// TODO: add actual attempt count here instead of "3"
+	$('.assessment-attempt-count').prepend(3) // number of assessments remaining
 	
-	var hidePages = true;
-	var hidePractice = true;
-	
-	// determine which content pages weren't seen
-	var contentPagesVisited = visitedPages.join('').split('true').length - 1
-	$('.icon-missed-count:eq(0)').text(contentPagesVisited-lo.pages.length)
-	
-	// code used to create a list of clickable subnavs of content items that were not seen
-	// if(contentPagesVisited < lo.pages.length)
-	// {
-	// 	var pListHTML = $('#assessment-overview .missed-pages-list:eq(0)');
-	// 	$(lo.pages).each(function(index, page)
-	// 	{
-	// 		if(!visitedPages[index])
-	// 		{
-	// 			hidePages = false;
-	// 			index++
-	// 			var pageHTML = $('<li><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
-	// 			pListHTML.append(pageHTML);
-	// 			pageHTML.children('a').click(onNavPageLinkClick);
-	// 		}
-	// 	});
-	// }
+	var showMissingPractice = false
+	var showMissingPages = false
 	
 	// determine which practice pages weren't seen
-	var practiceVisited = visitedPractice.join('').split('true').length - 1
-	$('.icon-missed-count:eq(1)').text(practiceVisited-lo.pGroup.kids.length)
-	// code used to create a list of clickable subnavs of practice items that were not seen
-	// if(practiceVisited < lo.pGroup.kids.length)
-	// {
-	// 	var qListHTML = $('#assessment-overview .missed-pages-list:eq(1)');
-	// 	$(lo.pGroup.kids).each(function(index, question)
-	// 	{
-	// 		if(!visitedPractice[index])
-	// 		{
-	// 			hidePractice = false;
-	// 			index++;
-	// 			var qLink = $('<li><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
-	// 			qListHTML.append(qLink)
-	// 			qLink.children('a').click(onNavPageLinkClick);
-	// 		}
-	// 	});
-	// }
+	var practiceMissed = lo.pGroup.kids.length - ( /* count trues */ visitedPractice.join('').split('true').length - 1 ) 
+	showMissingPractice =  practiceMissed > 0 
 	
-	if(hidePages && hidePractice)
+	// determine which content pages weren't seen
+	var contentMissed = lo.pages.length - ( /* count trues */ visitedPages.join('').split('true').length - 1 ) 
+	showMissingPages =  contentMissed > 0 
+	
+	// Hide everything
+	if(!showMissingPractice && !showMissingPages)
 	{
-		$('#assessment-overview section:eq(1)').remove();
+		$('.assessment-missed-section').remove()
 	}
+	// just hide one or the other
 	else
 	{
-		if(hidePages)
+		// Note this order is important, if you remove the 0 first, index 1 will become 0, booo
+		if(!showMissingPractice)
 		{
-			$('#assessment-overview .missed-section:eq(0)').remove();
+			$('.icon-missed-count:eq(1)').parent().parent().remove()
 		}
-		if(hidePractice)
+		else
 		{
-			$('#assessment-overview .missed-section:eq(1)').remove();
+			$('.icon-missed-count:eq(1)').text(practiceMissed)
+		}
+		if(!showMissingPages)
+		{
+			$('.icon-missed-count:eq(0)').parent().parent().remove()
+		}
+		else
+		{
+			$('.icon-missed-count:eq(0)').text(contentMissed)
 		}
 	}
+
+	
 	
 
 	
