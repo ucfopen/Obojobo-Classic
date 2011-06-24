@@ -322,6 +322,7 @@ h3
 /* ----------- CONTENT PAGE LAYOUTS ----------- */
 .page-layout
 {	
+	list-style-position: inside;
 }
 
 
@@ -352,14 +353,12 @@ h3
 
 .page-layout-2 .text-item
 {
-	float:right;
-	max-width:49%;
 	
 }
 .page-layout-2 .media-item
 {
 	float:left;
-	margin-right:20px;
+	margin-right:30px;
 	max-width:49%;
 }
 .page-layout-2 .media-item img
@@ -377,7 +376,6 @@ h3
 .page-layout-3 .media-item
 {
 	text-align:center;
-	
 }
 
 .page-layout-3 img
@@ -642,13 +640,13 @@ h3
 
 .footer-container
 {
-	height: 36px;
+	height: 33px;
 	width: 907px;
 	margin: 0 auto;
 	position: relative;
-	padding: 0px 10px 0px 36px;
+	padding: 2px 10px 0px 36px;
 	font-size: 0.75em;
-	line-height: 1.4em;
+	line-height: 1.2em;
 	background: url('/assets/images/viewer/icon-creative-commons.png') no-repeat 5px 5px ;
 	border-left: 1px solid #CCC;
 	border-right: 1px solid #CCC;
