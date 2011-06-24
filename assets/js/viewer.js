@@ -356,39 +356,44 @@ function onTemplateLoadAssessmentOverview(event)
 	
 	// determine which content pages weren't seen
 	var contentPagesVisited = visitedPages.join('').split('true').length - 1
-	if(contentPagesVisited < lo.pages.length)
-	{
-		var pListHTML = $('#assessment-overview .missed-pages-list:eq(0)');
-		$(lo.pages).each(function(index, page)
-		{
-			if(!visitedPages[index])
-			{
-				hidePages = false;
-				index++
-				var pageHTML = $('<li><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
-				pListHTML.append(pageHTML);
-				pageHTML.children('a').click(onNavPageLinkClick);
-			}
-		});
-	}
+	$('.icon-missed-count:eq(0)').text(contentPagesVisited-lo.pages.length)
+	
+	// code used to create a list of clickable subnavs of content items that were not seen
+	// if(contentPagesVisited < lo.pages.length)
+	// {
+	// 	var pListHTML = $('#assessment-overview .missed-pages-list:eq(0)');
+	// 	$(lo.pages).each(function(index, page)
+	// 	{
+	// 		if(!visitedPages[index])
+	// 		{
+	// 			hidePages = false;
+	// 			index++
+	// 			var pageHTML = $('<li><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ strip(page.title) +'">' + index +'</a></li>');
+	// 			pListHTML.append(pageHTML);
+	// 			pageHTML.children('a').click(onNavPageLinkClick);
+	// 		}
+	// 	});
+	// }
 	
 	// determine which practice pages weren't seen
 	var practiceVisited = visitedPractice.join('').split('true').length - 1
-	if(practiceVisited < lo.pGroup.kids.length)
-	{
-		var qListHTML = $('#assessment-overview .missed-pages-list:eq(1)');
-		$(lo.pGroup.kids).each(function(index, question)
-		{
-			if(!visitedPractice[index])
-			{
-				hidePractice = false;
-				index++;
-				var qLink = $('<li><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
-				qListHTML.append(qLink)
-				qLink.children('a').click(onNavPageLinkClick);
-			}
-		});
-	}
+	$('.icon-missed-count:eq(1)').text(practiceVisited-lo.pGroup.kids.length)
+	// code used to create a list of clickable subnavs of practice items that were not seen
+	// if(practiceVisited < lo.pGroup.kids.length)
+	// {
+	// 	var qListHTML = $('#assessment-overview .missed-pages-list:eq(1)');
+	// 	$(lo.pGroup.kids).each(function(index, question)
+	// 	{
+	// 		if(!visitedPractice[index])
+	// 		{
+	// 			hidePractice = false;
+	// 			index++;
+	// 			var qLink = $('<li><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
+	// 			qListHTML.append(qLink)
+	// 			qLink.children('a').click(onNavPageLinkClick);
+	// 		}
+	// 	});
+	// }
 	
 	if(hidePages && hidePractice)
 	{
