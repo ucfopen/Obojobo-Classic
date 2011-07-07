@@ -49,21 +49,37 @@ class Log
 	
 	private static function writeLog($output, $fileName=false)
 	{	
-		// create the log directory if it doesnt exist
-		if(!file_exists(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS))
+		try
 		{
-			@mkdir(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS, 0770, true);
+			// create the log directory if it doesnt exist
+			if(!file_exists(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS))
+			{
+				mkdir(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS, 0770, true);
+			}
+			if($fileName)
+			{
+				$f = \AppCfg::DIR_BASE.\AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';
+				$isNewFile = !file_exists($f);
+				$fh = fopen($f, 'a');
+				if($fh)
+				{
+					fwrite($fh, $output);
+					fclose($fh);
+					// if this is new, make sure its group writable
+					if($isNewFile)
+					{
+						chmod($f, 0664);
+					}
+				}
+			}
+			else
+			{
+				error_log($output);
+			}
 		}
-		if($fileName)
+		catch(Exception $e)
 		{
-			$f = \AppCfg::DIR_BASE.\AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';
-			$fh = fopen($f, 'a');
-			fwrite($fh, $output);
-			fclose($fh);
-		}
-		else
-		{
-			@error_log($output);
+			@error_log($e);
 		}
 	}
 	
