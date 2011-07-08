@@ -107,7 +107,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 
 		
 		$sent = $this->mail($student->email, $subject, $body, $headers);
-		\rocketD\util\Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
+		\rocketD\util\Log::profile('email', "'$studentID','$student->email','$score','" . ($sent ? '1' : '0' ). "'\n");
 
 		return $sent;
 	}
