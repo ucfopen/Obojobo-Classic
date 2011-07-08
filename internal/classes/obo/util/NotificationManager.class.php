@@ -33,7 +33,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 		$studentName = $AM->getName($student);
 		
 		// load up template
-		$smarty = new Smarty();
+		$smarty = new \Smarty();
 		$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
 		$smarty->assign('studentName', $studentName);
 		$smarty->assign('courseName', $courseName);
