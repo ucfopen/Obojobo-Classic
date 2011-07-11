@@ -623,10 +623,10 @@ class AuthManager extends \rocketD\db\DBEnabled
 			$q = $this->DBM->querySafe("SELECT auth_module FROM obo_users WHERE login = '?'", $username);
 			if($r = $this->DBM->fetch_obj($q))
 			{
-				$authMod = call_user_func(array($r->{auth_module}, 'getInstance'));
+				$authMod = call_user_func(array($r->auth_module, 'getInstance'));
 				if($authMod)
 				{
-					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, $r->{auth_module});
+					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, $r->auth_module);
 				}
 				return $authMod;
 			}
