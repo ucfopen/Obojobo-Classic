@@ -192,7 +192,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// required stuff not sent, CHECK IF A SINGLE SIGN ON METHOD IS BEING USED
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
 		{
-			// Sammy's SSO Hash for system to system single sign on
+			// *********** Sammy's SSO Hash for system to system single sign on ****************//
 			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 			{
 				$time = microtime(true);
@@ -215,14 +215,13 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				}
 				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'\n");
 			}
-			// CST Single Sign on from the Portal - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php
+			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
 			else if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
 			{
 				$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
 				$validSSO = true;
 				$weakExternalSync = true; // allow the user to not exist in external db
-				// logged in once, clear the session variables
-				$_SESSION['PORTAL_SSO_PASSED'] = 1;
+				// logged in, clear the session variables
 				unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
 				
 				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'\n");
@@ -239,8 +238,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// create/update the user with the external database
 		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
 		
-		trace($user);
-		trace($validSSO);
 		if($user instanceof \rocketD\auth\User)
 		{
 			
