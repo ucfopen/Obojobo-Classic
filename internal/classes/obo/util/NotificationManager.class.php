@@ -22,6 +22,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	public function sendCriticalError($subject, $message)
 	{
 		$this->mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
+		trace($subject . ' ' . $message, true);
 	}
 	
 	public function sendScoreFailureNotice($instructor, $student, $courseName)
