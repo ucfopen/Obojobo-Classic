@@ -2,25 +2,24 @@
 ob_start();
 try
 {
+	require_once(dirname(__FILE__)."/../../internal/app.php");
+	
 	//setup
 	$los = array(1429, 1428, 1427);
+	$targetURL = 'https://obojobo.ucf.edu/sso/portal/redirect.php';
+	$NID = $_REQUEST['nid'];
+	$timestamp = $_REQUEST['epoch'];
+	$hash = $_REQUEST['hash'];
 	$scores = array();
-	$secret = "whoadude324!@#";
-	// $targetURL = 'https://obojobo.ucf.edu/sso/portal/redirect.php';
+
+	// ************* TESTING CODE ************
 	$targetURL = 'http://obo/sso/portal/redirect.php';
-
-
-	$NID = 'footballface';
-	// $NID = $_REQUEST['nid'];
+	$NID = 'funnyfaceman';
 	$timestamp = time();
-	//$timestamp = $_REQUEST['epoch'];
-	$hash = md5($NID.$timestamp.$secret);
-	// $hash = $_REQUEST['hash'];
-
-	require_once(dirname(__FILE__)."/../../internal/app.php");
+	$hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
 
 	// valid hash
-	if(md5($NID.$timestamp.$secret) === $hash && $timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
+	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && $timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
 	{
 	
 		// valid store the session cookie
@@ -28,7 +27,6 @@ try
 		session_start();
 		$_SESSION['PORTAL_SSO_NID'] = $NID;
 		$_SESSION['PORTAL_SSO_EPOCH'] = $timestamp;
-
 	
 		// look for the user
 		$AM  = \rocketD\auth\AuthManager::getInstance();
@@ -65,7 +63,7 @@ try
 	else
 	{
 		$NM = \obo\util\NotificationManager::getInstance();
-		$NM->sendCriticalError('Pagelet - invalid hash', ' calculated has: '. md5($NID.$timestamp.$secret) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
+		$NM->sendCriticalError('Pagelet - invalid hash', ' calculated has: '. md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
 		echo "Session timed out or invalid, refresh the page to update.";
 		exit();
 	}
