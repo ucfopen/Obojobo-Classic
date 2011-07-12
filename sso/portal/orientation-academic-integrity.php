@@ -102,7 +102,6 @@ try
 catch (Exception $e)
 {
 	require_once(dirname(__FILE__)."/../../internal/app.php");
-	
 	$NM = \obo\util\NotificationManager::getInstance();
 	$NM->sendCriticalError('Pagelet Error', print_r($e, true) . print_r($_REQUEST, true),  true);
 	echo "Session timed out or invalid, refresh the page to update.";
