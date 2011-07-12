@@ -20,23 +20,14 @@ if(isset($_REQUEST['instID']) )
 		}
 	}
 }
-$API->getSessionValid();
+$API->getSessionValid(); // needed to get session variables
 trace('SSO REDIRECT ERROR', true);
 trace('isntid:' . $_REQUEST['instID'] . ' nid:' . $_SESSION['PORTAL_SSO_NID'] . ' epoch:' . $_SESSION['PORTAL_SSO_EPOCH'] . ' timed out? ' . ($_SESSION['PORTAL_SSO_EPOCH'] >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes'), true);
 
 
 function redirectToLO($instID)
 {
-	// place the instance id on the list of instances
-	if(!isset($_SESSION['PORTAL_SSO_PASSED']))
-	{
-		$_SESSION['PORTAL_SSO_PASSED'] = $instID;
-	}
-	else
-	{
-		$_SESSION['PORTAL_SSO_PASSED'] .= ',' . $instID;
-	}
-	header('Location: '.\AppCfg::URL_WEB . \AppCfg::URL_VIEWER  . $instID);
+	header('Location: '.\AppCfg::URL_WEB . \AppCfg::URL_VIEWER  . $instID . '?login=myUCF');
 	exit();
 }
 ?>
