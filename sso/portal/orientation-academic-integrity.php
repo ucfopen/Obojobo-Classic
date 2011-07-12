@@ -13,10 +13,10 @@ try
 	$scores = array();
 
 	// ************* TESTING CODE ************
-	$targetURL = 'http://obo/sso/portal/redirect.php';
-	$NID = 'funnyfaceman';
-	$timestamp = time();
-	$hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+	// $targetURL = 'http://obo/sso/portal/redirect.php';
+	// $NID = 'funnyfaceman';
+	// $timestamp = time();
+	// $hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
 
 	// valid hash
 	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && $timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
