@@ -69,7 +69,7 @@ $(window).load(function()
 	
 	// TODO: do this differently
 	// Get the loid from the url variable
-	loID = getURLParam('loid');
+	//loID = getURLParam('loid');
 	console.log(loID)
 	
 	// load the main template's children into the page
@@ -885,7 +885,6 @@ function cleanFlashHTML(input)
 	
 	return input;
 }
-
 
 function strip(html)
 {
