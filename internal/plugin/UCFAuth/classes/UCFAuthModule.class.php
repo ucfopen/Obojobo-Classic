@@ -62,7 +62,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				return false;
 			}
 			$this->DBM->startTransaction();
-			$result = parent::createNewUser( $fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success'] === true)
 			{
 				if(!$this->addRecord($result['userID'], $userName, $optionalVars['MD5Pass']))
@@ -160,7 +160,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($user != false)
 		{
 			$this->DBM->startTransaction();
-			$result = parent::updateUser($userID, $fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success']==true)
 			{
 				// update with md5 pass
@@ -447,7 +447,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						$user->first = $externalUser->{\cfg_plugin_AuthModUCF::FIRST};
 						$user->last = $externalUser->{\cfg_plugin_AuthModUCF::LAST};
 						$user->email = $externalUser->{\cfg_plugin_AuthModUCF::EMAIL};
-						parent::updateUser($user->userID, $user->first, $user->last, $user->mi, $user->email);
+						parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
 					}
 				}
 				else
