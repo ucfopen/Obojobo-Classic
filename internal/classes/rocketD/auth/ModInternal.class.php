@@ -55,7 +55,7 @@ class ModInternal extends AuthModule {
 				return false;
 			}
 			$this->DBM->startTransaction();
-			$result = parent::createNewUser($fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success'] == true)
 			{
 				trace('core user created');
@@ -143,7 +143,7 @@ class ModInternal extends AuthModule {
 		if($user != false)
 		{
 			$this->DBM->startTransaction();
-			$result = parent::updateUser($userID, $fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success']==true)
 			{
 				if($this->updateRecord($userID, $userName, $optionalVars['MD5Pass']))
