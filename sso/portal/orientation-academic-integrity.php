@@ -13,10 +13,10 @@ try
 	$scores = array();
 
 	// ************* TESTING CODE ************
-	// $targetURL = 'http://obo/sso/portal/redirect.php';
-	// $NID = 'funnyfaceman';
-	// $timestamp = time();
-	// $hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+	$targetURL = 'http://obo/sso/portal/redirect.php';
+	$NID = 'rumplefaceman';
+	$timestamp = time();
+	$hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
 
 	// valid hash
 	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && $timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
@@ -63,7 +63,7 @@ try
 	else
 	{
 		$NM = \obo\util\NotificationManager::getInstance();
-		$NM->sendCriticalError('Pagelet - invalid hash', ' calculated has: '. md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
+		$NM->sendCriticalError('Pagelet - invalid hash', ' calculated hash: '. md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
 		echo "Session timed out or invalid, refresh the page to update.";
 		exit();
 	}
@@ -73,28 +73,46 @@ try
 	<html>
 		<head><head>
 		<body bgcolor="#F8F8F8">
-		<p>Are you a new student going through orientation?  If so, you're required to complete the Academic Integrity modules listed below.  Click on each of these module links which will open in a new window.  You'll need to score a 80% or better on each module to pass.</p>
-		<ul>
 		<?php
-			foreach($los AS $key => $selectedinstID)
-			{
+		// we found at least one instances
+		if(count($scores) > 0)
+		{
+			?>
+			<p>Are you an incoming student?  If so, you're required to complete the Academic Integrity modules listed below.  Click on each of these module links which will open in a new window.  You'll need to score a 80% or better on each module to pass.</p>
+			<ul>
+			<?php
+
+				foreach($scores AS $key => $instance)
+				{
+					?>
+					<li>
+						<?php if($instance->score){?>
+							<p style="font-size: 12pt; margin-bottom: 0;"><?php echo $instance->name; ?></p>
+							<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $instance->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $instance->instID; ?>">Take again</a>)</p>
+						<?php } else { ?>
+							<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="<?php echo $targetURL;?>?instID=<?php echo $instance->instID; ?>"><?php echo $instance->name; ?></a></p>
+							<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not yet complete</p>
+						<?php } ?>
+					</li>
+					<?php
+				}
 				?>
-				<li>
-					<?php if($scores[$key]->score){?>
-						<p style="font-size: 12pt; margin-bottom: 0;"><?php echo $scores[$key]->name; ?></p>
-						<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $scores[$key]->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID; ?>">Take again</a>)</p>
-					<?php } else { ?>
-						<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID; ?>"><?php echo $scores[$key]->name; ?></a></p>
-						<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not yet complete</p>
-					<?php } ?>
-				</li>
-				<?php
-			
-			}
-		?>
-		</ul>
+
+			</ul>
 	
-		<p>You will need to complete these before <strong>August 22nd 2011</strong>.  Otherwise you will receive a hold on your account which will prevent you from registering for classes.</p>
+			<p>You will need to complete these before <strong>August 22nd 2011</strong>.  Otherwise you will receive a hold on your account which will prevent you from registering for classes.</p>
+			<?php
+		}
+		// Oh NOs, we couldn't retrieve the learning object instances
+		else
+		{
+			?>
+			<p>The Academic Integrity modules could not be found at this time, please try again later.</p>
+			<?php
+			$NM = \obo\util\NotificationManager::getInstance();
+			$NM->sendCriticalError('Pagelet Error', 'Instances could not be located ' . print_r($scores, true) . print_r($_REQUEST, true),  true);
+		}
+		?>
 		</body>
 	</html>
 	<?php
