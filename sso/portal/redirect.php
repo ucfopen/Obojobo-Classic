@@ -12,7 +12,7 @@ if(isset($_REQUEST['instID']) )
 	}
 
 	// not already logged in, SSO not timed out
-	if( isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - \AppCfg::UCF_PORTAL_TIMEOUT)
+	if( isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && (int)$_SESSION['PORTAL_SSO_EPOCH'] >= time() - \AppCfg::UCF_PORTAL_TIMEOUT)
 	{
 		if( $API->doLogin('', '') )
 		{
