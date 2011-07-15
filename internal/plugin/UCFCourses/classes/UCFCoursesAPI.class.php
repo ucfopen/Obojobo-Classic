@@ -24,7 +24,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 */
 	protected function send($url, $postVars=false)
 	{
-		trace('Sending HTTPRequest', true);
+		trace('Sending HTTPRequest ' . $url, true);
 		try
 		{
 			$request = new \HttpRequest($url, HTTP_METH_POST);
@@ -614,6 +614,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 				FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
 				JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
 				ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
+					AND L.".\cfg_plugin_UCFCourses::MAP_COL_ID." = M.". \cfg_plugin_UCFCourses::MAP_COL_ID ."
 				WHERE
 					L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
 					AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
