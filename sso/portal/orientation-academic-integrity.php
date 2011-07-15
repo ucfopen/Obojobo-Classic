@@ -88,7 +88,7 @@ try
 					<li>
 						<?php if($instance->score){?>
 							<p style="font-size: 12pt; margin-bottom: 0;"><?php echo $instance->name; ?></p>
-							<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $instance->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $instance->instID; ?>"proxied="false">Take again</a>)</p>
+							<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $instance->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $instance->instID; ?>" proxied="false">Take again</a>)</p>
 						<?php } else { ?>
 							<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="<?php echo $targetURL;?>?instID=<?php echo $instance->instID; ?>" proxied="false"><?php echo $instance->name; ?></a></p>
 							<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not yet complete</p>
