@@ -11,9 +11,16 @@ if(isset($_REQUEST['instID']) )
 		redirectToLO($_REQUEST['instID']);
 	}
 
-	// not already logged in, SSO not timed out
-	if( isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && (int)$_SESSION['PORTAL_SSO_EPOCH'] >= time() - \AppCfg::UCF_PORTAL_TIMEOUT)
+	// not already logged in, Check hash again
+	$NID = $_REQUEST['nid'];
+	$timestamp = $_REQUEST['epoch'];
+	$hash = $_REQUEST['hash'];
+	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
 	{
+		// store session variables for the authentication module
+		$_SESSION['PORTAL_SSO_NID'] = $NID;
+		$_SESSION['PORTAL_SSO_EPOCH'] = $timestamp;
+
 		if( $API->doLogin('', '') )
 		{
 			redirectToLO($_REQUEST['instID']);
@@ -30,6 +37,7 @@ function redirectToLO($instID)
 	header('Location: '.\AppCfg::URL_WEB . \AppCfg::URL_VIEWER  . $instID . '?login=myUCF');
 	exit();
 }
+
 ?>
 <html>
 	<head>

@@ -22,11 +22,9 @@ try
 	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
 	{
 	
-		// valid store the session cookie
-		session_name(\AppCfg::SESSION_NAME);
-		session_start();
-		$_SESSION['PORTAL_SSO_NID'] = $NID;
-		$_SESSION['PORTAL_SSO_EPOCH'] = $timestamp;
+		// build the url to add to the links below, this info must be copied to the redirect page
+		// The user grabbing this page is actually the portal, the session created here is not the user
+		$hashAppend = "&nid=$NID&epoch=$timestamp&hash=$hash";
 	
 		// look for the user
 		$AM  = \rocketD\auth\AuthManager::getInstance();
@@ -90,9 +88,9 @@ try
 					<li>
 						<?php if($scores[$key]->score){?>
 							<p style="font-size: 12pt; margin-bottom: 0;"><?php echo $scores[$key]->name; ?></p>
-							<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $scores[$key]->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID; ?>" target="_blank" proxied="false">Take again</a>)</p>
+							<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of <?php echo $scores[$key]->score; ?>% (<a  href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID . $hashAppend; ?>" target="_blank" proxied="false">Take again</a>)</p>
 						<?php } else { ?>
-							<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID; ?>" target="_blank" proxied="false"><?php echo $scores[$key]->name; ?></a></p>
+							<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="<?php echo $targetURL;?>?instID=<?php echo $scores[$key]->instID . $hashAppend; ?>" target="_blank" proxied="false"><?php echo $scores[$key]->name; ?></a></p>
 							<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not yet complete</p>
 						<?php } ?>
 					</li>
