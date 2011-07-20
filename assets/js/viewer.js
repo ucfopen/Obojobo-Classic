@@ -494,7 +494,7 @@ function onAnswerRadioClicked(event)
 			}
 			if(viewerMode == MODE_PREVIEW)
 			{
-				$(event.target).parent().append('<span class="answer-preview '+ weightCSS +'">'+answer.weight+'%</span>');
+				$(event.target).parent().append('<span class="answer-preview '+ weightCSS +'">'+answer.weight+'%</span><span class="answer-feedback"><h4>Review:</h4><p>lol</p></span>');
 			}
 			return true;
 		}
