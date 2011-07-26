@@ -650,7 +650,9 @@ h3
 	width: 74px;
 	height: 24px;
 	margin: 0;
-	margin-right: 1em;
+	margin-right: 2px;
+	padding-left: 8px;
+	padding-top: 4px;
 	background: url('/assets/images/viewer/review-pointer.png') no-repeat;
 }
 
