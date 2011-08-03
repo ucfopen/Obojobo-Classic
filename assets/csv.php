@@ -25,7 +25,7 @@ switch($_GET['function'])
 				foreach ($scores as $user)
 				{
 					$score = getCountedScore($user['attempts'], $_GET['method']);
-					if($score['score'] != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score['score'].','.date('m/d/Y G:i:s',$score['date'])."\r\n";
+					if($score != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score['score'].','.date('m/d/Y G:i:s',$score['date'])."\r\n";
 				}
 				
 				exit();
@@ -80,7 +80,7 @@ function getCountedScore($scores, $method)
 	{
 		case 'h': //Highest:
 			// return highest score and the date that it was achieved
-			$highest = 0;
+			$highest = -1; // need to use -1 here to capture a max score of 0 properly
 			$date = 0;
 			foreach ($attempts as $scoreData)
 			{
