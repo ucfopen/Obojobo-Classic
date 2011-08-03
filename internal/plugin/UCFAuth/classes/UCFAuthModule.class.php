@@ -85,9 +85,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace($valid, true);
 			return array('success' => false, 'error' => $valid);
 		}
-						
 	}
-		
+	
 	// security check: Ian Turgeon 2008-05-08 - PASS	
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
