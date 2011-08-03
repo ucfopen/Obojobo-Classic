@@ -18,17 +18,17 @@ switch($_GET['function'])
 				header("Content-Type: application/octet-stream");
 				header("Content-Type: application/download");
 				header("Content-Disposition: attachment; filename=\"{$_GET['filename']}.csv\"");
-				echo "User ID,Last Name,First Name,MI,Score\r\n";
+				echo "User ID,Last Name,First Name,MI,Score,Date Updated\r\n";
 				
 				usort($scores, "compareFunction");
 				
 				foreach ($scores as $user)
 				{
 					$score = getCountedScore($user['attempts'], $_GET['method']);
-					if($score != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score."\r\n";
+					if($score['score'] != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score['score'].','.date('m/d/Y G:i:s',$score['date'])."\r\n";
 				}
 				
-				exit ();
+				exit();
 			}
 		}
 		break;
@@ -76,27 +76,34 @@ function getCountedScore($scores, $method)
 	}
 	if(count($attempts) == 0) return -1;
 	
-    switch($method)
-    {
-        case 'h': //Highest:
-            $highest = 0;
-            foreach ($attempts as $scoreData)
-            {
-                $curScore = $scoreData['score'];
-                if ($curScore > $highest)
-                    $highest = $curScore;
-            }
-            return $highest;
-    	case 'm': //Mean:
-     	   $total = 0;
-    		foreach ($attempts as $scoreData)
-   			{
-        		$total += $scoreData['score'];
+	switch($method)
+	{
+		case 'h': //Highest:
+			// return highest score and the date that it was achieved
+			$highest = 0;
+			$date = 0;
+			foreach ($attempts as $scoreData)
+			{
+				$curScore = $scoreData['score'];
+				if ($curScore > $highest)
+				{
+					$highest = $curScore;
+					$date = $scoreData['submitDate'];
+				}
 			}
-			return $total/count($scores);
+			return array('score' => $highest, 'date' => $date);
+		case 'm': //Mean:
+			// return the average score and the latest date.. there is some innacuracy here as the latest score may not have changed the overall average
+			$total = 0;
+			foreach ($attempts as $scoreData)
+			{
+				$total += $scoreData['score'];
+			}
+			return array('score' => $total/count($scores), 'date' => $attempts[count($attempts)-1]['submitDate']);
 		case 'r': //Recent:
-    		return $attempts[count($attempts)-1]['score'];
-		}
+			// return the last score and date
+			return array('score' => $attempts[count($attempts)-1]['score'], 'date' => $attempts[count($attempts)-1]['submitDate']);  
+	}
 	exit();
 }
 
