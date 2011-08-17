@@ -26,7 +26,7 @@ try
 	// show a default set of learning objects in a dev environment
 	if($isDevEnvironment)
 	{
-		$los = array('1990','1991');
+		$los = array('2329','2330');
 	}
 	else
 	{
@@ -38,7 +38,7 @@ try
 	// $NID = 'rumplefaceman';
 	// $timestamp = time();
 	// $hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
-	// $los = array();
+	// $los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
 	
 	// valid hash
 	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
@@ -128,13 +128,8 @@ try
 					}
 				}
 				?>
-				<li>
-					<p style="font-size: 12pt; margin-bottom: 0;">Consequences of Academic Misconduct (Coming in August)</p>
-					<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not currently available.</p>
-				</li>
-
 			</ul>
-	
+
 			<p>You will need to complete these before <strong>August 22nd 2011</strong>.  Otherwise you will receive a hold on your account that will prevent you from registering for classes.</p>
 			<?php
 			if($isDevEnvironment)
