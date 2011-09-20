@@ -146,7 +146,7 @@ try
 				<?}
 				?>
 
-			<p>You will need to complete these before <strong>January 9nd 2012</strong>.  Otherwise you will receive a hold on your account that will prevent you from registering for classes.</p>
+			<p>You will need to complete these before <strong>January 9, 2012</strong>.  Otherwise you will receive a hold on your account that will prevent you from registering for classes.</p>
 			<?php
 			if($isDevEnvironment)
 			{
