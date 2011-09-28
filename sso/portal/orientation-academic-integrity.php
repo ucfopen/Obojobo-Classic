@@ -31,11 +31,11 @@ try
 	}
 
 	// ************* TESTING CODE ************
-	$targetURL = 'http://obo/sso/portal/redirect.php';
-	$NID = 'rumplefaceman';
-	$timestamp = time();
-	$hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
-	$los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
+	// $targetURL = 'http://obo/sso/portal/redirect.php';
+	// $NID = 'rumplefaceman';
+	// $timestamp = time();
+	// $hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+	// $los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
 	
 	
 	// valid hash
