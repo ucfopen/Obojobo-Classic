@@ -23,7 +23,7 @@ try
 	// show a default set of learning objects in a dev environment
 	if($isDevEnvironment)
 	{
-		$los = array('2329','2329','2330','2330');
+		$los = array('2329','2329','2330','2330','2328','2328');
 	}
 	else
 	{
@@ -31,11 +31,11 @@ try
 	}
 
 	// ************* TESTING CODE ************
-	// $targetURL = 'http://obo/sso/portal/redirect.php';
-	// $NID = 'rumplefaceman';
-	// $timestamp = time();
-	// $hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
-	// $los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
+	$targetURL = 'http://obo/sso/portal/redirect.php';
+	$NID = 'rumplefaceman';
+	$timestamp = time();
+	$hash = md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+	$los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
 	
 	
 	// valid hash
@@ -121,7 +121,7 @@ try
 		if(count($scores) > 0)
 		{
 			?>
-			<p>Are you an Incoming student? If so, you're required to complete the Academic Integrity Modules listed below. The links below are different for first time college students and transfer students.</p>
+			<p>Are you an Incoming student? If so, you're required to complete the Academic Integrity Modules listed below. The links below are different for first time college students, transfer students, and graduate students.</p>
 			<p>Click on each of the links that apply to you and a new window will open with the Academic Integrity module in it. You will need to score <?php echo $minScore; ?>% or better on each module to pass.</p>
 			<?php
 				if($scores[0] || $scores[1])
@@ -141,6 +141,16 @@ try
 						<?php
 							echo formatDisplayForInstance($los[2], $scores[2]->name, $scores[2]->score, $minScore, $targetURL, $hashAppend);
 							echo formatDisplayForInstance($los[3], $scores[3]->name, $scores[3]->score, $minScore, $targetURL, $hashAppend);
+						?>
+						</ul>
+				<?}
+				if($scores[4] || $scores[5])
+				{?>
+					<h3>Graduate Students</h3>
+						<ul>
+						<?php
+							echo formatDisplayForInstance($los[4], $scores[4]->name, $scores[4]->score, $minScore, $targetURL, $hashAppend);
+							echo formatDisplayForInstance($los[5], $scores[5]->name, $scores[5]->score, $minScore, $targetURL, $hashAppend);
 						?>
 						</ul>
 				<?}
