@@ -74,6 +74,14 @@ class QuestionManager extends \rocketD\db\DBEnabled
 			
 			$quest = $this->db_unserialize($r->questionData);
 			
+			//@ZACH - Somewhere createTime is being set to 'NAN' which the php JSON encoder chokes on.
+			//This is needed to get the HTML5 preview (which uses the JSON gateway) to work for any
+			//question with a createTime of "NAN".
+			if(is_nan($quest->createTime))
+			{
+				$quest->createTime = 0;
+			}
+			
 			if($quest instanceof \obo\lo\Question)
 			{
 				$quest->questionID = $questionID; // the question id isn't set in the serialized data when its inserted into the database
