@@ -853,14 +853,14 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	// public function getCurrentSemester()
 	// {
 	// 	
-	// 	if($semesters = \rocketD\util\Cache::getInstance()->getCurrentSemester())
+	// 	if($semesters = \obo\util\Cache::getInstance()->getCurrentSemester())
 	// 	{
 	// 		return $semesters;
 	// 	}
 	// 	else
 	// 	{
 	// 		$result = $this->getSemesterForDate(time());
-	// 		\rocketD\util\Cache::getInstance()->setCurrentSemester($result);
+	// 		\obo\util\Cache::getInstance()->setCurrentSemester($result);
 	// 		return $result;
 	// 	}
 	// }
@@ -883,7 +883,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	// public function getSemesters()
 	// {
 	// 	
-	// 	if($semesters = \rocketD\util\Cache::getInstance()->getSemesters())
+	// 	if($semesters = \obo\util\Cache::getInstance()->getSemesters())
 	// 	{
 	// 		return $semesters;
 	// 	}
@@ -895,7 +895,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	// 		{
 	// 			$semesters[] = new \obo\Semester($r);
 	// 		}
-	// 		\rocketD\util\Cache::getInstance()->setSemesters($semesters);
+	// 		\obo\util\Cache::getInstance()->setSemesters($semesters);
 	// 		return $semesters;
 	// 	}
 	// }
