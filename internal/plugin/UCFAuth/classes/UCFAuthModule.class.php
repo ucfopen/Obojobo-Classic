@@ -372,7 +372,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// update login
 		if($this->validateUsername($userName) === true)
 		{
-			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
+			\obo\util\Cache::getInstance()->clearUserByID($userID);
 			
 			// update username
 			 return $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, $userID);
@@ -565,7 +565,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			
 			//store in memcache
-			\rocketD\util\Cache::getInstance()->setModUCFExternalUser($userName, $return);
+			\obo\util\Cache::getInstance()->setModUCFExternalUser($userName, $return);
 		}
 		trace($return ? "$userName found, employee:$r->isCreator" : "$userName not found");
 		return $return;
@@ -692,7 +692,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 					if($this->DBM->affected_rows($q2) != 0)
 					{
 						$updated++;
-						\rocketD\util\Cache::getInstance()->clearUserByID($userID);
+						\obo\util\Cache::getInstance()->clearUserByID($userID);
 						trace('NID changed: ' . $r->{\cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{\cfg_plugin_AuthModUCF::NEW_NID}, true);
 					}  
 					else

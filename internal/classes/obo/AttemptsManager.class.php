@@ -710,7 +710,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		
 		// clear cached scores for this instance
-		\rocketD\util\Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		\obo\util\Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 		// clear equivalent cache
 		if(\AppCfg::CACHE_MEMCACHE)
 		{
@@ -718,7 +718,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			if($instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
 			{
 				$loID = $instData->loID;
-				\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
+				\obo\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
 			}
 		}
 		return $score;
@@ -979,7 +979,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		
 		// get unfiltered list from cache or database
-		if(!($attempt = \rocketD\util\Cache::getInstance()->getEquivalentAttempt($userID, $loID)))
+		if(!($attempt = \obo\util\Cache::getInstance()->getEquivalentAttempt($userID, $loID)))
 		{
 			$qstr = "SELECT 
 					".\cfg_obo_Attempt::ID.",
@@ -1007,7 +1007,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				$attempt = $r;
 			}
 			// store unfiltered in cache
-			\rocketD\util\Cache::getInstance()->setEquivalentAttempt($userID, $loID, $attempt);
+			\obo\util\Cache::getInstance()->setEquivalentAttempt($userID, $loID, $attempt);
 		}
 		return $attempt;
 	}

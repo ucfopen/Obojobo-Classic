@@ -35,7 +35,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		//check memcache
 		
-		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
+		if($user = \obo\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user;
 		}
@@ -49,7 +49,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
 		
 		//store in memcache
-		\rocketD\util\Cache::getInstance()->setUserByID($userID, $return);
+		\obo\util\Cache::getInstance()->setUserByID($userID, $return);
 		return $return;
 	}
 
@@ -102,7 +102,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		{
 			$this->defaultDBM();
 				
-			if($userID = \rocketD\util\Cache::getInstance()->getUIDForUserName($username))
+			if($userID = \obo\util\Cache::getInstance()->getUIDForUserName($username))
 			{
 				return $userID;
 			}
@@ -117,7 +117,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			if($r = $this->DBM->fetch_obj($q))
 			{
 				// store in memcache
-				\rocketD\util\Cache::getInstance()->setUIDForUserName($username, $r->{\cfg_core_User::ID});
+				\obo\util\Cache::getInstance()->setUIDForUserName($username, $r->{\cfg_core_User::ID});
 				
 				return $r->{\cfg_core_User::ID}; // return found user id
 			}
@@ -135,7 +135,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			// Invalidating memcache that has a list of all users
 			// TODO: may be better to just append to the list then delete it
 			
-			\rocketD\util\Cache::getInstance()->clearAllUsers();
+			\obo\util\Cache::getInstance()->clearAllUsers();
 						
 			$this->defaultDBM();
 			$qstr = "INSERT INTO ".\cfg_core_User::TABLE."
@@ -181,7 +181,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				if($q = $this->DBM->querySafe($qstr, $fName, $lName, $mName, $email, $userID))
 				{
 					
-					\rocketD\util\Cache::getInstance()->clearUserByID($userID);
+					\obo\util\Cache::getInstance()->clearUserByID($userID);
 					return array('success' => true, 'userID' => $userID);
 				}
 				else
@@ -285,7 +285,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			if(\AppCfg::CACHE_MEMCACHE)
 			{
 				
-				\rocketD\util\Cache::getInstance()->delete('\rocketD\auth\AuthModule:fetchUserByID:'.$userID);
+				\obo\util\Cache::getInstance()->delete('\rocketD\auth\AuthModule:fetchUserByID:'.$userID);
 			}
 			
 			$this->defaultDBM();
@@ -303,7 +303,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		//use fetchUserBYID if memcahe is on
 		
-		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
+		if($user = \obo\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user->login;
 		}

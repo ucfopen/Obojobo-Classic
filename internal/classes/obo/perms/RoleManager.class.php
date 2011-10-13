@@ -94,7 +94,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		
 		// clear memcache for all users in this role
 		
-		\rocketD\util\Cache::getInstance()->clearUsersInRole($roleID);
+		\obo\util\Cache::getInstance()->clearUsersInRole($roleID);
 		
 		return true;
 	}
@@ -203,7 +203,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		{
 			// check memcache for the list of user indexes
 			
-			$usersIndexes = \rocketD\util\Cache::getInstance()->getUsersInRole($roleid);
+			$usersIndexes = \obo\util\Cache::getInstance()->getUsersInRole($roleid);
 
 			// no cache, get the list of indexes to cache
 			if(!is_array($usersIndexes))
@@ -224,7 +224,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 					$usersIndexes[] = $r->{\cfg_core_User::ID};
 				}
 				// store in memcache
-				\rocketD\util\Cache::getInstance()->setUsersInRole($roleid, $usersIndexes);
+				\obo\util\Cache::getInstance()->setUsersInRole($roleid, $usersIndexes);
 			}
 			$users = array();
 			if(is_array($usersIndexes))
@@ -246,7 +246,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 			$cacheKey = implode(',',  $roleid);
 			// check memcache for the list of user indexes
 			
-			$usersIndexes = \rocketD\util\Cache::getInstance()->getUsersInRole($cacheKey);
+			$usersIndexes = \obo\util\Cache::getInstance()->getUsersInRole($cacheKey);
 
 			// no cache, get the list of indexes to cache
 			if(!is_array($usersIndexes))
@@ -266,7 +266,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 					$usersIndexes[] = $r->{\cfg_core_User::ID};
 				}
 				// store in memcache
-				\rocketD\util\Cache::getInstance()->setUsersInRole($cacheKey, $usersIndexes);
+				\obo\util\Cache::getInstance()->setUsersInRole($cacheKey, $usersIndexes);
 			}
 			$users = array();
 			if(is_array($usersIndexes))
@@ -440,7 +440,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		
 		// check memcache
 		
-		if($roleID = \rocketD\util\Cache::getInstance()->getRoleIDFromName($roleName))
+		if($roleID = \obo\util\Cache::getInstance()->getRoleIDFromName($roleName))
 		{
 			return $roleID;
 		}
@@ -456,7 +456,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		$r = $this->DBM->fetch_obj($q);
 		
 		// store in memcache
-		\rocketD\util\Cache::getInstance()->setRoleIDFromName($roleName, $r->{\cfg_obo_Role::ID});
+		\obo\util\Cache::getInstance()->setRoleIDFromName($roleName, $r->{\cfg_obo_Role::ID});
 				
 		return $r->{\cfg_obo_Role::ID};
 	}
@@ -565,7 +565,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 				{
 					
 					// clear memcache for all users in this role
-					\rocketD\util\Cache::getInstance()->clearUsersInRole($this->getRoleID($roleName));
+					\obo\util\Cache::getInstance()->clearUsersInRole($this->getRoleID($roleName));
 				}
 			}
 		}
@@ -613,7 +613,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 				else
 				{
 					// clear memcache for all users in this role
-					\rocketD\util\Cache::getInstance()->clearUsersInRole($this->getRoleID($roleName));
+					\obo\util\Cache::getInstance()->clearUsersInRole($this->getRoleID($roleName));
 				}
 			}
 		}
