@@ -341,7 +341,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			$permMan = \obo\perms\PermissionsManager::getInstance();
 			if($permMan->removeAllPermsForItem($loID, \cfg_obo_Perm::TYPE_LO))
 			{
-				\rocketD\util\Cache::getInstance()->clearLO($loID);
+				\obo\util\Cache::getInstance()->clearLO($loID);
 				$tracking = \obo\log\LogManager::getInstance();
 				$tracking->trackDeleteLO($loID, 1);
 				// mark LO as deleted
