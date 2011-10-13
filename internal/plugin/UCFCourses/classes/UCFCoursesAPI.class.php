@@ -650,7 +650,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 					$IM = \obo\lo\InstanceManager::getInstance();
 					$instData = $IM->getInstanceData($instID);
 					$NM = \obo\util\NotificationManager::getInstance();
-					$NM->sendScoreFailureNotice($instructor, $student, $instData->courseID);
+					$NM->sendScoreFailureNotice($instructor, $student, $instData);
 				}
 			}
 			// Increment success counter

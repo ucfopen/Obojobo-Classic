@@ -22,23 +22,25 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	public function sendCriticalError($subject, $message)
 	{
 		$this->mail('newmedia@mail.ucf.edu', '[OBO ERROR]: ' . $subject, $message);
-		trace($subject . ' ' . $message, true);
+		// echo($subject . ' ' . $message);
 	}
 	
-	public function sendScoreFailureNotice($instructor, $student, $courseName)
+	public function sendScoreFailureNotice($instructor, $student, $instData)
 	{
 		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
 		
 		// get student info
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$studentName = $AM->getName($student);
-		
+		trace('ya');
 		// load up template
 		$smarty = new \Smarty();
 		$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
 		$smarty->assign('studentName', $studentName);
-		$smarty->assign('courseName', $courseName);
+		$smarty->assign('courseName', $instData->courseID);
 		$smarty->assign('repositoryURL', \AppCfg::URL_WEB . \AppCfg::URL_REPOSITORY);
+		$smarty->assign('instanceName', $instData->name);
+		$smarty->assign('instanceURL', \AppCfg::URL_WEB . \AppCfg::URL_VIEWER . $instData->instID);
 		$body = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'email-instructor-score-sync-failure-plain.tpl');
 		$subject = $smarty->fetch('eval:Obojobo Score Sync Notice - {$studentName} - {$courseName}');
 
@@ -46,7 +48,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 		$headers .= "From: Obojobo <no-reply@obojobo.ucf.edu>\n";
 		
 		$sent = $this->mail($instructor->email, $subject, $body, $headers);
-		$this->sendCriticalError('Score Sync Failure - ' . $courseName, 'instructor: '.print_r($instructor, true) . ' Student: ' . print_r($student, true));
+		$this->sendCriticalError('Score Sync Failure - ' . $instData->courseID, 'instructor: '.print_r($instructor, true) . ' Student: ' . print_r($student, true) . ' InstData: ' . print_r($instData, true));
 		
 		return $sent;
 	}
