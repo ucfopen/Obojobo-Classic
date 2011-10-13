@@ -57,7 +57,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 				$this->DBM->commit();
 				// clear all cache
 				
-				\rocketD\util\Cache::getInstance()->clearAllCache();
+				\obo\util\Cache::getInstance()->clearAllCache();
 				// remove old user
 				$AM->removeUser($userIDFrom);
 				$TM = \obo\log\LogManager::getInstance();
