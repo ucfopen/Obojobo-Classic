@@ -43,7 +43,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 		
 		
-		if($media = \rocketD\util\Cache::getInstance()->getMedia($mediaID))
+		if($media = \obo\util\Cache::getInstance()->getMedia($mediaID))
 		{
 			return $media;
 		}
@@ -57,7 +57,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		$r = $this->DBM->fetch_obj($q);
 
 		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER}, $r->{\cfg_obo_Media::ATTRIBUTION});
-		\rocketD\util\Cache::getInstance()->setMedia($media);
+		\obo\util\Cache::getInstance()->setMedia($media);
 		return $media;
 	}
 
@@ -230,7 +230,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		$PM = \obo\perms\PermissionsManager::getInstance();
 		$PM->setFullPermsForItem($media->mediaID, \cfg_obo_Perm::TYPE_MEDIA);
 
-		\rocketD\util\Cache::getInstance()->setMedia($media);
+		\obo\util\Cache::getInstance()->setMedia($media);
 		
 		return $media;
 	}
@@ -480,7 +480,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 				return false;	
 			}   
 			
-			\rocketD\util\Cache::getInstance()->setMedia($mediaObj);
+			\obo\util\Cache::getInstance()->setMedia($mediaObj);
 			// clear cache for loid's containing this media
 			$los = $this->locateLOsWithMedia($mediaObj->mediaID);
 			if(is_array($los) && count($los) > 0)
@@ -488,7 +488,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 				
 				foreach($los AS $loID)
 				{
-					\rocketD\util\Cache::getInstance()->clearLO($loID);
+					\obo\util\Cache::getInstance()->clearLO($loID);
 				}
 			}
 		}
@@ -627,7 +627,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			return false;		
 		}
 		
-		\rocketD\util\Cache::getInstance()->clearMedia($mediaID);
+		\obo\util\Cache::getInstance()->clearMedia($mediaID);
 		
 		return true;
 	}

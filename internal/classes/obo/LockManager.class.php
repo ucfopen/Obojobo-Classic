@@ -46,7 +46,7 @@ class LockManager extends \rocketD\db\DBEnabled
 		}
 		// get from cache
 		
-		if($lock = \rocketD\util\Cache::getInstance()->setLock($lockObj))
+		if($lock = \obo\util\Cache::getInstance()->setLock($lockObj))
 		{
 			return $lock;
 		}
@@ -130,7 +130,7 @@ class LockManager extends \rocketD\db\DBEnabled
 				return false;	
 			}
 			
-			\rocketD\util\Cache::getInstance()->setLock($lockObj);
+			\obo\util\Cache::getInstance()->setLock($lockObj);
 		}
 		else if($makeNewLock)
 		{
@@ -145,7 +145,7 @@ class LockManager extends \rocketD\db\DBEnabled
 			}
 			$lockObj->lockID = $this->DBM->insertID;
 			
-			\rocketD\util\Cache::getInstance()->setLock($lockObj);
+			\obo\util\Cache::getInstance()->setLock($lockObj);
 		}
 		
 		return $lockObj; //return the new lock
@@ -188,7 +188,7 @@ class LockManager extends \rocketD\db\DBEnabled
 			// its a lock, delete it
 			$this->DBM->querySafe("DELETE FROM ".\cfg_obo_Lock::TABLE." WHERE ".\cfg_obo_Lock::ID."='?' LIMIT 1", $lock->lockID);
 			
-			\rocketD\util\Cache::getInstance()->clearLock($lock->lockID);
+			\obo\util\Cache::getInstance()->clearLock($lock->lockID);
 			return true;
 		}
 		// its false - which just meands it didnt exist, return true cause theres no lock anyway

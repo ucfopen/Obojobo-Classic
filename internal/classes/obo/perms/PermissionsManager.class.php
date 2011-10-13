@@ -209,7 +209,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		$itemType = mysql_real_escape_string($itemType);
 		// 
-		// if($permObj = \rocketD\util\Cache::getInstance()->getPerms($itemID, $itemType, $optUserID))
+		// if($permObj = \obo\util\Cache::getInstance()->getPerms($itemID, $itemType, $optUserID))
 		// {
 		// 	return $permObj;
 		// }
@@ -233,7 +233,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 				$r->{\cfg_obo_Perm::G_USE},
 				$r->{\cfg_obo_Perm::G_GLOBAL});
 
-			//\rocketD\util\Cache::getInstance()->setPerms($itemID, $itemType, $optUserID, $permObj);
+			//\obo\util\Cache::getInstance()->setPerms($itemID, $itemType, $optUserID, $permObj);
 			
 			return $permObj;
 		}
@@ -541,7 +541,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		//
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $userID);
+		//\obo\util\Cache::getInstance()->clearPerms($itemID, $itemType, $userID);
 		return true;
 	}
 	
@@ -700,7 +700,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		
 		
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
+		//\obo\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
 		return true;
 	}
 	
@@ -790,7 +790,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		// clear cache
 		//
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
+		//\obo\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
 		return true;
 	}
 	/*

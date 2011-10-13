@@ -36,7 +36,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			if(\obo\util\Validator::isPosInt($trackable->userID) &&  \obo\util\Validator::isPosInt($trackable->instID) )
 			{
 				
-				\rocketD\util\Cache::getInstance()->clearInteractionsByInstanceAndUser($trackable->instID, $trackable->userID);
+				\obo\util\Cache::getInstance()->clearInteractionsByInstanceAndUser($trackable->instID, $trackable->userID);
 			}
 			return true;
 		}
@@ -135,7 +135,7 @@ class LogManager extends \rocketD\db\DBEnabled
 		// must own instance or be user or SU
 		// check memcache
  		
-		if($tracking = \rocketD\util\Cache::getInstance()->getInteractionsByInstanceAndUser($instID, $userID))
+		if($tracking = \obo\util\Cache::getInstance()->getInteractionsByInstanceAndUser($instID, $userID))
 		{
 			return $tracking;
 		}
@@ -143,7 +143,7 @@ class LogManager extends \rocketD\db\DBEnabled
 		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?' AND ".\cfg_core_User::ID." = '?' ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $instID, $userID));
 		
-		\rocketD\util\Cache::getInstance()->setInteractionsByInstanceAndUser($instID, $userID, $return);
+		\obo\util\Cache::getInstance()->setInteractionsByInstanceAndUser($instID, $userID, $return);
 		
 		return $return;
 	}

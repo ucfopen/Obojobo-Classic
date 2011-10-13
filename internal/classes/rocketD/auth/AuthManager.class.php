@@ -106,7 +106,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		
 		// monitor repeat failed logins and throttle them
 		
-		\rocketD\util\Cache::getInstance()->doRateLimit($_SERVER['REMOTE_ADDR']);
+		\obo\util\Cache::getInstance()->doRateLimit($_SERVER['REMOTE_ADDR']);
 		
 		
 		return \rocketD\util\Error::getError(1003); // error: incorrect password
@@ -239,7 +239,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			}
 			// clear cache that may contain this user's data
 			
-			\rocketD\util\Cache::getInstance()->clearUserByID($_SESSION['userID']);
+			\obo\util\Cache::getInstance()->clearUserByID($_SESSION['userID']);
 		}
 		if(session_id())
 		{
@@ -498,7 +498,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	public function getAllUsers(){
 		// check memcache
 		
-		if($allUsers = \rocketD\util\Cache::getInstance()->getAllUsers)
+		if($allUsers = \obo\util\Cache::getInstance()->getAllUsers)
 		{
 				return $allUsers;
 		}
@@ -516,7 +516,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				$allUsers = array_merge($allUsers, $modUsers);
 			}
 		}
-		\rocketD\util\Cache::getInstance()->setAllUsers($allUsers); // store in memcache
+		\obo\util\Cache::getInstance()->setAllUsers($allUsers); // store in memcache
 		return $allUsers;
 	}
 	
@@ -591,7 +591,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		{
 			// check memcache
 			
-			if($authModClass = \rocketD\util\Cache::getInstance()->getAuthModClassForUser($userID))
+			if($authModClass = \obo\util\Cache::getInstance()->getAuthModClassForUser($userID))
 			{
 				return new $authModClass();
 			}
@@ -601,7 +601,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				if($authMod->recordExistsForID($userID))
 				{
 					// store in memcache
-					\rocketD\util\Cache::getInstance()->setAuthModClassForUser($userID, get_class($authMod) );
+					\obo\util\Cache::getInstance()->setAuthModClassForUser($userID, get_class($authMod) );
 					return $authMod;
 				}
 			}
@@ -614,7 +614,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		if($username !== false)
 		{
-			if($authModClass = \rocketD\util\Cache::getInstance()->getAuthModForUser($username))
+			if($authModClass = \obo\util\Cache::getInstance()->getAuthModForUser($username))
 			{
 				return call_user_func(array($authModClass, 'getInstance'));
 			}
@@ -626,7 +626,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				$authMod = call_user_func(array($r->auth_module, 'getInstance'));
 				if($authMod)
 				{
-					\rocketD\util\Cache::getInstance()->setAuthModForUser($username, $r->auth_module);
+					\obo\util\Cache::getInstance()->setAuthModForUser($username, $r->auth_module);
 				}
 				return $authMod;
 			}
