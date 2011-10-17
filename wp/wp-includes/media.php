@@ -125,7 +125,7 @@ function image_hwstring($width, $height) {
  *		resize services.
  *
  * @param int $id Attachment ID for image.
- * @param string $size Optional, default is 'medium'. Size of image, can be 'thumbnail'.
+ * @param array|string $size Optional, default is 'medium'. Size of image, either array or string.
  * @return bool|array False on failure, array on success.
  */
 function image_downsize($id, $size = 'medium') {
@@ -250,7 +250,7 @@ function wp_load_image( $file ) {
 		return __('The GD image library is not installed.');
 
 	// Set artificially high because GD uses uncompressed images in memory
-	@ini_set('memory_limit', '256M');
+	@ini_set( 'memory_limit', apply_filters( 'image_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 	$image = imagecreatefromstring( file_get_contents( $file ) );
 
 	if ( !is_resource( $image ) )
@@ -1025,14 +1025,7 @@ class WP_Embed {
 	var $linkifunknown = true;
 
 	/**
-	 * PHP4 constructor
-	 */
-	function WP_Embed() {
-		return $this->__construct();
-	}
-
-	/**
-	 * PHP5 constructor
+	 * Constructor
 	 */
 	function __construct() {
 		// Hack to get the [embed] shortcode to run before wpautop()
@@ -1406,3 +1399,43 @@ function wp_oembed_add_provider( $format, $provider, $regex = false ) {
 	$oembed = _wp_oembed_get_object();
 	$oembed->providers[$format] = array( $provider, $regex );
 }
+
+/**
+ * Determines if default embed handlers should be loaded.
+ *
+ * Checks to make sure that the embeds library hasn't already been loaded. If
+ * it hasn't, then it will load the embeds library.
+ *
+ * @since 2.9.0
+ */
+function wp_maybe_load_embeds() {
+	if ( ! apply_filters( 'load_default_embeds', true ) )
+		return;
+	wp_embed_register_handler( 'googlevideo', '#http://video\.google\.([A-Za-z.]{2,5})/videoplay\?docid=([\d-]+)(.*?)#i', 'wp_embed_handler_googlevideo' );
+}
+
+/**
+ * The Google Video embed handler callback. Google Video does not support oEmbed.
+ *
+ * @see WP_Embed::register_handler()
+ * @see WP_Embed::shortcode()
+ *
+ * @param array $matches The regex matches from the provided regex when calling {@link wp_embed_register_handler()}.
+ * @param array $attr Embed attributes.
+ * @param string $url The original URL that was matched by the regex.
+ * @param array $rawattr The original unmodified attributes.
+ * @return string The embed HTML.
+ */
+function wp_embed_handler_googlevideo( $matches, $attr, $url, $rawattr ) {
+	// If the user supplied a fixed width AND height, use it
+	if ( !empty($rawattr['width']) && !empty($rawattr['height']) ) {
+		$width  = (int) $rawattr['width'];
+		$height = (int) $rawattr['height'];
+	} else {
+		list( $width, $height ) = wp_expand_dimensions( 425, 344, $attr['width'], $attr['height'] );
+	}
+
+	return apply_filters( 'embed_googlevideo', '<embed type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docid=' . esc_attr($matches[2]) . '&amp;hl=en&amp;fs=true" style="width:' . esc_attr($width) . 'px;height:' . esc_attr($height) . 'px" allowFullScreen="true" allowScriptAccess="always" />', $matches, $attr, $url, $rawattr );
+}
+
+?>

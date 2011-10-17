@@ -77,7 +77,7 @@ class WP_List_Table {
 	 * @param array $args An associative array with information about the current table
 	 * @access protected
 	 */
-	function WP_List_Table( $args = array() ) {
+	function __construct( $args = array() ) {
 		$args = wp_parse_args( $args, array(
 			'plural' => '',
 			'singular' => '',
@@ -138,6 +138,12 @@ class WP_List_Table {
 
 		if ( !$args['total_pages'] && $args['per_page'] > 0 )
 			$args['total_pages'] = ceil( $args['total_items'] / $args['per_page'] );
+
+		// redirect if page number is invalid and headers are not already sent
+		if ( ! headers_sent() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) && $args['total_pages'] > 0 && $this->get_pagenum() > $args['total_pages'] ) {
+			wp_redirect( add_query_arg( 'paged', $args['total_pages'] ) );
+			exit;
+		}
 
 		$this->_pagination_args = $args;
 	}
@@ -282,8 +288,13 @@ class WP_List_Table {
 
 		echo "<select name='action$two'>\n";
 		echo "<option value='-1' selected='selected'>" . __( 'Bulk Actions' ) . "</option>\n";
-		foreach ( $this->_actions as $name => $title )
-			echo "\t<option value='$name'>$title</option>\n";
+
+		foreach ( $this->_actions as $name => $title ) {
+			$class = 'edit' == $name ? ' class="hide-if-no-js"' : '';
+
+			echo "\t<option value='$name'$class>$title</option>\n";
+		}
+
 		echo "</select>\n";
 
 		submit_button( __( 'Apply' ), 'button-secondary action', false, false, array( 'id' => "doaction$two" ) );
@@ -528,9 +539,12 @@ class WP_List_Table {
 			'&raquo;'
 		);
 
-		$output .= "\n" . join( "\n", $page_links );
+		$output .= "\n<span class='pagination-links'>" . join( "\n", $page_links ) . '</span>';
 
-		$page_class = $total_pages < 2 ? ' one-page' : '';
+		if ( $total_pages )
+			$page_class = $total_pages < 2 ? ' one-page' : '';
+		else
+			$page_class = ' no-pages';
 
 		$this->_pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
 
