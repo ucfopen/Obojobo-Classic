@@ -308,7 +308,7 @@ class ModInternal extends AuthModule {
 			$successCheck1 = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
 			// remove any cache references that use this username
 			
-			\obo\util\Cache::getInstance()->clearUserByID($userID);
+			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
 		}
 		$successCheck2 = true;
 		// update password		
