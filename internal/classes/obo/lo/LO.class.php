@@ -184,10 +184,19 @@ class LO
 	
 	public function dbGetInstance($DBM, $loID)
 	{
+		trace('dbGetInstance');
 		if($this->dbGetFull($DBM, $loID))
 		{
-			if(is_object($lo) && is_object($lo->pGroup))	unset($lo->pGroup->kids);
-			if(is_object($lo) && is_object($lo->aGroup))	unset($lo->aGroup->kids);
+			trace($this->pGroup);
+			/*
+			if(is_object($this) && is_object($this->pGroup))
+			{
+				unset($this->pGroup->kids);
+			}*/
+			if(is_object($this) && is_object($this->aGroup))
+			{
+				unset($this->aGroup->kids);
+			}
 		}
 		return false;
 	}
