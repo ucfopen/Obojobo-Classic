@@ -11,7 +11,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 
 	var $callback_args;
 
-	function WP_Terms_List_Table() {
+	function __construct() {
 		global $post_type, $taxonomy, $tax;
 
 		wp_reset_vars( array( 'action', 'taxonomy', 'post_type' ) );
@@ -27,7 +27,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 		if ( empty( $post_type ) || !in_array( $post_type, get_post_types( array( 'public' => true ) ) ) )
 			$post_type = 'post';
 
-		parent::WP_List_Table( array(
+		parent::__construct( array(
 			'plural' => 'tags',
 			'singular' => 'tag',
 		) );
@@ -97,7 +97,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 
 		$columns = array(
 			'cb'          => '<input type="checkbox" />',
-			'name'        => __( 'Name' ),
+			'name'        => _x( 'Name', 'term name' ),
 			'description' => __( 'Description' ),
 			'slug'        => __( 'Slug' ),
 		);
@@ -250,7 +250,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 		$pad = str_repeat( '&#8212; ', max( 0, $this->level ) );
 		$name = apply_filters( 'term_name', $pad . ' ' . $tag->name, $tag );
 		$qe_data = get_term( $tag->term_id, $taxonomy, OBJECT, 'edit' );
-		$edit_link = get_edit_term_link( $tag->term_id, $taxonomy, $post_type );
+		$edit_link = esc_url( get_edit_term_link( $tag->term_id, $taxonomy, $post_type ) );
 
 		$out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $name ) ) . '">' . $name . '</a></strong><br />';
 
@@ -261,6 +261,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 		}
 		if ( current_user_can( $tax->cap->delete_terms ) && $tag->term_id != $default_term )
 			$actions['delete'] = "<a class='delete-tag' href='" . wp_nonce_url( "edit-tags.php?action=delete&amp;taxonomy=$taxonomy&amp;tag_ID=$tag->term_id", 'delete-tag_' . $tag->term_id ) . "'>" . __( 'Delete' ) . "</a>";
+		$actions['view'] = '<a href="' . get_term_link( $tag ) . '">' . __( 'View' ) . '</a>';
 
 		$actions = apply_filters( 'tag_row_actions', $actions, $tag );
 		$actions = apply_filters( "{$taxonomy}_row_actions", $actions, $tag );
@@ -269,7 +270,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 		$out .= '<div class="hidden" id="inline_' . $qe_data->term_id . '">';
 		$out .= '<div class="name">' . $qe_data->name . '</div>';
 		$out .= '<div class="slug">' . apply_filters( 'editable_slug', $qe_data->slug ) . '</div>';
-		$out .= '<div class="parent">' . $qe_data->parent . '</div></div></td>';
+		$out .= '<div class="parent">' . $qe_data->parent . '</div></div>';
 
 		return $out;
 	}
@@ -300,7 +301,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 
 		$args['post_type'] = $post_type;
 
-		return "<a href='" . add_query_arg( $args, 'edit.php' ) . "'>$count</a>";
+		return "<a href='" . esc_url ( add_query_arg( $args, 'edit.php' ) ) . "'>$count</a>";
 	}
 
 	function column_links( $tag ) {
@@ -335,7 +336,7 @@ class WP_Terms_List_Table extends WP_List_Table {
 				<h4><?php _e( 'Quick Edit' ); ?></h4>
 
 				<label>
-					<span class="title"><?php _e( 'Name' ); ?></span>
+					<span class="title"><?php _ex( 'Name', 'term name' ); ?></span>
 					<span class="input-text-wrap"><input type="text" name="name" class="ptitle" value="" /></span>
 				</label>
 	<?php if ( !global_terms_enabled() ) { ?>

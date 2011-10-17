@@ -1,6 +1,6 @@
 <?php
 /**
- * Edit Posts Administration Panel.
+ * Edit Posts Administration Screen.
  *
  * @package WordPress
  * @subpackage Administration
@@ -120,13 +120,15 @@ if ( $doaction ) {
 			$sendback = add_query_arg('deleted', $deleted, $sendback);
 			break;
 		case 'edit':
-			$done = bulk_edit_posts($_REQUEST);
+			if ( isset($_REQUEST['bulk_edit']) ) {
+				$done = bulk_edit_posts($_REQUEST);
 
-			if ( is_array($done) ) {
-				$done['updated'] = count( $done['updated'] );
-				$done['skipped'] = count( $done['skipped'] );
-				$done['locked'] = count( $done['locked'] );
-				$sendback = add_query_arg( $done, $sendback );
+				if ( is_array($done) ) {
+					$done['updated'] = count( $done['updated'] );
+					$done['skipped'] = count( $done['skipped'] );
+					$done['locked'] = count( $done['locked'] );
+					$sendback = add_query_arg( $done, $sendback );
+				}
 			}
 			break;
 	}
@@ -141,12 +143,6 @@ if ( $doaction ) {
 }
 
 $wp_list_table->prepare_items();
-
-$total_pages = $wp_list_table->get_pagination_arg( 'total_pages' );
-if ( $pagenum > $total_pages && $total_pages > 0 ) {
-	wp_redirect( add_query_arg( 'paged', $total_pages ) );
-	exit;
-}
 
 wp_enqueue_script('inline-edit-post');
 
@@ -170,7 +166,7 @@ if ( 'post' == $post_type ) {
 	'</ul>' .
 	'<p>' . __('You can also edit multiple posts at once. Select the posts you want to edit using the checkboxes, select Edit from the Bulk Actions menu and click Apply. You will be able to change the metadata (categories, author, etc.) for all selected posts at once. To remove a post from the grouping, just click the x next to its name in the Bulk Edit area that appears.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
-	'<p>' . __('<a href="http://codex.wordpress.org/Posts_Posts_SubPanel" target="_blank">Documentation on Managing Posts</a>') . '</p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Posts_Screen" target="_blank">Documentation on Managing Posts</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 	);
 } elseif ( 'page' == $post_type ) {
@@ -179,7 +175,7 @@ if ( 'post' == $post_type ) {
 	'<p>' . __('Managing Pages is very similar to managing Posts, and the screens can be customized in the same way.') . '</p>' .
 	'<p>' . __('You can also perform the same types of actions, including narrowing the list by using the filters, acting on a Page using the action links that appear when you hover over a row, or using the Bulk Actions menu to edit the metadata for multiple Pages at once.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
-	'<p>' . __('<a href="http://codex.wordpress.org/Pages_Pages_SubPanel" target="_blank">Documentation on Managing Pages</a>') . '</p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Pages_Screen" target="_blank">Documentation on Managing Pages</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 	);
 }
@@ -190,7 +186,7 @@ require_once('./admin-header.php');
 ?>
 <div class="wrap">
 <?php screen_icon(); ?>
-<h2><?php echo esc_html( $post_type_object->labels->name ); ?> <a href="<?php echo $post_new_file ?>" class="button add-new-h2"><?php echo esc_html($post_type_object->labels->add_new); ?></a> <?php
+<h2><?php echo esc_html( $post_type_object->labels->name ); ?> <a href="<?php echo $post_new_file ?>" class="add-new-h2"><?php echo esc_html($post_type_object->labels->add_new); ?></a> <?php
 if ( isset($_REQUEST['s']) && $_REQUEST['s'] )
 	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', get_search_query() ); ?>
 </h2>

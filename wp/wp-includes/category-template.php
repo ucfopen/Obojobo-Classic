@@ -82,7 +82,7 @@ function get_the_category( $id = false ) {
 		_make_cat_compat( $categories[$key] );
 	}
 
-	// Filter name is plural because we return alot of categories not just one
+	// Filter name is plural because we return alot of categories (possibly more than #13237) not just one
 	return apply_filters( 'get_the_categories', $categories );
 }
 
@@ -533,7 +533,7 @@ function wp_tag_cloud( $args = '' ) {
 
 	$tags = get_terms( $args['taxonomy'], array_merge( $args, array( 'orderby' => 'count', 'order' => 'DESC' ) ) ); // Always query top tags
 
-	if ( empty( $tags ) )
+	if ( empty( $tags ) || is_wp_error( $tags ) )
 		return;
 
 	foreach ( $tags as $key => $tag ) {
@@ -1063,8 +1063,6 @@ function term_description( $term = 0, $taxonomy = 'post_tag' ) {
 
 /**
  * Retrieve the terms of the taxonomy that are attached to the post.
- *
- * This function can only be used within the loop.
  *
  * @since 2.5.0
  *
