@@ -19,7 +19,7 @@ add_filter('show_admin_bar', '__return_false');
 <script type="text/javascript" src="/assets/js/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
 <!--<script type="text/javascript" src="/assets/js/poshytip/src/jquery.poshytip.min.js"></script>-->
 <script type="text/javascript" src="/assets/js/tipTipv13/jquery.tipTip.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.activity-indicator-1.0.0.min.js"></script>
+<!--<script type="text/javascript" src="/assets/js/jquery.activity-indicator-1.0.0.min.js"></script>-->
 <script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.min.js"></script>
 <!--<script type="text/javascript" src="/assets/flowplayer/flowplayer-3.2.6.min.js"></script>-->
 <script type="text/javascript" src="/assets/js/swfobject.js"></script>
@@ -40,7 +40,7 @@ add_filter('show_admin_bar', '__return_false');
 
 <!-- <script type="text/javascript" src="/assets/js/jquery.history.js"></script> -->
 
-<link rel="stylesheet" type="text/css" href="/assets/js/poshytip/src/tip-twitter/tip-twitter.css">
+<!--<link rel="stylesheet" type="text/css" href="/assets/js/poshytip/src/tip-twitter/tip-twitter.css">-->
 <link rel="stylesheet" type="text/css" href="/assets/js/tipTipv13/tipTip.css">
 <!--<link rel="stylesheet" type="text/css" href="/assets/flowplayer/style.css">-->
 
