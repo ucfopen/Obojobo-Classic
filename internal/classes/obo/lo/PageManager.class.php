@@ -146,7 +146,7 @@ class PageManager extends \rocketD\db\DBEnabled
 		}
 	
 		
-		if($pages = \obo\util\Cache::getInstance()->getPagesForLOID($loID))
+		if($pages = \rocketD\util\Cache::getInstance()->getPagesForLOID($loID))
 		{
 			return count($pages);
 		}
@@ -168,7 +168,7 @@ class PageManager extends \rocketD\db\DBEnabled
 				
 		// try to retrieve from cache first
 		
-		if($pages = \obo\util\Cache::getInstance()->getPagesForLOID($loID))
+		if($pages = \rocketD\util\Cache::getInstance()->getPagesForLOID($loID))
 		{
 			return $pages;
 		}
@@ -181,7 +181,7 @@ class PageManager extends \rocketD\db\DBEnabled
 			
 		}
 	
-		\obo\util\Cache::getInstance()->setPagesForLOID($loID, $pages);
+		\rocketD\util\Cache::getInstance()->setPagesForLOID($loID, $pages);
 		
 		return $pages;
 	}

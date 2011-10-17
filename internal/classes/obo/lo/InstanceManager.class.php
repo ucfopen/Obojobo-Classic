@@ -289,7 +289,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				else
 				{
 					// TRY Retrieving from Cache
-					if($curInstData = \obo\util\Cache::getInstance()->getInstanceData($arrItem))
+					if($curInstData = \rocketD\util\Cache::getInstance()->getInstanceData($arrItem))
 					{
 						$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
 						$return[] = $curInstData; // store in return
@@ -316,7 +316,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 
 			// valid, attempt to get from cache since, special case for just one id
-			if($curInstData = \obo\util\Cache::getInstance()->getInstanceData($instID))
+			if($curInstData = \rocketD\util\Cache::getInstance()->getInstanceData($instID))
 			{
 
 				$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
@@ -349,7 +349,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$ownerName = $authMan->getName($r->{\cfg_core_User::ID});
 			$iData = new \obo\lo\InstanceData($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $ownerName, $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT});
 			$iData->dbGetCourseData();
-			\obo\util\Cache::getInstance()->setInstanceData($iData);
+			\rocketD\util\Cache::getInstance()->setInstanceData($iData);
 			// get perms
 			
 			// OBOJOBO OMG FIX
@@ -444,7 +444,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				`".\cfg_obo_Instance::ID."` = '?'";
 				
 		
-		\obo\util\Cache::getInstance()->clearInstanceData($instID);
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 		//Send query to DB, checking for errors
 		// TODO:future course code: if( !($q = $this->DBM->querySafe($qstr, $name, $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID, $instID)) )
 		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $instID)) )
@@ -504,8 +504,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		$pMan->clearPermsForItem(\cfg_core_Perm::TYPE_INSTANCE, $instID);
 		
 		// clear cache
-		\obo\util\Cache::getInstance()->clearInstanceData($instID);
-		\obo\util\Cache::getInstance()->clearInstanceScores($instID);
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
+		\rocketD\util\Cache::getInstance()->clearInstanceScores($instID);
 		$tracking = \obo\log\LogManager::getInstance();
 		$tracking->trackDeleteInstance($instID);
 		
@@ -523,7 +523,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		
 		// try cache, instanceData can find the loid by the instid
 		
-		if($instData = \obo\util\Cache::getInstance()->getInstanceData($instID))
+		if($instData = \rocketD\util\Cache::getInstance()->getInstanceData($instID))
 		{
 			return $instData->loID;
 		}
