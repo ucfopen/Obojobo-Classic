@@ -1,4 +1,5 @@
 <?php // Local config options set here, override settings from config_main here
+require_once('cfg.php'); // default config
 
 class AppCfg extends AppCfgDefault
 {
@@ -30,6 +31,13 @@ class AppCfg extends AppCfgDefault
 	const DB_MODX_NAME = '';
 	const DB_MODX_TYPE = ''; // either mysql or oci8
 	
+	// Wordpress DB Connection
+	const DB_WP_HOST = '';
+	const DB_WP_USER = '';
+	const DB_WP_PASS = '';
+	const DB_WP_NAME = '';
+	const DB_WP_TYPE = ''; // either mysql or oci8
+		
 	// UCF AUTH DB Connection
 	const UCF_DB_HOST = '';
 	const UCF_DB_USER = '';
