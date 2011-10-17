@@ -41,8 +41,10 @@ function deserializationAction(&$body)
 			if($value[0] != '[' && $value[0] != '{' && $value != "null" && $value != "false" && $value != "true")
 			{
 				//check to see if it is a number
-				$char1 = ord($value[0]);
-				if($char1 >= 0x30 && $char1 <= 0x39)
+				//$char1 = ord($value[0]);
+				//if($char1 >= 0x30 && $char1 <= 0x39)
+				//@ZACH - This was registering '0z' as a number since it was only checking the first digit
+				if(is_numeric($value))
 				{
 					//Then this is a number
 					$value = json_decode($value, true);
@@ -79,7 +81,6 @@ function serializationAction(& $body)
 	$rawResponse = & $body->getResults();
 	
 	adapterMap($rawResponse);
-	
 	//Now serialize it
 	$encodedResponse = json_encode($rawResponse);
 	if($body->jsonCallback != '')

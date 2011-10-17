@@ -633,7 +633,36 @@ h3
 	color:#BBFFBB;
 }
 
+.answer-feedback
+{
+	float: left;
+	border: thin solid black;
+	margin-top: 1em;
+}
 
+.answer-feedback h4
+{
+	float: left;
+	font-family: 'Lato';
+	font-weight: bold;
+	font-size: 0.7em;
+	text-transform: uppercase;
+	width: 74px;
+	height: 24px;
+	margin: 0;
+	margin-right: 2px;
+	padding-left: 8px;
+	padding-top: 4px;
+	background: url('/assets/images/viewer/review-pointer.png') no-repeat;
+}
+
+.answer-feedback p
+{
+	float: left;
+	margin: 0;
+	font-size: 0.8em;
+	width: 800px;
+}
 
 #footer
 {
