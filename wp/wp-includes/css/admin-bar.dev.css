@@ -7,6 +7,9 @@
 	text-transform: none;
 	letter-spacing: normal;
 	line-height: 1;
+	font: normal 13px/28px Arial, Helvetica, sans-serif;
+	color: #ddd;
+	text-shadow: #555 0px -1px 0px;
 }
 
 #wpadminbar :before,
@@ -73,11 +76,8 @@
 
 #wpadminbar .quicklinks a,
 #wpadminbar .shortlink-input {
-	color: #ddd;
 	height: 28px;
-	text-shadow: #555 0px -1px 0px;
 	display: block;
-	font: normal 13px/28px Arial, Helvetica, sans-serif;
 	padding: 0 0.85em;
 	margin: 0;
 }
@@ -108,7 +108,13 @@
 	float: none;
 }
 
+#wpadminbar .quicklinks .menupop ul li a strong {
+	font-weight: bold;
+}
+
 #wpadminbar .quicklinks .menupop ul li a,
+#wpadminbar .quicklinks .menupop ul li a span,
+#wpadminbar .quicklinks .menupop ul li a strong,
 #wpadminbar .shortlink-input {
 	color: #555;
 	text-shadow: none;
@@ -120,7 +126,9 @@
 	width: 200px;
 }
 
-#wpadminbar .quicklinks .menupop ul li:hover > a {
+#wpadminbar .quicklinks .menupop ul li:hover > a,
+#wpadminbar .quicklinks .menupop ul li:hover > a span,
+#wpadminbar .quicklinks .menupop ul li:hover > a strong {
 	color: #fff;
 	text-shadow: #666 0px -1px 0px;
 }

@@ -42,7 +42,7 @@ $help = '
 	<p>' . __('Many themes show some sidebar widgets by default until you edit your sidebars, but they are not automatically displayed in your sidebar management tool. After you make your first widget change, you can re-add the default widgets by adding them from the Available Widgets area.') . '</p>
 ';
 $help .= '<p><strong>' . __('For more information:') . '</strong></p>';
-$help .= '<p>' . __('<a href="http://codex.wordpress.org/Appearance_Widgets_SubPanel" target="_blank">Documentation on Widgets</a>') . '</p>';
+$help .= '<p>' . __('<a href="http://codex.wordpress.org/Appearance_Widgets_Screen" target="_blank">Documentation on Widgets</a>') . '</p>';
 $help .= '<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>';
 add_contextual_help($current_screen, $help);
 
@@ -357,7 +357,7 @@ require_once( './admin-header.php' ); ?>
 	<div id="available-widgets" class="widgets-holder-wrap">
 		<div class="sidebar-name">
 		<div class="sidebar-name-arrow"><br /></div>
-		<h3><?php _e('Available Widgets'); ?> <span id="removing-widget"><?php _e('Deactivate'); ?> <span></span></span></h3></div>
+		<h3><?php _e('Available Widgets'); ?> <span id="removing-widget"><?php _ex('Deactivate', 'removing-widget'); ?> <span></span></span></h3></div>
 		<div class="widget-holder">
 		<p class="description"><?php _e('Drag widgets from here to a sidebar on the right to activate them. Drag widgets back here to deactivate them and delete their settings.'); ?></p>
 		<div id="widget-list">

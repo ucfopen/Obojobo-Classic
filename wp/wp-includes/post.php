@@ -18,6 +18,9 @@
  */
 function create_initial_post_types() {
 	register_post_type( 'post', array(
+		'labels' => array(
+			'name_admin_bar' => _x( 'Post', 'add new on admin bar' ),
+		),
 		'public'  => true,
 		'_builtin' => true, /* internal use only. don't use this when registering your own post type. */
 		'_edit_link' => 'post.php?post=%d', /* internal use only. don't use this when registering your own post type. */
@@ -30,7 +33,11 @@ function create_initial_post_types() {
 	) );
 
 	register_post_type( 'page', array(
+		'labels' => array(
+			'name_admin_bar' => _x( 'Page', 'add new on admin bar' ),
+		),
 		'public' => true,
+		'publicly_queryable' => false,
 		'_builtin' => true, /* internal use only. don't use this when registering your own post type. */
 		'_edit_link' => 'post.php?post=%d', /* internal use only. don't use this when registering your own post type. */
 		'capability_type' => 'page',
@@ -55,6 +62,7 @@ function create_initial_post_types() {
 		'rewrite' => false,
 		'query_var' => false,
 		'show_in_nav_menus' => false,
+		'supports' => array( 'comments' ),
 	) );
 
 	register_post_type( 'revision', array(
@@ -626,7 +634,7 @@ function get_page_statuses( ) {
  *
  * label - A descriptive name for the post status marked for translation. Defaults to $post_status.
  * public - Whether posts of this status should be shown in the front end of the site. Defaults to true.
- * exclude_from_search - Whether to exclude posts with this post status from search results. Defaults to true.
+ * exclude_from_search - Whether to exclude posts with this post status from search results. Defaults to false.
  * show_in_admin_all_list - Whether to include posts in the edit listing for their post type
  * show_in_admin_status_list - Show in the list of statuses with post counts at the top of the edit
  *                             listings, e.g. All (12) | Published (9) | My Custom Status (2) ...
@@ -913,7 +921,8 @@ function register_post_type($post_type, $args = array()) {
 		'public' => false, 'rewrite' => true, 'has_archive' => false, 'query_var' => true,
 		'supports' => array(), 'register_meta_box_cb' => null,
 		'taxonomies' => array(), 'show_ui' => null, 'menu_position' => null, 'menu_icon' => null,
-		'permalink_epmask' => EP_PERMALINK, 'can_export' => true, 'show_in_nav_menus' => null, 'show_in_menu' => null,
+		'permalink_epmask' => EP_PERMALINK, 'can_export' => true,
+		'show_in_nav_menus' => null, 'show_in_menu' => null, 'show_in_admin_bar' => null,
 	);
 	$args = wp_parse_args($args, $defaults);
 	$args = (object) $args;
@@ -935,6 +944,10 @@ function register_post_type($post_type, $args = array()) {
 	// If not set, default to the setting for show_ui.
 	if ( null === $args->show_in_menu || ! $args->show_ui )
 		$args->show_in_menu = $args->show_ui;
+
+	// If not set, default to the whether the full UI is shown.
+	if ( null === $args->show_in_admin_bar )
+		$args->show_in_admin_bar = true === $args->show_in_menu;
 
 	// Whether to show this type in nav-menus.php.  Defaults to the setting for public.
 	if ( null === $args->show_in_nav_menus )
@@ -1067,7 +1080,7 @@ function register_post_type($post_type, $args = array()) {
  *   can be deleted. If the post type does not support an author, then this will
  *   behave like delete_posts.
  * - edit_private_posts - Controls whether private objects can be edited.
- * - edit_published_posts - Controls whether published objects can be deleted.
+ * - edit_published_posts - Controls whether published objects can be edited.
  *
  * These additional capabilities are only used in map_meta_cap(). Thus, they are
  * only assigned by default if the post type is registered with the 'map_meta_cap'
@@ -1172,6 +1185,7 @@ function get_post_type_labels( $post_type_object ) {
 		'not_found' => array( __('No posts found.'), __('No pages found.') ),
 		'not_found_in_trash' => array( __('No posts found in Trash.'), __('No pages found in Trash.') ),
 		'parent_item_colon' => array( null, __('Parent Page:') ),
+		'all_items' => array( __( 'All Posts' ), __( 'All Pages' ) )
 	);
 	$nohier_vs_hier_defaults['menu_name'] = $nohier_vs_hier_defaults['name'];
 	return _get_custom_object_labels( $post_type_object, $nohier_vs_hier_defaults );
@@ -1191,8 +1205,14 @@ function _get_custom_object_labels( $object, $nohier_vs_hier_defaults ) {
 	if ( !isset( $object->labels['singular_name'] ) && isset( $object->labels['name'] ) )
 		$object->labels['singular_name'] = $object->labels['name'];
 
+	if ( ! isset( $object->labels['name_admin_bar'] ) )
+		$object->labels['name_admin_bar'] = isset( $object->labels['singular_name'] ) ? $object->labels['singular_name'] : $object->name;
+
 	if ( !isset( $object->labels['menu_name'] ) && isset( $object->labels['name'] ) )
 		$object->labels['menu_name'] = $object->labels['name'];
+
+	if ( !isset( $object->labels['all_items'] ) && isset( $object->labels['menu_name'] ) )
+		$object->labels['all_items'] = $object->labels['menu_name'];
 
 	foreach ( $nohier_vs_hier_defaults as $key => $value )
 			$defaults[$key] = $object->hierarchical ? $value[1] : $value[0];
@@ -1213,7 +1233,7 @@ function _add_post_type_submenus() {
 		// Submenus only.
 		if ( ! $ptype_obj->show_in_menu || $ptype_obj->show_in_menu === true )
 			continue;
-		add_submenu_page( $ptype_obj->show_in_menu, $ptype_obj->labels->name, $ptype_obj->labels->menu_name, $ptype_obj->cap->edit_posts, "edit.php?post_type=$ptype" );
+		add_submenu_page( $ptype_obj->show_in_menu, $ptype_obj->labels->name, $ptype_obj->labels->all_items, $ptype_obj->cap->edit_posts, "edit.php?post_type=$ptype" );
 	}
 }
 add_action( 'admin_menu', '_add_post_type_submenus' );
@@ -1329,7 +1349,7 @@ function set_post_type( $post_id = 0, $post_type = 'post' ) {
  *     'meta_value' - See {@link WP_Query::query()} for more.
  *     'post_type' - Default is 'post'. Can be 'page', or 'attachment' to name a few.
  *     'post_parent' - The parent of the post or post type.
- *     'post_status' - Default is 'published'. Post status to retrieve.
+ *     'post_status' - Default is 'publish'. Post status to retrieve.
  *
  * @since 1.2.0
  * @uses $wpdb
@@ -1378,7 +1398,7 @@ function get_posts($args = null) {
 /**
  * Add meta data field to a post.
  *
- * Post meta data is called "Custom Fields" on the Administration Panels.
+ * Post meta data is called "Custom Fields" on the Administration Screen.
  *
  * @since 1.5.0
  * @uses $wpdb
@@ -1963,7 +1983,7 @@ function wp_delete_post( $postid = 0, $force_delete = false ) {
 	if ( $post->post_type == 'attachment' )
 		return wp_delete_attachment( $postid, $force_delete );
 
-	do_action('delete_post', $postid);
+	do_action('before_delete_post', $postid);
 
 	delete_post_meta($postid,'_wp_trash_meta_status');
 	delete_post_meta($postid,'_wp_trash_meta_time');
@@ -2035,7 +2055,7 @@ function wp_delete_post( $postid = 0, $force_delete = false ) {
 
 	wp_clear_scheduled_hook('publish_future_post', array( $postid ) );
 
-	do_action('deleted_post', $postid);
+	do_action('after_delete_post', $postid);
 
 	return $post;
 }
@@ -2410,6 +2430,9 @@ function wp_insert_post($postarr, $wp_error = false) {
 		'post_content' => '', 'post_title' => '');
 
 	$postarr = wp_parse_args($postarr, $defaults);
+
+	unset( $postarr[ 'filter' ] );
+
 	$postarr = sanitize_post($postarr, 'db');
 
 	// export array as variables
@@ -2461,7 +2484,7 @@ function wp_insert_post($postarr, $wp_error = false) {
 		$post_before = get_post($post_ID);
 	}
 
-	// Don't allow contributors to set to set the post slug for pending review posts
+	// Don't allow contributors to set the post slug for pending review posts
 	if ( 'pending' == $post_status && !current_user_can( 'publish_posts' ) )
 		$post_name = '';
 
@@ -3324,7 +3347,9 @@ function &get_pages($args = '') {
 		return false;
 
 	// Make sure we have a valid post status
-	if ( !in_array($post_status, get_post_stati()) )
+	if ( !is_array( $post_status ) )
+		$post_status = explode( ',', $post_status );
+	if ( array_diff( $post_status, get_post_stati() ) )
 		return false;
 
 	$cache = array();
@@ -3419,7 +3444,49 @@ function &get_pages($args = '') {
 	if ( $parent >= 0 )
 		$where .= $wpdb->prepare(' AND post_parent = %d ', $parent);
 
-	$where_post_type = $wpdb->prepare( "post_type = '%s' AND post_status = '%s'", $post_type, $post_status );
+	if ( 1 == count( $post_status ) ) {
+		$where_post_type = $wpdb->prepare( "post_type = %s AND post_status = %s", $post_type, array_shift( $post_status ) );
+	} else {
+		$post_status = implode( "', '", $post_status );
+		$where_post_type = $wpdb->prepare( "post_type = %s AND post_status IN ('$post_status')", $post_type );
+	}
+
+	$orderby_array = array();
+	$allowed_keys = array('author', 'post_author', 'date', 'post_date', 'title', 'post_title', 'modified',
+						  'post_modified', 'modified_gmt', 'post_modified_gmt', 'menu_order', 'parent', 'post_parent',
+						  'ID', 'rand', 'comment_count');
+	foreach ( explode( ',', $sort_column ) as $orderby ) {
+		$orderby = trim( $orderby );
+		if ( !in_array( $orderby, $allowed_keys ) )
+			continue;
+
+		switch ( $orderby ) {
+			case 'menu_order':
+				break;
+			case 'ID':
+				$orderby = "$wpdb->posts.ID";
+				break;
+			case 'rand':
+				$orderby = 'RAND()';
+				break;
+			case 'comment_count':
+				$orderby = "$wpdb->posts.comment_count";
+				break;
+			default:
+				if ( 0 === strpos( $orderby, 'post_' ) )
+					$orderby = "$wpdb->posts." . $orderby;
+				else
+					$orderby = "$wpdb->posts.post_" . $orderby;
+		}
+
+		$orderby_array[] = $orderby;
+
+	}
+	$sort_column = ! empty( $orderby_array ) ? implode( ',', $orderby_array ) : "$wpdb->posts.post_title";
+
+	$sort_order = strtoupper( $sort_order );
+	if ( '' !== $sort_order && !in_array( $sort_order, array( 'ASC', 'DESC' ) ) )
+		$sort_order = 'ASC';
 
 	$query = "SELECT * FROM $wpdb->posts $join WHERE ($where_post_type) $where ";
 	$query .= $author_query;
@@ -3546,6 +3613,8 @@ function wp_insert_attachment($object, $file = false, $parent = 0) {
 	$object = wp_parse_args($object, $defaults);
 	if ( !empty($parent) )
 		$object['post_parent'] = $parent;
+
+	unset( $object[ 'filter' ] );
 
 	$object = sanitize_post($object, 'db');
 
@@ -4058,63 +4127,49 @@ function wp_check_for_changed_slugs($post_id, $post, $post_before) {
  * Retrieve the private post SQL based on capability.
  *
  * This function provides a standardized way to appropriately select on the
- * post_status of posts/pages. The function will return a piece of SQL code that
- * can be added to a WHERE clause; this SQL is constructed to allow all
+ * post_status of a post type. The function will return a piece of SQL code
+ * that can be added to a WHERE clause; this SQL is constructed to allow all
  * published posts, and all private posts to which the user has access.
- *
- * It also allows plugins that define their own post type to control the cap by
- * using the hook 'pub_priv_sql_capability'. The plugin is expected to return
- * the capability the user must have to read the private post type.
  *
  * @since 2.2.0
  *
  * @uses $user_ID
- * @uses apply_filters() Call 'pub_priv_sql_capability' filter for plugins with different post types.
  *
  * @param string $post_type currently only supports 'post' or 'page'.
  * @return string SQL code that can be added to a where clause.
  */
-function get_private_posts_cap_sql($post_type) {
-	return get_posts_by_author_sql($post_type, FALSE);
+function get_private_posts_cap_sql( $post_type ) {
+	return get_posts_by_author_sql( $post_type, false );
 }
 
 /**
  * Retrieve the post SQL based on capability, author, and type.
  *
- * See above for full description.
+ * @see get_private_posts_cap_sql() for full description.
  *
  * @since 3.0.0
- * @param string $post_type currently only supports 'post' or 'page'.
+ * @param string $post_type Post type.
  * @param bool $full Optional.  Returns a full WHERE statement instead of just an 'andalso' term.
  * @param int $post_author Optional.  Query posts having a single author ID.
  * @return string SQL WHERE code that can be added to a query.
  */
-function get_posts_by_author_sql($post_type, $full = TRUE, $post_author = NULL) {
+function get_posts_by_author_sql( $post_type, $full = true, $post_author = null ) {
 	global $user_ID, $wpdb;
 
 	// Private posts
-	if ($post_type == 'post') {
-		$cap = 'read_private_posts';
-	// Private pages
-	} elseif ($post_type == 'page') {
-		$cap = 'read_private_pages';
-	// Dunno what it is, maybe plugins have their own post type?
-	} else {
-		$cap = '';
-		$cap = apply_filters('pub_priv_sql_capability', $cap);
+	$post_type_obj = get_post_type_object( $post_type );
+	if ( ! $post_type_obj )
+		return ' 1 = 0 ';
 
-		if (empty($cap)) {
-			// We don't know what it is, filters don't change anything,
-			// so set the SQL up to return nothing.
-			return ' 1 = 0 ';
-		}
-	}
+	// This hook is deprecated. Why you'd want to use it, I dunno.
+	if ( ! $cap = apply_filters( 'pub_priv_sql_capability', '' ) )
+		$cap = $post_type_obj->cap->read_private_posts;
 
-	if ($full) {
-		if (is_null($post_author)) {
-			$sql = $wpdb->prepare('WHERE post_type = %s AND ', $post_type);
+	if ( $full ) {
+		if ( null === $post_author ) {
+			$sql = $wpdb->prepare( 'WHERE post_type = %s AND ', $post_type );
 		} else {
-			$sql = $wpdb->prepare('WHERE post_author = %d AND post_type = %s AND ', $post_author, $post_type);
+			$sql = $wpdb->prepare( 'WHERE post_author = %d AND post_type = %s AND ', $post_author, $post_type );
 		}
 	} else {
 		$sql = '';
@@ -4122,15 +4177,15 @@ function get_posts_by_author_sql($post_type, $full = TRUE, $post_author = NULL) 
 
 	$sql .= "(post_status = 'publish'";
 
-	if (current_user_can($cap)) {
+	if ( current_user_can( $cap ) ) {
 		// Does the user have the capability to view private posts? Guess so.
 		$sql .= " OR post_status = 'private'";
-	} elseif (is_user_logged_in()) {
+	} elseif ( is_user_logged_in() ) {
 		// Users can view their own private posts.
 		$id = (int) $user_ID;
-		if (is_null($post_author) || !$full) {
+		if ( null === $post_author || ! $full ) {
 			$sql .= " OR post_status = 'private' AND post_author = $id";
-		} elseif ($id == (int)$post_author) {
+		} elseif ( $id == (int) $post_author ) {
 			$sql .= " OR post_status = 'private'";
 		} // else none
 	} // else none
@@ -4206,7 +4261,7 @@ function _get_last_post_time( $timezone, $field ) {
 	if ( !$date ) {
 		$add_seconds_server = date('Z');
 
-		$post_types = get_post_types( array( 'publicly_queryable' => true ) );
+		$post_types = get_post_types( array( 'public' => true ) );
 		array_walk( $post_types, array( &$wpdb, 'escape_by_ref' ) );
 		$post_types = "'" . implode( "', '", $post_types ) . "'";
 
@@ -5092,20 +5147,8 @@ function get_post_format_strings() {
  * @return array The array of post format slugs.
  */
 function get_post_format_slugs() {
-	// 3.2-early: use array_combine() and array_keys( get_post_format_strings() )
-	$slugs = array(
-		'standard' => 'standard', // Special case. any value that evals to false will be considered standard
-		'aside'    => 'aside',
-		'chat'     => 'chat',
-		'gallery'  => 'gallery',
-		'link'     => 'link',
-		'image'    => 'image',
-		'quote'    => 'quote',
-		'status'   => 'status',
-		'video'    => 'video',
-		'audio'    => 'audio',
-	);
-	return $slugs;
+	$slugs = array_keys( get_post_format_strings() );
+	return array_combine( $slugs, $slugs );
 }
 
 /**

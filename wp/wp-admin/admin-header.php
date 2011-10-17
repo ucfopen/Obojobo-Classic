@@ -28,7 +28,6 @@ else
 $admin_title = apply_filters( 'admin_title', $admin_title, $title );
 
 wp_user_settings();
-wp_menu_unfold();
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -68,8 +67,6 @@ var userSettings = {
 <?php
 
 if ( in_array( $pagenow, array('post.php', 'post-new.php') ) ) {
-	add_action( 'admin_print_footer_scripts', 'wp_tiny_mce', 25 );
-	add_action( 'admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30 );
 	wp_enqueue_script('quicktags');
 }
 
@@ -87,6 +84,13 @@ if ( get_user_setting('mfold') == 'f' )
 if ( is_admin_bar_showing() )
 	$admin_body_class .= ' admin-bar';
 
+if ( is_rtl() )
+	$admin_body_class .= ' rtl';
+
+$admin_body_class .= ' branch-' . str_replace( '.', '-', floatval( $wp_version ) );
+$admin_body_class .= ' version-' . str_replace( '.', '-', preg_replace( '/^([.0-9]+).*/', '$1', $wp_version ) );
+$admin_body_class .= ' admin-color-' . sanitize_html_class( get_user_option( 'admin_color' ), 'fresh' );
+
 if ( $is_iphone ) { ?>
 <style type="text/css">.row-actions{visibility:visible;}</style>
 <?php } ?>
@@ -103,6 +107,7 @@ document.body.className = c;
 </script>
 
 <div id="wpwrap">
+<?php require(ABSPATH . 'wp-admin/menu-header.php'); ?>
 <div id="wpcontent">
 <div id="wphead">
 <?php
@@ -132,47 +137,65 @@ if ( function_exists('mb_strlen') ) {
 }
 ?>
 
-<img id="header-logo" src="<?php echo esc_url( includes_url( 'images/blank.gif' ) ); ?>" alt="" width="32" height="32" />
+<img id="header-logo" src="<?php echo esc_url( includes_url( 'images/blank.gif' ) ); ?>" alt="" width="16" height="16" />
 <h1 id="site-heading" <?php echo $title_class ?>>
 	<a href="<?php echo trailingslashit( get_bloginfo( 'url' ) ); ?>" title="<?php esc_attr_e('Visit Site') ?>">
 		<span id="site-title"><?php echo $blog_name ?></span>
 	</a>
-<?php if ( !is_network_admin() && !is_user_admin() && current_user_can('manage_options') && '1' != get_option('blog_public') ): ?>
-	<a id="privacy-on-link" href="options-privacy.php" title="<?php echo esc_attr( apply_filters('privacy_on_link_title', __('Your site is asking search engines not to index its content') ) ); ?>"><?php echo apply_filters('privacy_on_link_text', __('Search Engines Blocked') ); ?></a>
-<?php endif; ?>
 </h1>
 
-<?php do_action('in_admin_header'); ?>
+<?php
+
+do_action('in_admin_header');
+
+$links = array();
+
+// Generate user profile and info links.
+$links[5] = sprintf( __('Howdy, %1$s'), $user_identity );
+
+$links[8] = '<a href="profile.php" title="' . esc_attr__('Edit your profile') . '">' . __('Your Profile') . '</a>';
+
+if ( is_multisite() && is_super_admin() ) {
+	if ( !is_network_admin() )
+		$links[10] = '<a href="' . network_admin_url() . '" title="' . ( ! empty( $update_title ) ? $update_title : esc_attr__('Network Admin') ) . '">' . __('Network Admin') . ( ! empty( $total_update_count ) ? ' (' . number_format_i18n( $total_update_count ) . ')' : '' ) . '</a>';
+	else
+		$links[10] = '<a href="' . get_dashboard_url( get_current_user_id() ) . '" title="' . esc_attr__('Site Admin') . '">' . __('Site Admin') . '</a>';
+}
+
+$links[15] = '<a href="' . wp_logout_url() . '" title="' . esc_attr__('Log Out') . '">' . __('Log Out') . '</a>';
+
+$links = apply_filters( 'admin_user_info_links', $links, $current_user );
+ksort( $links );
+
+// Trim whitespace and pipes from links, then convert to list items.
+$links = array_map( 'trim', $links, array_fill( 0, count( $links ), " |\n\t" ) );
+
+$howdy = array_shift( $links );
+
+$links_no_js = implode( ' | ', $links );
+$links_js = '<li>' . implode( '</li><li>', $links ) . '</li>';
+
+?>
 
 <div id="wphead-info">
 <div id="user_info">
-<p><?php
-$links = array();
-$links[5] = sprintf(__('Howdy, <a href="%1$s" title="Edit your profile">%2$s</a>'), 'profile.php', $user_identity);
-if ( is_multisite() && is_super_admin() ) {
-	if ( !is_network_admin() )
-		$links[10] = '| <a href="' . network_admin_url() . '" title="' . ( ! empty( $update_title ) ? $update_title : esc_attr__('Network Admin') ) . '">' . __('Network Admin') . ( ! empty( $total_update_count ) ? ' (' . number_format_i18n( $total_update_count ) . ')' : '' ) . '</a>';
-	else
-		$links[10] = '| <a href="' . get_dashboard_url( get_current_user_id() ) . '" title="' . esc_attr__('Site Admin') . '">' . __('Site Admin') . '</a>';
-}
-$links[15] = '| <a href="' . wp_logout_url() . '" title="' . esc_attr__('Log Out') . '">' . __('Log Out') . '</a>';
+	<p class="hide-if-js"><?php echo "$howdy | $links_no_js"; ?></p>
 
-$links = apply_filters('admin_user_info_links', $links, $current_user);
-ksort($links);
-
-echo implode(' ', $links);
-?></p>
+	<div class="hide-if-no-js">
+		<p><?php echo $howdy; ?></p>
+		<div id="user_info_arrow"></div>
+		<div id="user_info_links_wrap"><div id="user_info_links">
+			<ul><?php echo $links_js; ?></ul>
+		</div></div>
+	</div>
+</div>
 </div>
 
-<?php favorite_actions($current_screen); ?>
-</div>
 </div>
 
 <div id="wpbody">
 <?php
 unset($title_class, $blog_name, $total_update_count, $update_title);
-
-require(ABSPATH . 'wp-admin/menu-header.php');
 
 $current_screen->parent_file = $parent_file;
 $current_screen->parent_base = preg_replace('/\?.*$/', '', $parent_file);

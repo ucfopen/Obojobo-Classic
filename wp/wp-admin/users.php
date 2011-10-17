@@ -25,7 +25,7 @@ add_contextual_help($current_screen,
     '<p>' . __('You can customize the display of information on this screen as you can on other screens, by using the Screen Options tab and the on-screen filters.') . '</p>' .
     '<p>' . __('To add a new user for your site, click the Add New button at the top of the screen or Add New in the Users menu section.') . '</p>' .
     '<p><strong>' . __('For more information:') . '</strong></p>' .
-    '<p>' . __('<a href="http://codex.wordpress.org/Users_Users_SubPanel" target="_blank">Documentation on Managing Users</a>') . '</p>' .
+    '<p>' . __('<a href="http://codex.wordpress.org/Users_Screen" target="_blank">Documentation on Managing Users</a>') . '</p>' .
     '<p>' . __('<a href="http://codex.wordpress.org/Roles_and_Capabilities" target="_blank">Descriptions of Roles and Capabilities</a>') . '</p>' .
     '<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 );
@@ -150,7 +150,7 @@ case 'delete':
 	if ( empty($_REQUEST['users']) )
 		$userids = array(intval($_REQUEST['user']));
 	else
-		$userids = $_REQUEST['users'];
+		$userids = (array) $_REQUEST['users'];
 
 	include ('admin-header.php');
 ?>
@@ -161,24 +161,24 @@ case 'delete':
 <div class="wrap">
 <?php screen_icon(); ?>
 <h2><?php _e('Delete Users'); ?></h2>
-<p><?php _e('You have specified these users for deletion:'); ?></p>
+<p><?php echo _n( 'You have specified this user for deletion:', 'You have specified these users for deletion:', count( $userids ) ); ?></p>
 <ul>
 <?php
-	$go_delete = false;
-	foreach ( (array) $userids as $id ) {
+	$go_delete = 0;
+	foreach ( $userids as $id ) {
 		$id = (int) $id;
 		$user = new WP_User($id);
 		if ( $id == $current_user->ID ) {
 			echo "<li>" . sprintf(__('ID #%1s: %2s <strong>The current user will not be deleted.</strong>'), $id, $user->user_login) . "</li>\n";
 		} else {
 			echo "<li><input type=\"hidden\" name=\"users[]\" value=\"" . esc_attr($id) . "\" />" . sprintf(__('ID #%1s: %2s'), $id, $user->user_login) . "</li>\n";
-			$go_delete = true;
+			$go_delete++;
 		}
 	}
 	?>
 	</ul>
 <?php if ( $go_delete ) : ?>
-	<fieldset><p><legend><?php _e('What should be done with posts and links owned by this user?'); ?></legend></p>
+	<fieldset><p><legend><?php echo _n( 'What should be done with posts and links owned by this user?', 'What should be done with posts and links owned by these users?', $go_delete ); ?></legend></p>
 	<ul style="list-style:none;">
 		<li><label><input type="radio" id="delete_option0" name="delete_option" value="delete" checked="checked" />
 		<?php _e('Delete all posts and links.'); ?></label></li>
@@ -360,9 +360,9 @@ if ( ! empty($messages) ) {
 <?php
 echo esc_html( $title );
 if ( current_user_can( 'create_users' ) ) { ?>
-	<a href="user-new.php" class="button add-new-h2"><?php echo esc_html_x( 'Add New', 'user' ); ?></a>
+	<a href="user-new.php" class="add-new-h2"><?php echo esc_html_x( 'Add New', 'user' ); ?></a>
 <?php } elseif ( is_multisite() && current_user_can( 'promote_users' ) ) { ?>
-	<a href="user-new.php" class="button add-new-h2"><?php echo esc_html_x( 'Add Existing', 'user' ); ?></a>
+	<a href="user-new.php" class="add-new-h2"><?php echo esc_html_x( 'Add Existing', 'user' ); ?></a>
 <?php }
 
 if ( $usersearch )
@@ -377,16 +377,6 @@ if ( $usersearch )
 
 <?php $wp_list_table->display(); ?>
 </form>
-
-<?php
-if ( is_multisite() ) {
-	foreach ( array('user_login' => 'user_login', 'first_name' => 'user_firstname', 'last_name' => 'user_lastname', 'email' => 'user_email', 'url' => 'user_uri', 'role' => 'user_role') as $formpost => $var ) {
-		$var = 'new_' . $var;
-		$$var = isset($_REQUEST[$formpost]) ? esc_attr(stripslashes($_REQUEST[$formpost])) : '';
-	}
-	unset($name);
-}
-?>
 
 <br class="clear" />
 </div>

@@ -45,7 +45,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 	 */
 	var $sticky_posts_count = 0;
 
-	function WP_Posts_List_Table() {
+	function __construct() {
 		global $post_type_object, $post_type, $wpdb;
 
 		if ( !isset( $_REQUEST['post_type'] ) )
@@ -74,7 +74,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 			$this->sticky_posts_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( 1 ) FROM $wpdb->posts WHERE post_type = %s AND post_status != 'trash' AND ID IN ($sticky_posts)", $post_type ) );
 		}
 
-		parent::WP_List_Table( array(
+		parent::__construct( array(
 			'plural' => 'posts',
 		) );
 	}
@@ -281,7 +281,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 
 		$post_status = !empty( $_REQUEST['post_status'] ) ? $_REQUEST['post_status'] : 'all';
 		if ( post_type_supports( $post_type, 'comments' ) && !in_array( $post_status, array( 'pending', 'draft', 'future' ) ) )
-			$posts_columns['comments'] = '<div class="vers"><img alt="' . esc_attr__( 'Comments' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></div>';
+			$posts_columns['comments'] = '<span class="vers"><img alt="' . esc_attr__( 'Comments' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>';
 
 		$posts_columns['date'] = __( 'Date' );
 
@@ -550,11 +550,13 @@ class WP_Posts_List_Table extends WP_List_Table {
 					if ( 'trash' == $post->post_status || !EMPTY_TRASH_DAYS )
 						$actions['delete'] = "<a class='submitdelete' title='" . esc_attr( __( 'Delete this item permanently' ) ) . "' href='" . get_delete_post_link( $post->ID, '', true ) . "'>" . __( 'Delete Permanently' ) . "</a>";
 				}
-				if ( in_array( $post->post_status, array( 'pending', 'draft' ) ) ) {
-					if ( $can_edit_post )
-						$actions['view'] = '<a href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
-				} elseif ( 'trash' != $post->post_status ) {
-					$actions['view'] = '<a href="' . get_permalink( $post->ID ) . '" title="' . esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $title ) ) . '" rel="permalink">' . __( 'View' ) . '</a>';
+				if ( $post_type_object->public ) {
+					if ( in_array( $post->post_status, array( 'pending', 'draft' ) ) ) {
+						if ( $can_edit_post )
+							$actions['view'] = '<a href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $title ) ) . '" rel="permalink">' . __( 'Preview' ) . '</a>';
+					} elseif ( 'trash' != $post->post_status ) {
+						$actions['view'] = '<a href="' . get_permalink( $post->ID ) . '" title="' . esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $title ) ) . '" rel="permalink">' . __( 'View' ) . '</a>';
+					}
 				}
 
 				$actions = apply_filters( is_post_type_hierarchical( $post->post_type ) ? 'page_row_actions' : 'post_row_actions', $actions, $post );
@@ -1003,6 +1005,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 			} ?>
 			<input type="hidden" name="post_view" value="<?php echo esc_attr( $m ); ?>" />
 			<input type="hidden" name="screen" value="<?php echo esc_attr( $screen->id ); ?>" />
+			<span class="error" style="display:none"></span>
 			<br class="clear" />
 		</p>
 		</td></tr>
