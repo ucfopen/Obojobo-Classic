@@ -35,7 +35,7 @@ class LanguageManager extends \rocketD\db\DBEnabled
 	{
 		
 		// check memcache
- 		$oboCache = \obo\util\Cache::getInstance();
+ 		$oboCache = \rocketD\util\Cache::getInstance();
 		if($langs = $oboCache->getAllLangs)
 		{
 			return $langs;

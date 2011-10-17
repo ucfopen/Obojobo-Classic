@@ -192,7 +192,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			return \rocketD\util\Error::getError(2);
 		}
 		
-		if($perms = \obo\util\Cache::getInstance()->getPermsForUserToItem($userID, $itemType, $itemID))
+		if($perms = \rocketD\util\Cache::getInstance()->getPermsForUserToItem($userID, $itemType, $itemID))
 		{
 			return $perms;
 		}
@@ -205,7 +205,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			$perms[] = $r[\cfg_core_Perm::PERM];
 		}
 		
-		\obo\util\Cache::getInstance()->setPermsFOrUserToItem($userID, $itemType, $itemID, $perms);
+		\rocketD\util\Cache::getInstance()->setPermsFOrUserToItem($userID, $itemType, $itemID, $perms);
 		
 		return $perms;
 		
@@ -258,7 +258,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			$q = $this->DBM->querySafe($query, $perm, $userID, $itemID, $itemType);
 		}
 		
-		\obo\util\Cache::getInstance()->clearPermsFOrUserToItem($userID, $itemType, $itemID);
+		\rocketD\util\Cache::getInstance()->clearPermsFOrUserToItem($userID, $itemType, $itemID);
 		return true;
 	}
 	
@@ -276,7 +276,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		foreach($groupIDs AS $groupID)
 		{
 			/** Get From Cache **/
-			if($cachedPerms = \obo\util\Cache::getInstance()->getPermsForGroup($groupID))
+			if($cachedPerms = \rocketD\util\Cache::getInstance()->getPermsForGroup($groupID))
 			{
 				$perms = array_merge($perms, $cachedPerms);
 			}
@@ -290,7 +290,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 				{
 					$dbPerms[] = $r->{\cfg_core_Perm::PERM};
 				}
-				\obo\util\Cache::getInstance()->setPermsForGroup($groupID, $dbPerms);
+				\rocketD\util\Cache::getInstance()->setPermsForGroup($groupID, $dbPerms);
 				$perms = array_merge($perms, $dbPerms);
 			}
 		}
@@ -339,7 +339,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			$q = $this->DBM->querySafe($query, $groupID, $perm);
 		}
 		
-		\obo\util\Cache::getInstance()->clearPermsForGroup($groupID);
+		\rocketD\util\Cache::getInstance()->clearPermsForGroup($groupID);
 		return true;
 	}
 	
@@ -360,7 +360,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		}
 		
 		/** Get From Cache **/
-		if($perms = \obo\util\Cache::getInstance()->getPermsForItem($itemType, $itemID))
+		if($perms = \rocketD\util\Cache::getInstance()->getPermsForItem($itemType, $itemID))
 		{
 			return $perms;
 		}
@@ -374,7 +374,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			$perms[] = $r[\cfg_core_Perm::PERM];
 		}
 		
-		\obo\util\Cache::getInstance()->setPermsForItem($itemType, $itemID, $perms);
+		\rocketD\util\Cache::getInstance()->setPermsForItem($itemType, $itemID, $perms);
 		return $perms;
 	}
 	public function setPermsForItem($itemType, $itemID, $addPerms, $remPerms)
@@ -421,7 +421,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			$this->DBM->querySafe($query, $itemType, $itemID, $perm);
 		}
 		
-		\obo\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
+		\rocketD\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
 		return true;
 	}
 	
@@ -479,7 +479,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		$this->DBM->querySafe($query, $itemType, $itemID);
 
 		
-		\obo\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
+		\rocketD\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
 		
 	}
 	public function clearPermsForGroup($groupID){}

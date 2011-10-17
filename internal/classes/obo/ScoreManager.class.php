@@ -272,7 +272,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			}
 
 			// get from memcache
-			if(false && $scores = \obo\util\Cache::getInstance()->getInstanceScores($instID))
+			if(false && $scores = \rocketD\util\Cache::getInstance()->getInstanceScores($instID))
 			{
 				return $scores;
 			}
@@ -353,7 +353,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			}
 			
 			// store in memcache
-			\obo\util\Cache::getInstance()->setInstanceScores($instID, $result);
+			\rocketD\util\Cache::getInstance()->setInstanceScores($instID, $result);
 			
 		}
 		//********************  GET ONLY MY SCORES  ************************//

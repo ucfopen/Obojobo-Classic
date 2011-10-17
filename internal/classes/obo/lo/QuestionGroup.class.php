@@ -83,7 +83,7 @@ class QuestionGroup
 			return false;
 		}
 		
-		if( ($qgroup = \obo\util\Cache::getInstance()->getQGroup($qGroupID) ) && is_array($qgroup))
+		if( ($qgroup = \rocketD\util\Cache::getInstance()->getQGroup($qGroupID) ) && is_array($qgroup))
 		{
 			// copy data to this object
 			foreach($qgroup AS $key => $value)
@@ -128,7 +128,7 @@ class QuestionGroup
 			}
 			$this->quizSize = $this->calculateQuizSize();
 			
-			\obo\util\Cache::getInstance()->setQGroup($qGroupID, $this);
+			\rocketD\util\Cache::getInstance()->setQGroup($qGroupID, $this);
 		}
 		
 
