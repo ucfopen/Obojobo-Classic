@@ -376,6 +376,8 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$loObj = \rocketD\util\Error::getError(1);
 		}
+		//trace('getLO');
+		//trace($loObj);
 		return $loObj;
 	}
 	
@@ -494,6 +496,8 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function createDraft($loObj)
 	{
+		trace('createDraft');
+		trace($loObj);
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
