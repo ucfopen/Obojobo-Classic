@@ -604,7 +604,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 			{
 				$qstr = "INSERT IGNORE INTO ".\cfg_obo_Role::MAP_USER_TABLE." SET ".\cfg_core_User::ID."='?', ".\cfg_obo_Role::ID."='?'";
 			
-				if(!($q = $this->DBM->querySafeTrace($qstr, $userID, $this->getRoleID($roleName))))
+				if(!($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
 				{
 				    trace(mysql_error(), true);
 					$this->DBM->rollback();
