@@ -301,10 +301,10 @@ class LOManager extends \rocketD\db\DBEnabled
 	 */
 	public function deleteLO($loID)
 	{
-		trace('deleteLO');
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$rootID = $this->getRootId($loID);
+		/* ------------------- CHECK PERMISSIONS ------------------*/
 		// must be SU OR (LibararyUser && have write permissions)
 		if(!$roleMan->isSuperUser())
 		{
@@ -313,7 +313,7 @@ class LOManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(4);
 			}
 			$lo = $this->getLO($loID);
-			 // Didn't do this at the same time as the check above to save these lines from executing if not a lib user
+			
 			$perms = $permMan->getMergedPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO);
 			if($perms instanceof \obo\perms\Permissions)
 			{
@@ -546,6 +546,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$loIDArr = $permMan->getItemsWithPerm(\cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::READ, true);
 		$loArr = array();
+		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='".$loID."' AND ".\cfg_obo_LO::SUB_VER." = 0 ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 		foreach($loIDArr as $loID)
 		{
 			$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='".$loID."' AND ".\cfg_obo_LO::SUB_VER." = 0 ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
@@ -595,17 +596,20 @@ class LOManager extends \rocketD\db\DBEnabled
 			trace('invalid input', true);
 			return false; // error: invalid input
 		}
-
+		// get loid for lo with the largest revision with the matching rootID
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ROOT_LO."='?' ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 		$q = $this->DBM->querySafe($qstr, $rootID);
 
+		// return 
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			return $this->getLO($r->{\cfg_obo_LO::ID}, $amount);
 		}
 		// none found, assume it to be the latest draft
-		$this->getLO($rootID);
-		return $this->getLO($rootID);
+		else
+		{
+			return $this->getLO($rootID, $amount);
+		}
 	}
 
 	/**
