@@ -277,21 +277,32 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		$return = array();
 		$permman = \obo\perms\PermissionsManager::getInstance();
 		
+		$roleMan = \obo\perms\RoleManager::getInstance();
+		
+		//--------------------------- REQUESTED ARRAY OF INSTANCES ------------------------//
+		// run through the array
+		// remove any non integers
+		// get any that we can from cache
 		if(is_array($instID))
 		{
-			// remove non posInts from the array
+			
 			foreach($instID AS $key => $arrItem)
 			{
+				// remove non posInts from the array
 				if( !\obo\util\Validator::isPosInt($arrItem) )
 				{
 					unset($instID[$key]);
 				}
+				// get instance data
 				else
 				{
-					// TRY Retrieving from Cache
+					
 					if($curInstData = \rocketD\util\Cache::getInstance()->getInstanceData($arrItem))
 					{
-						$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
+						if($roleMan->isSuperUser())
+						{
+							$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
+						}
 						$return[] = $curInstData; // store in return
 						unset($instID[$key]); // remove from list of keys to get
 					}
@@ -312,14 +323,17 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 			$instArr = implode(',', $instID);
 		}
+		//--------------------------- REQUESTED SINGLE INSTANCES ------------------------//
 		else
 		{
 
-			// valid, attempt to get from cache since, special case for just one id
+			// get single instance
 			if($curInstData = \rocketD\util\Cache::getInstance()->getInstanceData($instID))
 			{
-
-				$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
+				if($roleMan->isSuperUser())
+				{
+					$curInstData->perms = $permman->getMergedPerms($curInstData->instID, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
+				}
 				$return[] = $curInstData; // store in return
 				return $curInstData; // store in return
 				
@@ -338,12 +352,13 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (?) AND ".\cfg_obo_Instance::DELETED." = '0' ";
 		}
 
+		// Exit if theres an issue with the query
 		if(!$q = $this->DBM->querySafe($qstr, $instArr))
 		{
 			return false;
 		}
-
 		$authMan = \rocketD\auth\AuthManager::getInstance();
+		// Get all the instances from the database
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			$ownerName = $authMan->getName($r->{\cfg_core_User::ID});
@@ -352,8 +367,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			\rocketD\util\Cache::getInstance()->setInstanceData($iData);
 			// get perms
 			
-			// OBOJOBO OMG FIX
-			if($authMan->verifySession() && $_SESSION['userID'] == 1)
+			// Fix if the user is SU, just get merged perms
+			if($roleMan->isSuperUser())
 			{
 				$iData->perms = $permman->getMergedPerms($r->{\cfg_obo_Instance::ID}, \cfg_obo_Perm::TYPE_INSTANCE, $_SESSION['userID']);
 			}
@@ -381,6 +396,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 		// TODO: limit what is returned based on what perm they have
 		$myInstances = array_keys($itemPerms);
+		
 		return $this->getInstanceData($myInstances);
 	}
 		
@@ -560,7 +576,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		
 		$qstr = "SELECT ".\cfg_obo_Instance::ID."  FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_LO::ID."` IN (?)";
 		
-		if( !($q = $this->DBM->querySafeTrace($qstr, $loID)) )
+		if( !($q = $this->DBM->querySafe($qstr, $loID)) )
 		{
 			return false;
 		}
