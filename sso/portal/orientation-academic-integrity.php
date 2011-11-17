@@ -91,11 +91,11 @@ try
 	}
 
 	// ************* TESTING CODE ************
-	$targetURL = 'http://obo/sso/portal/redirect.php';
-	$nid = 'iturgeon';
-	$timestamp = time();
-	$hash = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
-	$los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
+	// $targetURL = 'http://obo/sso/portal/redirect.php';
+	// $nid = 'iturgeon';
+	// $timestamp = time();
+	// $hash = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+	// $los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
 	
 	
 	// valid hash
