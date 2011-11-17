@@ -42,6 +42,7 @@ class RDMemcache
 			}
 			catch(\Exception $e)	
 			{
+				trace('memcache connection failure', true);
 				trace($e, true);
 				$this->memEnabled = false;
 			}		

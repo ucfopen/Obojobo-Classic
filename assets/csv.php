@@ -5,8 +5,8 @@ switch($_GET['function'])
 	case 'scores':
 		if ($_GET['instID'] > 0 && strlen($_GET['filename']) > 0)
 		{
-			$lor = \obo\API::getInstance();
-			$scores = $lor->getScoresForInstance($_GET['instID']);
+			$api = \obo\API::getInstance();
+			$scores = $api->getScoresForInstance($_GET['instID']);
 			if (is_array($scores))
 			{
 				$UM = \rocketD\auth\AuthManager::getInstance();

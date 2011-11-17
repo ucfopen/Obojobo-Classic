@@ -1188,7 +1188,7 @@ class API extends \rocketD\db\DBEnabled
 			if($this->getSessionValid())
 			{
 				$scoreman = \obo\ScoreManager::getInstance();
-				$result = $scoreman->getScores($instid);
+				$result = $scoreman->getScoresForAllUsers($instid);
 			}
 			else
 			{

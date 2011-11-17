@@ -151,10 +151,10 @@ class Cache extends \rocketD\util\RDMemcache
 		if($this->memEnabled)
 		{
 			$this->delete($this->ns.'\obo\Lock:'.$lock->lockID);
-		}		
+		}
 	}
 	
-	public function setInstanceScores($instID, $scores)
+	public function setScoresForAllUsers($instID, $scores)
 	{
 		if($this->memEnabled)
 		{
@@ -162,7 +162,7 @@ class Cache extends \rocketD\util\RDMemcache
 		}
 	}
 	
-	public function getInstanceScores($instID)
+	public function getScoresForAllUsers($instID)
 	{
 		if($this->memEnabled)
 		{
@@ -170,13 +170,39 @@ class Cache extends \rocketD\util\RDMemcache
 		}
 	}
 	
-	public function clearInstanceScores($instID)
+	public function clearScoresForAllUsers($instID)
 	{
 		if($this->memEnabled)
 		{
 			$this->delete($this->ns.'\obo\ScoreManager:getScores:'.$instID);
 		}
 	}
+	
+	public function setScoresForUser($instID, $userID, $scores)
+	{
+		if($this->memEnabled)
+		{
+			$this->set($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID, $scores, false, 0) or trace('Memcache Failed to write', true);
+		}
+	}
+	
+	public function getScoresForUser($instID, $userID)
+	{
+		if($this->memEnabled)
+		{
+			return $this->get($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID);
+		}
+	}
+	
+	public function clearScoresForUser($instID, $userID)
+	{
+		if($this->memEnabled)
+		{
+			$this->delete($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID);
+		}
+	}
+	
+	
 	
 	public function getAllUsers()
 	{
