@@ -521,7 +521,9 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		
 		// clear cache
 		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
-		\rocketD\util\Cache::getInstance()->clearInstanceScores($instID);
+		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+		\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $_SESSION['userID']);
+		
 		$tracking = \obo\log\LogManager::getInstance();
 		$tracking->trackDeleteInstance($instID);
 		

@@ -667,8 +667,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		
 		$scoreman = \obo\ScoreManager::getInstance();
-		$allScores = $scoreman->getScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID']);
-		$scores = $allScores[0]; // this returns an array of users, we just want the first one since we only asked for one
+		$scores = $scoreman->getScoresForUser($instData->instID, $_SESSION['userID']);
 		
 		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
 		
@@ -680,7 +679,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				// TODO: NEED TO USE SYSTEM EVENTS
 				// Send the score to webcourses
 				$PM = \rocketD\plugin\PluginManager::getInstance();
-				$result = $PM->callAPI('UCFCourses', 'sendScore', array($GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'], $submittableScore), true);
+				$result = $PM->callAPI('UCFCourses', 'sendScore', array($instData->instID, $_SESSION['userID'], $submittableScore), true);
 			}
 		}
 		
@@ -706,21 +705,14 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			}
 			$NM = \obo\util\NotificationManager::getInstance();
 			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
-	
 		}
-		
 		// clear cached scores for this instance
-		\rocketD\util\Cache::getInstance()->clearInstanceScores($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instData->instID);
+		// clear score 
+		\rocketD\util\Cache::getInstance()->clearScoresForUser($instData->instID, $_SESSION['userID']);
 		// clear equivalent cache
-		if(\AppCfg::CACHE_MEMCACHE)
-		{
-			$IM = \obo\lo\InstanceManager::getInstance();
-			if($instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
-			{
-				$loID = $instData->loID;
-				\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
-			}
-		}
+		\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
+		
 		return $score;
 	}
 	
@@ -976,7 +968,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(2);
 			}
 		}
-		
 		
 		// get unfiltered list from cache or database
 		if(!($attempt = \rocketD\util\Cache::getInstance()->getEquivalentAttempt($userID, $loID)))
