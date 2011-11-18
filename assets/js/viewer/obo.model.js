@@ -10,9 +10,13 @@ if(!window.obo)
 	window.obo = {};
 }
 
-obo.model = function(view, opts)
+obo.model = function()
 {
-	
+	var init = function(viewModule, options)
+	{
+		view = viewModule;
+		opts = options;
+	};
 	
 	//@PRIVATE
 	
@@ -215,6 +219,7 @@ obo.model = function(view, opts)
 	// event handler to get the lo
 	var onGetLO = function(result)
 	{
+		console.log('onGetLO', result);
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'lo').length > 0)
@@ -1055,13 +1060,18 @@ obo.model = function(view, opts)
 		{
 			page = getAssessmentPageIndex(page).index + 1;
 		}
+		console.log('STORING ', answerID_or_shortAnswerResponse_or_score, ' WITH SECTION ', section, ' PAGE ', page);
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
+		
 	};
 	
 	// return the previous response, if it exists, for the current question
 	// return 'undefined' if it doesn't exist
+	// note that for media questions the previous response is really the score
 	var getPreviousResponse = function()
 	{
+		console.log('getPreviousResponse');
+		console.log(responses);
 		return responses[section][getPage()];
 	};
 	
@@ -1139,6 +1149,7 @@ obo.model = function(view, opts)
 	};*/
 	
 	return {
+		init: init,
 		isInAssessmentQuiz: isInAssessmentQuiz,
 		instanceIsClosed: instanceIsClosed,
 		getScores: getScores,
@@ -1182,4 +1193,4 @@ obo.model = function(view, opts)
 		//getResponses: getResponses,
 		currentQuestionIsAlternate: currentQuestionIsAlternate
 	};
-};
+}();
