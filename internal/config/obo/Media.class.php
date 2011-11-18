@@ -6,6 +6,7 @@ class cfg_obo_Media
 	const TITLE = 'title';
 	const TYPE = 'itemType';
 	const VER = 'version';
+	const META = 'meta';
 	const SCORABLE = 'scorable';
 	const DESC = 'descText';
 	const TIME = 'createTime';
