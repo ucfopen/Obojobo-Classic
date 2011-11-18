@@ -11,12 +11,12 @@
 namespace obo\lo;
 class Media
 {
-	public $mediaID;				//Number:  database id
+	public $mediaID;		//Number:  database id
 	public $auth;			//User:  creator of media
 	public $title;			//String:  The name of the piece of media
-	public $itemType;			//String:  What type of media it is (pic, swf, vid)
-	public $descText;			//String:  in-depth description of contents of package
-	public $createTime;			//Number:  date media was created
+	public $itemType;		//String:  What type of media it is (pic, swf, vid)
+	public $descText;		//String:  in-depth description of contents of package
+	public $createTime;		//Number:  date media was created
 	public $copyright;		//String:
 	public $thumb;			//String:  URL of the thumbnail image
 	public $url;			//String:  URL of the actual media
@@ -26,12 +26,13 @@ class Media
 	public $height;			//height in pixels of the media (works for swf and images)
 	public $width;			//width in pixels of media
 	public $version;		//version of the file (swf version for instance)
+	public $meta;			//metadata object specific to media type (aka swf version)
 	public $attribution;	//Tinyint: If true (1), the image requires CC attribution
 
-	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='', $attribution=0)
+	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='', $meta=0, $attribution=0)
 	{
 	    if(func_num_args() == 1)
-        {   	
+        {
        		$mediaObj = func_get_arg(0);
        		$this->mediaID = $mediaObj['mediaID'];
 //			$this->auth = $mediaObj[''];
@@ -46,6 +47,7 @@ class Media
 			$this->width = $mediaObj['width'];
 			$this->height = $mediaObj['height'];
 			$this->version = $mediaObj['version'];
+			$this->meta = $mediaObj['meta'];
 			$this->attribution = $mediaObj['attribution'];
         }
         else
@@ -65,6 +67,7 @@ class Media
 			$this->width = $width;
 			$this->height = $height;
 			$this->version = $version;
+			$this->meta = $meta;
 			$this->attribution = $attribution;
         }
 	}
