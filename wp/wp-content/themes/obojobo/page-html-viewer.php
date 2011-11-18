@@ -60,6 +60,11 @@ add_filter('show_admin_bar', '__return_false');
 
 <?php wp_head(); ?>
 <script type="text/javascript" defer="defer">	
+	if(!console)
+	{
+		console = {log:function() { }};
+	}
+	
 	$(function() {
 		
 		//@TODO: are these the right params?
@@ -73,7 +78,7 @@ add_filter('show_admin_bar', '__return_false');
 		obo.model.loadLO(loID, function() {
 			obo.view.init($('body'));
 		});*/
-		obo.model = obo.model(obo.view, {});
+		obo.model.init(obo.view, {});
 		console.log(obo.model);
 		obo.model.load(params, function() {
 			obo.view.init($('body'));
@@ -82,7 +87,18 @@ add_filter('show_admin_bar', '__return_false');
 			obo.view.init($('body'));
 		});*/
 		
-		
+		document.onkeypress = function(event)
+		{
+			console.log(event);
+			if(event.ctrlKey && event.keyCode == 44)
+			{
+				obo.model.gotoPrevPage();
+			}
+			else if(event.ctrlKey && event.keyCode == 46)
+			{
+				obo.model.gotoNextPage();
+			}
+		}
 	});
 	
 	
