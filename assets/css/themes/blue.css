@@ -11,8 +11,16 @@ html
 
 body
 {
+	/*@TODO - rgba probably doesnt work on filters wont work on IE! */
 	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.5, white), color-stop(1, #f9f1ea)) #f9f1ea;*/
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.5, white), color-stop(1, rgba(255, 255, 255, 0)));
+	background: -moz-linear-gradient(white, rgba(255, 255, 255, 0));
+	background: -ms-linear-gradient(white, rgba(255, 255, 255, 0));
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, rgba(255, 255, 255, 0)));
+	background: -webkit-linear-gradient(white, rgba(255, 255, 255, 0));
+	background: -o-linear-gradient(white, rgba(255, 255, 255, 0));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='rgba(255, 255, 255, 0)');
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='rgba(255, 255, 255, 0)')";
+	background: linear-gradient(white, rgba(255, 255, 255, 0));
 
 }
 
@@ -103,7 +111,14 @@ h3
 	
 	border-bottom: 1px solid gray;
 	border-top: 1px solid white;
-	background: -webkit-gradient( linear, left top, left bottom, color-stop(0, white), color-stop(1, #e7e7e7));
+	background: -moz-linear-gradient(white, #e7e7e7);
+	background: -ms-linear-gradient(white, #e7e7e7);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #e7e7e7));
+	background: -webkit-linear-gradient(white, #e7e7e7);
+	background: -o-linear-gradient(white, #e7e7e7);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='#e7e7e7');
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='#e7e7e7')";
+	background: linear-gradient(white, #e7e7e7);
 	
 	/*background: url('/assets/images/viewer/themes/classic/overview-bg-pixel.png') repeat-y 276px, url('/assets/images/viewer/themes/classic/overview-details-header-bg.png') repeat-x 0 0, #e7e7e7;*/
 }

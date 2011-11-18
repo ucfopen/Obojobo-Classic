@@ -42,9 +42,10 @@ obo.view = function()
 	
 	//@TODO: Make sure this is defined when we set it
 	// for convience keep a reference to the URL sans fake # URL
-	//var baseURL = location.href.substr(0, location.href.indexOf('#') == -1 ? location.href.length : location.href.indexOf('#'));
-	var baseURL = location.origin + location.pathname + location.search;
-	
+	var baseURL = location.href.substr(0, location.href.indexOf('#') == -1 ? location.href.length : location.href.indexOf('#'));
+	//var baseURL = location.origin + location.pathname + location.search;
+	console.log('location=');
+	console.log(location);
 	// @TODO can this be made more elegant?
 	// this is needed if the user uses the back/foward buttons.
 	// in this case we don't want to modify to the history stack,
@@ -79,13 +80,25 @@ obo.view = function()
 	
 	var setupUI = function()
 	{
+		console.log(Modernizr.history, window.history, history.pushState, window.addEventListener);
+		/*
+		$(window).resize(function() {
+			console.log('resize');
+			$('.media-item').offset($('.media-item-standin').offset());
+		});
+		*/
 		// listen for history events
 		if(Modernizr.history)
 		{
-			window.addEventListener('popstate', function(event) {
+			//FF wants window.onpopstate
+			/*window.addEventListener('popstate', function(event) {
 				preventUpdateHistoryOnNextRender = true;
 				gotoPageFromURL();
-			});
+			});*/
+			window.onpopstate = function(event) {
+				preventUpdateHistoryOnNextRender = true;
+				gotoPageFromURL();
+			};
 		}
 		
 		// inject preview header if needed
@@ -93,15 +106,16 @@ obo.view = function()
 		{
 			$('body').prepend($('<div id="preview-mode-notification"><p>(Previewing)</p><a id="close-preview-bar-button" role="button" href="#">Close</a></div>'));
 			$('#close-preview-bar-button').click(function(event) {
+				event.preventDefault();
 				$(event.target).parent().hide();
 			});
 		}
 		// for convience we map a H1 title click to the overview page
-		$('#lo-title').click(function() {
+		$('#lo-title').click(function(event) {
 			obo.model.gotoSection('overview');
 		});
 		// Set up all the navigation Links
-		$('#nav-list li a').click(function () {
+		$('#nav-list li a').click(function(event) {
 			event.preventDefault();
 			
 			var $e = $(event.currentTarget).parent();
@@ -119,7 +133,7 @@ obo.view = function()
 		$('#nav-assessment')[0].href = baseURL + 'assessment/start/';
 		
 		// navigation handlers:
-		$('#prev-page-button').click(function() {
+		$('#prev-page-button').click(function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -127,7 +141,7 @@ obo.view = function()
 				obo.model.gotoPrevPage();
 			}
 		});
-		$('#next-page-button').click(function() {
+		$('#next-page-button').click(function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -135,7 +149,7 @@ obo.view = function()
 				obo.model.gotoNextPage();
 			}
 		});
-		$('.next-section-button').live('click', function() {
+		$('.next-section-button').live('click', function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -143,7 +157,7 @@ obo.view = function()
 				obo.model.gotoStartPageOfNextSection();
 			}
 		});
-		$('.begin-section-button').live('click', function() {
+		$('.begin-section-button').live('click', function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -151,16 +165,16 @@ obo.view = function()
 				obo.model.gotoPage(1);
 			}
 		});
-		$('#start-assessment-button').live('click', function() {
+		$('#start-assessment-button').live('click', function(event) {
 			// start the assessment
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
 			{
-				obo.model.startAssessment();
+				startAssessment();
 			}
 		});
-		$('#return-to-overview-button').live('click', function() {
+		$('#return-to-overview-button').live('click', function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -168,7 +182,7 @@ obo.view = function()
 				obo.model.gotoPage('start');
 			}
 		});
-		$('#view-scores-button').live('click', function() {
+		$('#view-scores-button').live('click', function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -176,7 +190,7 @@ obo.view = function()
 				obo.model.gotoPage('scores');
 			}
 		});
-		$('.oml-page-link').live('click', function() {
+		$('.oml-page-link').live('click', function(event) {
 			event.preventDefault();
 			
 			// @TODO- check to see if this works
@@ -190,7 +204,7 @@ obo.view = function()
 				obo.model.gotoPage(pageID);
 			}
 		});
-		$('#submit-qa-answer-button').live('click', function() {
+		$('#submit-qa-answer-button').live('click', function(event) {
 			event.preventDefault();
 			
 			$form = $(event.target).parent();
@@ -236,13 +250,13 @@ obo.view = function()
 		$('#qa-input').live('keyup', function(event) {
 			updateQAButton();
 		});
-		$('#submit-assessment-button').live('click', function() {
+		$('#submit-assessment-button').live('click', function(event) {
 			event.preventDefault();
 			submitAssessment();
 		});
 		
 		// setup tooltips:
-		var o = {maxWidth:'200px', delay:0, fadeIn:250, fadeOut:250, defaultPosition:'top', live:true, deactivationOnClick:true};
+		var o = {maxWidth:'200px', delay:0, fadeIn:0, fadeOut:0, defaultPosition:'top', live:true, deactivationOnClick:true};
 		// oml tooltips
 		$('.oml').tipTip(o);
 		// we only want to shop subnav tips for content pages (practice and assessment don't have titles)
@@ -364,13 +378,33 @@ obo.view = function()
 		$('#content-blocker').remove();
 	}
 	
+	// @TODO instead of wrapper functions should these be callbacks from obo.model.startAssessment?
+	var startAssessment = function()
+	{
+		// @HACK: wipe out practice captivate overlays
+		if($('#swf-holder-practice').length > 0)
+		{
+			$('#swf-holder-practice').remove();
+		}
+		obo.captivate.clearCaptivateData();
+		
+		obo.model.startAssessment();
+	}
+	
 	var submitAssessment = function()
 	{
+		// @HACK: wipe out assessment captivate overlays
+		if($('#swf-holder-assessment').length > 0)
+		{
+			$('#swf-holder-assessment').remove();
+		}
+		
 		unlockNonAssessment();
 		showThrobber();
 		// @TODO: What happens if the server takes a dump?  Should I not clear out assessment?
 		visited.assessment = []; // clear out assessment answers so new attempts are empty
 		obo.model.submitAssessment();
+		obo.captivate.clearCaptivateData();
 	};
 	
 	var showSubnav = function()
@@ -482,6 +516,22 @@ obo.view = function()
 		$('.missed-pages-list a').click(onNavPageLinkClick);
 	}
 	
+	var buildPage = function(section, index)
+	{
+		// clean up any overlayed captivates
+		// @HACK we turn both parent and object visible for Safari
+		$('#swf-holder object').css('visibility', 'hidden');
+		$('#swf-holder .media-item').css('visibility', 'hidden');
+		
+		switch(section)
+		{
+			case 'overview': buildOverviewPage(); break;
+			case 'content': buildContentPage(index); break;
+			case 'practice': buildQuestionPage(section, index); break;
+			case 'assessment': buildQuestionPage(section, index); break;
+		}
+	}
+	
 	// creates a content page (index = 'start', 'end' or a standard page 1-n)
 	var buildContentPage = function(index)
 	{
@@ -524,6 +574,7 @@ obo.view = function()
 			
 			var $pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
 			$pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
+			$('#content').append($pageHTML);
 			
 			// for custom layout the html target is a container div for the custom layout page,
 			// otherwise it is simply the content div.
@@ -578,12 +629,15 @@ obo.view = function()
 				$pageHTML.append($target);
 			}
 			
-			$('#content').append($pageHTML);
+			//$('#content').append($pageHTML);
 		}
 	};
 	
-	var buildQuestionPage = function(sectionName, baseid, index)
+	var buildQuestionPage = function(section, index)
 	{
+		var sectionName = section.substr(0, 1).toUpperCase() + section.substr(1);
+		var baseid = section == 'practice' ? 'PQ' : 'AQ';
+		
 		switch(index)
 		{
 			case 'start':
@@ -666,11 +720,11 @@ obo.view = function()
 							if(importableScore != -1)
 							{
 								$('#previous-score').html(importableScore);
-								$('#do-import-previous-score-button').click(function() {
+								$('#do-import-previous-score-button').click(function(event) {
 									showThrobber();
 									obo.model.importPreviousScore();
 								});
-								$('#dont-import-previous-score-button').click(function() {
+								$('#dont-import-previous-score-button').click(function(event) {
 									$('.assessment-import-score-section').remove();
 									$('#start-assessment-button').removeClass('disabled');
 								});
@@ -761,6 +815,8 @@ obo.view = function()
 				var page = $('<div id="' + baseid + '-' + index + '" class="question-page question-type-' + question.itemType + '"></div>');
 				page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
 				
+				$('#content').append(page);
+				
 				// add switcher for questions with alternates:
 				//var numVersions = obo.model.getCurrentAssessmentQuestions().length;
 				if(obo.model.currentQuestionIsAlternate())
@@ -776,6 +832,7 @@ obo.view = function()
 				}
 				
 				var questionPage = $('<div class="question"></div>');
+				page.append(questionPage);
 				// question has multiple page items
 				if(question.items.length > 1)
 				{
@@ -788,12 +845,26 @@ obo.view = function()
 						questionPage.append(formatPageItemTextArea(question.items[1]));
 					}
 					// text left, media right
-					if(question.items[0].component == 'TextArea' && question.items[1].component == 'MediaView')
+					else if(question.items[0].component == 'TextArea' && question.items[1].component == 'MediaView')
 					{
 						page.addClass('page-layout-4');
 						//questionPage.append(formatPageItemMediaView(question.items[1]));
 						createPageItemMediaView(question.items[1], questionPage);
 						questionPage.append(formatPageItemTextArea(question.items[0]));
+					}
+					// media left, media right
+					else if(question.items[0].component == 'MediaView' && question.items[1].component == 'MediaView')
+					{
+						page.addClass('page-layout-9');
+						createPageItemMediaView(question.items[0], questionPage);
+						createPageItemMediaView(question.items[1], questionPage);
+					}
+					// text left, text right
+					else if(question.items[0].component == 'TextArea' && question.items[1].component == 'TextArea')
+					{
+						page.addClass('page-layout-6');
+						questionPage.append(formatPageItemTextArea(question.items[0]));
+						questionPage.append(formatPageItemTextArea(question.items[1]));
 					}
 				}
 				// question has a single page item
@@ -802,15 +873,17 @@ obo.view = function()
 					switch(question.items[0].component)
 					{
 						case 'MediaView':
+							page.addClass('page-layout-7');
 							//questionPage.append(formatPageItemMediaView(question.items[0]));
 							createPageItemMediaView(question.items[0], questionPage);
 							break;
 						case 'TextArea':
+							page.addClass('page-layout-1');
 							questionPage.append(formatPageItemTextArea(question.items[0]));
 							break;
 					}
 				}
-				page.append(questionPage);
+				//page.append(questionPage);
 
 				// build answer form input
 				switch(question.itemType)
@@ -833,7 +906,7 @@ obo.view = function()
 						break;
 				}
 				
-				$('#content').append(page);
+				//$('#content').append(page);
 				break;
 		}
 	};
@@ -846,13 +919,16 @@ obo.view = function()
 		
 		if(prevResponse != undefined)
 		{
-			switch(obo.model.getPageObject().itemType)
+			switch(obo.model.getPageObject().itemType.toLowerCase())
 			{
-				case 'MC':
+				case 'mc':
 					selectMCAnswer(prevResponse);
 					break;
-				case 'QA':
+				case 'qa':
 					fillInQAAnswer(prevResponse);
+					break;
+				case 'media':
+					updateInteractiveScoreDisplay(prevResponse);
 					break;
 			}
 		}
@@ -1030,35 +1106,79 @@ obo.view = function()
 	
 	var updateInteractiveScore = function(score)
 	{
+		var oldScore = obo.model.getPreviousResponse();
+		console.log('updateInteractiveScore', score, oldScore);
 		obo.model.submitQuestion(score);
 		
-		// graphics:
-		if($('.answer-preview').length == 0)
-		{
-			$answerPreview = $('<div class="answer-preview"></div>');
-			$('.question').append($answerPreview);
-			$answerPreview.fadeIn();
-		}
-		else
-		{
-			// pulse the answer-preview
-			console.log('fuck-', $('.answer-preview'));
-			//$('.answer-preview p').animate({backgroundColor: '#f9f3dc'}, 200).animate({backgroundColor: '#efe1a8'}, 200).animate({backgroundColor: '#f9f3dc'}, 200).animate({backgroundColor: '#efe1a8'}, 200);
-			$('p#shit').animate({padding: 200}, 5000);
-			
-			$('#shit').width(6000);
-		}
-		
+		updateInteractiveScoreDisplay(score, oldScore);
+	}
+	
+	var updateInteractiveScoreDisplay = function(score, oldScore)
+	{
+		var html = '';
+		var showScore;
 		if(obo.model.getSection() == 'practice' || obo.model.getMode() == 'preview')
 		{
 			// display the score
-			$('.answer-preview').html('Current Score:<p id="shit">' + score + '%</p>');
+			html = 'Current Score:<p>' + score + '%</p>';
+			showScore = true;
 		}
 		else
 		{
 			// only display that the score was updated
-			$('.answer-preview').html('score updated bra');
+			html = 'Question score updated';
+			showScore = false;
 		}
+		
+		console.log('abcd');
+		
+		// flashy graphics if the score is updated
+		if(isNaN(oldScore) || (!isNaN(oldScore) && oldScore != score))
+		{
+			console.log('jkl');
+			
+			// for the first update fade in:
+			if($('.answer-preview').length == 0)
+			{
+				console.log('123');
+				
+				$answerPreview = $('<div style="display: none;" class="answer-preview">' + html + '</div>');
+				$('.question').append($answerPreview);
+				if(showScore)
+				{
+					$answerPreview.fadeIn();
+				}
+				else
+				{
+					$answerPreview.fadeIn().delay(1000).fadeOut();
+				}
+			}
+			else
+			{
+				console.log('456');
+				
+				if(showScore)
+				{
+					// pulse the answer-preview
+					$('.answer-preview').html(html);
+					/*
+					$('.answer-preview').animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#d6d6d6'}, 200).animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#d6d6d6'}, 200);
+					$('.answer-preview p').animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#efe1a8'}, 200).animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#efe1a8'}, 200);*/
+					//$('.answer-preview').animate({fontSize: 21}, 200).animate({fontSize: 20}, 200);
+					//$('.answer-preview p').animate({backgroundColor: 'white'}, 200).animate({backgroundColor: '#efe1a8'}, 200).animate({backgroundColor: 'white'}, 200).delay(1000).animate({backgroundColor: '#efe1a8'}, 2000);
+					$('.answer-preview p')
+						.animate({color: '#b3e99d'}, defaultAnimationDuration)
+						.animate({color: 'white'}, defaultAnimationDuration)
+						.animate({color: '#b3e99d'}, defaultAnimationDuration)
+						.animate({color: 'white'}, defaultAnimationDuration);
+				}
+				else
+				{
+					$('.answer-preview').fadeIn().delay(3000).fadeOut();
+				}
+			}
+		}
+		
 	}
 	
 	var buildMCAnswers = function(questionID, answers)
@@ -1105,7 +1225,8 @@ obo.view = function()
 	//var formatPageItemMediaView = function(pageItem)
 	{
 		//var mediaHTML = displayMedia(pageItem.media[0]);
-		$media = createMedia(pageItem.media[0], $target);
+		$media = obo.media.createMedia(pageItem.media[0], $target, pageItem.options);
+		
 		if(pageItem.options)
 		{
 			$media.addClass('custom-page-item');
@@ -1115,7 +1236,7 @@ obo.view = function()
 		{
 			$media.addClass('page-item');
 		}
-
+		
 		return $media;
 	};
 	
@@ -1143,35 +1264,78 @@ obo.view = function()
 		if(pageItem.media.length > 0)
 		{
 			//Resize and center media element inside container div
-			var mediaElement = pageItemHTML.children(":first");
+			var $mediaElement = pageItemHTML.children(":first");
 			var containerWidth = pageItemHTML.width();
 			var containerHeight = pageItemHTML.height();
 
 			var scale = Math.min(Math.min(containerWidth, pageItem.media[0].width) / pageItem.media[0].width, Math.min(containerHeight, pageItem.media[0].height) / pageItem.media[0].height);
-			mediaElement.width(pageItem.media[0].width * scale);
-			mediaElement.height(pageItem.media[0].height * scale);
-
-			mediaElement.css('top', ((containerHeight - mediaElement.height()) / 2));
+			var w = pageItem.media[0].width * scale;
+			var h = pageItem.media[0].height * scale;
+			$mediaElement.width(w).height(h);
+			
+			// we need to wrap this mediaElement in a div to give it position
+			// (some media, like swfs, will replace the placeholder with the actual media
+			// which will clear out our positioning css)
+			$mediaPositionWrapper = $('<div></div>');
+			$mediaPositionWrapper.css('top', ((containerHeight - h) / 2));
+			$mediaElement.wrap($mediaPositionWrapper);
 		}
 
 		return pageItemHTML;
 	};
-	
-	var createMedia = function(mediaItem, $target)
-	//var displayMedia = function(mediaItem)
+	/*
+	var createMediaOLD = function(mediaItem, $target)
 	{
-		var $mediaElement = $('<div class="media-item"></div>');
+		
+		
+		//$target = $('#swf-holder');
+		//$('object').css('visibility', 'hidden');
+		//$('.media-item').width(400).height(300);
+		
+		var $mediaElement = $('<div class="media-item-standin"></div>');
 		$target.append($mediaElement);
 		
 		// we wrap this in a 1ms set timeout so that we can perform dimension calculations
 		// on $mediaElement, since apparently it's not instantenously in the DOM.
+		var $swfHolder = $('#swf-holder-2');
+		var $mediaElement2 = $('<div class="media-item"></div>');
+		$('.media-item').css('visibility', 'hidden');
+		$('.media-item object').css('visibility', 'hidden');
+		//$('.media-item').hide();
+		$swfHolder.prepend($mediaElement2);
 		setTimeout(function() {
-			obo.media.createMedia(mediaItem, $mediaElement);
+			var targetPage = obo.model.getSection() + obo.model.getPage();
+			var $targetMediaItem = null;
+			console.log('lookum for', targetPage);
+			$('.media-item').each(function(index, item) {
+				console.log($(item).attr('data-page'));
+				if($(item).attr('data-page') == targetPage)
+				{
+					console.log('daddy found it sweetums!');
+					$targetMediaItem = $(item);
+				} 
+			});
+			if($targetMediaItem != null)
+			{
+				//$targetMediaItem.show();
+				$targetMediaItem.css('visibility', 'visible');
+				$targetMediaItem.find('object').css('visibility', 'visible');
+			}
+			else
+			{
+				obo.media.createMedia(mediaItem, $mediaElement2);
+				var o = $mediaElement.offset();
+				console.log('o=', o);
+				$mediaElement2.offset({left: o.left});
+				$('#swf-holder').offset({top: o.top});
+			}
+			
 		}, 1);
+		
 		
 		//return $mediaHTML;
 		return $mediaElement;
-	};
+	};*/
 	
 	// update history pushes to HTML5 history. 
 	// browers that don't support it simply don't modify the history.
@@ -1421,7 +1585,7 @@ obo.view = function()
 		switch(section)
 		{
 			case 'overview':
-				buildOverviewPage();
+				buildPage('overview');
 				hideSubnav();
 				hideNextPrevNav();
 				//updateHistory('overview/');
@@ -1429,7 +1593,7 @@ obo.view = function()
 			case 'content':
 				//$('#nav-content')[0].href = baseURL + 'page/' + p + '/';
 				makeContentPageNav();
-				buildContentPage(p);
+				buildPage('content', p);
 				//updateHistory('page/' + p + '/');
 				break;
 			case 'practice':
@@ -1438,7 +1602,7 @@ obo.view = function()
 				{
 					makePracticePageNav();
 				}
-				buildQuestionPage('Practice', 'PQ', p);
+				buildPage('practice', p);
 				//updateHistory('practice/' + p + '/');
 				// fill out a previous response:
 				selectPreviousAnswer();
@@ -1451,7 +1615,7 @@ obo.view = function()
 				{
 					makeAssessmentPageNav();
 				}
-				buildQuestionPage('Assessment', 'AQ', p);
+				buildPage('assessment', p);
 				//updateHistory('assessment/' + p + '/');
 				// fill out a previous response:
 				selectPreviousAnswer();
@@ -1490,24 +1654,6 @@ obo.view = function()
 		if(unrendered)
 		{
 			unrendered = false;
-			
-			/*
-			$('body').click(function() {
-				showThrobber();
-				setTimeout(hideThrobber, 3000);
-			});*/
-			
-			//@TODO
-			/*
-			$('<div title="Dialog">This is some dialog text.  Please make sure that you read all of this text and understand the meaning of all of it.</div>').dialog({
-				modal: false,
-				width: 400,
-				resizable: false,
-				buttons: {
-					"Cancel": function() { console.log('cancel') },
-					"OK": function() { console.log('ok')}
-				}
-			});*/
 			
 			// we want to force the user to the assessment if they are 
 			// coming back from a previously un-submitted attempt.
