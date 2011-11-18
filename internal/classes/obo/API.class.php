@@ -40,7 +40,7 @@ class API extends \rocketD\db\DBEnabled
 	public function getSessionValid($roleName='')
 	{
 		$UM = \rocketD\auth\AuthManager::getInstance();
-		trace($UM->verifySession($roleName)); 
+		//trace($UM->verifySession($roleName)); 
 		return $UM->verifySession($roleName);
 	}
 
@@ -357,13 +357,12 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getLO($loID, $newest=false)
 	{
-
 		// TODO: move validation
 	    if(!\obo\util\Validator::isPosInt($loID))
 		{
 			return \rocketD\util\Error::getError(2);
 		}   
-
+		
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -376,8 +375,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$loObj = \rocketD\util\Error::getError(1);
 		}
-		//trace('getLO');
-		//trace($loObj);
+		
 		return $loObj;
 	}
 	
@@ -496,8 +494,6 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function createDraft($loObj)
 	{
-		trace('createDraft');
-		trace($loObj);
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();

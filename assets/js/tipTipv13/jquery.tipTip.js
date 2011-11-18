@@ -68,7 +68,7 @@
 			} else {
 				var org_title = org_elem.attr(opts.attribute);
 			}
-			console.log('OK DOG, THE ORG TITLE IS[', org_title, ']');
+			
 			if(org_title != undefined && org_title != ""){
 				if(!opts.content){
 					org_elem.removeAttr(opts.attribute); //remove original Attribute
