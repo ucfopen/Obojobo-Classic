@@ -55,8 +55,10 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 		
 		$r = $this->DBM->fetch_obj($q);
+		
+		
 
-		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER}, $r->{\cfg_obo_Media::ATTRIBUTION});
+		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER}, unserialize(base64_decode($r->{\cfg_obo_Media::META})), $r->{\cfg_obo_Media::ATTRIBUTION});
 		\rocketD\util\Cache::getInstance()->setMedia($media);
 		return $media;
 	}
@@ -81,7 +83,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			// force getLO on an array to use meta
 			$mediaArr = $optMediaIDArray;
 		}
-
+		
 		$result = array();
 		$result = $this->getMediaWithPerm('read');
 		if(count($mediaArr) > 0) // remove unwanted items
@@ -135,7 +137,6 @@ class MediaManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function newMedia($media)
 	{
-		
 	    if(! $media instanceof \obo\lo\Media)
 		{
 			return \rocketD\util\Error::getError(2);
@@ -192,10 +193,11 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
 				".\cfg_obo_Media::VER."='?',
+				".\cfg_obo_Media::META."='?',
 				".\cfg_obo_Media::ATTRIBUTION."='?'";
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
-		$media->size, $media->length, $media->height, $media->width, $media->version, $media->attribution)) )
+		$media->size, $media->length, $media->height, $media->width, $media->version, base64_encode(serialize($media->meta)), $media->attribution)))
 		{
 		    $this->DBM->rollback();
 			return false;
@@ -317,11 +319,15 @@ class MediaManager extends \rocketD\db\DBEnabled
 					// get swf dimensions and size
 					if($fileType == 'swf')
 					{
-						$swf = new \obo\lo\media\SWF();
-						$swf->getDimensions($newFileLocation);
+						$swf = new \obo\lo\media\SWF($newFileLocation);
+						//$swf->getDimensions($newFileLocation);
 						$media->width = $swf->width;
 						$media->height = $swf->height;
 						$media->version = $swf->version;
+						$media->meta = array(
+							'version' => $swf->version,
+							'asVersion' => $swf->actionScriptVersion
+						);
 					}
 					// get the image dimensions
 					else if($fileType == 'pic')
@@ -397,11 +403,15 @@ class MediaManager extends \rocketD\db\DBEnabled
 			// get swf dimensions and size
 			if($fileType == 'swf')
 			{
-				$swf = new \obo\lo\media\SWF();
-				$swf->getDimensions($newFileLocation);
+				$swf = new \obo\lo\media\SWF($newFileLocation);
+				//$swf->getDimensions($newFileLocation);
 				$media->width = $swf->width;
 				$media->height = $swf->height;
 				$media->version = $swf->version;
+				$media->meta = array(
+					'version' => $swf->version,
+					'asVersion' => $swf->actionScriptVersion
+				);
 			}
 			// get the image dimensions
 			else if($fileType == 'pic')

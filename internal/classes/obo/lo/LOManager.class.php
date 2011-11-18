@@ -459,7 +459,6 @@ class LOManager extends \rocketD\db\DBEnabled
 	 */
 	public function shareLO($loID, $permObj)
 	{
-		
 		if(!is_numeric($loID) || $loID <= 0)
 		{
 			trace('invalid input', true);
