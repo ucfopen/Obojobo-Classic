@@ -1,0 +1,3 @@
+[submodule "internal/tools"]
+	path = internal/tools
+	url = ssh://iturgeon@tux.cdl.ucf.edu/srv/git/newmedia/obojobo_tools.git
