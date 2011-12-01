@@ -77,6 +77,7 @@ class Analytics extends \rocketD\db\DBEnabled
 				default:
 					$group = "";
 					$order = "";
+					$select = "";
 					break;
 			}
 			$results = '';

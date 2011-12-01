@@ -77,7 +77,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 			//@ZACH - Somewhere createTime is being set to 'NAN' which the php JSON encoder chokes on.
 			//This is needed to get the HTML5 preview (which uses the JSON gateway) to work for any
 			//question with a createTime of "NAN".
-			if(is_nan($quest->createTime))
+			if(!property_exists($quest, 'createTime') || is_nan($quest->createTime))
 			{
 				$quest->createTime = 0;
 			}
