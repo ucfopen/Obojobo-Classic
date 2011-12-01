@@ -31,9 +31,17 @@ class VisitManager extends \rocketD\db\DBEnabled
 	 */
 	public function createVisit($instID = 0)
 	{
-		$qstr = "INSERT INTO ".\cfg_obo_Visit::TABLE." SET `".\cfg_core_User::ID."` = '?',	`".\cfg_obo_Visit::TIME."` = UNIX_TIMESTAMP(), `".\cfg_obo_Visit::IP."` = '?', `".\cfg_obo_Instance::ID."` = '?'";
 		
-		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $_SERVER['REMOTE_ADDR'], $instID)))
+		// log the visit in the database
+		$qstr = "INSERT INTO ".\cfg_obo_Visit::TABLE." 
+			SET 
+			`".\cfg_core_User::ID."` = '?',
+			`".\cfg_obo_Visit::TIME."` = UNIX_TIMESTAMP(),
+			`".\cfg_obo_Visit::IP."` = '?',
+			`".\cfg_obo_Instance::ID."` = '?',
+			`".\cfg_obo_LO::ID."` = (SELECT ".\cfg_obo_LO::ID." from ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?')";
+		
+		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $_SERVER['REMOTE_ADDR'], $instID, $instID)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
@@ -214,6 +222,8 @@ class VisitManager extends \rocketD\db\DBEnabled
 			}
 			$prev_instID = $visit->instID;
 			
+			$visitUpdated = false;
+			
 			if(is_array($track))
 			{
 				foreach($track['visitLog'] AS $vLog)
@@ -223,9 +233,14 @@ class VisitManager extends \rocketD\db\DBEnabled
 						// update the db
 						$count++;
 						$this->DBM->querySafe("UPDATE obo_log_visits SET overviewTime = '?', contentTime = '?', practiceTime = '?', assessmentTime = '?' WHERE visitID = '?'", $vLog['sectionTime']['overview'], $vLog['sectionTime']['content'], $vLog['sectionTime']['practice'], $vLog['sectionTime']['assessment'], $visit->visitID);
+						$visitUpdated = true;
 						break;
 					}
 				}
+			}
+			if($visitUpdated == false)
+			{
+				$this->DBM->querySafeTrace("UPDATE obo_log_visits SET overviewTime = '0', contentTime = NULL, practiceTime = NULL, assessmentTime = NULL WHERE visitID = '?'", $visit->visitID);
 			}
 		}
 		return $count;
