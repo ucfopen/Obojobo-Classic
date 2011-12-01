@@ -171,6 +171,9 @@ class LogManager extends \rocketD\db\DBEnabled
 			$sectionTime = array('overview' => 0, 'content' => 0, 'practice' => 0, 'assessment' => 0, 'total' => 0, 'other' => 0);
 			$overallPageViews  = array('content' => array('total'=>0,'unique'=>0), 'practice' => array('total'=>0,'unique'=>0), 'assessment' => array('total'=>0,'unique'=>0));
 			$sectionNames = array('overview', 'content', 'practice', 'assessment');
+			$visitStarted = false;
+			$thisVisit = array();
+			$pageViews = array('content' => array('total' => 0,'unique' => 0), 'practice' => array('total'=>0,'unique'=>0), 'assessment' => array('total'=>0,'unique'=>0));
 			while($r = $this->DBM->fetch_obj($query))
 			{
 				switch($r->{\cfg_obo_Track::TYPE})
@@ -179,7 +182,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						// print and tally totals for previous visit
 						
 						// total up the time from the previous visit's data
-						if(isset($thisVisit) && isset($sectionTime))
+						if($visitStarted  && isset($sectionTime))
 						{
 							$sectionTime['total'] += ($thisVisit[count($thisVisit) - 1]->createTime - $thisVisit[0]->createTime);
 							$sectionTime['other'] = $sectionTime['total'] - $sectionTime['overview'] - $sectionTime['content'] - $sectionTime['practice'] - $sectionTime['assessment'];
@@ -234,6 +237,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						}
 						// Initialize this visit
 						$prevPageView = false;
+						$visitStarted = true;
 						$thisVisit = array();
 						$sectionTime = array('overview' => 0, 'content' => 0, 'practice' => 0, 'assessment' => 0, 'total' => 0);
 						$pageViews = array('content' => array('total' => 0,'unique' => 0), 'practice' => array('total'=>0,'unique'=>0), 'assessment' => array('total'=>0,'unique'=>0));
@@ -488,7 +492,6 @@ class LogManager extends \rocketD\db\DBEnabled
 							}
 							$sectionTime[$curSection] += $r->{\cfg_obo_Track::TIME} - $thisVisit[count($thisVisit) - 1]->createTime;
 							$thisVisit[] = $r;
-							trace($r);
 						}
 						break;
 
@@ -497,15 +500,6 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							if(!$totalsOnly)
 							{
-								// if this log is a repeat of the previous log dont store it (submitMedia is sometimes sent more then it should be)
-								if($thisVisit[count($thisVisit)-1]->itemType == 'SubmitMedia')
-								{
-									$prevLog = $thisVisit[count($thisVisit)-1];
-									if($prevLog->data->score == $r->{\cfg_obo_Track::SCORE} && $prevLog->{\cfg_obo_Track::QID} == $r->{\cfg_obo_Track::QID} && $r->{\cfg_obo_Track::TIME} == $prevLog->createTime)
-									{
-										break;
-									}
-								}						
 								$secNum = array_search($curSection, $sectionNames);
 								$parentGroup = $secNum==2 ? $lo->pGroup->kids : $lo->aGroup->kids;
 								$question = 0;
@@ -548,8 +542,11 @@ class LogManager extends \rocketD\db\DBEnabled
 					break;
 				}				
 			}
-
-			$sectionTime['total'] += ($thisVisit[count($thisVisit) - 1]->createTime - $thisVisit[0]->createTime);
+			
+			if(count($thisVisit) > 1)
+			{
+				$sectionTime['total'] += ($thisVisit[count($thisVisit) - 1]->createTime - $thisVisit[0]->createTime);
+			}
 			$sectionTime['other'] = $sectionTime['total'] - $sectionTime['overview'] - $sectionTime['content'] - $sectionTime['practice'] - $sectionTime['assessment'];
 			$overallSectionTime['total'] += $sectionTime['total'];
 			$overallSectionTime['overview'] += $sectionTime['overview'];
