@@ -6,13 +6,16 @@ html
 
 html
 {
-	background: url('/assets/images/viewer/themes/blue/main-bg.png') center repeat-y, url('../../images/viewer/themes/blue/bg.png');
+	/*background: url('/assets/images/viewer/themes/blue/main-bg.png') center repeat-y, url('/assets/images/viewer/themes/blue/bg.png');*/
+	background: url('/assets/images/viewer/themes/blue/main-bg.png') center repeat-y, url('/assets/images/viewer/themes/blue/bg.png');
 }
 
 body
 {
 	/*@TODO - rgba probably doesnt work on filters wont work on IE! */
 	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.5, white), color-stop(1, #f9f1ea)) #f9f1ea;*/
+	
+	/*
 	background: -moz-linear-gradient(white, rgba(255, 255, 255, 0));
 	background: -ms-linear-gradient(white, rgba(255, 255, 255, 0));
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, rgba(255, 255, 255, 0)));
@@ -20,14 +23,15 @@ body
 	background: -o-linear-gradient(white, rgba(255, 255, 255, 0));
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='rgba(255, 255, 255, 0)');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='rgba(255, 255, 255, 0)')";
-	background: linear-gradient(white, rgba(255, 255, 255, 0));
+	background: linear-gradient(white, rgba(255, 255, 255, 0));*/
+	/*THIS--> background: white;*/
 
 }
 
 #header
 {
 	height: 68px;
-	background: url('../../images/viewer/themes/classic/head-bg-highlight-left.png') top left no-repeat, url('../../images/viewer/themes/classic/head-bg-highlight-right.png') top right no-repeat, url('../../images/viewer/themes/blue/head-bg.png') top repeat-x, url('../../images/viewer/themes/blue/nav-bg.png') bottom repeat-x;
+	background: url('/assets/images/viewer/themes/classic/head-bg-highlight-left.png') top left no-repeat, url('/assets/images/viewer/themes/classic/head-bg-highlight-right.png') top right no-repeat, url('/assets/images/viewer/themes/blue/head-bg.png') top repeat-x, url('/assets/images/viewer/themes/blue/nav-bg.png') bottom repeat-x;
 	
 	border: none;
 }
@@ -52,7 +56,7 @@ body
 {
 	
 	padding-bottom: 18px;
-	background: url('../../images/viewer/themes/blue/nav-pointer.png') bottom center no-repeat;
+	background: url('/assets/images/viewer/themes/blue/nav-pointer.png') bottom center no-repeat;
 }
 
 #nav-list a
@@ -130,7 +134,7 @@ h3
 
 #overview-page hr
 {
-	background: url('../../images/viewer/themes/blue/overview-hr.png');
+	background: url('/assets/images/viewer/themes/blue/overview-hr.png');
 }
 
 ::selection,

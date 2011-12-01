@@ -1,0 +1,75 @@
+.overview-details
+{
+	border: 1px solid gray;
+}
+
+#navigation #log-out-button
+{
+	background: url('/assets/images/viewer/icon-exit.png') no-repeat 60px center;
+	border-left: 1px solid #898989;
+	height: 24px;
+}
+
+.subnav-list > li > a
+{
+	/*behavior: url(/assets/htc/PIE.htc);*/
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') 0 0;
+}
+
+/* alter dots in content for page views, in quizzes if they answered the question */
+#nav-list .subnav-list.content  li.visited > a,
+#nav-list .subnav-list.practice li.answered > a,
+#nav-list .subnav-list.assessment li.answered > a
+{
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -27px 0;
+}
+
+#nav-list .subnav-list  li.selected > a,
+#nav-list .subnav-list li > a:hover
+{
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -54px 0 !important;
+}
+
+#nav-list > li
+{
+	background: url('/assets/images/viewer/themes/classic/nav-line.png') top right repeat-y;
+}
+
+#nav-list > li:first-child
+{
+	background: url('/assets/images/viewer/themes/classic/nav-line.png') top right repeat-y,
+				url('/assets/images/viewer/themes/classic/nav-line.png') top left repeat-y;
+}
+
+.missed-pages-list > li > a
+{
+	/*behavior: url(/assets/htc/PIE.htc);*/
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -81px 0;
+	width: 38px;
+}
+
+.missed-pages-list li > a:hover
+{
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -119px 0;
+}
+
+.next-section-button,
+.begin-section-button,
+.button
+{
+	border: 1px solid #759BB7;
+}
+
+.icon-missed-count
+{
+	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -157px 0;
+	width: 58px;
+}
+
+#finish-section-button,
+#nav-list .subnav-list li > #finish-section-button:hover
+{
+	background: none !important;
+	text-decoration: underline !important;
+	width: 54px;
+}
