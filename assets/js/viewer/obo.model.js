@@ -18,7 +18,7 @@ obo.model = function()
 		opts = options;
 	};
 	
-	//@PRIVATE
+	// @PRIVATE
 	
 	// A reference to the view
 	var view;
@@ -69,39 +69,49 @@ obo.model = function()
 	// when we first load.
 	var attemptImportedThisVisit;
 	
+	var isValidSection = function(_section)
+	{
+		return _section === 'overview' || _section === 'content' || _section === 'practice' || _section === 'assessment';
+	};
+	
 	// returns true if the supplied page is in a valid format
 	// technically this code would allow page '2b' for content, but this just
 	// maps to 2, so it's harmless to allow it.
 	var isValidPage = function(_section, page)
 	{
-		if(_section == undefined)
+		if(_section === undefined)
 		{
 			_section = section;
 		}
-		if(page == undefined)
+		if(page === undefined)
 		{
 			page = pages[_section];
 		}
 		
-		if(_section == 'overview')
+		if(_section === 'overview')
 		{
-			return page == 'start';
+			return page === 'start';
 		}
 		else
 		{
-			return (_section == 'assessment' && page == 'scores') || page == 'start' || page == 'end' || pageIsNumericWithinBounds(_section, page)
+			return (_section === 'assessment' && page === 'scores') || page === 'start' || page === 'end' || pageIsNumericWithinBounds(_section, page)
 		}
+	};
+	
+	var canAccessSection = function(_section)
+	{
+		return isValidSection(_section) && ((inAssessmentQuiz && _section == 'assessment') || !inAssessmentQuiz);
 	};
 	
 	// determines if a user can view a page, bascially a wrapper for
 	// logic with inAssessmentQuiz
 	var canAccessPage = function(_section, page)
 	{
-		if(_section == undefined)
+		if(_section === undefined)
 		{
 			_section = section;
 		}
-		if(page == undefined)
+		if(page === undefined)
 		{
 			page = pages[_section];
 		}
@@ -111,12 +121,12 @@ obo.model = function()
 			if(inAssessmentQuiz)
 			{
 				// in a assessment quiz a user can only access numeric pages inside the assessment, OR the end page
-				return _section == 'assessment' && (pageIsNumericWithinBounds(_section, page) || page == 'end');
+				return _section === 'assessment' && (pageIsNumericWithinBounds(_section, page) || page === 'end');
 			}
 			else
 			{
 				// outside assessment a user can access only the start or score pages in assessment or any other section
-				return (_section == 'assessment' && (page == 'start' || page == 'scores')) || _section != 'assessment';
+				return (_section === 'assessment' && (page === 'start' || page === 'scores')) || _section != 'assessment';
 			}
 		}
 	};
@@ -126,11 +136,11 @@ obo.model = function()
 	// a three question assessment)
 	var pageIsNumericWithinBounds = function(_section, page)
 	{
-		if(_section == undefined)
+		if(_section === undefined)
 		{
 			_section = section;
 		}
-		if(page == undefined)
+		if(page === undefined)
 		{
 			page = pages[_section];
 		}
@@ -144,28 +154,23 @@ obo.model = function()
 			index = page.substr(0, page.length - 1);
 			//altIndex = page.substr(page.length);
 		}*/
-		if(_section == 'assessment' && isNaN(page))
+		if(_section === 'assessment' && isNaN(page))
 		{
 			index = getAssessmentPageIndex(page).index + 1;
-			//@TODO - check the altIndex bounds
+			// @TODO - check the altIndex bounds
 		}
 		
 		return index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
 	};
-	/*
-	var currentPageIsNumericWithinBounds = function()
-	{
-		return pageIsNumericWithinBounds(section, getPage());
-	}*/
 	
 	// utility function that turns a page like '2b' into {index:1, altIndex:1}
 	var getAssessmentPageIndex = function(page)
 	{
-		//@TODO - save this regex maybe?
+		// @TODO - save this regex maybe?
 		var regex = /([0-9]+)([b-z]?)/;
 		var match = regex.exec(page);
 		
-		if(match == null)
+		if(match === null)
 		{
 			return false;
 		}
@@ -173,7 +178,7 @@ obo.model = function()
 		{
 			return {
 				index: parseInt(match[1]) - 1,
-				altIndex: match[2] == '' ? 0 : match[2].charCodeAt(0) - 97
+				altIndex: match[2] === '' ? 0 : match[2].charCodeAt(0) - 97
 			};
 		}
 	};
@@ -185,7 +190,7 @@ obo.model = function()
 	// returns true if no errors found, false otherwise
 	var processResponse = function(response)
 	{
-		console.log('processResponse', response);
+		debug.log('processResponse', response);
 		
 		if(obo.remote.isError(response))
 		{
@@ -193,17 +198,17 @@ obo.model = function()
 			{
 				case 1: // not logged in
 					view.displayError('You are not logged in!');
-					//@TODO: Log the user out
-					//@TODO: send client error
+					// @TODO: Log the user out
+					// @TODO: send client error
 					break;
 				case 4: // insufficient permissions
 					view.displayError('You do not have permissions!');
-					//@TODO: Log the user out
-					//@TODO: send client error
+					// @TODO: Log the user out
+					// @TODO: send client error
 					break;
 				case 5: // bad visit key
 					view.displayError('You already have this object open!');
-					//@TODO: send client error
+					// @TODO: send client error
 					break;
 				default:
 					view.displayError(response);
@@ -219,7 +224,7 @@ obo.model = function()
 	// event handler to get the lo
 	var onGetLO = function(result)
 	{
-		console.log('onGetLO', result);
+		debug.log('onGetLO', result);
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'lo').length > 0)
@@ -231,7 +236,7 @@ obo.model = function()
 				lo = result;
 				processQuestions();
 		
-				//@TODO
+				// @TODO
 				var options = {};
 				if(options.useOpenDatabase)
 				{
@@ -245,7 +250,7 @@ obo.model = function()
 				{
 					localStorage['lo'+lo.loID] = result;
 				}
-		
+				
 				// call the callback to let the view respond
 				loadCallback();
 			}
@@ -254,8 +259,8 @@ obo.model = function()
 	
 	var onLoadInstance = function(result)
 	{
-		console.log('onLoadInstance');
-		console.log(result);
+		debug.log('onLoadInstance');
+		debug.log(result);
 		
 		if(processResponse(result) === true)
 		{
@@ -310,14 +315,14 @@ obo.model = function()
 			{
 				errors.push(104); // the practice group id isnt above 0
 			}
-			if(type == 'instance')
+			if(type === 'instance')
 			{
 				if(Number(lo.aGroup.qGroupID) < 1)
 				{
 					errors.push(108); // assessment group id isnt above 0
 				}
 			}
-			else if(type == 'lo')
+			else if(type === 'lo')
 			{
 				// if in preview mode, there needs to be practice and assessment questions
 				if(lo.aGroup.kids.length < 1)
@@ -335,7 +340,7 @@ obo.model = function()
 			errors.push(101);
 		}
 		
-		//@TODO
+		// @TODO
 		/*if(errors.length > 0)
 		{
 			losService.getOperation('trackClientError').send(102, '', errors)
@@ -357,7 +362,7 @@ obo.model = function()
 		$(lo.aGroup.kids).each(function(index, page)
 		{
 			index++;
-			if(curQIndex != page.questionIndex || page.questionIndex == 0)
+			if(curQIndex != page.questionIndex || page.questionIndex === 0)
 			{
 				curQIndex++
 				questions.assessment.push([]);
@@ -368,53 +373,64 @@ obo.model = function()
 	
 	var setLocation = function(newSection, newPage)
 	{
-		if(newSection == undefined)
+		if(newSection === undefined)
 		{
 			newSection = section;
 		}
-		if(newPage == undefined)
+		if(newPage === undefined)
 		{
 			newPage = pages[newSection];
 		}
 		
-		if(canAccessPage(newSection, newPage))
+		if(canAccessSection(newSection))
 		{
-			if(mode == 'instance')
+			if(canAccessPage(newSection, newPage))
 			{
-				if(newSection != section)
+				if(mode === 'instance')
 				{
-					obo.remote.makeCall('trackSectionChanged', [lo.viewID, getSectionIndex()], processResponse);
+					if(newSection != section)
+					{
+						obo.remote.makeCall('trackSectionChanged', [lo.viewID, getSectionIndex()], processResponse);
+					}
+					else if(newPage != pages[section])
+					{
+						obo.remote.makeCall('trackPageChanged', [lo.viewID, getPageID(), getSectionIndex()], processResponse);
+					}
 				}
-				else if(newPage != pages[section])
+
+				// special case - overview only has a start page
+				if(newSection === 'overview')
 				{
-					obo.remote.makeCall('trackPageChanged', [lo.viewID, getPageID(), getSectionIndex()], processResponse);
+					newPage = 'start';
 				}
+				// special case - no start page for content
+				if(newSection === 'content' && newPage === 'start')
+				{
+					newPage = 1;
+				}
+
+				// special case - dealing with question alternates:
+				var assessPageIndex = getAssessmentPageIndex(newPage);
+				if(assessPageIndex.altIndex && assessPageIndex.altIndex.length > 0)
+				{
+					activequestions.assessment[assessPageIndex.index] = assessPageIndex.altIndex;
+				}
+				
+				section = newSection;
+				pages[section] = newPage;
+				view.render();
+
+				return true;
 			}
-			
-			// special case - overview only has a start page
-			if(newSection == 'overview')
+			// if can't access the page we want then at least attempt to access the start page of this section:
+			else if(canAccessPage(newSection, 'start'))
 			{
-				newPage = 'start';
+				section = newSection;
+				pages[section] = section === 'content' ? 1 : 'start';
+				view.render();
+
+				return true;
 			}
-			// special case - no start page for content
-			if(newSection == 'content' && newPage == 'start')
-			{
-				newPage = 1;
-			}
-			
-			// special case - dealing with question alternates:
-			var assessPageIndex = getAssessmentPageIndex(newPage);
-			if(assessPageIndex.altIndex && assessPageIndex.altIndex.length > 0)
-			{
-				activequestions.assessment[assessPageIndex.index] = assessPageIndex.altIndex;
-			}
-			
-			section = newSection;
-			pages[section] = newPage;
-			//alert('model::setLocation render');
-			view.render();
-			
-			return true;
 		}
 		
 		return false;
@@ -458,9 +474,9 @@ obo.model = function()
 	var loadAssessment = function(result)
 	{
 		// we'll have a result if this was called via trackSubmitStart
-		if(mode == 'preview' || result && processResponse(result))
+		if(mode === 'preview' || result && processResponse(result))
 		{
-			if(mode == 'instance')
+			if(mode === 'instance')
 			{
 				// overwrite our aGroup with the set from trackSubmitStart
 				lo.aGroup.kids = result;
@@ -493,7 +509,7 @@ obo.model = function()
 	{
 		if(result != undefined)
 		{
-			//@TODO: Recover from errors
+			// @TODO: Recover from errors
 			if(processResponse(result))
 			{
 				if(!isNaN(result))
@@ -503,18 +519,18 @@ obo.model = function()
 					s.score = result;
 					s.endTime = parseInt(new Date().getTime() / 1000);
 				
-					//@TODO - how does this work in preview mode?
+					// @TODO - how does this work in preview mode?
 					// clear out responses
 					responses.assessment = [];
 				}
 			}
 		}
 		
-		//@TODO: Do this with practice as well?
+		// @TODO: Do this with practice as well?
 		// to keep things simple we destroy aGroup since we get that on startAssessment
-		if(mode == 'instance')
+		if(mode === 'instance')
 		{
-			//@TODO: right now we're getting back the assessment questions!
+			// @TODO: right now we're getting back the assessment questions!
 			//delete lo.aGroup;
 		}
 		
@@ -528,12 +544,12 @@ obo.model = function()
 	/*
 	var practiceQuestionsLoaded = function()
 	{
-		return mode == 'preview' || lo.hasOwnProperty('pgroup');
+		return mode === 'preview' || lo.hasOwnProperty('pgroup');
 	};
 	
 	var questions.assessmentLoaded = function()
 	{
-		return mode == 'preview' || lo.hasOwnProperty('agroup');
+		return mode === 'preview' || lo.hasOwnProperty('agroup');
 	}*/
 	/*
 	// determine if the standard pages (1-n) for the current section are available
@@ -550,7 +566,7 @@ obo.model = function()
 	
 	var isPreviousScoreImported = function()
 	{
-		return mode == 'instance' && (attemptImportedThisVisit || (lo.tracking != null && lo.tracking.prevScores != null && lo.tracking.prevScores.length != null && lo.tracking.prevScores.length > 0 && lo.tracking.prevScores[0].linkedAttemptID != null && parseInt(lo.tracking.prevScores[0].linkedAttemptID) > 0));
+		return mode === 'instance' && (attemptImportedThisVisit || (lo.tracking != null && lo.tracking.prevScores != null && lo.tracking.prevScores.length != null && lo.tracking.prevScores.length > 0 && lo.tracking.prevScores[0].linkedAttemptID != null && parseInt(lo.tracking.prevScores[0].linkedAttemptID) > 0));
 	};
 	
 	// @public
@@ -562,12 +578,12 @@ obo.model = function()
 	var instanceIsClosed = function()
 	{
 		// must be an instance and between the start and end times
-		return mode == 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
+		return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
 	};
 	
 	var currentQuestionIsAlternate = function()
 	{
-		return section == 'assessment' && getAssessmentPageIndex(getPage()).altIndex > 0;
+		return section === 'assessment' && getAssessmentPageIndex(getPage()).altIndex > 0;
 	}
 	
 	var getScores = function()
@@ -577,7 +593,7 @@ obo.model = function()
 	/*
 	var getNumAttempts = function()
 	{
-		if(mode == 'preview')
+		if(mode === 'preview')
 		{
 			return '?';
 		}
@@ -588,7 +604,7 @@ obo.model = function()
 	var getNumAttemptsRemaining = function()
 	{
 		// no real limit in preview mode:
-		if(mode == 'preview')
+		if(mode === 'preview')
 		{
 			return '?';
 		}
@@ -602,7 +618,7 @@ obo.model = function()
 	// if the importable score is 0 we treat this as non-importable (why would you want to import a failing grade?)
 	var getImportableScore = function()
 	{
-		if(mode == 'instance' && !isResumingPreviousAttempt() && lo.instanceData != null && lo.instanceData.allowScoreImport != null && lo.instanceData.allowScoreImport == 1 && scores.length == 0 && lo.equivalentAttempt != null && lo.equivalentAttempt.score != null && lo.equivalentAttempt.score > 0)
+		if(mode === 'instance' && !isResumingPreviousAttempt() && lo.instanceData != null && lo.instanceData.allowScoreImport != null && lo.instanceData.allowScoreImport === 1 && scores.length === 0 && lo.equivalentAttempt != null && lo.equivalentAttempt.score != null && lo.equivalentAttempt.score > 0)
 		{
 			return lo.equivalentAttempt.score;
 		}
@@ -645,7 +661,7 @@ obo.model = function()
 	// (useful to abstract out preview mode vs instance mode)
 	var getScoreMethod = function()
 	{
-		return mode == 'preview' ? 'h' : lo.instanceData.scoreMethod;
+		return mode === 'preview' ? 'h' : lo.instanceData.scoreMethod;
 	};
 	
 	// returns a rounded int representing final calculated score (based on score mode)
@@ -663,7 +679,7 @@ obo.model = function()
 				s = s / parseFloat(scores.length);
 				break;
 			case 'r': // most recent
-				s = scores.length == 0 ? 0 : parseFloat(scores[scores.length - 1].scores);
+				s = scores.length === 0 ? 0 : parseFloat(scores[scores.length - 1].scores);
 				break;
 			case 'h': // highest
 			default:
@@ -687,11 +703,11 @@ obo.model = function()
 		return pages[section];
 	};
 	
-	//@TODO: use this more!
+	// @TODO: use this more!
 	var getPageObject = function()
 	{
 		var i = getPage();
-		console.log('getPageObject', i);
+		debug.log('getPageObject', i);
 		if(pageIsNumericWithinBounds(undefined, i))
 		{
 			switch(section)
@@ -699,7 +715,7 @@ obo.model = function()
 				case 'content': return lo.pages[i - 1];
 				case 'practice': return questions.practice[i - 1][0];
 				case 'assessment':
-					if(mode == 'instance')
+					if(mode === 'instance')
 					{
 						return questions.assessment[i - 1][0];
 					}
@@ -732,9 +748,9 @@ obo.model = function()
 		for(var i in pageObject.items)
 		{
 			curPageItem = pageObject.items[i];
-			if(curPageItem.component.toLowerCase() == 'mediaview')
+			if(curPageItem.component.toLowerCase() === 'mediaview')
 			{
-				if(curPageItem.media && curPageItem.media.length > 0 && curPageItem.media[0].mediaID && curPageItem.media[0].mediaID == mediaID)
+				if(curPageItem.media && curPageItem.media.length > 0 && curPageItem.media[0].mediaID && curPageItem.media[0].mediaID === mediaID)
 				{
 					return curPageItem.media[0];
 				}
@@ -766,7 +782,7 @@ obo.model = function()
 		switch(_section)
 		{
 			case 'overview': return 0;
-			case 'content': return mode == 'preview' ? lo.pages.length : parseInt(lo.summary.contentSize);
+			case 'content': return mode === 'preview' ? lo.pages.length : parseInt(lo.summary.contentSize);
 			case 'practice': return questions.practice.length;
 			case 'assessment': return questions.assessment.length;
 		}
@@ -785,14 +801,14 @@ obo.model = function()
 		return questions.assessment;
 	};*/
 	
-	//@TODO is this used?
+	// @TODO is this used?
 	/*
 	var getCurrentquestions.assessment = function()
 	{
 		return questions.assessment[getAssessmentPageIndex(getPageOfCurrentSection()).index];
 	};*/
 	
-	//@TODO: use this more!
+	// @TODO: use this more!
 	var getQGroup = function()
 	{
 		switch(section)
@@ -810,13 +826,13 @@ obo.model = function()
 	// for los we should return 'title', but for instances we want the instance title
 	var getTitle = function()
 	{
-		return mode == 'preview' ? lo.title : lo.instanceData.name;
+		return mode === 'preview' ? lo.title : lo.instanceData.name;
 	};
 	
 	// returns true if the user still has an attempt under way
 	var isResumingPreviousAttempt = function()
 	{
-		return lo && lo.tracking && lo.tracking.isInAttempt && lo.tracking.isInAttempt == true;
+		return lo && lo.tracking && lo.tracking.isInAttempt && lo.tracking.isInAttempt === true;
 	};
 	
 	// load either an instance or LO based on params
@@ -855,7 +871,7 @@ obo.model = function()
 		loadCallback = callback;
 		
 		// set up options:
-		//@TODO: Do these work?
+		// @TODO: Do these work?
 		var options = {
 			useOpenDatabase: false,
 			useLocalStorage: false
@@ -876,7 +892,7 @@ obo.model = function()
 					var len = results.rows.length, i;
 					if(results.rows.length)
 					{
-						//@TODO: WTF
+						// @TODO: WTF
 						///////onGetLO(results.rows.item(0).loJSON);
 						return;
 					}
@@ -907,18 +923,18 @@ obo.model = function()
 		var newPage;
 		var newSection = undefined;
 		
-		if(page == 'start')
+		if(page === 'start')
 		{
 			newPage = 'end';
 			newSection = getPrevSection();
 		}
-		else if(page == 'end')
+		else if(page === 'end')
 		{
 			newPage = getNumPagesOfCurrentSection();
 		}
-		else if(page == 1)
+		else if(page === 1)
 		{
-			if(section == 'content')
+			if(section === 'content')
 			{
 				newSection = 'overview';
 			}
@@ -930,10 +946,10 @@ obo.model = function()
 		else
 		{
 			// special <number><letter> pages for assessment preview
-			if(mode == 'preview' && section == 'assessment')
+			if(mode === 'preview' && section === 'assessment')
 			{
 				var assessIndex = getAssessmentPageIndex(page);
-				if(assessIndex.altIndex == 0)
+				if(assessIndex.altIndex === 0)
 				{
 					newPage = String(assessIndex.index);
 					var altIndex = questions.assessment[assessIndex.index - 1].length - 1;
@@ -942,7 +958,7 @@ obo.model = function()
 						newPage += String.fromCharCode(altIndex + 97);
 					}
 				}
-				else if(assessIndex.altIndex == 1)
+				else if(assessIndex.altIndex === 1)
 				{
 					newPage = assessIndex.index - 1;
 				}
@@ -968,27 +984,27 @@ obo.model = function()
 		var newPage;
 		var newSection = undefined;
 		
-		if(section == 'overview')
+		if(section === 'overview')
 		{
 			newSection = 'content';
 			newPage = 1;
 		}
-		else if(page == 'start')
+		else if(page === 'start')
 		{
 			newPage = 1;
 		}
-		else if(page == 'end')
+		else if(page === 'end')
 		{
 			newPage = 'start';
 			newSection = getNextSection();
 		}
 		// special <number><letter> pages for assessment preview
-		else if(mode == 'preview' && section == 'assessment')
+		else if(mode === 'preview' && section === 'assessment')
 		{
 			var assessIndex = getAssessmentPageIndex(page);
 			
 			// + 2 since pages are indexed at 1 but getAssessmentPageIndex returns 0-indexed values
-			if(assessIndex.altIndex == questions.assessment[assessIndex.index].length - 1)
+			if(assessIndex.altIndex === questions.assessment[assessIndex.index].length - 1)
 			{
 				newPage = assessIndex.index + 2;
 				if(parseInt(newPage) > getNumPagesOfCurrentSection())
@@ -1001,7 +1017,7 @@ obo.model = function()
 				newPage = String(assessIndex.index + 1) + String.fromCharCode(assessIndex.altIndex + 1 + 97);
 			}
 		}
-		else if(page == getNumPagesOfCurrentSection())
+		else if(page === getNumPagesOfCurrentSection())
 		{
 			newPage = 'end';
 		}
@@ -1047,22 +1063,22 @@ obo.model = function()
 		var page = getPage();
 		var qGroup = getQGroup();
 		
-		console.log('submitQuestion(' + answerID_or_shortAnswerResponse_or_score + ')');
-		if(mode == 'instance')
+		debug.log('submitQuestion(' + answerID_or_shortAnswerResponse_or_score + ')');
+		if(mode === 'instance')
 		{
-			obo.remote.makeCall(qGroup.itemType.toLowerCase() == 'media' ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
+			obo.remote.makeCall(qGroup.itemType.toLowerCase() === 'media' ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
 		}
 		
 		// store this response
 		// (for question alternates in preview mode we just store one response -
 		//	the last response)
-		if(mode == 'preview' && section == 'assessment')
+		if(mode === 'preview' && section === 'assessment')
 		{
 			page = getAssessmentPageIndex(page).index + 1;
 		}
-		console.log('STORING ', answerID_or_shortAnswerResponse_or_score, ' WITH SECTION ', section, ' PAGE ', page);
+		debug.log('STORING ', answerID_or_shortAnswerResponse_or_score, ' WITH SECTION ', section, ' PAGE ', page);
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
-		
+		debug.log('responses:', responses);
 	};
 	
 	// return the previous response, if it exists, for the current question
@@ -1070,14 +1086,14 @@ obo.model = function()
 	// note that for media questions the previous response is really the score
 	var getPreviousResponse = function()
 	{
-		console.log('getPreviousResponse');
-		console.log(responses);
+		debug.log('getPreviousResponse');
+		debug.log(responses);
 		return responses[section][getPage()];
 	};
 	
 	var startAssessment = function()
 	{
-		if(mode == 'instance')
+		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptStart', [lo.viewID, lo.aGroup.qGroupID], loadAssessment);
 		}
@@ -1089,7 +1105,9 @@ obo.model = function()
 	
 	var submitAssessment = function()
 	{
-		if(mode == 'instance')
+		debug.log('submitAssessment');
+		
+		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptEnd', [lo.viewID, lo.aGroup.qGroupID], onSubmitAssessment);
 		}
@@ -1104,24 +1122,32 @@ obo.model = function()
 			{
 				curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
-				for(var j in curQuestion.answers)
+				debug.log('curQuestion=',curQuestion)
+				switch(curQuestion.itemType.toLowerCase())
 				{
-					switch(curQuestion.itemType.toLowerCase())
-					{
-						case 'mc':
-							if(curQuestion.answers[j].answerID == curResponse)
+					case 'mc':
+						for(var j in curQuestion.answers)
+						{
+							if(curQuestion.answers[j].answerID === curResponse)
 							{
 								total += parseInt(curQuestion.answers[j].weight);
 							}
-							break;
-						case 'qa':
-							if(curQuestion.answers[j].answer == curResponse)
+						}
+						break;
+					case 'qa':
+						for(var j in curQuestion.answers)
+						{
+							if(curQuestion.answers[j].answer === curResponse)
 							{
 								total += 100;
 							}
-							break;
-					}
+						}
+						break;
+					case 'media':
+						total += parseInt(curResponse);
+						break;
 				}
+				
 			}
 			onSubmitAssessment(parseFloat(total) / parseFloat(lo.aGroup.kids.length));
 		}

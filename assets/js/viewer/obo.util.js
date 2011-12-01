@@ -36,8 +36,8 @@ obo.util = function()
 	var patternStrictRemoveExtraUL = /<\/ul><ul>/gi;
 	var patternStrictEmpty1 = /<(\w+?)[^>]*?>(\s*?)<\/\1>/gi;
 	var patternStrictEmpty2 = /<(\w+)>(\s*?)<\/\1>/gi;
-	var patternStrictOMLTooltip = /\[\s*?tooltip\s+?text\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+)\[\/tooltip\]/gi;
-	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+)\[\/page\]/gi;
+	var patternStrictOMLTooltip = /\[\s*?tooltip\s+?text\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/tooltip\]/gi;
+	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/page\]/gi;
 	
 	var patternTF = /<\/?textformat\s?.*?>/gi;
 	var patternPFont = /<p\s?(.*?)><font.*?(?:FACE="(\w+)").*?(?:SIZE="(\d+)").*?(?:COLOR="(#\d+)").*?>/gi;
@@ -50,7 +50,7 @@ obo.util = function()
 	var patternAddUL = /<LI>([\s\S]*?)<\/LI>/gi;
 	var patternRemoveExtraUL = /<\/ul><ul>/gi;
 	
-	//@TODO ul and p should have margin = 0
+	// @TODO ul and p should have margin = 0
 	/** This attempts to recreate HTML from flash HTML exactly **/
 	var cleanFlashHTMLStrict = function(input)
 	{
@@ -87,7 +87,7 @@ obo.util = function()
 		input = input.replace(patternStrictTFClose, "</li>");
 //patternStrictTfToDiv.lastIndex = 0;
 		var matchFound = true;
-		//@TODO: handle textformat with no style options
+		// @TODO: handle textformat with no style options
 		//Convert <textformat> into <div>
 		var i = 0;
 		//console.log('convert textformat into div');
@@ -152,7 +152,7 @@ obo.util = function()
 			//console.log('input now =');
 			//console.log(input);
 			//console.log(' ');
-			//matchFound = false; //@TODO
+			//matchFound = false; // @TODO
 			//if(j > 3) return;
 		}
 		
@@ -173,7 +173,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; //@TODO
+			matchFound = false; // @TODO
 		}
 		
 		input = input.replace(patternStrictFontClose, "</span>");
@@ -206,7 +206,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; //@TODO
+			matchFound = false; // @TODO
 		}
 
 		var matchFound = true;
@@ -223,7 +223,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; //@TODO
+			matchFound = false; // @TODO
 		}
 
 		input = createOMLTags(input);
@@ -231,7 +231,7 @@ obo.util = function()
 		return input;
 	};
 	
-	//@TODO: This runs very very slow in FF
+	// @TODO: This runs very very slow in FF
 	var generateStyleFromFlashHTMLTag = function(attribs, rules)
 	{
 		var style = '';
@@ -254,14 +254,14 @@ obo.util = function()
 		var pattern;
 
 		/*Find OML tooltips*/
-		//@TODO: Img
+		// @TODO: Img
 		input = input.replace(patternStrictOMLTooltip, '<span title="$1" class="oml oml-tip">$2</span>');
 
 		/*Find OML page links*/
-		//@TODO: Left or right arrow depending on if that would be foward or back
+		// @TODO: Left or right arrow depending on if that would be foward or back
 		input = input.replace(patternStrictOMLPageLink, '<a class="oml oml-page-link" data-page-id="$1" href="' + location.href + 'page/$1" title="' + '&rarr; Page $1">$2</a>');
 		/*input = input.replace(pattern, '<a class="oml oml-page-link" data-page-id="$1" href="http://www.google.com/" title="Go to page $1">$2</a>');*/
-		//@TODO: Fix quote issues (" --> &quot;)
+		// @TODO: Fix quote issues (" --> &quot;)
 
 		return input;
 	};
@@ -269,7 +269,14 @@ obo.util = function()
 	// @public
 	getRGBA = function(colorInt, alpha)
 	{
-		return 'rgba(' + ((colorInt >> 16) & 255) + ',' + ((colorInt >> 8) & 255) + ',' + (colorInt & 255) + ',' + alpha + ')';
+		if(Modernizr.rgba)
+		{
+			return 'rgba(' + ((colorInt >> 16) & 255) + ',' + ((colorInt >> 8) & 255) + ',' + (colorInt & 255) + ',' + alpha + ')';
+		}
+		else
+		{
+			return '#' + ('000000' + colorInt.toString(16)).slice(-6);
+		}
 	};
 	
 	// Old learning objects were saved using flash's textfields - which suck at html
@@ -303,7 +310,7 @@ obo.util = function()
 		input = input.replace(patternRemoveUL, "");
 
 		// add <ul></ul> arround list items
-		input = input.replace(patternAddUL, "<ul><li>$1</li></ul>"); //@TODO DOES THIS WORK??????????
+		input = input.replace(patternAddUL, "<ul><li>$1</li></ul>"); // @TODO DOES THIS WORK??????????
 
 		// kill extra </ul><ul> that are back to back - this will make proper lists
 		input = input.replace(patternRemoveExtraUL, "");
@@ -318,7 +325,7 @@ obo.util = function()
 		return html.replace(/</g,'v').replace(/>/g,'&gt;').replace(/&/g,'&amp;').replace(/\"/g, '');
 	};
 
-	//@TODO: Get rid of this?
+	// @TODO: Get rid of this?
 	/*
 	getURLParam = function(strParamName)
 	{
@@ -346,7 +353,7 @@ obo.util = function()
 	{
 		for(var i in answers)
 		{
-			if(answers[i].answerID == answerID)
+			if(answers[i].answerID === answerID)
 			{
 				return answers[i];
 			}
