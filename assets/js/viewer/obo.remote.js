@@ -6,10 +6,10 @@ if(!window.obo)
 
 obo.remote = function()
 {
-	var makeCall = function(method, arguments, callback)
+	var makeCall = function(method, args, callback)
 	{
-		console.log('makeCall: ' + method + ', arguments: ' + arguments);
-		//console.log("http://obo/assets/gateway-json.php/loRepository."+method+"/"+arguments.join("/")+'/?contentType=application/json');
+		debug.log('makeCall: ' + method + ', args: ' + args);
+		//debug.log("http://obo/assets/gateway-json.php/loRepository."+method+"/"+arguments.join("/")+'/?contentType=application/json');
 		
 		if(!callback)
 		{
@@ -20,7 +20,7 @@ obo.remote = function()
 		// we also automatically filter every call to check for errors
 		$.ajax(
 		{
-			url: "http://obo/assets/gateway-json.php/loRepository."+method+"/"+arguments.join("/")+'/?contentType=application/json',
+			url: "http://obo/assets/gateway-json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json',
 			context: document.body,
 			dataType: 'json',
 			success: callback
@@ -35,7 +35,7 @@ obo.remote = function()
 	
 	return {
 		makeCall: makeCall,
-		isError: isError,
+		isError: isError
 	};
 }();
 
