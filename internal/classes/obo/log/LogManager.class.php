@@ -148,10 +148,21 @@ class LogManager extends \rocketD\db\DBEnabled
 		return $return;
 	}
 	
-	public function getInteractionLogByVisit($vid=0)
+	public function getInteractionLogByVisit($visitID=0)
 	{
 		// must be user, instance owner, or SU
 		
+		// if($tracking = \rocketD\util\Cache::getInstance()->getInteractionsByVisit($visitID))
+		// {
+		// 	return $tracking;
+		// }
+		
+		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Visit::ID." = '?' ORDER BY ".\cfg_obo_Track::TIME;
+		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $visitID));
+		
+		// \rocketD\util\Cache::getInstance()->setInteractionsByVisit($visitID, $return);
+		
+		return $return;
 	}
 
 	protected function getInteractionLogs($query, $totalsOnly=false)
@@ -402,9 +413,10 @@ class LogManager extends \rocketD\db\DBEnabled
 								}
 								
 								// if this is the assessment section AND the assessment uses randomization or alternate questions, get the questions in order
-								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Attempt::ID} > 0 )
+								// trace($r);
+								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Track::A} > 0 )
 								{
-									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Attempt::ID});
+									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Track::A});
 								}
 								else
 								{
