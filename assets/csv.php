@@ -36,7 +36,7 @@ switch($_GET['function'])
 
 			$API = \obo\API::getInstance();
 			$stats = $API->getLOStats($_GET['los'], $_GET['stat'], $_GET['start'], $_GET['end'], $_GET['resolution'], false);
-			if(is_array($stats))
+			if(is_array($stats) && count($stats) > 0)
 			{
 				session_write_close();
 				header("Pragma: public");
@@ -51,6 +51,11 @@ switch($_GET['function'])
 				{
 					echo '"' . implode('","', (array)$row) . '"' . "\r\n";
 				}
+			}
+			else
+			{
+				trace('Stats - no returned stats', true);
+				trace($stats);
 			}
 			exit();
 		break;
