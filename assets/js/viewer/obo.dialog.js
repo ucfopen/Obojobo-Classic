@@ -4,10 +4,10 @@ if(!window.obo)
 	window.obo = {};
 }
 
-//@TODO: Need to have our callbacks close the dialog
+// @TODO: Need to have our callbacks close the dialog
 obo.dialog = function()
 {
-	//@public
+	// @public
 	// convience wrapper function to simplify jquery ui dialog creation
 	/*
 	var closeDialog = function(dialogID)
@@ -22,7 +22,7 @@ obo.dialog = function()
 	
 	var showDialog = function(options)
 	{
-		if($('#content-blocker').length == 0)
+		if($('#content-blocker').length === 0)
 		{
 			//$('body').append($('<div id="content-blocker"></div>'));
 		}
