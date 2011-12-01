@@ -773,7 +773,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
     public function getAttemptDetails($attemptID = 0, $includeScores = true )
     {
-		trace('get attempt details for attempt'.$attemptID);
 		if(!\obo\util\Validator::isPosInt($attemptID))
 		{
 			return \rocketD\util\Error::getError(2);
