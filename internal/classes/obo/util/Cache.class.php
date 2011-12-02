@@ -426,6 +426,31 @@ class Cache extends \rocketD\util\RDMemcache
 			$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByUserAndInstance:'.$instID.':'.$userID);
 		}		
 	}
+		
+	// public function getInteractionsByVisit($visitID)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		return $this->get($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
+	// 	}
+	// 	
+	// }
+	// 
+	// public function setInteractionsByVisit($visitID, $interactions)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		$this->set($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID, $interactions, false, 3600) or trace('failure writing memcache', true);
+	// 	}
+	// }
+	// 
+	// public function clearInteractionsByVisit($visitID)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
+	// 	}		
+	// }
 	
 	public function setUIDForUserName($userID, $userName)
 	{
