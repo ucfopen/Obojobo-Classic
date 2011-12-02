@@ -148,10 +148,21 @@ class LogManager extends \rocketD\db\DBEnabled
 		return $return;
 	}
 	
-	public function getInteractionLogByVisit($vid=0)
+	public function getInteractionLogByVisit($visitID=0)
 	{
 		// must be user, instance owner, or SU
 		
+		// if($tracking = \rocketD\util\Cache::getInstance()->getInteractionsByVisit($visitID))
+		// {
+		// 	return $tracking;
+		// }
+		
+		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Visit::ID." = '?' ORDER BY ".\cfg_obo_Track::TIME;
+		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $visitID));
+		
+		// \rocketD\util\Cache::getInstance()->setInteractionsByVisit($visitID, $return);
+		
+		return $return;
 	}
 
 	protected function getInteractionLogs($query, $totalsOnly=false)
@@ -402,9 +413,10 @@ class LogManager extends \rocketD\db\DBEnabled
 								}
 								
 								// if this is the assessment section AND the assessment uses randomization or alternate questions, get the questions in order
-								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Attempt::ID} > 0 )
+								// trace($r);
+								if(array_search($curSection, $sectionNames) == 3  &&  ($lo->aGroup->rand == 1  ||  $lo->aGroup->allowAlts == 1) && $r->{\cfg_obo_Track::A} > 0 )
 								{
-									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Attempt::ID});
+									$currentAttemptOrder = $AM->filterQuestionsByAttempt($lo->aGroup->kids, $r->{\cfg_obo_Track::A});
 								}
 								else
 								{
@@ -692,7 +704,6 @@ class LogManager extends \rocketD\db\DBEnabled
 		$this->track(new \obo\log\Trackable('LoggedOut', 0, 0));
 	}
 
-
     public function getInstanceTrackingData($userID = 0, $instID = 0)
     {
         if(!is_numeric($userID) || $userID < 1 || !is_numeric($instID) || $instID < 1)
@@ -703,7 +714,13 @@ class LogManager extends \rocketD\db\DBEnabled
         $trackingArr = new \stdClass();
 		$trackingArr->prevScores = $SM->getAssessmentScores($instID, $userID);
 
-        $qstr = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE `".\cfg_obo_Track::TYPE."`='PageChanged' AND `".\cfg_obo_Instance::ID."` = '?' AND `".\cfg_core_User::ID."` = '?'";
+        $qstr = "SELECT ".\cfg_obo_Track::TO." FROM 
+				".\cfg_obo_Track::TABLE." 
+				WHERE 
+					`".\cfg_obo_Track::TYPE."`='PageChanged'
+					AND `".\cfg_obo_Instance::ID."` = '?'
+					AND `".\cfg_core_User::ID."` = '?'
+					AND `".\cfg_obo_Track::IN."` = '".\obo\lo\Page::SECTION_CONTENT."'";
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 		    $this->DBM->rollback();
@@ -714,15 +731,12 @@ class LogManager extends \rocketD\db\DBEnabled
 		$trackingArr->contentVisited = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
-		    if($data->{\cfg_obo_Track::IN} == \obo\log\PageChanged::CONTENT)
-			{
-                $trackingArr->contentVisited[] = $data->{\cfg_obo_Track::TO};
-			}
+			$trackingArr->contentVisited[] = $r->{\cfg_obo_Track::TO};
 		}
 		$trackingArr->contentVisited = array_values(array_unique($trackingArr->contentVisited));
 
-        return $trackingArr;
-    }
+		return $trackingArr;
+	}
 	
 }
 ?>
