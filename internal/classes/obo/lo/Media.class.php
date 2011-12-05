@@ -26,7 +26,7 @@ class Media
 	public $height;			//height in pixels of the media (works for swf and images)
 	public $width;			//width in pixels of media
 	public $version;		//version of the file (swf version for instance)
-	public $meta;			//metadata object specific to media type (aka swf version)
+	public $meta;			//metadata object specific to media type (aka actionscript version)
 	public $attribution;	//Tinyint: If true (1), the image requires CC attribution
 
 	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='', $meta=0, $attribution=0)
