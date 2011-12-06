@@ -25,11 +25,10 @@ class Media
 	public $perms;			//Permissions object:  merged from global and user
 	public $height;			//height in pixels of the media (works for swf and images)
 	public $width;			//width in pixels of media
-	public $version;		//version of the file (swf version for instance)
 	public $meta;			//metadata object specific to media type (aka actionscript version)
 	public $attribution;	//Tinyint: If true (1), the image requires CC attribution
 
-	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $version='', $meta=0, $attribution=0)
+	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $meta=0, $attribution=0)
 	{
 	    if(func_num_args() == 1)
         {
@@ -46,7 +45,6 @@ class Media
 			$this->length = $mediaObj['length'];
 			$this->width = $mediaObj['width'];
 			$this->height = $mediaObj['height'];
-			$this->version = $mediaObj['version'];
 			$this->meta = $mediaObj['meta'];
 			$this->attribution = $mediaObj['attribution'];
         }
@@ -66,7 +64,6 @@ class Media
 			$this->perms = $perms;
 			$this->width = $width;
 			$this->height = $height;
-			$this->version = $version;
 			$this->meta = $meta;
 			$this->attribution = $attribution;
         }
