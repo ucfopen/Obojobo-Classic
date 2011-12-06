@@ -58,7 +58,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		
 		
 
-		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, $r->{\cfg_obo_Media::VER}, unserialize(base64_decode($r->{\cfg_obo_Media::META})), $r->{\cfg_obo_Media::ATTRIBUTION});
+		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, unserialize(base64_decode($r->{\cfg_obo_Media::META})), $r->{\cfg_obo_Media::ATTRIBUTION});
 		\rocketD\util\Cache::getInstance()->setMedia($media);
 		return $media;
 	}
@@ -192,12 +192,11 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::LENGTH."='?',
 				".\cfg_obo_Media::HEIGHT."='?',
 				".\cfg_obo_Media::WIDTH."='?',
-				".\cfg_obo_Media::VER."='?',
 				".\cfg_obo_Media::META."='?',
 				".\cfg_obo_Media::ATTRIBUTION."='?'";
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
 		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
-		$media->size, $media->length, $media->height, $media->width, $media->version, base64_encode(serialize($media->meta)), $media->attribution)))
+		$media->size, $media->length, $media->height, $media->width, base64_encode(serialize($media->meta)), $media->attribution)))
 		{
 		    $this->DBM->rollback();
 			return false;
@@ -320,14 +319,14 @@ class MediaManager extends \rocketD\db\DBEnabled
 					if($fileType == 'swf')
 					{
 						$swf = new \obo\lo\media\SWF($newFileLocation);
-						//$swf->getDimensions($newFileLocation);
+
 						$media->width = $swf->width;
 						$media->height = $swf->height;
-						$media->version = $swf->version;
 						$media->meta = array(
 							'version' => $swf->version,
-							'asVersion' => $swf->actionScriptVersion
+							'asVersion' => $swf->asVersion
 						);
+						$length = $swf->totalFrames;
 					}
 					// get the image dimensions
 					else if($fileType == 'pic')
@@ -345,10 +344,9 @@ class MediaManager extends \rocketD\db\DBEnabled
 					$media->itemType = $fileType;
 					$media->thumb = 0;
 					$media->url = $fileName.".".$extension; // same as basename?
-					//$media->size = $fileData['size'];
 					$media->size = $size;
 					$media->length = $length;
-					$lor = \obo\API::getInstance();
+
 					$result = $this->newMedia($media);
 					
 					if( !($result instanceof nm_los_Media) )
@@ -404,14 +402,14 @@ class MediaManager extends \rocketD\db\DBEnabled
 			if($fileType == 'swf')
 			{
 				$swf = new \obo\lo\media\SWF($newFileLocation);
-				//$swf->getDimensions($newFileLocation);
+				
 				$media->width = $swf->width;
 				$media->height = $swf->height;
-				$media->version = $swf->version;
 				$media->meta = array(
 					'version' => $swf->version,
-					'asVersion' => $swf->actionScriptVersion
+					'asVersion' => $swf->asVersion
 				);
+				$length = $swf->totalFrames;
 			}
 			// get the image dimensions
 			else if($fileType == 'pic')
@@ -431,8 +429,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			$media->url = $fileName.".".$extension; // same as basename?
 			$media->size = $fileData['size'];
 			$media->length = $length;
-			
-			$lor = \obo\API::getInstance();
+
 			$result = $this->newMedia($media);
 			if( !($result instanceof \obo\lo\Media) )
 			{
@@ -482,9 +479,10 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::LENGTH."='?', 
 				".\cfg_obo_Media::HEIGHT."='?', 
 				".\cfg_obo_Media::WIDTH."='?', 
-				".\cfg_obo_Media::URL."='?' 
+				".\cfg_obo_Media::URL."='?',
+				".\cfg_obo_Media::META."='?', 
 				WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1";
-			if( !($q = $this->DBM->querySafe($qstr, $mediaObj->title, $mediaObj->descText, $mediaObj->copyright, $mediaObj->length, $mediaObj->height, $mediaObj->width, $mediaObj->url, $mediaObj->mediaID)))
+			if( !($q = $this->DBM->querySafe($qstr, $mediaObj->title, $mediaObj->descText, $mediaObj->copyright, $mediaObj->length, $mediaObj->height, $mediaObj->width, $mediaObj->url, base64_encode(serialize($mediaObj->meta)), $mediaObj->mediaID)))
 	        {
 			    $this->DBM->rollback();
 				return false;	
