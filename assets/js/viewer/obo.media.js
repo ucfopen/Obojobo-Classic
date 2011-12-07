@@ -135,6 +135,7 @@ obo.media = function()
 	};*/
 	
 	// @TODO need to deal with the player variable
+	/*
 	var buildYouTubeVideo = function($placeholder)
 	{
 		var youtubeID = $placeholder.attr('data-youtube-id');
@@ -155,7 +156,7 @@ obo.media = function()
 		
 		return player;
 	};
-	
+	*/
 	var swfize = function()
 	{
 		debug.log('swfize');
@@ -171,15 +172,18 @@ obo.media = function()
 				//$placeholder.parent('.media-item').css('height', $placeholder.css('height')).css('width', $placeholder.css('width'));
 				var url = '/media/';
 				var asVersion = $placeholder.attr('data-as-version');
-				
+				debug.log('here0');
 				if(asVersion && asVersion.length > 0)
 				{
 					debug.log('asVersion', asVersion);
 					asVersions[placeholder.id] = 3;
 					mediaIDs[placeholder.id] = mediaID;
 					
+					debug.log('here');
+					debug.log($('#swap-cap').length);
 					if($('#swap-cap').length === 0)
 					{
+						debug.log('APPENDING!!!');
 						$('#swf-holder').append('<a id="swap-cap" style="position:relative; top:-25px;" href="#" onclick="switchCaptivateSpy(event)">(Toggle)</a>');
 					}
 					$('#swap-cap').show();
@@ -231,6 +235,24 @@ obo.media = function()
 	
 	// converts any youtube placeholder elements with an instance of the youtube player.
 	var youtubeize = function()
+	{
+		if(AUTOLOAD_FLASH)
+		{
+			$('.youtube-placeholder').each(function(index, placeholder)
+			{
+				var $placeholder = $(placeholder);
+				$placeholder.removeClass('youtube-placeholder').addClass('youtube-container');
+				//var mediaID = placeholder.id.split('media-')[1];
+				//var mediaID = $placeholder.attr('data-media-id');
+				var youtubeURL = $placeholder.attr('data-youtube-id');
+				var params = getParams();
+				params.allowScriptAccess = "always";
+				swfobject.embedSWF('http://www.youtube.com/v/' + youtubeURL + '', placeholder.id, $placeholder.width() + 'px', $placeholder.height() + 'px', "10",  "/assets/flash/expressInstall.swf", null, params);
+			});
+		}
+	};
+	
+	var youtubeizeIFrame = function()
 	{
 		debug.log('youtubeize');
 		if(AUTOLOAD_FLASH)
@@ -298,7 +320,17 @@ obo.media = function()
 		{
 			case 'pic':
 				$target.append($mediaElement);
-				$mediaElement.append('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
+				$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
+				$img.one('load', function() {
+					debug.log($(this).parent());
+					$(this).css('background', 'white');
+				}).each(function() {
+					if(this.complete)
+					{
+						$(this).trigger('load');
+					}
+				});
+				$mediaElement.append($img);
 				//$mediaElement.width(mediaObject.width).height(mediaObject.height);
 				break;
 			case 'cap5': // @TODO - is 'cap5' used?
@@ -309,7 +341,7 @@ obo.media = function()
 				
 				// we assume this is a captivate if it is a swf in an interactive question
 				var isCaptivate = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
-				debug.log('isCaptivate=');
+				
 				debug.log(obo.model.getPageObject());
 				debug.log($('.question-page').hasClass('question-type-Media'));
 				debug.log($('.question-page'));
@@ -397,7 +429,7 @@ obo.media = function()
 					$mediaElement.width(mediaObject.width).height(mediaObject.height);
 				}
 				
-				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
+				
 				/*
 				//$('.media-item').click(function(event) {
 				setTimeout(function () {
@@ -482,34 +514,9 @@ obo.media = function()
 				}
 				$target.append($mediaElement);
 				$mediaElement.append($youtube);
-
+				
+				//@TODO - This is iFrame embed code which doesn't play nice with IE8
 				/*
-				// we need to load the API if it hasn't been loaded
-				if(!youTubeAPIReady)
-				{
-					// loading this script will call onYouTubePlayerAPIReady in the global namespace
-					var script = document.createElement('script');
-					script.src = 'http://www.youtube.com/player_api';
-					var firstScriptTag = document.getElementsByTagName('script')[0];
-					firstScriptTag.parentNode.insertBefore(script, firstScriptTag);
-				}
-				else
-				{
-					// @TODO  - this is hack town
-					setTimeout(function() {
-						debug.log('now lets youtubeize');
-						youtubeize();
-					}, 1);
-
-				}*/
-				/*
-				obo.loader.loadScript('http://www.youtube.com/player_api', function() {
-					setTimeout(function() {
-						debug.log('now lets youtubeize');
-						youtubeize();
-					}, 2000);
-				});*/
-
 				if(!youTubeAPIReady)
 				{
 					obo.loader.loadScript('http://www.youtube.com/player_api');
@@ -519,7 +526,9 @@ obo.media = function()
 					setTimeout(function() {
 						youtubeize();
 					}, 1);
-				}
+				}*/
+				//youtubeize();
+				
 				break;
 			case 'flv':
 				var style = '';
@@ -640,6 +649,8 @@ obo.media = function()
 				//alert('yup');
 				debug.log('youtube fix');
 				$youtube.width(mediaObject.width).height(mediaObject.height);
+				$youtube.load('/assets/templates/viewer.html #swf-alt-text', youtubeize);
+				
 				$youtube = undefined;
 			}
 			//alert('begin');
@@ -648,6 +659,8 @@ obo.media = function()
 			{
 				//alert('!!!!!!!!!!!swf fix');
 				$swf.width(mediaObject.width).height(mediaObject.height);
+				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
+				
 				$swf = undefined;
 			}
 			//alert('5. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
@@ -659,6 +672,13 @@ obo.media = function()
 		alert('c' + $mediaElement.width() + ',' + $mediaElement.height());
 		alert('d' + $standin.width() + ',' + $standin.height());
 		*/
+		
+		// attribution
+		if(true || mediaObject.attribution === true || mediaObject.attribution.toString() === '1')
+		{
+			$mediaElement.append('<span class="attribution">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>');
+		}
+		
 		mediaCount++;
 		return $mediaElement;
 	};
@@ -683,23 +703,23 @@ obo.media = function()
 			}
 		}
 	};*/
-	
+	/*
 	var setYouTubeAPIReady = function(val)
 	{
 		youTubeAPIReady = val;
-	};
+	};*/
 	
 	return {
-		setYouTubeAPIReady: setYouTubeAPIReady,
-		createMedia: createMedia,
-		youtubeize: youtubeize
+		//setYouTubeAPIReady: setYouTubeAPIReady,
+		createMedia: createMedia//,
+		//youtubeize: youtubeize
 	};
 }();
-
+/*
 // @TODO does this need to be in the global namespace?
 // required callback by the youtube iframe API.
 function onYouTubePlayerAPIReady(event)
 {
 	obo.media.setYouTubeAPIReady(true);
 	obo.media.youtubeize();
-}
+}*/
