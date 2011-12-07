@@ -6,39 +6,50 @@ require(__DIR__ . '/../../internal/app.php');
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
-$mediaIDs = array(); // keep track of the media id's to update
 
-
-// lets open up every media swf and update it's metadata
-
-$q = $DBM->query("SELECT * FROM obo_lo_media WHERE itemType = 'swf' WHERE meta = ''");
-while($r = $DBM->fetch_obj($q))
+if(isset($_REQUEST['done']))
 {
-
-	
-	$mediaIDs[] = $r->mediaID;
-	// echo "Media ID: " . $r->mediaID . "\n";
-	$swf= new \obo\lo\media\SWF(__DIR__ . '/../../internal/media/'.$r->mediaID.'.swf');
-	echo "height=[".$swf->height."]\n";
-	echo "width=[".$swf->width."]\n";
-	echo "totalFrames=[".$swf->totalFrames."]\n";
-	echo "asVersion=[".$swf->asVersion."]\n";
-	echo "swfVersion=[".$swf->version."]\n";
-	echo "==========================\n";
-	$metadata = array(
-		'version' => $swf->version,
-		'asVersion' => $swf->asVersion
-		);
-	$meta = base64_encode(serialize($metadata));
-	$DBM->query("UPDATE obo_lo_media SET 
-				meta = '$meta',
-				length = '$swf->totalFrames',
-				height = '".$swf->height."',
-				`width` = '".$swf->width ."'
-				WHERE mediaID = '".$r->mediaID."'");
-	unset($swf);
+	exit('DONE ALREADY!!!');
 }
 
+// lets open up every media swf and update it's metadata
+if(!isset($_REQUEST['loID']))
+{
+	if(isset($_REQUEST['mediaID']))
+	{
+		$q = $DBM->querySafe("SELECT * FROM obo_lo_media WHERE itemType = 'swf' AND mediaID >= '?' ORDER BY mediaID ", $_REQUEST['mediaID']);
+	}
+	else
+	{
+		$q = $DBM->query("SELECT * FROM obo_lo_media WHERE itemType = 'swf' ORDER BY mediaID ");
+	}
+	while($r = $DBM->fetch_obj($q))
+	{
+		echo "Media ID: " . $r->mediaID . "\n";
+		$swf= new \obo\lo\media\SWF(__DIR__ . '/../../internal/media/'.$r->mediaID.'.swf');
+		echo "height=[".$swf->height."]\n";
+		echo "width=[".$swf->width."]\n";
+		echo "totalFrames=[".$swf->totalFrames."]\n";
+		echo "asVersion=[".$swf->asVersion."]\n";
+		echo "swfVersion=[".$swf->version."]\n";
+		
+		
+		$metadata = array(
+			'version' => $swf->version,
+			'asVersion' => $swf->asVersion
+			);
+		$meta = base64_encode(serialize($metadata));
+		$DBM->query("UPDATE obo_lo_media SET 
+					meta = '$meta',
+					length = '$swf->totalFrames',
+					height = '".$swf->height."',
+					`width` = '".$swf->width ."'
+					WHERE mediaID = '".$r->mediaID."'");
+		unset($swf);
+		echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?mediaID=$r->mediaID');</script>\n";
+		echo "==========================\n";
+	}
+}
 echo('metadata done!');
 flush();
 // now we need make sure the media objects in the pages, questions
@@ -52,9 +63,21 @@ $qgm = \obo\lo\QuestionGroupManager::getInstance();
 $mm = \obo\lo\MediaManager::getInstance();
 $loIDs = array();
 $medias = array();
-$q = $DBM->query("SELECT DISTINCT(obo_map_media_to_lo.loID), obo_los.* FROM obo_map_media_to_lo LEFT JOIN obo_los ON obo_los.loID = obo_map_media_to_lo.loID WHERE obo_map_media_to_lo.mediaID IN (". implode(',', $mediaIDs) .") ");
+
+
+if(isset($_REQUEST['loID']))
+{
+	$q = $DBM->querySafe("SELECT DISTINCT(obo_map_media_to_lo.loID), obo_los.* FROM obo_map_media_to_lo LEFT JOIN obo_los ON obo_los.loID = obo_map_media_to_lo.loID WHERE obo_map_media_to_lo.mediaID IN (SELECT mediaID FROM obo_lo_media WHERE itemType = 'swf' ORDER BY mediaID ) AND obo_map_media_to_lo.loID > '?' ORDER BY obo_map_media_to_lo.loID", $_REQUEST['loID']);
+}
+else
+{
+	$q = $DBM->query("SELECT DISTINCT(obo_map_media_to_lo.loID), obo_los.* FROM obo_map_media_to_lo LEFT JOIN obo_los ON obo_los.loID = obo_map_media_to_lo.loID WHERE obo_map_media_to_lo.mediaID IN (SELECT mediaID FROM obo_lo_media WHERE itemType = 'swf' ORDER BY mediaID ) ORDER BY obo_map_media_to_lo.loID");
+}
+
+
 while($r = $DBM->fetch_obj($q))
 {
+	echo "Lo ID: " . $r->loID . "\n";
 	$loIDs [] = $r->loID;
 	$pages = $pm->getPagesForLOID($r->loID);
 	
@@ -162,8 +185,9 @@ while($r = $DBM->fetch_obj($q))
 			}
 		}
 	}
-
+	echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?loID=$r->loID');</script>\n";
+	echo "==========================\n";
 }
-
+echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?done=1');</script>\n";
 echo('DONE!');
 ?>
