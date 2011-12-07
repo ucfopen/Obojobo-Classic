@@ -352,6 +352,8 @@ obo.model = function()
 	// this is only necessary in preview mode to show the multiple questions per index
 	var processQuestions = function()
 	{
+		debug.log('processQuestions', lo.aGroup.kids);
+		
 		questions.practice = [];
 		$(lo.pGroup.kids).each(function(index, page) {
 			questions.practice.push([page]);
@@ -367,7 +369,7 @@ obo.model = function()
 				curQIndex++
 				questions.assessment.push([]);
 			}
-			questions.assessment[curQIndex-1].push(page);
+			questions.assessment[curQIndex - 1].push(page);
 		});
 	};
 	
@@ -721,8 +723,12 @@ obo.model = function()
 					}
 					else
 					{
+						debug.log('L@@K');
+						
 						// need to handle question alternates
 						var pageIndex = getAssessmentPageIndex(i);
+						debug.log(pageIndex);
+						debug.log(questions.assessment);
 						return questions.assessment[pageIndex.index][pageIndex.altIndex];
 					}
 			}
@@ -980,6 +986,8 @@ obo.model = function()
 	// 'start', 'end', or a number, or a qalt page
 	var gotoNextPage = function()
 	{
+		debug.log('gotoNextPage');
+		
 		var page = getPage();
 		var newPage;
 		var newSection = undefined;
@@ -1155,6 +1163,8 @@ obo.model = function()
 	
 	var isPageAnswered = function(section, page)
 	{
+		debug.log('model.isPageAnswered(',section,page);
+		debug.log(responses[section]);
 		return responses[section][parseInt(page)] != undefined;
 	};
 	

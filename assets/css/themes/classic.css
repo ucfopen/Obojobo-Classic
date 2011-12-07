@@ -29,7 +29,7 @@ html
 
 html
 {
-	/*overflow-y: scroll;*/
+	overflow-y: scroll;
 	background: url('/assets/images/viewer/themes/classic/main-bg.png') center repeat-y, #995a5a;
 	/*background:#fbf6f1;*/
 }
@@ -210,7 +210,7 @@ h3
 	float: left;
 	font-size: 0.8em;
 	width: 100%;
-	text-align: left;
+	text-align: center;
 	color: #666;
 	/*margin: 80px auto 23px auto;	*/
 }
@@ -560,15 +560,12 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 
 .page-layout h2
 {
-	text-align:left;
+	text-align:center;
 	margin:27px 0 20px 0;
 	padding:0;
 	display:block;
-	width:50%;
 	word-wrap:break-word;
 	
-	width: 50%;
-	padding-right: 50%;
 	padding-bottom: 40px;
 	border-bottom: 1px solid rgba(0, 0, 0, .1);
 }
@@ -876,14 +873,16 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 /* ----------- Question Page Layouts ----------- */
 .question-page h2
 {
-	text-align:left;
-	margin:25px 0 30px 0;
+	text-align:center;
+	margin: 0;
 	padding:0;
 	display:block;
 	/*width:550px;*/
-	width: auto;
+	width: 100%;
 	color:#444;
 	float: left;
+	
+	padding-bottom: 40px;
 }
 
 .question-page h3
@@ -1276,6 +1275,8 @@ body
 
 #finish-section-button
 {
+	padding: 3px 10px 0 10px;
+	width: auto;
 	z-index: 1;
 }
 
@@ -1662,19 +1663,18 @@ body
 	text-transform:uppercase;
 }
 
-
-
 /* ----------- Second and subsequent levels ----------- */
 .subnav-list
 {
 	position: absolute;
-	top: 62px;
-	width: 50%;
+	top: 53px;
+	/*width: 50%;*/
 	border-top: none;
-	padding:0px;
-	right: 0;
-	text-align:right;
+	padding: 0 0 0 8%;
+	left: 0;
+	/*text-align:right;*/
 	z-index:100;
+	width: 84%;
 }
 
 .missed-pages-list li,
@@ -1687,35 +1687,12 @@ body
 	position:relative;
 	padding-bottom: 3px;
 }
-
+/*
 .subnav-list li:last-child a
 {
-	/*
-	position: absolute;
-	right: 0px;
-	top: 62px;
-	text-transform: uppercase;
-	z-index:150;
-	color: #202020;
-	font-weight: bold;
-	
-	background: #CCC;
-	display: inline-block;
-	height: 24px;
-	-moz-border-radius: 13px;
-	-webkit-border-radius: 13px;
-	border-radius: 13px;
-	
-	-moz-border-radius: 13px;
-	
-	-webkit-border-radius: 13px;
-	
-	border-radius: 13px;
-	padding: 3px 10px 0 10px;
-	text-shadow: rgba(255, 255, 255, .4) 0 1px 1px;*/
 	padding: 3px 10px 0 10px;
 	width: auto;
-}
+}*/
 
 .missed-pages-list li a,
 #nav-list .subnav-list li a,
@@ -2012,7 +1989,7 @@ li:last-child > input[type="radio"]:checked+label
 	font-size:.8em;
 }
 
-#page-navigation
+#page-navigation-bottom
 {
 	width: 954px;
 	margin:0 auto;
@@ -2024,49 +2001,119 @@ li:last-child > input[type="radio"]:checked+label
 	display: block;
 }
 
-#page-navigation ul
+#page-navigation-bottom ul
 {
 	height: 30px;
 	margin: 0;
 	padding: 0;
 }
 
-#page-navigation li
+#page-navigation-bottom li
 {
 	display: inline-block;
 	margin: 5px 0 0 0;
-	font-family: 'Lato';
-	text-transform: uppercase;
 	
+	
+	
+	
+}
+
+.page-navigation li
+{
 	float: right;
 }
 
-#page-navigation li a
+.page-navigation li a
 {
+	font-family: 'Lato';
+	text-transform: uppercase;
 	color:#888;
 	text-decoration: none;
 }
 
-#page-navigation li a:hover
+.page-navigation li a:hover
 {
 	color: #666;
 	text-decoration: underline;
 }
 
-#page-navigation li a:visited
+.page-navigation li a:visited
 {
 	color: #888;
 }
 
-#page-navigation li:first-child
+.page-navigation li:first-child
 {
 	float: left;
 }
 
-#page-navigation li a.disabled
+.page-navigation li a.disabled
 {
 	display: none;
 }
+
+#page-navigation-top
+{
+	position: absolute;
+	top: -107px;
+	left: 0;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	text-align: left;
+}
+
+#page-navigation-top ul
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+/*
+#page-navigation-top ul li
+{
+	position: absolute;
+}
+
+#page-navigation-top ul li:last-child
+{
+	right: 0;
+}
+
+*/
+
+
+#nav-list .next-page-button,
+#nav-list .prev-page-button
+{
+	position: absolute !important;
+	top: 55px !important;
+	color:#888 !important;
+	text-decoration: none !important;
+	padding: 0 !important;
+	background: none !important;
+	text-shadow: none;
+	height: auto !important;
+	z-index: 1000 !important;
+}
+
+#nav-list .prev-page-button
+{
+	left: 0 !important;
+}
+
+#nav-list .next-page-button
+{
+	right: 0 !important;
+}
+
+#nav-list .next-page-button:hover,
+#nav-list .prev-page-button:hover
+{
+	color: #666;
+	text-decoration: underline;
+}
+
 
 #custom-layout-page
 {
@@ -2447,28 +2494,20 @@ li:last-child > input[type="radio"]:checked+label
 {
 	background: rgba(0, 0, 0, .2);
 	position: fixed;
-	top: 40%;
+	top: 0;
 	left: 0;
-	-moz-border-radius: 0 10px 10px 0;
-	-webkit-border-radius: 0 10px 10px 0;
-	border-radius: 0 10px 10px 0;
-	height: 100px;
+	height: 100%;
 	text-indent: -9999px;
-	display: none;
 }
 
 #go-right
 {
 	background: rgba(0, 0, 0, .2);
 	position: fixed;
-	top: 40%;
+	top: 0;
 	right: 0;
-	-moz-border-radius: 10px 0 0 10px;
-	-webkit-border-radius: 10px 0 0 10px;
-	border-radius: 10px 0 0 10px;
-	height: 100px;
+	height: 100%;
 	text-indent: -9999px;
-	display: none;
 }
 
 .shortanswer .answer-feedback
@@ -2546,4 +2585,13 @@ li:last-child > input[type="radio"]:checked+label
 	margin: 0 auto;
 	position: relative;
 	/*background-color: rgba(255, 0, 0, .2);*/
+}
+
+.attribution
+{
+	font-style: italic;
+	font-size: 10pt;
+	color: gray;
+	text-align: left;
+	display: block;
 }
