@@ -122,6 +122,7 @@ obo.view = function()
 				obo.model.gotoStartPageOfNextSection();
 			}
 		}).on('mouseenter', '.subnav-list.assessment li:has(ul)', function(event) {
+			console.log('mouseenter');
 			hideSWFs();
 		}).on('mouseleave', '.subnav-list.assessment li:has(ul)', function(event) {
 			console.log('mouseleave');
@@ -213,6 +214,26 @@ obo.view = function()
 		}).on('click', '#submit-assessment-button', function(event) {
 			event.preventDefault();
 			submitAssessment();
+		}).on('click', '#go-left', function(event) {
+			event.preventDefault();
+			obo.model.gotoPrevPage();
+		}).on('click', '#go-right', function(event) {
+			event.preventDefault();
+			obo.model.gotoNextPage();
+		}).on('click', '.prev-page-button', function(event) {
+			event.preventDefault();
+			if(!$(event.target).hasClass('disabled'))
+			{
+				obo.model.gotoPrevPage();
+			}
+		}).on('click', '.next-page-button', function(event) {
+			debug.log('npb CLICK');
+			event.preventDefault();
+			if(!$(event.target).hasClass('disabled'))
+			{
+				
+				obo.model.gotoNextPage();
+			}
 		});
 		// End live events.
 		
@@ -251,9 +272,9 @@ obo.view = function()
 		$('#nav-content').attr('href', baseURL + '#page/1');
 		$('#nav-practice').attr('href', baseURL + '#practice/start');
 		$('#nav-assessment').attr('href', baseURL + '#assessment/start');
-		
+		/*
 		// navigation handlers:
-		$('#prev-page-button').click(function(event) {
+		$('.prev-page-button').click(function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
@@ -261,14 +282,14 @@ obo.view = function()
 				obo.model.gotoPrevPage();
 			}
 		});
-		$('#next-page-button').click(function(event) {
+		$('.next-page-button').click(function(event) {
 			event.preventDefault();
 			
 			if(!$(event.target).hasClass('disabled'))
 			{
 				obo.model.gotoNextPage();
 			}
-		});
+		});*/
 		
 		// setup tooltips:
 		var o = {maxWidth:'200px', delay:0, fadeIn:0, fadeOut:0, defaultPosition:'top', live:true, deactivationOnClick:true};
@@ -440,21 +461,26 @@ obo.view = function()
 	var showSubnav = function()
 	{
 		$('.subnav-list').show();
+		var pList = $('.subnav-list');
+			$($('#content')[0]).css('margin-top', (pList.height() + 40) + 'px');
 	};
 
 	var hideSubnav = function()
 	{
 		$('.subnav-list').hide();
+			$($('#content')[0]).css('margin-top', 0);
 	};
 
 	var showNextPrevNav = function()
 	{
-		$('#page-navigation').show();
+		$('.page-navigation').show();
+		debug.log('show next prev nav');
 	};
 
 	var hideNextPrevNav = function()
 	{
-		$('#page-navigation').hide();
+		$('.page-navigation').hide();
+		debug.log('HIDE next prev nav');
 	};
 	
 	var lockoutSections = function(sections)
@@ -500,6 +526,7 @@ obo.view = function()
 	}
 	
 	// @TODO
+	/*
 	var onChangeSection = function()
 	{
 		$('#content').empty(); // clear previous content
@@ -507,7 +534,7 @@ obo.view = function()
 		$('#nav-list li').removeClass('selected'); // reset the class for nav links
 		
 		obo.model.section = 'blah';
-	};
+	};*/
 	
 	var buildOverviewPage = function()
 	{
@@ -532,7 +559,7 @@ obo.view = function()
 	var createUnvisitedPageList = function()
 	{
 		// we added in 'finish', remove it when cloning
-		var missedPages = $('.subnav-list > li:not(.visited)').not(':last-child');
+		var missedPages = $('.subnav-list > li:not(.visited)');
 		missedPages.clone().appendTo('.missed-pages-list');
 		$('.missed-pages-list a').click(onNavPageLinkClick);
 	}
@@ -541,7 +568,14 @@ obo.view = function()
 	var createUnansweredPageList = function()
 	{
 		// we added in 'finish', remove it when cloning
-		var unanswered = $('.subnav-list > li:not(.answered)').not(':last-child');
+		if(obo.model.getSection() === 'assessment')
+		{
+			var unanswered = $('.subnav-list > li:not(.answered)').not(':last-child');
+		}
+		else
+		{
+			var unanswered = $('.subnav-list > li:not(.answered)');
+		}
 		unanswered.clone().appendTo('.missed-pages-list');
 		$('.missed-pages-list a').click(onNavPageLinkClick);
 	}
@@ -595,6 +629,7 @@ obo.view = function()
 			{
 				// some content pages missed
 				$('#content').load('/assets/templates/viewer.html #template-final-content-page-incomplete', createUnvisitedPageList);
+				hideSubnav();
 			}
 			//curPageIndex = lo.pages.length;
 		}
@@ -606,7 +641,10 @@ obo.view = function()
 			var page = obo.model.getLO().pages[index - 1]
 			
 			var $pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
-			$pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
+			//$pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
+			//$pageHTML.append('<nav id="page-navigation-top" class="page-navigation"><ul><li><a class="prev-page-button" href="#" role="button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>');
+			buildPageHeader($pageHTML, page.title.length > 0 ? page.title : 'Page ' + index);
+			//$pageHTML.append('<nav id="page-navigation-top"></nav>');
 			$('#content').append($pageHTML);
 			
 			// for custom layout the html target is a container div for the custom layout page,
@@ -666,6 +704,12 @@ obo.view = function()
 			//$('#content').append($pageHTML);
 		}
 	};
+	
+	var buildPageHeader = function($target, title)
+	{
+		$target.append('<h2>' + title + '</h2>');
+		//$target.append('<nav id="page-navigation-top" class="page-navigation"><ul><li><a class="prev-page-button" href="#" role="button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>');
+	}
 	
 	var buildQuestionPage = function(section, index)
 	{
@@ -786,32 +830,34 @@ obo.view = function()
 				switch(obo.model.getSection())
 				{
 					case 'practice':
-						showSubnav();
 						// @TODO - Should this be a review?
 						// check the number of visited questions vs the number of questions
 						if(obo.model.getNumPagesAnswered('practice') >= obo.model.getNumPagesOfCurrentSection())
 						{
 							// all practice questions answered
 							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-complete');
+							showSubnav();
 						}
 						else
 						{
 							// some practice questions not answered
 							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-incomplete', createUnansweredPageList);
+							hideSubnav();
 						}
 						break;
 					case 'assessment':
-						showSubnav();
 						// check the number of visited questions vs the number of questions
 						if(obo.model.getNumPagesAnswered('assessment') >= obo.model.getNumPagesOfCurrentSection())
 						{
 							// all practice questions seen
 							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-complete');
+							showSubnav();
 						}
 						else
 						{
 							// some practice questions missed
 							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-incomplete', createUnansweredPageList);
+							hideSubnav();
 						}
 						break;
 				}
@@ -847,7 +893,8 @@ obo.view = function()
 				
 				// init container
 				var page = $('<div id="' + baseid + '-' + index + '" class="question-page question-type-' + question.itemType + '"></div>');
-				page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
+				//page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
+				buildPageHeader(page, sectionName+' Question ' + index + ':');
 				
 				$('#content').append(page);
 				
@@ -1140,6 +1187,8 @@ obo.view = function()
 	
 	var updateInteractiveScore = function(score)
 	{
+		setPageAsAnswered(obo.model.getSection(), obo.model.getPage());
+		
 		var oldScore = obo.model.getPreviousResponse();
 		debug.log('updateInteractiveScore', score, oldScore);
 		obo.model.submitQuestion(score);
@@ -1398,17 +1447,29 @@ obo.view = function()
 		$target.append($finishButton);
 	}
 	
+	var makePageNav = function(section, $target)
+	{
+		// clear previous subnav
+		$('.subnav-list').remove();
+		debug.log('>>>', $('.nav-list .prev-page-button'));
+		$('#nav-list .prev-page-button').remove();
+		$('#nav-list .next-page-button').remove();
+		
+		var $pList = $('<ul class="subnav-list ' + section + '"></ul>');
+		$target.append('<a class="page-navigation prev-page-button" href="#">Prev</a>').append($pList).append('<a class="page-navigation next-page-button" href="#">Next</a>');
+		
+		return $pList;
+	}
+	
 	// makes the content page nav if none exists
 	var makeContentPageNav = function() 
 	{
 		//if($('.nav-P-1').length === 0)
 		if($('.subnav-list.content').length === 0)
 		{
-			// clear previous subnav
-			$('.subnav-list').remove();
-			
-			var pList = $('<ul class="subnav-list content"></ul>');
-			$('#nav-content').parent().append(pList);
+			//var pList = $('<ul class="subnav-list content"></ul>');
+			//$('#nav-content').parent().append('<a class="page-navigation prev-page-button" href="#">Prev</a>').append(pList).append('<a class="page-navigation next-page-button" href="#">Next</a>');
+			var pList = makePageNav('content', $('#nav-content').parent());
 		
 			var lo = obo.model.getLO();
 			$(lo.pages).each(function(index, page){
@@ -1417,12 +1478,12 @@ obo.view = function()
 				pList.append(pageHTML);
 				pageHTML.children('a').click(onNavPageLinkClick);
 			});
-			appendFinishButton(pList);
+			//appendFinishButton(pList);
 			
 			// @TODO - a js hack to 
-			setTimeout(function() {
-				$($('.page-layout h2')[0]).css('padding-bottom', (pList.height() - 6) + 'px');
-			}, 1);
+			/*setTimeout(function() {
+				$($('.page-layout h2')[0]).css('padding-bottom', (pList.height() + 40) + 'px');
+			}, 1);*/
 		}
 	};
 	
@@ -1431,12 +1492,10 @@ obo.view = function()
 	{
 		if($('.subnav-list.practice').length === 0)
 		{
-			// clear previous subnav
-			$('.subnav-list').remove();
+			//var qListHTML = $('<ul class="subnav-list practice"></ul>');
+			//$('#nav-practice').parent().append(qListHTML);
+			var qListHTML = makePageNav('practice', $('#nav-practice').parent());
 			
-			var qListHTML = $('<ul class="subnav-list practice"></ul>');
-			$('#nav-practice').parent().append(qListHTML);
-		
 			var lo = obo.model.getLO();
 			$(lo.pGroup.kids).each(function(index, page)
 			{
@@ -1445,7 +1504,7 @@ obo.view = function()
 				qListHTML.append(qLink)
 				qLink.children('a').click(onNavPageLinkClick);
 			});
-			appendFinishButton(qListHTML);
+			//appendFinishButton(qListHTML);
 		}
 	};
 	
@@ -1456,12 +1515,10 @@ obo.view = function()
 		var numItems = $('.subnav-list.assessment li').length;
 		if($('.subnav-list.assessment').length === 0 || (obo.model.getNumPagesOfSection('assessment') != numItems))
 		{
-			// clear previous subnav
-			$('.subnav-list').remove();
+			//var qListHTML = $('<ul class="subnav-list assessment"></ul>');
+			//$('#nav-assessment').parent().append(qListHTML)
+			var qListHTML = makePageNav('assessment', $('#nav-assessment').parent());
 			
-			var qListHTML = $('<ul class="subnav-list assessment"></ul>');
-			$('#nav-assessment').parent().append(qListHTML)
-
 			var lo = obo.model.getLO();
 			$(obo.model.getPageObjects()).each(function(qIndex, pageGroup)
 			{
@@ -1665,10 +1722,10 @@ obo.view = function()
 					lockoutNonAssessment();
 				}
 				// disable next/prev links on the first and last natural pages
-				$('#page-navigation li a').removeClass('disabled');
+				$('.page-navigation li a').removeClass('disabled');
 				if(p === 1)
 				{
-					$('#prev-page-button').addClass('disabled');
+					$('.prev-page-button').addClass('disabled');
 				}
 				
 				break;
@@ -1744,9 +1801,10 @@ obo.view = function()
 		
 		// @TODO
 		//setTimeout(function() {
+			/*
 			var pList = $('.subnav-list');
-			
-			$($('.page-layout h2')[0]).css('padding-bottom', (pList.height() - 6) + 'px');
+				$($('#content')[0]).css('margin-top', (pList.height() + 40) + 'px');
+			*/
 		//}, 1);
 		
 		if(!preventUpdateHistoryOnNextRender)
@@ -1785,8 +1843,13 @@ obo.view = function()
 	
 	var unhideSWFs = function()
 	{
-		$('object').css('visibility', 'visible');
-		$('object').parent().removeClass('stripe-bg');
+		// unhide all content objects:
+		$('#content object').css('visibility', 'visible');
+		$('#content object').parent().removeClass('stripe-bg');
+		
+		// unhide overlay swfs for the current page
+		var s = $('#swf-holder .media-for-page-' + obo.model.getSection() + obo.model.getPage() + ' object');
+		s.css('visibility', 'visible').parent().removeClass('stripe-bg');
 	};
 	
 	// tosses up a error dialog. error can be a string message or an error object
