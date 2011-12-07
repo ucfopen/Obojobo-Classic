@@ -40,9 +40,9 @@ obo.util = function()
 	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/page\]/gi;
 	
 	var patternTF = /<\/?textformat\s?.*?>/gi;
-	var patternPFont = /<p\s?(.*?)><font.*?(?:FACE="(\w+)").*?(?:SIZE="(\d+)").*?(?:COLOR="(#\d+)").*?>/gi;
+	var patternPFont = /<p\s?(.*?)><font.*?>/gi;
 	var patternPFontClose = /<\/font><\/p>/gi;
-	var patternFont = /<font.*?(?:KERNING="\d+")?.*?(?:FACE="(\w+)")?.*?(?:SIZE="(\d+)")?.*?(?:COLOR="(#\d+)")?.*?>/gi;
+	var patternFont = /<font.*?>/gi;
 	var patternFontClose = /<\/font>/gi;
 	var patternEmpty1 = /<(\w+?)[^>]*?>(\s*?)<\/\1>/gi;
 	var patternEmpty2 = /<(\w+)>(\s*?)<\/\1>/gi;
@@ -157,7 +157,7 @@ obo.util = function()
 		}
 		
 		input = input.replace(patternStrictPFontClose, "</p>");
-
+		
 		//Convert single <font> into <span>
 		var matchFound = true;
 		while(matchFound)
@@ -173,7 +173,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; // @TODO
+			//matchFound = false; // @TODO
 		}
 		
 		input = input.replace(patternStrictFontClose, "</span>");
@@ -206,7 +206,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; // @TODO
+			//matchFound = false; // @TODO
 		}
 
 		var matchFound = true;
@@ -223,7 +223,7 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			matchFound = false; // @TODO
+			//matchFound = false; // @TODO
 		}
 
 		input = createOMLTags(input);
