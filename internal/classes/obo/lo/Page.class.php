@@ -12,6 +12,10 @@
 namespace obo\lo;
 class Page
 {
+	const SECTION_CONTENT = 1;
+	const SECTION_PRACTICE = 2;
+	const SECTION_ASSESSMENT = 3;
+	
 	public $pageID;				//Number:  database id
 	public $title;			//String:  formal title of the page
 	public $userID;			//User:  creator of page
@@ -19,6 +23,7 @@ class Page
 	public $createTime;			//Timestamp:  Creation date
 	public $items;			//Array<PageItems>:  of items on page
 	public $questionID;			//Number: question id that filters the content page.
+
 
 	function __construct($pageID=0, $title='', $userID=0, $layoutID=0, $createTime=0, $questionID=0, $items=Array())
 	{

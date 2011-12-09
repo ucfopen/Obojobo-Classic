@@ -62,7 +62,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				return false;
 			}
 			$this->DBM->startTransaction();
-			$result = parent::createNewUser( $fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success'] === true)
 			{
 				if(!$this->addRecord($result['userID'], $userName, $optionalVars['MD5Pass']))
@@ -85,9 +85,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace($valid, true);
 			return array('success' => false, 'error' => $valid);
 		}
-						
 	}
-		
+	
 	// security check: Ian Turgeon 2008-05-08 - PASS	
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
@@ -160,7 +159,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($user != false)
 		{
 			$this->DBM->startTransaction();
-			$result = parent::updateUser($userID, $fName, $lName, $mName, $email, $optionalVars);
+			$result = parent::updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success']==true)
 			{
 				// update with md5 pass
@@ -187,11 +186,12 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
-		$validSSO = false;
-		// required stuff not sent, 
+		$validSSO = false; // flag to indicate a SSO authentication is assumed
+		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
+		// required stuff not sent, CHECK IF A SINGLE SIGN ON METHOD IS BEING USED
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
 		{
-			
+			// *********** Sammy's SSO Hash for system to system single sign on ****************//
 			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 			{
 				$time = microtime(true);
@@ -214,6 +214,18 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				}
 				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'\n");
 			}
+			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
+			else if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
+			{
+				$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
+				$validSSO = true;
+				$weakExternalSync = true; // allow the user to not exist in external db
+				// logged in, clear the session variables
+				unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
+				
+				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'\n");
+			}
+			
 		}
 		
 		if($this->validateUsername($requestVars['userName']) !== true) return false;
@@ -223,10 +235,11 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		
 		$time = time();
 		// create/update the user with the external database
-		$user = $this->syncExternalUser($requestVars['userName']);
+		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
 		
 		if($user instanceof \rocketD\auth\User)
 		{
+			
 			// if the user is not signed in by SSO, authenticate using WebService/LDAP
 			if($validSSO != true)
 			{
@@ -413,7 +426,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 	
-	public function syncExternalUser($userName)
+	public function syncExternalUser($userName, $allowWeakSync=false)
 	{
 		if($this->validateUsername($userName) !== true) return false;
 
@@ -433,7 +446,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						$user->first = $externalUser->{\cfg_plugin_AuthModUCF::FIRST};
 						$user->last = $externalUser->{\cfg_plugin_AuthModUCF::LAST};
 						$user->email = $externalUser->{\cfg_plugin_AuthModUCF::EMAIL};
-						parent::updateUser($user->userID, $user->first, $user->last, $user->mi, $user->email);
+						parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
 					}
 				}
 				else
@@ -466,6 +479,50 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			$this->updateRole($user->userID, $externalUser->isCreator);
 			
 			return $user;
+		}
+		
+		
+		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
+		if($allowWeakSync === true)
+		{
+			// if the placeholder already exists
+			if($userID = $this->getUIDforUsername($userName))
+			{
+				// load user data from db
+				if($user = $this->fetchUserByID($userID) )
+				{
+					return $user;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			// no placeholder, create
+			else
+			{
+				// create internal placeholder record
+				$created = $this->createNewUser($userName, '', '', '', '', array());
+				if(!$created['success'])
+				{
+					trace('createNewUser Failed', true);
+					return false;
+				}
+				else
+				{
+					trace('weak Sync used for '. $userName, true);
+					// load user data from db
+					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
+					{
+						trace('fetchUserByID failed', true);
+						return false;
+					}
+				
+					$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?'";
+					$result = $this->DBM->querySafe($qstr, $user->userID, 'portal_sso', '1'); // add record to track where the user was originally created
+					return $user;
+				}
+			}
 		}
 		return false;
 	}

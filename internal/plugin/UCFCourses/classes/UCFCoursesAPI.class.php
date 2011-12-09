@@ -4,6 +4,14 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 
 	const PUBLIC_FUNCTION_LIST = 'syncFailedInstanceScores'; // dont allow any direct calls
 	private static $instance;
+	
+	/**
+	 * Singleton Instantiation function, Use this to get a reference to this class
+	 * DO NOT: var x = new plg_UCFCourses_UCFCoursesAPI()
+	 *
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	static public function getInstance()
 	{
 		if(!isset(self::$instance))
@@ -24,7 +32,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 */
 	protected function send($url, $postVars=false)
 	{
-		trace('Sending HTTPRequest', true);
+		trace('Sending HTTPRequest ' . $url, true);
 		try
 		{
 			$request = new \HttpRequest($url, HTTP_METH_POST);
@@ -89,6 +97,13 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		}
 	}
 	
+	/**
+	 * For Testing Only: Gets a list of a user's courses
+	 *
+	 * @param string $NID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	public function testOnlyGetCourses($NID)
 	{
 		$API = \obo\API::getInstance();
@@ -102,7 +117,13 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		return  $result;
 	}
 	
-	
+	/**
+	 * Get the course data for a specific instance
+	 *
+	 * @param string $insID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	public function getInstanceCourseData($insID)
 	{
 		$courseData = new \stdClass();
@@ -131,6 +152,13 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		return $courseData;
 	}
 	
+	/**
+	 * Gets the course list from the enterprise connector
+	 *
+	 * @param string $NID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	protected function sendGetCourseRequest($NID)
 	{
 		//$NID = 'wink';
@@ -178,6 +206,13 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		return array('courses' => $courses, 'errors' => $errors);
 	}
 	
+	/**
+	 * Checks to make sure the user is using a UCF NID
+	 *
+	 * @param string $userID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	protected function isNIDAccount($userID)
 	{
 		$AM = \rocketD\auth\AuthManager::getInstance();
@@ -327,7 +362,15 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		}
 	}
 
-	
+	/**
+	 * Creates a Column in Blackboard Vista using the enterprise connector
+	 *
+	 * @param string $NID 
+	 * @param string $sectionID 
+	 * @param string $columnName 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	protected function sendCreateColumnRequest($NID, $sectionID, $columnName)
 	{
 		$columnName = trim($columnName);
@@ -473,6 +516,13 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 				// log the result
 				$this->logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
 				
+				if($result['scoreSent'] == true)
+				{
+					// clear cached scores for this instance
+					\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+					\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $studentUserID);
+				}
+				
 				return $result;
 			}
 			// no need to send the score - the column/section id's aren't set
@@ -484,7 +534,17 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		}
 	}
 	
-	
+	/**
+	 * Sets a user's score in a previously created column using the enterprise connector
+	 *
+	 * @param string $instructorNID 
+	 * @param string $studentNID 
+	 * @param string $sectionID 
+	 * @param string $columnID 
+	 * @param string $score 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{		
 		
@@ -533,7 +593,14 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
 	
-	/********************* PUBLICLY AVAILIBLE FROM APP API *******************/
+	/**
+	 * Manually Sync any failed scores for an instance
+	 * Accessible through doPluginCall 
+	 * 
+	 * @param string $instID 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	public function syncFailedInstanceScores($instID)
 	{
 		
@@ -591,14 +658,28 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 					if($result['scoreSent'] == true)
 					{
 						$updated++;
+						
+						// clear cached scores for this instance
+						\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+						\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
 					}
 				}
+				
 				return array('updated' => $updated, 'total' => $total);
 			}
 		}
 		return \rocketD\util\Error::getError(4);
 	}
 	
+	/**
+	 * Send any failed score set requests
+	 * If a score failed previously, this function will try to send them up to 5 times
+	 * This is called via a cron job 
+	 *
+	 * @param string $limit 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	public function sendFailedScoreSetRequests($limit=10)
 	{
 		$updated = 0;
@@ -614,6 +695,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 				FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
 				JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
 				ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
+					AND L.".\cfg_plugin_UCFCourses::MAP_COL_ID." = M.". \cfg_plugin_UCFCourses::MAP_COL_ID ."
 				WHERE
 					L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
 					AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
@@ -649,19 +731,35 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 					$IM = \obo\lo\InstanceManager::getInstance();
 					$instData = $IM->getInstanceData($instID);
 					$NM = \obo\util\NotificationManager::getInstance();
-					$NM->sendScoreFailureNotice($instructor, $student, $instData->courseID);
+					$NM->sendScoreFailureNotice($instructor, $student, $instData);
 				}
 			}
 			// Increment success counter
 			else
 			{
 				$updated++;
+				// clear cached scores for this instance
+				\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+				\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
 			}
 		}
 		return array('updated' => $updated, 'total' => $total);
 	}
 	
-	
+	/**
+	 * Log the score being sent
+	 *
+	 * @param string $instID 
+	 * @param string $currentUserID 
+	 * @param string $studentUserID 
+	 * @param string $sectionID 
+	 * @param string $columnID 
+	 * @param string $columnName 
+	 * @param string $score 
+	 * @param string $success 
+	 * @return void
+	 * @author Ian Turgeon
+	 */
 	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
 	{
 		$time = time();
