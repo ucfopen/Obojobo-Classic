@@ -1,20 +1,23 @@
+<IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
 
 # OBOJOBO dont rewrite these directories
 RewriteRule ^(manager|assets) - [L]
 
+# Preview LO links
+# RewriteRule ^preview/([0-9]*)$ index.php?q=viewer&newest=true&preview=$1 [L,QSA]
+
+# OBOJOBO media
+RewriteRule ^media/([0-9]*)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
+
 # OBOJOBO media
 RewriteRule ^media/([0-9]*)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
 
 # BEGIN WordPress
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
-</IfModule>
-
 # END WordPress
+</IfModule>

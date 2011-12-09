@@ -88,7 +88,7 @@ td { font-size:12px; color:#000000; font-family:arial; } a { color:#FF0000;}
 		<td align="center" style="padding:10px;">
 				<span style="background-color:#f3efeb;display:block;padding:7px;width:60px">
 					<span align="center" style="font-size:12px;font-weight:bold;">Attempt</span>
-					<span align="center" style="font-family:arial;font-weight:bold;font-size:40px;">{$attempt@index+1}</span>
+					<span align="center" style="font-family:arial;font-weight:bold;font-size:40px;">{$attempt@total-$attempt@index}</span>
 				</span>
 		</td>
 		<td align="left" style="padding:10px;">

@@ -82,7 +82,7 @@ class Cache extends \rocketD\util\RDMemcache
 		}
 	}
 	
-	public function setInstanceData($instData)
+	public function setInstanceData(\obo\lo\InstanceData $instData)
 	{
 		if($this->memEnabled)
 		{
@@ -94,8 +94,8 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			return $this->get($this->ns.'\obo\lo\InstanceData:'.$instID);
-		}		
+			 return $this->get($this->ns.'\obo\lo\InstanceData:'.$instID);
+		}
 	}
 	
 	public function clearInstanceData($instID)
@@ -151,10 +151,10 @@ class Cache extends \rocketD\util\RDMemcache
 		if($this->memEnabled)
 		{
 			$this->delete($this->ns.'\obo\Lock:'.$lock->lockID);
-		}		
+		}
 	}
 	
-	public function setInstanceScores($instID, $scores)
+	public function setScoresForAllUsers($instID, $scores)
 	{
 		if($this->memEnabled)
 		{
@@ -162,7 +162,7 @@ class Cache extends \rocketD\util\RDMemcache
 		}
 	}
 	
-	public function getInstanceScores($instID)
+	public function getScoresForAllUsers($instID)
 	{
 		if($this->memEnabled)
 		{
@@ -170,13 +170,39 @@ class Cache extends \rocketD\util\RDMemcache
 		}
 	}
 	
-	public function clearInstanceScores($instID)
+	public function clearScoresForAllUsers($instID)
 	{
 		if($this->memEnabled)
 		{
 			$this->delete($this->ns.'\obo\ScoreManager:getScores:'.$instID);
 		}
 	}
+	
+	public function setScoresForUser($instID, $userID, $scores)
+	{
+		if($this->memEnabled)
+		{
+			$this->set($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID, $scores, false, 0) or trace('Memcache Failed to write', true);
+		}
+	}
+	
+	public function getScoresForUser($instID, $userID)
+	{
+		if($this->memEnabled)
+		{
+			return $this->get($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID);
+		}
+	}
+	
+	public function clearScoresForUser($instID, $userID)
+	{
+		if($this->memEnabled)
+		{
+			$this->delete($this->ns.'\obo\ScoreManager:getUserScores:'.$instID . ':' . $userID);
+		}
+	}
+	
+	
 	
 	public function getAllUsers()
 	{
@@ -288,11 +314,7 @@ class Cache extends \rocketD\util\RDMemcache
 		if($this->memEnabled)
 		{
 			// set lo in memcache
-			if($this->set($this->ns.'\obo\lo\LO'.$loID, $LO, false, 0))
-			{
-				return; // memcache worked, skip the db cache even if it is on
-			}
-			trace('Memcache Failed to write ');
+			$this->set($this->ns.'\obo\lo\LO'.$loID, $LO, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -328,11 +350,7 @@ class Cache extends \rocketD\util\RDMemcache
 		if($this->memEnabled)
 		{
 			// set lo in memcache
-			if($this->set($this->ns.'\obo\lo\LO:Meta'.$loID, $LO, false, 0))
-			{
-				return; // memcache worked, skip the db cache even if it is on
-			}
-			trace('Memcache Failed to write ');
+			$this->set($this->ns.'\obo\lo\LO:Meta'.$loID, $LO, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -408,6 +426,31 @@ class Cache extends \rocketD\util\RDMemcache
 			$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByUserAndInstance:'.$instID.':'.$userID);
 		}		
 	}
+		
+	// public function getInteractionsByVisit($visitID)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		return $this->get($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
+	// 	}
+	// 	
+	// }
+	// 
+	// public function setInteractionsByVisit($visitID, $interactions)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		$this->set($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID, $interactions, false, 3600) or trace('failure writing memcache', true);
+	// 	}
+	// }
+	// 
+	// public function clearInteractionsByVisit($visitID)
+	// {
+	// 	if($this->memEnabled)
+	// 	{
+	// 		$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
+	// 	}		
+	// }
 	
 	public function setUIDForUserName($userID, $userName)
 	{
@@ -460,11 +503,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'\obo\lo\QuestionGroup:getFromDB:'.$qGroupID, $qGroup, false, 0))
-			{
-				return; // if memcache works, return, if it fails, failover to db caching
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\lo\QuestionGroup:getFromDB:'.$qGroupID, $qGroup, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -480,11 +519,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'\obo\lo\PageManager:getPagesForLOID:'.$loID, $pages, false, 0))
-			{
-				return; // if memcache works, return, if it fails, failover to db caching
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\lo\PageManager:getPagesForLOID:'.$loID, $pages, false, 0)  or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -506,11 +541,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'\obo\AttemptsManager:getEquivalentAttempt:'.$userID.':'.$loID, $attempts, false, 0))
-			{
-				return;
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\AttemptsManager:getEquivalentAttempt:'.$userID.':'.$loID, $attempts, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -549,11 +580,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'nm_los_Perms:getPermsForItem:'.$itemType.':'.$itemID, $perms, false, 0))
-			{
-				return;
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'nm_los_Perms:getPermsForItem:'.$itemType.':'.$itemID, $perms, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -578,11 +605,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'nm_los_Perms:getPermsForGroup:'.$groupID, $perms, false, 0))
-			{
-				return;
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'nm_los_Perms:getPermsForGroup:'.$groupID, $perms, false, 0) or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -603,11 +626,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'nm_los_Perms:getPermsFOrUserToItem:'.$userID.':'.$itemType.':'.$itemID, $perms, false, 0))
-			{
-				return;
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'nm_los_Perms:getPermsFOrUserToItem:'.$userID.':'.$itemType.':'.$itemID, $perms, false, 0) or trace('Memcache Failed to write', true);
 		}
 	
 	}
@@ -634,11 +653,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			if($this->set($this->ns.'plugin_UCFCourseDataAPI:getCourseStudents:'.$courseID, $students, false, 3600))
-			{
-				return;
-			}
-			trace('failure writing memcache', true);
+			$this->set($this->ns.'plugin_UCFCourseDataAPI:getCourseStudents:'.$courseID, $students, false, 3600)  or trace('Memcache Failed to write', true);
 		}
 	}
 	
@@ -669,12 +684,12 @@ class Cache extends \rocketD\util\RDMemcache
 			$rate = $this->get($this->ns.'rateLimit:'.$ip);
 			if($rate === false)
 			{
-				$this->set($this->ns.'rateLimit:'.$ip, 0, false, 60);
+				$this->set($this->ns.'rateLimit:'.$ip, 0, false, 60)  or trace('Memcache Failed to write', true);
 				return;
 			}
 			if($rate > 30)
 			{
-				$this->set($this->ns.'rateLimit:'.$ip, $rate, false, 60); // extend the slow down for a minute
+				$this->set($this->ns.'rateLimit:'.$ip, $rate, false, 60) or trace('Memcache Failed to write', true); // extend the slow down for a minute
 				\rocketD\util\Error::getError(6);
 				usleep(10000000);
 			}
