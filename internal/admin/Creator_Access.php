@@ -1,3 +1,10 @@
+<script type="text/javascript" charset="utf-8">
+	jQuery(window).load(function()
+	{
+		// Enable the table sorter
+		jQuery("#results-table").tablesorter({widthFixed: true, widgets: ['zebra']});
+	});	
+</script>
 <h1>Give a NID Content Creator Role</h1>
 <hr>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
@@ -15,7 +22,6 @@ if($_GET['NID'])
 {
 	?>
 	<h1>RESULTS:</h1>
-	<pre>
 	<?php
 	$success = false;
 	$AM = \rocketD\auth\AuthManager::getInstance();
@@ -38,12 +44,21 @@ if($_GET['NID'])
 	}
 	echo "</pre>";
 	echo $success ? $_GET['NID'] . ' Now has Content Creator Role.' : 'Unable to grant role';
-	
 }
 
-echo "<pre>";
+
+echo '<h1>All Content Creators</h1>';
+echo '<table id="results-table" class="tablesorter">';
+echo "<thead><tr><th>userID</th><th>login</th><th>first</th><th>last</th></tr></thead><tbody>";
 $users = $API->getUsersInRole(cfg_obo_Role::CONTENT_CREATOR);
-print_r($users);
+foreach($users AS $user)
+{
+	echo "<tr><td>$user->userID</td><td>$user->login</td><td>$user->first</td><td>$user->last</td></tr>";
+}
+echo "</tbody></table>";
+
 
 ?>
-</pre>
+
+
+<div id="results"></div>

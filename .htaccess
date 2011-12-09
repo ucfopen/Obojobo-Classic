@@ -9,7 +9,7 @@ RewriteRule ^(manager|assets) - [L]
 # RewriteRule ^preview/([0-9]*)$ index.php?q=viewer&newest=true&preview=$1 [L,QSA]
 
 # OBOJOBO media
-RewriteRule ^media/([0-9]*)$ internal/includes/getAsset.php?id=$1 [L,QSA]
+RewriteRule ^media/([0-9]*)$ assets/getAsset.php?id=$1 [L,QSA]
 
 # WORDPRESS
 RewriteRule ^index\.php$ - [L]
