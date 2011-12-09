@@ -179,6 +179,7 @@ class Services_JSON
     */
     function encode($var)
     {
+		trace('encode['.$var.']');
         switch (gettype($var)) {
             case 'boolean':
                 return $var ? 'true' : 'false';
