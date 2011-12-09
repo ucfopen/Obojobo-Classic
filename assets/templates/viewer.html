@@ -4,55 +4,51 @@
 <meta />
 <title></title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
-
-<link rel="stylesheet" type="text/css" href="/assets/css/viewer-screen.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="/assets/css/viewer-phone.css" media="screen and (max-device-width: 500px) and (orientation: portrait)" />
+<!--
 <link rel="stylesheet" type="text/css" href="/assets/css/viewer.css"> 
+<link rel="stylesheet" type="text/css" href="/assets/css/themes/classic.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/assets/css/viewer-phone.css" media="screen and (max-device-width: 500px) and (orientation: portrait)" />
+-->
 
 </head>
 <body>
-
 <span id="template-main">
 	<header id='header'>
 		<h1 id="lo-title"></h1>
-		<div id='logo'>powered by Obojobo</div>
-		<nav id="navigation">
+		<nav role="main" id="navigation">
 			<ul id="nav-list">
-				<li><a class="nav-item" id="nav-overview" href="#" title="Learning Object Overview">Overview</a></li>
-				<li><a class="nav-item" id="nav-content" href="#" title="Content Pages">Content</a></li>
-				<li><a class="nav-item" id="nav-practice" href="#" title="Practice Questions">Practice</a></li>
-				<li><a class="nav-item" id="nav-assessment" href="#" title="Assessment">Assessment</a></li>
+				<li><a class="nav-item" id="nav-overview" href="#" role="button" title="Learning Object Overview">Overview</a></li><li><a class="nav-item" id="nav-content" href="#" role="button" title="Content Pages">Content</a></li><li><a class="nav-item" id="nav-practice" href="#" role="button" title="Practice Questions">Practice</a></li><li><a class="nav-item" id="nav-assessment" href="#" role="button" title="Assessment">Assessment</a></li>
 			</ul>
-			<a id="next-page-button" href="#" title="Next Page">Next</a>
-			<a id="settings-button" href="#" title="Settings Menu">Settings</a>
-			<a id="log-out-button" href="#" title="Log Out of Obojobo">Log Out</a></div>
+			<a id="settings-button" href="#" role="button" title="Settings Menu">Settings</a>
+			<a id="log-out-button" href="#" role="button" title="Logout of Obojobo">Logout</a></div>
 		</nav>
 	</header>
-	
-	<section id="content"></section>
-
+	<section id="content"></section><nav id="page-navigation" role="page"><ul><li><a href="#" role="button" id="prev-page-button">Prev</a></li><li><a id="next-page-button" href="#" role="button">Next</a></li></nav>
 	<footer id="footer">
 		<div class="footer-container">
-			<h5>Content created using Obojobo™<br> © 2011 University of Central Florida</h5>
-			<p>Some content is used under Creative Commons.  <a href="#">View license details</a>.</p>
+			<div id='logo'>powered by Obojobo</div>
+			<h5>© 2011 University of Central Florida</h5>
+			<p>Some content is used under Creative Commons.  <a href="#" role="button">View license details</a>.</p>
 			<p>Learning object created by: Ian Turgeon, Zach Berry, Francisca Yonekura, and Keegan Berry</p>
 		</div>
 	</footer>
+	<a href="#" id="go-left">Go left</a>
+	<a href="#" id="go-right">Go right</a>
 </span>
 
 
 <div class="page-centered" id="template-final-content-page-complete">
 	<h2>Content Section Complete</h2>
 	<p>You can return to any page if you wish to review its contents.</p>
-	<a class="next-section-button" href="#" title="Next Sextion" >Next Section <span class="triange-right"></span></a>
+	<a class="next-section-button" href="#" role="button" title="Next Sextion" >Next Section <span class="triange-right"></span></a>
 </div>
 
 
 <div class="page-centered" id="template-final-content-page-incomplete">
-	<h2>You Missed a Page or Two</h2>
+	<h2>You Skipped a Page or Two</h2>
 	<ul class="missed-pages-list"></ul>
 	<p>You can visit those pages now or continue to the Practice Section.</p>
-	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+	<a class="next-section-button" href="#" role="button">Next Section <span class="triange-right"></span></a>
 </div>
 
 	
@@ -60,34 +56,36 @@
 <span id="overview-page">
 	<h2>Overview</h2>
 	<p>Welcome to the '<span id="overview-blurb-title">Title</span>' learning object.  This object has four sections - this overview page, a content section to teach you about this topic, a self-paced practice quiz to test yourself on your knowledge of the topic, and finally a recorded assessment quiz to prove your mastery of the subject.<p>
-	<hr>
 	<div class="overview-details">
-		<section id="overview-time-estimate">
-			<h3>Time Estimate</h3>
-			<span id="learn-time">10 Min.</span>
-			<p>This is how long the author has estimated it will take to complete this learning object.</p>
-		</section>
-		<section id="ovierview-learning-objective">
-			<h3>Learning Objective - What you will learn</h3>
+		
+		<section id="overview-learning-objective">
+			<h3>Learning Objective - What you will learn:</h3>
 			<span id="objective"></span>
 		</section>
+		
+		<section id="overview-time-estimate">
+			<h3>Time Estimate:</h3>
+			<span id="learn-time">10 Minutes</span>
+			<p>The author(s) estimate it will take about 30 minutes to complete this learning object.</p>
+		</section>
+		
 		<span id="content-size" class="content-size-display">content-size</span>
 		<span id="practice-size" class="content-size-display">practice-size</span>
 		<span id="assessment-size" class="content-size-display">assessment-size</span>
 	</div>
+	<!--
 	<section id="overview-instructions">
-		<h3>How to navigate</h3>
-		<p>Click '<em>Next Section</em>' below to move on to the '<em>Content</em>' section and start learning more about this topic.  You can also select a section from the bar at the top to move freely between this section, the 'Lesson' and the '<em>Practice</em>' sections.  When you feel you are prepared, move to the '<em>Assessment</em>' section and take the Assessment quiz.</p>
-	</section>
-	<a class="next-section-button" href="#">Next Section <span class="triange-right"></span></a>
+		<p>Click '<em>Get Started</em>' below to move on to the '<em>Content</em>' section and start learning more about this topic.</p>
+	</section>-->
+	<a class="next-section-button" href="#" role="button">Get Started <span class="triange-right"></span></a>
 </span>
 
 <div id="swf-alt-text">
-	<p>This page requires a version of Adobe Flash Plugin you don't have installed.<br><a class="button" href="http://get.adobe.com/flashplayer/" target="_blank">Download Flash</a></p>
+	<p>This component requires a version of the Adobe Flash Plugin that you don't have installed.<br><a class="button" href="http://get.adobe.com/flashplayer/" target="_blank">Download Flash</a></p>
 </div>
 
 <div id="flv-alt-text">
-	<p>This video requires a version of Adobe Flash Plugin you don't have installed.<br><a class="button" href="http://get.adobe.com/flashplayer/" target="_blank">Download Flash</a></p>
+	<p>This video requires a version of the Adobe Flash Plugin that you don't have installed.<br><a class="button" href="http://get.adobe.com/flashplayer/" target="_blank">Download Flash</a></p>
 </div>
 
 
@@ -102,7 +100,21 @@
 	 <h3>How Practice Works</h3>
 	<p>This section is optional but recommended to help you prepare for the questions in the Assessment Section. Unlike the Assessment, you are free to review the content at any time.  You will also receive feedback on your answers when available.</p>
 		<hr>
-	<a class="next-section-button" href="#">Begin Practice <span class="triange-right"></span></a>
+	<a class="begin-section-button" href="#" role="button">Begin Practice <span class="triange-right"></span></a>
+</div>
+
+<div class="page-centered" id="template-final-practice-page-complete">
+	<h2>Practice Section Complete</h2>
+	<p>You can return to any question if you wish to review its contents.</p>
+	<a class="next-section-button" href="#" role="button" title="Next Sextion" >Next Section <span class="triange-right"></span></a>
+</div>
+
+
+<div class="page-centered" id="template-final-practice-page-incomplete">
+	<h2>You Skipped a Question or Two</h2>
+	<ul class="missed-pages-list"></ul>
+	<p>You can visit those questions now or continue to the Assessment Section.</p>
+	<a class="next-section-button" href="#" role="button">Next Section <span class="triange-right"></span></a>
 </div>
 
 <div id="assessment-overview">
@@ -117,22 +129,51 @@
 		</ul>
 		
 		<section class="assessment-missed-section">
-			<h4>You Missed a Page or Two</h4>
-			<p>You can proceed to the Assessment at any time, however reviewing any content you missed may help you achieve a higher score.  <a href="#">You can review those pages here</a>.</p>
+			<h4>You Skipped a Page or Two</h4>
+			<p>You can proceed to the Assessment at any time, however reviewing any content you skipped may help you achieve a higher score.  <a href="#" role="button">You can review those pages here</a>.</p>
 			<ul>
 				<li><figure><span class="icon-missed-count"></span><figcaption>Content Pages</figcaption></figure></li>
 				<li><figure><span class="icon-missed-count"></span><figcaption>Practice Questions</figcaption></figure></li>
 			</ul>
 		</section>
 		
+		<!-- @TODO -->
+		<section class="assessment-import-score-section">
+			<h4>Import?</h4>
+			<p>Would you like to import your previous score of <span id="previous-score">
+</span>?</p>
+			<a id="do-import-previous-score-button" class="button" href="#" role="button">Yes, import</a>
+			<a id="dont-import-previous-score-button" class="button" href="#" role="button">Don't import</a>
+		</section>
+		
 		<h3>How Assessment Works</h3>
-		<p>You will receive <span class="assessment-attempt-count"></span> attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
+		<p>You have <span class="assessment-attempt-count"></span> attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
 	</section>
 	<hr>
-	<a class="next-section-button" href="#">Start Assessment <span class="triange-right"></span></a>
+	<a id="view-scores-button" class="button" href="#" role="button">View Scores</a>
+	<a id="start-assessment-button" class="button" href="#" role="button">Start Assessment <span class="triange-right"></span></a>
 	
 </div>
 
+<div class="page-centered" id="template-final-assessment-page-complete">
+	<h2>Review</h2>
+	<p>Click this button to submit your assessment:</p>
+	<a id="submit-assessment-button" class="button" href="#" role="button" title="Submit assessment" >Submit assessment</a>
+</div>
+
+
+<div class="page-centered" id="template-final-assessment-page-incomplete">
+	<h2>You Skipped a Question or Two</h2>
+	<ul class="missed-pages-list"></ul>
+	<p>Answer the questions you skipped, then return to this page to submit your assessment. You can submit your assessment now, but you won't get credit for any unanswered questions.</p>
+	<a id="submit-assessment-button" class="button" href="#" role="button" title="Submit incomplete assessment" >Submit incomplete assessment</a>
+</div>
+
+<div class="page-centered" id="scores-page">
+	<h2>Scores:</h2>
+	<ul id="scores-list"></ul>
+	<a class="button" id="return-to-overview-button" href="#" role="button" title="Return to the Assessment Overview page" >Return to the Assessment Overview page</a>
+</div>
 
 
 

@@ -14,12 +14,13 @@ add_filter('rewrite_rules_array', 'rocketD_modify_rewrite_rules');
 add_filter('query_vars', 'rocketD_add_query_vars');
 add_action('wp_loaded', 'rocketD_flush_rewrite_rules');
 
+// changes to these require you to update permalinks in wp admin
 function rocketD_modify_rewrite_rules($rules)
 {
 	$newrules = array();
 	// add rule for viewing instances
 	//$newrules['view/(\d+?)/?$'] = 'index.php?pagename=view&instID=$matches[1]';
-	$newrules['view/(\d+?)/?$'] = 'index.php?pagename=viewer&instID=$matches[1]';
+	$newrules['view/(\d+?)/?$'] = 'index.php?pagename=view&instID=$matches[1]';
 	// add rule for previewing los
 	// $newrules['preview/(\d+?)/?$'] = 'index.php?pagename=view&loID=$matches[1]';
 	$newrules['preview/(\d+?)/?$'] = 'index.php?pagename=view&loID=$matches[1]';
