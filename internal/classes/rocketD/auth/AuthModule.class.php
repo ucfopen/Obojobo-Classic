@@ -127,7 +127,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	}
 	
 	// security check: Ian Turgeon 2008-05-08 - PASS	
-	public function createNewUser($fName, $lName, $mName, $email, $optionalVars=0)
+	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// Only update if valid (empty keeps existing value)		
 		if($this->validateFirstName($fName) && $this->validateLastName($lName) && $this->validateMiddleName($mName) && $this->validateEmail($email))
@@ -156,7 +156,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	}
 
 	// security check: Ian Turgeon 2008-05-08 - PASS	
-	public function updateUser($userID, $fName, $lName, $mName, $email, $optionalVars=0)
+	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// require a valid UID
 		if($this->validateUID($userID))

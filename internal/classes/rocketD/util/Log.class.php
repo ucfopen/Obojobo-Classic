@@ -49,43 +49,64 @@ class Log
 	
 	private static function writeLog($output, $fileName=false)
 	{	
-		// create the log directory if it doesnt exist
-		if(!file_exists(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS))
+		try
 		{
-			@mkdir(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS, 0770, true);
+			// create the log directory if it doesnt exist
+			if(!file_exists(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS))
+			{
+				mkdir(\AppCfg::DIR_BASE.\AppCfg::DIR_LOGS, 0770, true);
+			}
+			if($fileName)
+			{
+				$f = \AppCfg::DIR_BASE.\AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';
+				$isNewFile = !file_exists($f);
+				$fh = fopen($f, 'a');
+				if($fh)
+				{
+					fwrite($fh, $output);
+					fclose($fh);
+					// if this is new, make sure its group writable
+					if($isNewFile)
+					{
+						chmod($f, 0664);
+					}
+				}
+			}
+			else
+			{
+				error_log($output);
+			}
 		}
-		if($fileName)
+		catch(Exception $e)
 		{
-			$f = \AppCfg::DIR_BASE.\AppCfg::DIR_LOGS.$fileName.date('m_d_y', time()) .'.txt';
-			$fh = fopen($f, 'a');
-			fwrite($fh, $output);
-			fclose($fh);
-		}
-		else
-		{
-			@error_log($output);
+			@error_log($e);
 		}
 	}
 	
 	public static function profile($key, $append)
 	{
-		if(\AppCfg::CACHE_MEMCACHE)
-		{
-			$log = Cache::getInstance()->get($key);
-			if(strlen($log) < 100000)
-			{
-				$append = $log . $append; // append if log is less then 100k chars
-			}
-			else
-			{
-				self::dumpProfile($key, $log); // dump stored log to file
-			}
-			Cache::getInstance()->set($key, $append, false, 0);
-		}
-		else
-		{
-			self::dumpProfile($key, $append);
-		}
+		// DISABLED FOR LATER THOUGHT
+		// Its problematic not to write logs, but writing to the disk so much is slow... maybe a smaller cache
+		// or cache it per request and write it when the scrip dies?
+		// if(\AppCfg::CACHE_MEMCACHE)
+		// {
+		// 	$log = Cache::getInstance()->get($key);
+		// 	if(strlen($log) < 100000)
+		// 	{
+		// 		$append = $log . $append; // append if log is less then 100k chars
+		// 	}
+		// 	else
+		// 	{
+		// 		self::dumpProfile($key, $log); // dump stored log to file
+		// 	}
+		// 	Cache::getInstance()->set($key, $append, false, 0);
+		// }
+		// else
+		// {
+		// 	self::dumpProfile($key, $append);
+		// }
+		
+		self::dumpProfile($key, $append);
 	}
 	
 	public static function dumpProfile($key, &$value=false)
