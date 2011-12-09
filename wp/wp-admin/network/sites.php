@@ -34,7 +34,7 @@ add_contextual_help($current_screen,
 	'<li>' . __('Delete which is a permanent action after the confirmation screens.') . '</li>' .
 	'<li>' . __('Visit to go to the frontend site live.') . '</li></ul>' .
 	'<p>' . __('The site ID is used internally, and is not shown on the front end of the site or to users/viewers.') . '</p>' .
-	'<p>' . __('Clicking on bold settings can re-sort this table. The upper right icons switch between list and excerpt views.') . '</p>' .
+	'<p>' . __('Clicking on bold headings can re-sort this table.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
 	'<p>' . __('<a href="http://codex.wordpress.org/Network_Admin_Sites_Screens" target="_blank">Documentation on Site Management</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/forum/multisite/" target="_blank">Support Forums</a>') . '</p>'
@@ -88,12 +88,6 @@ if ( isset( $_REQUEST['updated'] ) && $_REQUEST['updated'] == 'true' && ! empty(
 
 $wp_list_table->prepare_items();
 
-$total_pages = $wp_list_table->get_pagination_arg( 'total_pages' );
-if ( $pagenum > $total_pages && $total_pages > 0 ) {
-	wp_redirect( add_query_arg( 'paged', $total_pages ) );
-	exit;
-}
-
 require_once( '../admin-header.php' );
 ?>
 
@@ -102,7 +96,7 @@ require_once( '../admin-header.php' );
 <h2><?php _e('Sites') ?>
 <?php echo $msg; ?>
 <?php if ( current_user_can( 'create_sites') ) : ?>
-        <a href="<?php echo network_admin_url('site-new.php'); ?>" class="button add-new-h2"><?php echo esc_html_x( 'Add New', 'site' ); ?></a>
+        <a href="<?php echo network_admin_url('site-new.php'); ?>" class="add-new-h2"><?php echo esc_html_x( 'Add New', 'site' ); ?></a>
 <?php endif; ?>
 
 <?php if ( isset( $_REQUEST['s'] ) && $_REQUEST['s'] ) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Edit Tags Administration Panel.
+ * Edit Tags Administration Screen.
  *
  * @package WordPress
  * @subpackage Administration
@@ -34,7 +34,7 @@ switch ( $wp_list_table->current_action() ) {
 
 case 'add-tag':
 
-	check_admin_referer( 'add-tag' );
+	check_admin_referer( 'add-tag', '_wpnonce_add-tag' );
 
 	if ( !current_user_can( $tax->cap->edit_terms ) )
 		wp_die( __( 'Cheatin&#8217; uh?' ) );
@@ -209,11 +209,11 @@ if ( 'category' == $taxonomy || 'link_category' == $taxonomy || 'post_tag' == $t
 		'<p><strong>' . __( 'For more information:' ) . '</strong></p>';
 
 	if ( 'category' == $taxonomy )
-		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Posts_Categories_SubPanel" target="_blank">Documentation on Categories</a>' ) . '</p>';
+		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Posts_Categories_Screen" target="_blank">Documentation on Categories</a>' ) . '</p>';
 	elseif ( 'link_category' == $taxonomy )
-		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Links_Link_Categories_SubPanel" target="_blank">Documentation on Link Categories</a>' ) . '</p>';
+		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Links_Link_Categories_Screen" target="_blank">Documentation on Link Categories</a>' ) . '</p>';
 	else
-		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Posts_Post_Tags_SubPanel" target="_blank">Documentation on Post Tags</a>' ) . '</p>';
+		$help .= '<p>' . __( '<a href="http://codex.wordpress.org/Posts_Post_Tags_Screen" target="_blank">Documentation on Post Tags</a>' ) . '</p>';
 
 	$help .= '<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>';
 
@@ -328,7 +328,7 @@ if ( current_user_can($tax->cap->edit_terms) ) {
 <input type="hidden" name="screen" value="<?php echo esc_attr($current_screen->id); ?>" />
 <input type="hidden" name="taxonomy" value="<?php echo esc_attr($taxonomy); ?>" />
 <input type="hidden" name="post_type" value="<?php echo esc_attr($post_type); ?>" />
-<?php wp_nonce_field('add-tag'); ?>
+<?php wp_nonce_field('add-tag', '_wpnonce_add-tag'); ?>
 
 <div class="form-field form-required">
 	<label for="tag-name"><?php _ex('Name', 'Taxonomy Name'); ?></label>

@@ -73,7 +73,7 @@ case 'edit' :
 	'<p>' . __('Note that you crop the image by clicking on it (the Crop icon is already selected) and dragging the cropping frame to select the desired part. Then click Save to retain the cropping.') . '</p>' .
 	'<p>' . __('Remember to click Update Media to save metadata entered or changed.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
-	'<p>' . __('<a href="http://codex.wordpress.org/Media_Add_New_SubPanel#Edit_Media" target="_blank">Documentation on Edit Media</a>') . '</p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Media_Add_New_Screen#Edit_Media" target="_blank">Documentation on Edit Media</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 );
 
@@ -97,7 +97,13 @@ case 'edit' :
 
 <div class="wrap">
 <?php screen_icon(); ?>
-<h2><?php _e( 'Edit Media' ); ?></h2>
+<h2>
+<?php
+echo esc_html( $title );
+if ( current_user_can( 'upload_files' ) ) { ?>
+	<a href="media-new.php" class="add-new-h2"><?php echo esc_html_x('Add New', 'file'); ?></a>
+<?php } ?>
+</h2>
 
 <form method="post" action="" class="media-upload-form" id="media-single-form">
 <p class="submit" style="padding-bottom: 0;">

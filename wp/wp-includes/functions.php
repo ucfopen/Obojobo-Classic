@@ -84,8 +84,8 @@ function current_time( $type, $gmt = 0 ) {
 function date_i18n( $dateformatstring, $unixtimestamp = false, $gmt = false ) {
 	global $wp_locale;
 	$i = $unixtimestamp;
-	// Sanity check for PHP 5.1.0-
-	if ( false === $i || intval($i) < 0 ) {
+
+	if ( false === $i ) {
 		if ( ! $gmt )
 			$i = current_time( 'timestamp' );
 		else
@@ -120,7 +120,7 @@ function date_i18n( $dateformatstring, $unixtimestamp = false, $gmt = false ) {
 	}
 	$timezone_formats = array( 'P', 'I', 'O', 'T', 'Z', 'e' );
 	$timezone_formats_re = implode( '|', $timezone_formats );
-	if ( preg_match( "/$timezone_formats_re/", $dateformatstring ) && wp_timezone_supported() ) {
+	if ( preg_match( "/$timezone_formats_re/", $dateformatstring ) ) {
 		$timezone_string = get_option( 'timezone_string' );
 		if ( $timezone_string ) {
 			$timezone_object = timezone_open( $timezone_string );
@@ -288,9 +288,19 @@ function is_serialized_string( $data ) {
 	if ( !is_string( $data ) )
 		return false;
 	$data = trim( $data );
-	if ( preg_match( '/^s:[0-9]+:.*;$/s', $data ) ) // this should fetch all serialized strings
+	$length = strlen( $data );
+	if ( $length < 4 )
+		return false;
+	elseif ( ':' !== $data[1] )
+		return false;
+	elseif ( ';' !== $data[$length-1] )
+		return false;
+	elseif ( $data[0] !== 's' )
+		return false;
+	elseif ( '"' !== $data[$length-2] )
+		return false;
+	else
 		return true;
-	return false;
 }
 
 /**
@@ -509,7 +519,7 @@ function update_option( $option, $newvalue ) {
 	wp_protect_special_option( $option );
 
 	if ( is_object($newvalue) )
-		$newvalue = wp_clone($newvalue);
+		$newvalue = clone $newvalue;
 
 	$newvalue = sanitize_option( $option, $newvalue );
 	$oldvalue = get_option( $option );
@@ -591,7 +601,7 @@ function add_option( $option, $value = '', $deprecated = '', $autoload = 'yes' )
 	wp_protect_special_option( $option );
 
 	if ( is_object($value) )
-		$value = wp_clone($value);
+		$value = clone $value;
 
 	$value = sanitize_option( $option, $value );
 
@@ -1291,7 +1301,7 @@ function wp_get_http( $url, $file_path = false, $red = 1 ) {
 		return false;
 
 	$headers = wp_remote_retrieve_headers( $response );
-	$headers['response'] = $response['response']['code'];
+	$headers['response'] = wp_remote_retrieve_response_code( $response );
 
 	// WP_HTTP no longer follows redirects for HEAD requests.
 	if ( 'HEAD' == $options['method'] && in_array($headers['response'], array(301, 302)) && isset( $headers['location'] ) ) {
@@ -1306,7 +1316,7 @@ function wp_get_http( $url, $file_path = false, $red = 1 ) {
 	if ( !$out_fp )
 		return $headers;
 
-	fwrite( $out_fp,  $response['body']);
+	fwrite( $out_fp,  wp_remote_retrieve_body( $response ) );
 	fclose($out_fp);
 	clearstatcache();
 
@@ -1368,6 +1378,36 @@ function is_new_day() {
  */
 function build_query( $data ) {
 	return _http_build_query( $data, null, '&', '', false );
+}
+
+// from php.net (modified by Mark Jaquith to behave like the native PHP5 function)
+function _http_build_query($data, $prefix=null, $sep=null, $key='', $urlencode=true) {
+	$ret = array();
+
+	foreach ( (array) $data as $k => $v ) {
+		if ( $urlencode)
+			$k = urlencode($k);
+		if ( is_int($k) && $prefix != null )
+			$k = $prefix.$k;
+		if ( !empty($key) )
+			$k = $key . '%5B' . $k . '%5D';
+		if ( $v === NULL )
+			continue;
+		elseif ( $v === FALSE )
+			$v = '0';
+
+		if ( is_array($v) || is_object($v) )
+			array_push($ret,_http_build_query($v, '', $sep, $k, $urlencode));
+		elseif ( $urlencode )
+			array_push($ret, $k.'='.urlencode($v));
+		else
+			array_push($ret, $k.'='.$v);
+	}
+
+	if ( NULL === $sep )
+		$sep = ini_get('arg_separator.output');
+
+	return implode($sep, $ret);
 }
 
 /**
@@ -1512,7 +1552,7 @@ function wp_remote_fopen( $uri ) {
 	if ( is_wp_error( $response ) )
 		return false;
 
-	return $response['body'];
+	return wp_remote_retrieve_body( $response );
 }
 
 /**
@@ -1910,11 +1950,6 @@ function wp_nonce_url( $actionurl, $action = -1 ) {
  * offer absolute protection, but should protect against most cases. It is very
  * important to use nonce field in forms.
  *
- * If you set $echo to true and set $referer to true, then you will need to
- * retrieve the {@link wp_referer_field() wp referer field}. If you have the
- * $referer set to true and are echoing the nonce field, it will also echo the
- * referer field.
- *
  * The $action and $name are optional, but if you want to have better security,
  * it is strongly suggested to set those two parameters. It is easier to just
  * call the function without any parameters, because validation of the nonce
@@ -1938,11 +1973,12 @@ function wp_nonce_url( $actionurl, $action = -1 ) {
 function wp_nonce_field( $action = -1, $name = "_wpnonce", $referer = true , $echo = true ) {
 	$name = esc_attr( $name );
 	$nonce_field = '<input type="hidden" id="' . $name . '" name="' . $name . '" value="' . wp_create_nonce( $action ) . '" />';
-	if ( $echo )
-		echo $nonce_field;
 
 	if ( $referer )
-		wp_referer_field( $echo );
+		$nonce_field .= wp_referer_field( false );
+
+	if ( $echo )
+		echo $nonce_field;
 
 	return $nonce_field;
 }
@@ -2108,6 +2144,42 @@ function path_join( $base, $path ) {
 		return $path;
 
 	return rtrim($base, '/') . '/' . ltrim($path, '/');
+}
+
+/**
+ * Determines a writable directory for temporary files.
+ * Function's preference is to WP_CONTENT_DIR followed by the return value of <code>sys_get_temp_dir()</code>, before finally defaulting to /tmp/
+ *
+ * In the event that this function does not find a writable location, It may be overridden by the <code>WP_TEMP_DIR</code> constant in your <code>wp-config.php</code> file.
+ *
+ * @since 2.5.0
+ *
+ * @return string Writable temporary directory
+ */
+function get_temp_dir() {
+	static $temp;
+	if ( defined('WP_TEMP_DIR') )
+		return trailingslashit(WP_TEMP_DIR);
+
+	if ( $temp )
+		return trailingslashit($temp);
+
+	$temp = WP_CONTENT_DIR . '/';
+	if ( is_dir($temp) && @is_writable($temp) )
+		return $temp;
+
+	if  ( function_exists('sys_get_temp_dir') ) {
+		$temp = sys_get_temp_dir();
+		if ( @is_writable($temp) )
+			return trailingslashit($temp);
+	}
+
+	$temp = ini_get('upload_tmp_dir');
+	if ( is_dir($temp) && @is_writable($temp) )
+		return trailingslashit($temp);
+
+	$temp = '/tmp/';
+	return $temp;
 }
 
 /**
@@ -2493,6 +2565,7 @@ function get_allowed_mime_types() {
 		'txt|asc|c|cc|h' => 'text/plain',
 		'csv' => 'text/csv',
 		'tsv' => 'text/tab-separated-values',
+		'ics' => 'text/calendar',
 		'rtx' => 'text/richtext',
 		'css' => 'text/css',
 		'htm|html' => 'text/html',
@@ -2783,6 +2856,42 @@ if ( 'rtl' == $text_direction ) : ?>
 <?php
 	die();
 }
+
+/**
+ * Kill WordPress execution and display XML message with error message.
+ *
+ * This is the handler for wp_die when processing XMLRPC requests.
+ *
+ * @since 3.2.0
+ * @access private
+ *
+ * @param string $message Error message.
+ * @param string $title Error title.
+ * @param string|array $args Optional arguements to control behaviour.
+ */
+function _xmlrpc_wp_die_handler( $message, $title = '', $args = array() ) {
+	global $wp_xmlrpc_server;
+	$defaults = array( 'response' => 500 );
+
+	$r = wp_parse_args($args, $defaults);
+
+	if ( $wp_xmlrpc_server ) {
+		$error = new IXR_Error( $r['response'] , $message);
+		$wp_xmlrpc_server->output( $error->getXml() );
+	}
+	die();
+}
+
+/**
+ * Filter to enable special wp_die handler for xmlrpc requests.
+ *
+ * @since 3.2.0
+ * @access private
+ */
+function _xmlrpc_wp_die_filter() {
+	return '_xmlrpc_wp_die_handler';
+}
+
 
 /**
  * Retrieve the WordPress home page URL.
@@ -3101,20 +3210,6 @@ function wp_list_pluck( $list, $field ) {
 }
 
 /**
- * Determines if default embed handlers should be loaded.
- *
- * Checks to make sure that the embeds library hasn't already been loaded. If
- * it hasn't, then it will load the embeds library.
- *
- * @since 2.9.0
- */
-function wp_maybe_load_embeds() {
-	if ( ! apply_filters('load_default_embeds', true) )
-		return;
-	require_once( ABSPATH . WPINC . '/default-embeds.php' );
-}
-
-/**
  * Determines if Widgets library should be loaded.
  *
  * Checks to make sure that the widgets library hasn't already been loaded. If
@@ -3250,22 +3345,6 @@ function url_is_accessable_via_ssl($url)
 		}
 	}
 	return false;
-}
-
-/**
- * Secure URL, if available or the given URL.
- *
- * @since 2.5.0
- *
- * @param string $url Complete URL path with transport.
- * @return string Secure or regular URL path.
- */
-function atom_service_url_filter($url)
-{
-	if ( url_is_accessable_via_ssl($url) )
-		return preg_replace( '/^http:\/\//', 'https://',  $url );
-	else
-		return $url;
 }
 
 /**
@@ -3563,7 +3642,7 @@ function force_ssl_login( $force = null ) {
 }
 
 /**
- * Whether to force SSL used for the Administration Panels.
+ * Whether to force SSL used for the Administration Screens.
  *
  * @since 2.6.0
  *
@@ -3992,9 +4071,6 @@ function global_terms_enabled() {
  * @return float|bool
  */
 function wp_timezone_override_offset() {
-	if ( !wp_timezone_supported() ) {
-		return false;
-	}
 	if ( !$timezone_string = get_option( 'timezone_string' ) ) {
 		return false;
 	}
@@ -4005,27 +4081,6 @@ function wp_timezone_override_offset() {
 		return false;
 	}
 	return round( timezone_offset_get( $timezone_object, $datetime_object ) / 3600, 2 );
-}
-
-/**
- * Check for PHP timezone support
- *
- * @since 2.9.0
- *
- * @return bool
- */
-function wp_timezone_supported() {
-	$support = false;
-	if (
-		function_exists( 'date_create' ) &&
-		function_exists( 'date_default_timezone_set' ) &&
-		function_exists( 'timezone_identifiers_list' ) &&
-		function_exists( 'timezone_open' ) &&
-		function_exists( 'timezone_offset_get' )
-	) {
-		$support = true;
-	}
-	return apply_filters( 'timezone_support', $support );
 }
 
 /**

@@ -59,7 +59,7 @@ if ( $action ) {
 				update_option('recently_activated', $recent);
 			}
 			if ( isset($_GET['from']) && 'import' == $_GET['from'] ) {
-				wp_redirect( self_admin_url("import.php?import=" . str_replace('-importer', '', dirname($plugin))) ); // overrides the ?error=true one above and redirects to the Imports page, striping the -importer suffix
+				wp_redirect( self_admin_url("import.php?import=" . str_replace('-importer', '', dirname($plugin))) ); // overrides the ?error=true one above and redirects to the Imports page, stripping the -importer suffix
 			} else {
 				wp_redirect( self_admin_url("plugins.php?activate=true&plugin_status=$status&paged=$page&s=$s") ); // overrides the ?error=true one above
 			}
@@ -137,10 +137,7 @@ if ( $action ) {
 				wp_die($valid);
 
 			if ( ! WP_DEBUG ) {
-				if ( defined('E_RECOVERABLE_ERROR') )
-					error_reporting(E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR);
-				else
-					error_reporting(E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING);
+				error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
 			}
 
 			@ini_set('display_errors', true); //Ensure that Fatal errors are displayed.
@@ -316,12 +313,6 @@ if ( $action ) {
 
 $wp_list_table->prepare_items();
 
-$total_pages = $wp_list_table->get_pagination_arg( 'total_pages' );
-if ( $pagenum > $total_pages && $total_pages > 0 ) {
-	wp_redirect( add_query_arg( 'paged', $total_pages ) );
-	exit;
-}
-
 wp_enqueue_script('plugin-install');
 add_thickbox();
 
@@ -390,7 +381,7 @@ if ( !empty($invalid) )
 <?php screen_icon(); ?>
 <h2><?php echo esc_html( $title );
 if ( ( ! is_multisite() || is_network_admin() ) && current_user_can('install_plugins') ) { ?>
-<a href="<?php echo self_admin_url( 'plugin-install.php' ); ?>" class="button add-new-h2"><?php echo esc_html_x('Add New', 'plugin'); ?></a>
+<a href="<?php echo self_admin_url( 'plugin-install.php' ); ?>" class="add-new-h2"><?php echo esc_html_x('Add New', 'plugin'); ?></a>
 <?php }
 if ( $s )
 	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html( $s ) ); ?>
@@ -402,7 +393,7 @@ if ( $s )
 
 <form method="post" action="">
 
-<?php $wp_list_table->search_box( __( 'Search Plugins' ), 'plugin' ); ?>
+<?php $wp_list_table->search_box( __( 'Search Installed Plugins' ), 'plugin' ); ?>
 
 <input type="hidden" name="plugin_status" value="<?php echo esc_attr($status) ?>" />
 <input type="hidden" name="paged" value="<?php echo esc_attr($page) ?>" />

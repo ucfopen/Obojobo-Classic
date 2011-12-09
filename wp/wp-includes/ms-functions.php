@@ -882,8 +882,7 @@ function wpmu_signup_user_notification($user, $user_email, $key, $meta = '') {
 			__( "To activate your user, please click the following link:\n\n%s\n\nAfter you activate, you will receive *another email* with your login.\n\n" ),
 			$user, $user_email, $key, $meta
 		),
-		site_url( "wp-activate.php?key=$key" ),
-		$key
+		site_url( "wp-activate.php?key=$key" )
 	);
 	// TODO: Don't hard code activation link.
 	$subject = sprintf(
@@ -1313,10 +1312,9 @@ BLOG_URL
 You can log in to the administrator account with the following information:
 Username: USERNAME
 Password: PASSWORD
-Login Here: BLOG_URLwp-login.php
+Log in here: BLOG_URLwp-login.php
 
-We hope you enjoy your new site.
-Thanks!
+We hope you enjoy your new site. Thanks!
 
 --The Team @ SITE_NAME' ) );
 
@@ -1340,7 +1338,7 @@ Thanks!
 	$message = $welcome_email;
 
 	if ( empty( $current_site->site_name ) )
-		$current_site->site_name = 'WordPress MU';
+		$current_site->site_name = 'WordPress';
 
 	$subject = apply_filters( 'update_welcome_subject', sprintf(__('New %1$s Site: %2$s'), $current_site->site_name, stripslashes( $title ) ) );
 	wp_mail($user->user_email, $subject, $message, $message_headers);
@@ -1388,7 +1386,7 @@ function wpmu_welcome_user_notification($user_id, $password, $meta = '') {
 	$message = $welcome_email;
 
 	if ( empty( $current_site->site_name ) )
-		$current_site->site_name = 'WordPress MU';
+		$current_site->site_name = 'WordPress';
 
 	$subject = apply_filters( 'update_welcome_user_subject', sprintf(__('New %1$s User: %2$s'), $current_site->site_name, $user->user_login) );
 	wp_mail($user->user_email, $subject, $message, $message_headers);
@@ -1860,7 +1858,7 @@ function add_existing_user_to_blog( $details = false ) {
  */
 function add_new_user_to_blog( $user_id, $email, $meta ) {
 	global $current_site;
-	if ( $meta[ 'add_to_blog' ] ) {
+	if ( !empty( $meta[ 'add_to_blog' ] ) ) {
 		$blog_id = $meta[ 'add_to_blog' ];
 		$role = $meta[ 'new_role' ];
 		remove_user_from_blog($user_id, $current_site->blog_id); // remove user from main blog.

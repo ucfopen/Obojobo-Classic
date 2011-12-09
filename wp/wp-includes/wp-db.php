@@ -39,9 +39,8 @@ define( 'ARRAY_N', 'ARRAY_N' );
  *
  * It is possible to replace this class with your own
  * by setting the $wpdb global variable in wp-content/db.php
- * file with your class. You can name it wpdb also, since
- * this file will not be included, if the other file is
- * available.
+ * file to your class. The wpdb class will still be included,
+ * so you can extend it or simply use your own.
  *
  * @link http://codex.wordpress.org/Function_Reference/wpdb_Class
  *
@@ -464,23 +463,6 @@ class wpdb {
 	/**
 	 * Connects to the database server and selects a database
 	 *
-	 * PHP4 compatibility layer for calling the PHP5 constructor.
-	 *
-	 * @uses wpdb::__construct() Passes parameters and returns result
-	 * @since 0.71
-	 *
-	 * @param string $dbuser MySQL database user
-	 * @param string $dbpassword MySQL database password
-	 * @param string $dbname MySQL database name
-	 * @param string $dbhost MySQL database host
-	 */
-	function wpdb( $dbuser, $dbpassword, $dbname, $dbhost ) {
-		return $this->__construct( $dbuser, $dbpassword, $dbname, $dbhost );
-	}
-
-	/**
-	 * Connects to the database server and selects a database
-	 *
 	 * PHP5 style constructor for compatibility with PHP5. Does
 	 * the actual setting up of the class properties and connection
 	 * to the database.
@@ -644,6 +626,7 @@ class wpdb {
 		if ( is_multisite() ) {
 			if ( null === $blog_id )
 				$blog_id = $this->blogid;
+			$blog_id = (int) $blog_id;
 			if ( defined( 'MULTISITE' ) && ( 0 == $blog_id || 1 == $blog_id ) )
 				return $this->base_prefix;
 			else
@@ -1030,8 +1013,6 @@ class wpdb {
 	 * @since 3.0.0
 	 */
 	function db_connect() {
-		global $db_list, $global_db_list;
-
 		if ( WP_DEBUG ) {
 			$this->dbh = mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, true );
 		} else {
@@ -1102,10 +1083,12 @@ class wpdb {
 			return false;
 		}
 
-		if ( preg_match( "/^\\s*(insert|delete|update|replace|alter) /i", $query ) ) {
+		if ( preg_match( '/^\s*(create|alter|truncate|drop) /i', $query ) ) {
+			$return_val = $this->result;
+		} elseif ( preg_match( '/^\s*(insert|delete|update|replace) /i', $query ) ) {
 			$this->rows_affected = mysql_affected_rows( $this->dbh );
 			// Take note of the insert_id
-			if ( preg_match( "/^\\s*(insert|replace) /i", $query ) ) {
+			if ( preg_match( '/^\s*(insert|replace) /i', $query ) ) {
 				$this->insert_id = mysql_insert_id($this->dbh);
 			}
 			// Return number of rows affected
@@ -1383,7 +1366,7 @@ class wpdb {
 			// Return an array of row objects with keys from column 1
 			// (Duplicates are discarded)
 			foreach ( $this->last_result as $row ) {
-				$key = array_shift( $var_by_ref = get_object_vars( $row ) );
+				$key = array_shift( get_object_vars( $row ) );
 				if ( ! isset( $new_array[ $key ] ) )
 					$new_array[ $key ] = $row;
 			}

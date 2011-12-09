@@ -163,7 +163,7 @@ function get_allowed_themes() {
  *
  * @since 1.5.0
  *
- * @return array Key is template name, Value is template name
+ * @return array Key is the template name, value is the filename of the template
  */
 function get_page_templates() {
 	$themes = get_themes();
@@ -179,6 +179,9 @@ function get_page_templates() {
 
 			// don't allow template files in subdirectories
 			if ( false !== strpos($basename, '/') )
+				continue;
+
+			if ( 'functions.php' == $basename )
 				continue;
 
 			$template_data = implode( '', file( $template ));
@@ -268,6 +271,7 @@ function get_theme_feature_list() {
 				'black'   => __( 'Black' ),
 				'blue'    => __( 'Blue' ),
 				'brown'   => __( 'Brown' ),
+				'gray'    => __( 'Gray' ),
 				'green'   => __( 'Green' ),
 				'orange'  => __( 'Orange' ),
 				'pink'    => __( 'Pink' ),
@@ -296,26 +300,30 @@ function get_theme_feature_list() {
 		),
 
 		__( 'Features' ) => array(
-			'blavatar'             => __( 'Blavatar' ),
-			'buddypress'           => __( 'BuddyPress' ),
-			'custom-background'    => __( 'Custom Background' ),
-			'custom-colors'        => __( 'Custom Colors' ),
-			'custom-header'        => __( 'Custom Header' ),
-			'custom-menu'          => __( 'Custom Menu' ),
-			'editor-style'         => __( 'Editor Style' ),
-			'front-page-post-form' => __( 'Front Page Posting' ),
-			'microformats'         => __( 'Microformats' ),
-			'sticky-post'          => __( 'Sticky Post' ),
-			'theme-options'        => __( 'Theme Options' ),
-			'threaded-comments'    => __( 'Threaded Comments' ),
-			'translation-ready'    => __( 'Translation Ready' ),
-			'rtl-language-support' => __( 'RTL Language Support' )
+			'blavatar'              => __( 'Blavatar' ),
+			'buddypress'            => __( 'BuddyPress' ),
+			'custom-background'     => __( 'Custom Background' ),
+			'custom-colors'         => __( 'Custom Colors' ),
+			'custom-header'         => __( 'Custom Header' ),
+			'custom-menu'           => __( 'Custom Menu' ),
+			'editor-style'          => __( 'Editor Style' ),
+			'featured-image-header' => __( 'Featured Image Header' ),
+			'featured-images'       => __( 'Featured Images' ),
+			'front-page-post-form'  => __( 'Front Page Posting' ),
+			'full-width-template'   => __( 'Full Width Template' ),
+			'microformats'          => __( 'Microformats' ),
+			'post-formats'          => __( 'Post Formats' ),
+			'rtl-language-support'  => __( 'RTL Language Support' ),
+			'sticky-post'           => __( 'Sticky Post' ),
+			'theme-options'         => __( 'Theme Options' ),
+			'threaded-comments'     => __( 'Threaded Comments' ),
+			'translation-ready'     => __( 'Translation Ready' )
 		),
 
 		__( 'Subject' )  => array(
-			'holiday' => __( 'Holiday' ),
+			'holiday'       => __( 'Holiday' ),
 			'photoblogging' => __( 'Photoblogging' ),
-			'seasonal' => __( 'Seasonal' )
+			'seasonal'      => __( 'Seasonal' )
 		)
 	);
 
@@ -393,9 +401,9 @@ function themes_api($action, $args = null) {
 		if ( is_wp_error($request) ) {
 			$res = new WP_Error('themes_api_failed', __('An Unexpected HTTP Error occurred during the API request.'), $request->get_error_message() );
 		} else {
-			$res = unserialize($request['body']);
+			$res = unserialize( wp_remote_retrieve_body( $request ) );
 			if ( ! $res )
-			$res = new WP_Error('themes_api_failed', __('An unknown error occurred.'), $request['body']);
+			$res = new WP_Error('themes_api_failed', __('An unknown error occurred.'), wp_remote_retrieve_body( $request ) );
 		}
 	}
 	//var_dump(array($args, $res));
