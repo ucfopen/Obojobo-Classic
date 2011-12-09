@@ -84,6 +84,9 @@ class AppCfgDefault
 	
 	// Define the relative location for the remoting gateway
 	const AMF_GATEWAY  = 'assets/gateway-amf.php';
+	
+	// Define the json gateway location
+	const JSON_GATEWAY = 'assets/gateway-json.php';
 
 	// Define the Form Manager form ID
 	const ACCOUNT_FORM_ID = '27373';
