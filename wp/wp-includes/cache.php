@@ -350,7 +350,7 @@ class WP_Object_Cache {
 		if ( isset ($this->cache[$group][$id]) ) {
 			$this->cache_hits += 1;
 			if ( is_object($this->cache[$group][$id]) )
-				return wp_clone($this->cache[$group][$id]);
+				return clone $this->cache[$group][$id];
 			else
 				return $this->cache[$group][$id];
 		}
@@ -426,7 +426,7 @@ class WP_Object_Cache {
 			$data = '';
 
 		if ( is_object($data) )
-			$data = wp_clone($data);
+			$data = clone $data;
 
 		$this->cache[$group][$id] = $data;
 
@@ -454,17 +454,6 @@ class WP_Object_Cache {
 			echo "<li><strong>Group:</strong> $group - ( " . number_format( strlen( serialize( $cache ) ) / 1024, 2 ) . 'k )</li>';
 		}
 		echo '</ul>';
-	}
-
-	/**
-	 * PHP4 constructor; Calls PHP 5 style constructor
-	 *
-	 * @since 2.0.0
-	 *
-	 * @return WP_Object_Cache
-	 */
-	function WP_Object_Cache() {
-		return $this->__construct();
 	}
 
 	/**

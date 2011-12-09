@@ -19,12 +19,14 @@ if ( ! current_user_can( 'update_core' ) )
 
 function list_core_update( $update ) {
 	global $wp_local_package, $wpdb;
+	static $first_pass = true;
+
 	$version_string = ('en_US' == $update->locale && 'en_US' == get_locale() ) ?
 			$update->current : sprintf("%s&ndash;<strong>%s</strong>", $update->current, $update->locale);
 	$current = false;
 	if ( !isset($update->response) || 'latest' == $update->response )
 		$current = true;
-	$submit = __('Update Automatically');
+	$submit = __('Update Now');
 	$form_action = 'update-core.php?action=do-core-upgrade';
 	$php_version    = phpversion();
 	$mysql_version  = $wpdb->db_version();
@@ -35,7 +37,7 @@ function list_core_update( $update ) {
 	} else {
 		if ( $current ) {
 			$message = sprintf(__('You have the latest version of WordPress. You do not need to update. However, if you want to re-install version %s, you can do so automatically or download the package and re-install manually:'), $version_string);
-			$submit = __('Re-install Automatically');
+			$submit = __('Re-install Now');
 			$form_action = 'update-core.php?action=do-core-reinstall';
 		} else {
 			$php_compat     = version_compare( $php_version, $update->php_version, '>=' );
@@ -63,8 +65,13 @@ function list_core_update( $update ) {
 	echo '<input name="version" value="'. esc_attr($update->current) .'" type="hidden"/>';
 	echo '<input name="locale" value="'. esc_attr($update->locale) .'" type="hidden"/>';
 	if ( $show_buttons ) {
-		submit_button( $submit, 'button', 'upgrade', false );
-		echo '&nbsp;<a href="' . esc_url($update->package) . '" class="button">' . $download . '</a>&nbsp;';
+		if ( $first_pass ) {
+			submit_button( $submit, 'button button-primary', 'upgrade', false );
+			$first_pass = false;
+		} else {
+			submit_button( $submit, 'button', 'upgrade', false );
+		}
+		echo '&nbsp;<a href="' . esc_url( $update->download ) . '" class="button">' . $download . '</a>&nbsp;';
 	}
 	if ( 'en_US' != $update->locale )
 		if ( !isset( $update->dismissed ) || !$update->dismissed )
@@ -75,7 +82,7 @@ function list_core_update( $update ) {
 	if ( 'en_US' != $update->locale && ( !isset($wp_local_package) || $wp_local_package != $update->locale ) )
 	    echo '<p class="hint">'.__('This localized version contains both the translation and various other localization fixes. You can skip upgrading if you want to keep your current translation.').'</p>';
 	else if ( 'en_US' == $update->locale && get_locale() != 'en_US' ) {
-	    echo '<p class="hint">'.sprintf( __('You are about to install WordPress %s <strong>in English (US).</strong> There is a chance this update will break your translation. You may prefer to wait for the localized version to be released.'), $update->current ).'</p>';
+	    echo '<p class="hint">'.sprintf( __('You are about to install WordPress %s <strong>in English (US).</strong> There is a chance this update will break your translation. You may prefer to wait for the localized version to be released.'), $update->response != 'development' ? $update->current : '' ).'</p>';
 	}
 	echo '</form>';
 
@@ -403,7 +410,7 @@ add_contextual_help($current_screen,
 	'<p>' . __('Updating your WordPress installation is a simple one-click procedure; just click on the Update button when it says a new version is available.') . '</p>' .
 	'<p>' . __('To update themes or plugins from this screen, use the checkboxes to make your selection and click on the appropriate Update button. Check the box at the top of the Themes or Plugins section to select all and update them all at once.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
-	'<p>' . __('<a href="http://codex.wordpress.org/Dashboard_Updates_SubPanel" target="_blank">Documentation on Updating WordPress</a>') . '</p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Dashboard_Updates_Screen" target="_blank">Documentation on Updating WordPress</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 );
 
@@ -412,6 +419,7 @@ if ( 'upgrade-core' == $action ) {
 	wp_version_check();
 	require_once(ABSPATH . 'wp-admin/admin-header.php');
 	core_upgrade_preamble();
+	include(ABSPATH . 'wp-admin/admin-footer.php');
 
 } elseif ( 'do-core-upgrade' == $action || 'do-core-reinstall' == $action ) {
 	check_admin_referer('upgrade-core');
@@ -431,6 +439,8 @@ if ( 'upgrade-core' == $action ) {
 
 	if ( isset( $_POST['upgrade'] ) )
 		do_core_upgrade($reinstall);
+
+	include(ABSPATH . 'wp-admin/admin-footer.php');
 
 } elseif ( 'do-plugin-upgrade' == $action ) {
 
@@ -459,6 +469,7 @@ if ( 'upgrade-core' == $action ) {
 	echo '<h2>' . esc_html__('Update Plugins') . '</h2>';
 	echo "<iframe src='$url' style='width: 100%; height: 100%; min-height: 750px;' frameborder='0'></iframe>";
 	echo '</div>';
+	include(ABSPATH . 'wp-admin/admin-footer.php');
 
 } elseif ( 'do-theme-upgrade' == $action ) {
 
@@ -487,6 +498,8 @@ if ( 'upgrade-core' == $action ) {
 	echo '<h2>' . esc_html__('Update Themes') . '</h2>';
 	echo "<iframe src='$url' style='width: 100%; height: 100%; min-height: 750px;' frameborder='0'></iframe>";
 	echo '</div>';
-}
+	include(ABSPATH . 'wp-admin/admin-footer.php');
 
-include(ABSPATH . 'wp-admin/admin-footer.php');
+} else {
+	do_action('update-core-custom_' . $action);
+}

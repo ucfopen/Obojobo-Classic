@@ -195,9 +195,6 @@ add_filter( 'pings_open',           '_close_comments_for_old_post', 10, 2 );
 add_filter( 'editable_slug',        'urldecode'                           );
 add_filter( 'nav_menu_meta_box_object', '_wp_nav_menu_meta_box_object'    );
 
-// Atom SSL support
-add_filter( 'atom_service_url','atom_service_url_filter' );
-
 // Actions
 add_action( 'wp_head',             'wp_enqueue_scripts',            1     );
 add_action( 'wp_head',             'feed_links',                    2     );
@@ -218,6 +215,9 @@ add_action( 'wp_head',             'rel_canonical'                        );
 add_action( 'wp_footer',           'wp_print_footer_scripts'              );
 add_action( 'wp_head',             'wp_shortlink_wp_head',          10, 0 );
 add_action( 'template_redirect',   'wp_shortlink_header',           11, 0 );
+
+if ( isset( $_GET['replytocom'] ) )
+    add_filter( 'pre_option_blog_public', '__return_zero' );
 
 // Login actions
 add_action( 'login_head',          'wp_print_head_scripts',         9     );
@@ -254,6 +254,8 @@ add_action( 'save_post',                  '_save_post_hook',          5, 2 );
 add_action( 'transition_post_status',     '_transition_post_status',  5, 3 );
 add_action( 'comment_form', 'wp_comment_form_unfiltered_html_nonce'        );
 add_action( 'wp_scheduled_delete',        'wp_scheduled_delete'            );
+add_action( 'before_wp_tiny_mce',         'wp_print_editor_js'             );
+add_action( 'after_wp_tiny_mce',          'wp_preload_dialogs',      10, 1 );
 add_action( 'admin_init',                 'send_frame_options_header', 10, 0 );
 add_action( 'importer_scheduled_cleanup', 'wp_delete_attachment'           );
 

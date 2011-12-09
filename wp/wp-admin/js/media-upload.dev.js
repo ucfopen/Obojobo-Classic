@@ -3,9 +3,9 @@ function send_to_editor(h) {
 	var ed;
 
 	if ( typeof tinyMCE != 'undefined' && ( ed = tinyMCE.activeEditor ) && !ed.isHidden() ) {
-		ed.focus();
-		if ( tinymce.isIE )
-			ed.selection.moveToBookmark(tinymce.EditorManager.activeEditor.windowManager.bookmark);
+		// restore caret position on IE
+		if ( tinymce.isIE && ed.windowManager.insertimagebookmark )
+			ed.selection.moveToBookmark(ed.windowManager.insertimagebookmark);
 
 		if ( h.indexOf('[caption') === 0 ) {
 			if ( ed.plugins.wpeditimage )
@@ -57,13 +57,16 @@ var tb_position;
 
 	$(window).resize(function(){ tb_position(); });
 
-})(jQuery);
+	// store caret position in IE
+	$(document).ready(function($){
+		$('a.thickbox').click(function(){
+			var ed;
 
-jQuery(document).ready(function($){
-	$('a.thickbox').click(function(){
-		if ( typeof tinyMCE != 'undefined' && tinyMCE.activeEditor ) {
-			tinyMCE.get('content').focus();
-			tinyMCE.activeEditor.windowManager.bookmark = tinyMCE.activeEditor.selection.getBookmark('simple');
-		}
+			if ( typeof tinyMCE != 'undefined' && tinymce.isIE && ( ed = tinyMCE.activeEditor ) && !ed.isHidden() ) {
+				ed.focus();
+				ed.windowManager.insertimagebookmark = ed.selection.getBookmark();
+			}
+		});
 	});
-});
+
+})(jQuery);
