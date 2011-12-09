@@ -1,0 +1,129 @@
+body,
+html
+{
+	
+}
+
+html
+{
+	background: url('/assets/images/viewer/themes/blue/main-bg.png') center repeat-y, url('../../images/viewer/themes/blue/bg.png');
+}
+
+body
+{
+	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.5, white), color-stop(1, #f9f1ea)) #f9f1ea;*/
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.5, white), color-stop(1, rgba(255, 255, 255, 0)));
+
+}
+
+#header
+{
+	height: 68px;
+	background: url('../../images/viewer/themes/classic/head-bg-highlight-left.png') top left no-repeat, url('../../images/viewer/themes/classic/head-bg-highlight-right.png') top right no-repeat, url('../../images/viewer/themes/blue/head-bg.png') top repeat-x, url('../../images/viewer/themes/blue/nav-bg.png') bottom repeat-x;
+	
+	border: none;
+}
+
+#nav-list
+{
+	margin-before: 0;
+	margin-after: 0;
+}
+
+#nav-list > li
+{
+	height: 31px;
+}
+
+#nav-list > li.selected
+{
+	background: #4f4f4f;
+}
+
+#nav-list > li.selected > a
+{
+	
+	padding-bottom: 18px;
+	background: url('../../images/viewer/themes/blue/nav-pointer.png') bottom center no-repeat;
+}
+
+#nav-list a
+{
+	color: #f6eedc;
+}
+
+#nav-list a:link
+{
+	color: #f6eedc;
+}
+
+#nav-list a:visited
+{
+	color: #f6eedc
+}
+
+h2
+{
+	/*color: #555; /*#3c607b;*/
+	/*color: #587057;*/
+/*	color: #8e6b94;*/
+	/*color: #c02b4e*/
+	color: #86273d;
+	text-shadow: none;
+}
+
+h3
+{
+	text-shadow: none;
+}
+
+#overview-page h3
+{
+	/*color: #3c607b;*/
+	color: #555;
+	/*color: #6e8f5a;*/
+	text-shadow: white 0px 1px 1px;
+}
+/*
+.page-layout
+{	
+	
+}
+*/
+.page-layout h2
+{
+	margin:31px 0 20px 0;
+}
+
+.overview-details
+{
+	/*background: #e7e7e7 url('/assets/images/viewer/themes/classic/overview-bg-pixel.png') repeat-y 276px, url('/assets/images/viewer/themes/classic/overview-details-header-bg.png') repeat-x;*/
+	
+	/*background: url('/assets/images/viewer/themes/classic/overview-bg-pixel.png') repeat-y 276px, #eeeeee;*/
+	
+	border-bottom: 1px solid gray;
+	border-top: 1px solid white;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0, white), color-stop(1, #e7e7e7));
+	
+	/*background: url('/assets/images/viewer/themes/classic/overview-bg-pixel.png') repeat-y 276px, url('/assets/images/viewer/themes/classic/overview-details-header-bg.png') repeat-x 0 0, #e7e7e7;*/
+}
+
+#overview-instructions h3
+{
+	color: #555;
+}
+
+#overview-page hr
+{
+	background: url('../../images/viewer/themes/blue/overview-hr.png');
+}
+
+::selection,
+::-moz-selection
+{
+	color: white;
+	background: #444444;
+}
+
+
+
