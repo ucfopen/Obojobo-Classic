@@ -49,6 +49,6 @@ if($_REQUEST['formatTime'] == true)
 }
 echo (microtime(1) - $time) . "\n";
 print_r($track);
-//echo "\n" . (microtime(1) - $time) . "\n";
 
 ?>
+</pre>

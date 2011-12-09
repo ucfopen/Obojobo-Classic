@@ -1,28 +1,19 @@
 <?php
 
 $API = \obo\API::getInstance();
-<<<<<<< HEAD
-$result = $API->getSessionRoleValid(array('SuperUser'));
-if(! in_array('SuperUser', $result['hasRoles']) )
-{
-	exit();
-}
-=======
-
->>>>>>> f3353fe... Adding plugin to execute admin scripts
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
-//if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');
 
 $nid = $_GET['nid'];
 $uid = 0;
 $email = '';
-$result = $DBM->query("SELECT userID FROM `obo_users` WHERE login = '$nid'");
-$r = $DBM->fetch_assoc($result);
-$uid = $r['userID'];
+$UM = \rocketD\auth\AuthManager::getInstance();
+$result = $UM->fetchUserByUserName($nid);
+$uid = $result->userID;
 
-echo '<form action="" method="get" accept-charset="utf-8">
+echo '<form action="'. $_SERVER['PHP_SELF'] .'" method="get" accept-charset="utf-8">
 	<label for="nid">NID</label><input type="text" name="nid" value="" id="nid">
+	'.rocketD_admin_tool_get_form_page_input().'
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>';
 
@@ -30,8 +21,6 @@ if(is_numeric($uid) && $uid > 0)
 {
 	echo '<h1>Data for user '.$uid.':</h1>';
 	
-	$UM = \rocketD\auth\AuthManager::getInstance();
-	$result = $UM->fetchUserByID($uid);
 	$lastLogin = $result->lastLogin;
 	
 	echo '<h2>User Info:</h2><hr>';
