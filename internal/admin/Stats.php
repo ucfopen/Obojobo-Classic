@@ -15,8 +15,6 @@ $gateway = \AppCfg::URL_WEB . \AppCfg::JSON_GATEWAY;
 				dataType: 'json',
 				success: function(msg)
 					{
-						// $('span.first').append(msg.first);
-						// $('span.last').append(msg.last);
 						getMyLOs();
 					}
 			});
@@ -171,7 +169,6 @@ $gateway = \AppCfg::URL_WEB . \AppCfg::JSON_GATEWAY;
 		
 		function downloadCSV()
 		{
-			
 			var los = new Array();
 			jQuery("#mylos option:selected").each(function(index,val){
 				los.push(jQuery(this).val());
