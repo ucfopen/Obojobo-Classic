@@ -36,7 +36,7 @@ function create_initial_taxonomies() {
 		'query_var' => 'tag',
 		'rewrite' => did_action( 'init' ) ? array(
 					'slug' => get_option('tag_base') ? get_option('tag_base') : 'tag',
-					'with_front' => ( get_option('category_base') && ! $wp_rewrite->using_index_permalinks() ) ? false : true ) : false,
+					'with_front' => ( get_option('tag_base') && ! $wp_rewrite->using_index_permalinks() ) ? false : true ) : false,
 		'public' => true,
 		'show_ui' => true,
 		'_builtin' => true,
@@ -354,7 +354,7 @@ function register_taxonomy( $taxonomy, $object_type, $args = array() ) {
 	unset( $args['capabilities'] );
 
 	$args['name'] = $taxonomy;
-	$args['object_type'] = (array) $object_type;
+	$args['object_type'] =  array_unique( (array)$object_type );
 
 	$args['labels'] = get_taxonomy_labels( (object) $args );
 	$args['label'] = $args['labels']->name;
@@ -404,6 +404,7 @@ function get_taxonomy_labels( $tax ) {
 		'parent_item' => array( null, __( 'Parent Category' ) ),
 		'parent_item_colon' => array( null, __( 'Parent Category:' ) ),
 		'edit_item' => array( __( 'Edit Tag' ), __( 'Edit Category' ) ),
+		'view_item' => array( __( 'View Tag' ), __( 'View Category' ) ),
 		'update_item' => array( __( 'Update Tag' ), __( 'Update Category' ) ),
 		'add_new_item' => array( __( 'Add New Tag' ), __( 'Add New Category' ) ),
 		'new_item_name' => array( __( 'New Tag Name' ), __( 'New Category Name' ) ),
@@ -437,7 +438,8 @@ function register_taxonomy_for_object_type( $taxonomy, $object_type) {
 	if ( ! get_post_type_object($object_type) )
 		return false;
 
-	$wp_taxonomies[$taxonomy]->object_type[] = $object_type;
+	if ( ! in_array( $object_type, $wp_taxonomies[$taxonomy]->object_type ) )
+		$wp_taxonomies[$taxonomy]->object_type[] = $object_type;
 
 	return true;
 }
@@ -539,7 +541,7 @@ class WP_Tax_Query {
 	 *		Possible values: 'term_id', 'slug' or 'name'
 	 *		Default: 'term_id'
 	 * - 'operator' string (optional)
-	 *		Possible values: 'IN' and 'NOT IN'.
+	 *		Possible values: 'AND', 'IN' or 'NOT IN'.
 	 *		Default: 'IN'
 	 * - 'include_children' bool (optional) Whether to include child terms.
 	 *		Default: true
@@ -548,7 +550,7 @@ class WP_Tax_Query {
 	 * @access public
 	 * @var array
 	 */
-	var $queries = array();
+	public $queries = array();
 
 	/**
 	 * The relation between the queries. Can be one of 'AND' or 'OR'.
@@ -557,10 +559,19 @@ class WP_Tax_Query {
 	 * @access public
 	 * @var string
 	 */
-	var $relation;
+	public $relation;
 
 	/**
-	 * PHP4 type constructor.
+	 * Standard response when the query should not return any rows.
+	 *
+	 * @since 3.2.0
+	 * @access private
+	 * @var string
+	 */
+	private static $no_results = array( 'join' => '', 'where' => ' AND 0 = 1' );
+
+	/**
+	 * Constructor.
 	 *
 	 * Parses a compact tax query and sets defaults.
 	 *
@@ -581,10 +592,8 @@ class WP_Tax_Query {
 	 *      'field' => 'slug',
 	 *    ),
 	 *  )
-	 *
-	 * @return WP_Tax_Query
 	 */
-	function WP_Tax_Query( $tax_query ) {
+	public function __construct( $tax_query ) {
 		if ( isset( $tax_query['relation'] ) && strtoupper( $tax_query['relation'] ) == 'OR' ) {
 			$this->relation = 'OR';
 		} else {
@@ -621,7 +630,7 @@ class WP_Tax_Query {
 	 * @param string $primary_id_column
 	 * @return array
 	 */
-	function get_sql( $primary_table, $primary_id_column ) {
+	public function get_sql( $primary_table, $primary_id_column ) {
 		global $wpdb;
 
 		$join = '';
@@ -629,31 +638,13 @@ class WP_Tax_Query {
 		$i = 0;
 
 		foreach ( $this->queries as $query ) {
+			$this->clean_query( $query );
+
+			if ( is_wp_error( $query ) ) {
+				return self::$no_results;
+			}
+
 			extract( $query );
-
-			if ( ! taxonomy_exists( $taxonomy ) )
-				return array( 'join' => '', 'where' => ' AND 0 = 1');
-
-			$terms = array_unique( (array) $terms );
-
-			if ( empty( $terms ) )
-				continue;
-
-			if ( is_taxonomy_hierarchical( $taxonomy ) && $include_children ) {
-				$this->_transform_terms( $terms, $taxonomy, $field, 'term_id' );
-
-				$children = array();
-				foreach ( $terms as $term ) {
-					$children = array_merge( $children, get_term_children( $term, $taxonomy ) );
-					$children[] = $term;
-				}
-				$terms = $children;
-
-				$this->_transform_terms( $terms, $taxonomy, 'term_id', 'term_taxonomy_id' );
-			}
-			else {
-				$this->_transform_terms( $terms, $taxonomy, $field, 'term_taxonomy_id' );
-			}
 
 			if ( 'IN' == $operator ) {
 
@@ -661,7 +652,7 @@ class WP_Tax_Query {
 					if ( 'OR' == $this->relation )
 						continue;
 					else
-						return array( 'join' => '', 'where' => ' AND 0 = 1' );
+						return self::$no_results;
 				}
 
 				$terms = implode( ',', $terms );
@@ -694,12 +685,12 @@ class WP_Tax_Query {
 
 				$terms = implode( ',', $terms );
 
-				$where[] = "$primary_table.$primary_id_column IN (
-					SELECT object_id
+				$where[] = "(
+					SELECT COUNT(1)
 					FROM $wpdb->term_relationships
 					WHERE term_taxonomy_id IN ($terms)
-					GROUP BY object_id HAVING COUNT(object_id) = $num_terms
-				)";
+					AND object_id = $primary_table.$primary_id_column
+				) = $num_terms";
 			}
 
 			$i++;
@@ -714,49 +705,88 @@ class WP_Tax_Query {
 	}
 
 	/**
-	 * Transforms a list of terms, from one field to another.
+	 * Validates a single query.
 	 *
-	 * @since 3.1.0
+	 * @since 3.2.0
 	 * @access private
 	 *
-	 * @param array &$terms The list of terms
-	 * @param string $taxonomy The taxonomy of the terms
-	 * @param string $field The initial field
+	 * @param array &$query The single query
+	 */
+	private function clean_query( &$query ) {
+		if ( ! taxonomy_exists( $query['taxonomy'] ) ) {
+			$query = new WP_Error( 'Invalid taxonomy' );
+			return;
+		}
+
+		$query['terms'] = array_unique( (array) $query['terms'] );
+
+		if ( is_taxonomy_hierarchical( $query['taxonomy'] ) && $query['include_children'] ) {
+			$this->transform_query( $query, 'term_id' );
+
+			if ( is_wp_error( $query ) )
+				return;
+
+			$children = array();
+			foreach ( $query['terms'] as $term ) {
+				$children = array_merge( $children, get_term_children( $term, $query['taxonomy'] ) );
+				$children[] = $term;
+			}
+			$query['terms'] = $children;
+		}
+
+		$this->transform_query( $query, 'term_taxonomy_id' );
+	}
+
+	/**
+	 * Transforms a single query, from one field to another.
+	 *
+	 * @since 3.2.0
+	 * @access private
+	 *
+	 * @param array &$query The single query
 	 * @param string $resulting_field The resulting field
 	 */
-	function _transform_terms( &$terms, $taxonomy, $field, $resulting_field ) {
+	private function transform_query( &$query, $resulting_field ) {
 		global $wpdb;
 
-		if ( empty( $terms ) )
+		if ( empty( $query['terms'] ) )
 			return;
 
-		if ( $field == $resulting_field )
+		if ( $query['field'] == $resulting_field )
 			return;
 
 		$resulting_field = esc_sql( $resulting_field );
 
-		switch ( $field ) {
+		switch ( $query['field'] ) {
 			case 'slug':
 			case 'name':
-				$terms = "'" . implode( "','", array_map( 'sanitize_title_for_query', $terms ) ) . "'";
+				$terms = "'" . implode( "','", array_map( 'sanitize_title_for_query', $query['terms'] ) ) . "'";
 				$terms = $wpdb->get_col( "
 					SELECT $wpdb->term_taxonomy.$resulting_field
 					FROM $wpdb->term_taxonomy
 					INNER JOIN $wpdb->terms USING (term_id)
-					WHERE taxonomy = '$taxonomy'
-					AND $wpdb->terms.$field IN ($terms)
+					WHERE taxonomy = '{$query['taxonomy']}'
+					AND $wpdb->terms.{$query['field']} IN ($terms)
 				" );
 				break;
 
 			default:
-				$terms = implode( ',', array_map( 'intval', $terms ) );
+				$terms = implode( ',', array_map( 'intval', $query['terms'] ) );
 				$terms = $wpdb->get_col( "
 					SELECT $resulting_field
 					FROM $wpdb->term_taxonomy
-					WHERE taxonomy = '$taxonomy'
+					WHERE taxonomy = '{$query['taxonomy']}'
 					AND term_id IN ($terms)
 				" );
 		}
+
+		if ( 'AND' == $query['operator'] && count( $terms ) < count( $query['terms'] ) ) {
+			$query = new WP_Error( 'Inexistent terms' );
+			return;
+		}
+
+		$query['terms'] = $terms;
+		$query['field'] = $resulting_field;
 	}
 }
 
@@ -1100,6 +1130,11 @@ function get_term_to_edit( $id, $taxonomy ) {
  * The 'parent' argument is different from 'child_of' in that a term X is considered a 'parent'
  * of term Y only if term X is the father of term Y, not its grandfather or great-grandfather, etc.
  *
+ * The 'cache_domain' argument enables a unique cache key to be produced when this query is stored
+ * in object cache. For instance, if you are using one of this function's filters to modify the
+ * query (such as 'terms_clauses'), setting 'cache_domain' to a unique value will not overwrite
+ * the cache for similar queries. Default value is 'core'.
+ *
  * @package WordPress
  * @subpackage Taxonomy
  * @since 2.3.0
@@ -1132,7 +1167,7 @@ function &get_terms($taxonomies, $args = '') {
 		'hide_empty' => true, 'exclude' => array(), 'exclude_tree' => array(), 'include' => array(),
 		'number' => '', 'fields' => 'all', 'slug' => '', 'parent' => '',
 		'hierarchical' => true, 'child_of' => 0, 'get' => '', 'name__like' => '',
-		'pad_counts' => false, 'offset' => '', 'search' => '');
+		'pad_counts' => false, 'offset' => '', 'search' => '', 'cache_domain' => 'core' );
 	$args = wp_parse_args( $args, $defaults );
 	$args['number'] = absint( $args['number'] );
 	$args['offset'] = absint( $args['offset'] );
@@ -1194,6 +1229,8 @@ function &get_terms($taxonomies, $args = '') {
 		$orderby = '';
 	elseif ( empty($_orderby) || 'id' == $_orderby )
 		$orderby = 't.term_id';
+	else
+		$orderby = 't.name';
 
 	$orderby = apply_filters( 'get_terms_orderby', $orderby, $args );
 
@@ -1201,6 +1238,10 @@ function &get_terms($taxonomies, $args = '') {
 		$orderby = "ORDER BY $orderby";
 	else
 		$order = '';
+
+	$order = strtoupper( $order );
+	if ( '' !== $order && !in_array( $order, array( 'ASC', 'DESC' ) ) )
+		$order = 'ASC';
 
 	$where = "tt.taxonomy IN ('" . implode("', '", $taxonomies) . "')";
 	$inclusions = '';

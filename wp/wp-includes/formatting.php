@@ -28,14 +28,10 @@
  */
 function wptexturize($text) {
 	global $wp_cockneyreplace;
-	static $static_setup = false, $opening_quote, $closing_quote, $default_no_texturize_tags, $default_no_texturize_shortcodes, $static_characters, $static_replacements, $dynamic_characters, $dynamic_replacements;
-	$output = '';
-	$curl = '';
-	$textarr = preg_split('/(<.*>|\[.*\])/Us', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-	$stop = count($textarr);
+	static $opening_quote, $closing_quote, $default_no_texturize_tags, $default_no_texturize_shortcodes, $static_characters, $static_replacements, $dynamic_characters, $dynamic_replacements;
 
-	// No need to set up these variables more than once
-	if (!$static_setup) {
+	// No need to set up these static variables more than once
+	if ( empty( $opening_quote ) ) {
 		/* translators: opening curly quote */
 		$opening_quote = _x('&#8220;', 'opening curly quote');
 		/* translators: closing curly quote */
@@ -58,8 +54,6 @@ function wptexturize($text) {
 
 		$dynamic_characters = array('/\'(\d\d(?:&#8217;|\')?s)/', '/\'(\d)/', '/(\s|\A|[([{<]|")\'/', '/(\d)"/', '/(\d)\'/', '/(\S)\'([^\'\s])/', '/(\s|\A|[([{<])"(?!\s)/', '/"(\s|\S|\Z)/', '/\'([\s.]|\Z)/', '/\b(\d+)x(\d+)\b/');
 		$dynamic_replacements = array('&#8217;$1','&#8217;$1', '$1&#8216;', '$1&#8243;', '$1&#8242;', '$1&#8217;$2', '$1' . $opening_quote . '$2', $closing_quote . '$1', '&#8217;$1', '$1&#215;$2');
-
-		$static_setup = true;
 	}
 
 	// Transform into regexp sub-expression used in _wptexturize_pushpop_element
@@ -70,32 +64,27 @@ function wptexturize($text) {
 	$no_texturize_tags_stack = array();
 	$no_texturize_shortcodes_stack = array();
 
-	for ( $i = 0; $i < $stop; $i++ ) {
-		$curl = $textarr[$i];
+	$textarr = preg_split('/(<.*>|\[.*\])/Us', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-		if ( !empty($curl) && '<' != $curl[0] && '[' != $curl[0]
-				&& empty($no_texturize_shortcodes_stack) && empty($no_texturize_tags_stack)) {
-			// This is not a tag, nor is the texturization disabled
-			// static strings
+	foreach ( $textarr as &$curl ) {
+		if ( empty( $curl ) )
+			continue;
+
+		// Only call _wptexturize_pushpop_element if first char is correct tag opening
+		$first = $curl[0];
+		if ( '<' === $first ) {
+			_wptexturize_pushpop_element($curl, $no_texturize_tags_stack, $no_texturize_tags, '<', '>');
+		} elseif ( '[' === $first ) {
+			_wptexturize_pushpop_element($curl, $no_texturize_shortcodes_stack, $no_texturize_shortcodes, '[', ']');
+		} elseif ( empty($no_texturize_shortcodes_stack) && empty($no_texturize_tags_stack) ) {
+			// This is not a tag, nor is the texturization disabled static strings
 			$curl = str_replace($static_characters, $static_replacements, $curl);
 			// regular expressions
 			$curl = preg_replace($dynamic_characters, $dynamic_replacements, $curl);
-		} elseif (!empty($curl)) {
-			/*
-			 * Only call _wptexturize_pushpop_element if first char is correct
-			 * tag opening
-			 */
-			if ('<' == $curl[0])
-				_wptexturize_pushpop_element($curl, $no_texturize_tags_stack, $no_texturize_tags, '<', '>');
-			elseif ('[' == $curl[0])
-				_wptexturize_pushpop_element($curl, $no_texturize_shortcodes_stack, $no_texturize_shortcodes, '[', ']');
 		}
-
 		$curl = preg_replace('/&([^#])(?![a-zA-Z1-4]{1,8};)/', '&#038;$1', $curl);
-		$output .= $curl;
 	}
-
-	return $output;
+	return implode( '', $textarr );
 }
 
 /**
@@ -573,7 +562,7 @@ function remove_accents($string) {
 		chr(195).chr(176) => 'd', chr(195).chr(177) => 'n',
 		chr(195).chr(178) => 'o', chr(195).chr(179) => 'o',
 		chr(195).chr(180) => 'o', chr(195).chr(181) => 'o',
-		chr(195).chr(182) => 'o', chr(195).chr(182) => 'o',
+		chr(195).chr(182) => 'o', chr(195).chr(184) => 'o',
 		chr(195).chr(185) => 'u', chr(195).chr(186) => 'u',
 		chr(195).chr(187) => 'u', chr(195).chr(188) => 'u',
 		chr(195).chr(189) => 'y', chr(195).chr(190) => 'th',
@@ -876,7 +865,7 @@ function sanitize_sql_orderby( $orderby ){
 /**
  * Santizes a html classname to ensure it only contains valid characters
  *
- * Strips the string down to A-Z,a-z,0-9,'-' if this results in an empty
+ * Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
  * string then it will return the alternative value supplied.
  *
  * @todo Expand to support the full range of CDATA that a class attribute can contain.
@@ -890,10 +879,10 @@ function sanitize_sql_orderby( $orderby ){
  */
 function sanitize_html_class( $class, $fallback = '' ) {
 	//Strip out any % encoded octets
-	$sanitized = preg_replace('|%[a-fA-F0-9][a-fA-F0-9]|', '', $class);
+	$sanitized = preg_replace( '|%[a-fA-F0-9][a-fA-F0-9]|', '', $class );
 
-	//Limit to A-Z,a-z,0-9,'-'
-	$sanitized = preg_replace('/[^A-Za-z0-9-]/', '', $sanitized);
+	//Limit to A-Z,a-z,0-9,_,-
+	$sanitized = preg_replace( '/[^A-Za-z0-9_-]/', '', $sanitized );
 
 	if ( '' == $sanitized )
 		$sanitized = $fallback;
@@ -1238,7 +1227,7 @@ function addslashes_gpc($gpc) {
  *
  * @since 2.0.0
  *
- * @param array|string $value The array or string to be striped.
+ * @param array|string $value The array or string to be stripped.
  * @return array|string Stripped array (or string in the callback).
  */
 function stripslashes_deep($value) {
@@ -1599,8 +1588,8 @@ function _wp_iso_convert( $match ) {
  *
  * Requires and returns a date in the Y-m-d H:i:s format. Simply subtracts the
  * value of the 'gmt_offset' option. Return format can be overridden using the
- * $format parameter. If PHP5 is supported, the function uses the DateTime and
- * DateTimeZone objects to respect time zone differences in DST.
+ * $format parameter. The DateTime and DateTimeZone classes are used to respect
+ * time zone differences in DST.
  *
  * @since 1.2.0
  *
@@ -1612,8 +1601,7 @@ function _wp_iso_convert( $match ) {
 function get_gmt_from_date($string, $format = 'Y-m-d H:i:s') {
 	preg_match('#([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})#', $string, $matches);
 	$tz = get_option('timezone_string');
-	if( class_exists('DateTime') && $tz ) {
-		//PHP5
+	if ( $tz ) {
 		date_default_timezone_set( $tz );
 		$datetime = new DateTime( $string );
 		$datetime->setTimezone( new DateTimeZone('UTC') );
@@ -1622,9 +1610,7 @@ function get_gmt_from_date($string, $format = 'Y-m-d H:i:s') {
 		$string_gmt = gmdate($format, $datetime->format('U'));
 
 		date_default_timezone_set('UTC');
-	}
-	else {
-		//PHP4
+	} else {
 		$string_time = gmmktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
 		$string_gmt = gmdate($format, $string_time - get_option('gmt_offset') * 3600);
 	}
@@ -2440,7 +2426,14 @@ function sanitize_option($option, $value) {
 					add_settings_error('admin_email', 'invalid_admin_email', __('The email address entered did not appear to be a valid email address. Please enter a valid email address.'));
 			}
 			break;
-
+		case 'new_admin_email':
+			$value = sanitize_email($value);
+			if ( !is_email($value) ) {
+				$value = get_option( $option ); // Resets option to stored value in the case of failed sanitization
+				if ( function_exists('add_settings_error') )
+					add_settings_error('new_admin_email', 'invalid_admin_email', __('The email address entered did not appear to be a valid email address. Please enter a valid email address.'));
+			}
+			break;
 		case 'thumbnail_size_w':
 		case 'thumbnail_size_h':
 		case 'medium_size_w':
@@ -2532,6 +2525,20 @@ function sanitize_option($option, $value) {
 				$value = get_option( $option ); // Resets option to stored value in the case of failed sanitization
 				if ( function_exists('add_settings_error') )
 					add_settings_error('home', 'invalid_home', __('The Site address you entered did not appear to be a valid URL. Please enter a valid URL.'));
+			}
+			break;
+		case 'WPLANG':
+			$allowed = get_available_languages();
+			if ( ! in_array( $value, $allowed ) && ! empty( $value ) )
+				$value = get_option( $option );
+			break;
+
+		case 'timezone_string':
+			$allowed_zones = timezone_identifiers_list();
+			if ( ! in_array( $value, $allowed_zones ) && ! empty( $value ) ) {
+				$value = get_option( $option ); // Resets option to stored value in the case of failed sanitization
+				if ( function_exists('add_settings_error') )
+					add_settings_error('timezone_string', 'invalid_timezone_string', __('The timezone you have entered is not valid. Please select a valid timezone.') );
 			}
 			break;
 
@@ -2678,7 +2685,7 @@ function wp_sprintf_l($pattern, $args) {
 
 	// Translate and filter the delimiter set (avoid ampersands and entities here)
 	$l = apply_filters('wp_sprintf_l', array(
-		/* translators: used between list items, there is a space after the coma */
+		/* translators: used between list items, there is a space after the comma */
 		'between'          => __(', '),
 		/* translators: used between list items, there is a space after the and */
 		'between_last_two' => __(', and '),
@@ -2769,7 +2776,7 @@ function _links_add_base($m) {
  * This function by default only applies to <a> tags, however this can be
  * modified by the 3rd param.
  *
- * <b>NOTE:</b> Any current target attributed will be striped and replaced.
+ * <b>NOTE:</b> Any current target attributed will be stripped and replaced.
  *
  * @since 2.7.0
  *
@@ -2912,7 +2919,7 @@ function capital_P_dangit( $text ) {
  * @return string Sanitized mime type
  */
 function sanitize_mime_type( $mime_type ) {
-	$sani_mime_type = preg_replace( '/[^-*.a-zA-Z0-9\/]/', '', $mime_type );
+	$sani_mime_type = preg_replace( '/[^-+*.a-zA-Z0-9\/]/', '', $mime_type );
 	return apply_filters( 'sanitize_mime_type', $sani_mime_type, $mime_type );
 }
 

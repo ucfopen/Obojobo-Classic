@@ -1,5 +1,5 @@
 <?php
-define( "WP_INSTALLING", true );
+define( 'WP_INSTALLING', true );
 
 /** Sets up the WordPress Environment. */
 require( dirname(__FILE__) . '/wp-load.php' );
@@ -14,10 +14,10 @@ if ( !is_multisite() ) {
 if ( is_object( $wp_object_cache ) )
 	$wp_object_cache->cache_enabled = false;
 
-do_action("activate_header");
+do_action( 'activate_header' );
 
 function do_activate_header() {
-	do_action("activate_wp_head");
+	do_action( 'activate_wp_head' );
 }
 add_action( 'wp_head', 'do_activate_header' );
 
@@ -87,9 +87,9 @@ get_header();
 			</div>
 
 			<?php if ( $url != network_home_url('', 'http') ) : ?>
-				<p class="view"><?php printf( __('Your account is now activated. <a href="%1$s">View your site</a> or <a href="%2$s">Login</a>'), $url, $url . 'wp-login.php' ); ?></p>
+				<p class="view"><?php printf( __('Your account is now activated. <a href="%1$s">View your site</a> or <a href="%2$s">Log in</a>'), $url, $url . 'wp-login.php' ); ?></p>
 			<?php else: ?>
-				<p class="view"><?php printf( __('Your account is now activated. <a href="%1$s">Login</a> or go back to the <a href="%2$s">homepage</a>.' ), network_site_url('wp-login.php', 'login'), network_home_url() ); ?></p>
+				<p class="view"><?php printf( __('Your account is now activated. <a href="%1$s">Log in</a> or go back to the <a href="%2$s">homepage</a>.' ), network_site_url('wp-login.php', 'login'), network_home_url() ); ?></p>
 			<?php endif;
 		}
 	}

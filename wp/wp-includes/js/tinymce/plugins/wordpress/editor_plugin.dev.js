@@ -67,7 +67,6 @@
 			// Register buttons
 			ed.addButton('wp_more', {
 				title : 'wordpress.wp_more_desc',
-				image : url + '/img/more.gif',
 				cmd : 'WP_More'
 			});
 
@@ -79,13 +78,11 @@
 
 			ed.addButton('wp_help', {
 				title : 'wordpress.wp_help_desc',
-				image : url + '/img/help.gif',
 				cmd : 'WP_Help'
 			});
 
 			ed.addButton('wp_adv', {
 				title : 'wordpress.wp_adv_desc',
-				image : url + '/img/toolbars.gif',
 				cmd : 'WP_Adv'
 			});
 
@@ -189,6 +186,9 @@
 					}
 				});
 
+				if ( ed.id != 'wp_mce_fullscreen' )
+					ed.dom.addClass(ed.getBody(), 'wp-editor');
+
 				// remove invalid parent paragraphs when pasting HTML and/or switching to the HTML editor and back
 				ed.onBeforeSetContent.add(function(ed, o) {
 					if ( o.content ) {
@@ -198,14 +198,25 @@
 				});
 			});
 
-			// Word count if script is loaded
-			if ( 'undefined' != typeof wpWordCount ) {
+			// Word count
+			if ( 'undefined' != typeof(jQuery) ) {
 				ed.onKeyUp.add(function(ed, e) {
-					if ( e.keyCode == last ) return;
-					if ( 13 == e.keyCode || 8 == last || 46 == last ) wpWordCount.wc( ed.getContent({format : 'raw'}) );
-					last = e.keyCode;
+					var k = e.keyCode || e.charCode;
+
+					if ( k == last )
+						return;
+
+					if ( 13 == k || 8 == last || 46 == last )
+						jQuery(document).triggerHandler('wpcountwords', [ ed.getContent({format : 'raw'}) ]);
+
+					last = k;
 				});
 			};
+
+			// keep empty paragraphs :(
+			ed.onSaveContent.addToTop(function(ed, o) {
+				o.content = o.content.replace(/<p>(<br ?\/?>|\u00a0|\uFEFF)?<\/p>/g, '<p>&nbsp;</p>');
+			});
 
 			ed.onSaveContent.add(function(ed, o) {
 				if ( typeof(switchEditors) == 'object' ) {

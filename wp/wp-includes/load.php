@@ -2,6 +2,8 @@
 /**
  * These functions are needed to load WordPress.
  *
+ * @internal This file must be parsable by PHP4.
+ *
  * @package WordPress
  */
 
@@ -94,6 +96,9 @@ function wp_fix_server_vars() {
  * Check for the required PHP version, and the MySQL extension or a database drop-in.
  *
  * Dies if requirements are not met.
+ *
+ * This function must be able to work without a complete environment set up. In wp-load.php, for
+ * example, WP_CONTENT_DIR is defined and version.php is included before this function is called.
  *
  * @access private
  * @since 3.0.0
@@ -271,10 +276,7 @@ function wp_debug_mode() {
 			ini_set( 'error_log', WP_CONTENT_DIR . '/debug.log' );
 		}
 	} else {
-		if ( defined( 'E_RECOVERABLE_ERROR' ) )
-			error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
-		else
-			error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING );
+		error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
 	}
 }
 
@@ -283,8 +285,10 @@ function wp_debug_mode() {
  *
  * To set directory manually, define <code>WP_LANG_DIR</code> in wp-config.php.
  *
- * First looks for language folder in WP_CONTENT_DIR and uses that folder if it
- * exists. Or it uses the "languages" folder in WPINC.
+ * If the language directory exists within WP_CONTENT_DIR that is used
+ * Otherwise if the language directory exists within WPINC, that's used
+ * Finally, If neither of the preceeding directories is found,
+ * WP_CONTENT_DIR/languages is used.
  *
  * The WP_LANG_DIR constant was introduced in 2.1.0.
  *
@@ -293,7 +297,7 @@ function wp_debug_mode() {
  */
 function wp_set_lang_dir() {
 	if ( !defined( 'WP_LANG_DIR' ) ) {
-		if ( file_exists( WP_CONTENT_DIR . '/languages' ) && @is_dir( WP_CONTENT_DIR . '/languages' ) ) {
+		if ( file_exists( WP_CONTENT_DIR . '/languages' ) && @is_dir( WP_CONTENT_DIR . '/languages' ) || !@is_dir(ABSPATH . WPINC . '/languages') ) {
 			define( 'WP_LANG_DIR', WP_CONTENT_DIR . '/languages' ); // no leading slash, no trailing slash, full path, not relative to ABSPATH
 			if ( !defined( 'LANGDIR' ) ) {
 				// Old static relative path maintained for limited backwards compatibility - won't work in some cases
@@ -554,19 +558,16 @@ function shutdown_action_hook() {
 /**
  * Copy an object.
  *
- * Returns a cloned copy of an object.
- *
  * @since 2.7.0
+ * @deprecated 3.2
  *
  * @param object $object The object to clone
  * @return object The cloned object
  */
-function wp_clone( $object ) {
-	static $can_clone;
-	if ( !isset( $can_clone ) )
-		$can_clone = version_compare( phpversion(), '5.0', '>=' );
 
-	return $can_clone ? clone( $object ) : $object;
+function wp_clone( $object ) {
+	// Use parens for clone to accommodate PHP 4.  See #17880
+	return clone( $object );
 }
 
 /**

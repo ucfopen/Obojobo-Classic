@@ -1,6 +1,6 @@
 <?php
 /**
- * Link Management Administration Panel.
+ * Link Management Administration Screen.
  *
  * @package WordPress
  * @subpackage Administration
@@ -46,7 +46,7 @@ add_contextual_help( $current_screen,
     '<p>' . __('You can customize the display of this screen using the Screen Options tab and/or the dropdown filters above the links table.') . '</p>' .
     '<p>' . __('If you delete a link, it will be removed permanently, as Links do not have a Trash function yet.') . '</p>' .
 	'<p><strong>' . __('For more information:') . '</strong></p>' .
-	'<p>' . __('<a href="http://codex.wordpress.org/Links_Links_SubPanel" target="_blank">Documentation on Managing Links</a>') . '</p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Links_Screen" target="_blank">Documentation on Managing Links</a>') . '</p>' .
 	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 );
 
@@ -59,7 +59,7 @@ if ( ! current_user_can('manage_links') )
 
 <div class="wrap nosubsub">
 <?php screen_icon(); ?>
-<h2><?php echo esc_html( $title ); ?> <a href="link-add.php" class="button add-new-h2"><?php echo esc_html_x('Add New', 'link'); ?></a> <?php
+<h2><?php echo esc_html( $title ); ?> <a href="link-add.php" class="add-new-h2"><?php echo esc_html_x('Add New', 'link'); ?></a> <?php
 if ( !empty($_REQUEST['s']) )
 	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html( stripslashes($_REQUEST['s']) ) ); ?>
 </h2>

@@ -228,6 +228,10 @@ function media_handle_upload($file_id, $post_id, $post_data = array(), $override
 		'post_content' => $content,
 	), $post_data );
 
+	// This should never be set as it would then overwrite an existing attachment.
+	if ( isset( $attachment['ID'] ) )
+		unset( $attachment['ID'] );
+
 	// Save the data
 	$id = wp_insert_attachment($attachment, $file, $post_id);
 	if ( !is_wp_error($id) ) {
@@ -280,6 +284,10 @@ function media_handle_sideload($file_array, $post_id, $desc = null, $post_data =
 		'post_title' => $title,
 		'post_content' => $content,
 	), $post_data );
+
+	// This should never be set as it would then overwrite an existing attachment.
+	if ( isset( $attachment['ID'] ) )
+		unset( $attachment['ID'] );
 
 	// Save the attachment metadata
 	$id = wp_insert_attachment($attachment, $file, $post_id);
@@ -337,7 +345,16 @@ if ( is_string($content_func) )
 	do_action( "admin_head_{$content_func}" );
 ?>
 </head>
-<body<?php if ( isset($GLOBALS['body_id']) ) echo ' id="' . $GLOBALS['body_id'] . '"'; ?>>
+<body<?php if ( isset($GLOBALS['body_id']) ) echo ' id="' . $GLOBALS['body_id'] . '"'; ?> class="no-js">
+<script type="text/javascript">
+//<![CDATA[
+(function(){
+var c = document.body.className;
+c = c.replace(/no-js/, 'js');
+document.body.className = c;
+})();
+//]]>
+</script>
 <?php
 	$args = func_get_args();
 	$args = array_slice($args, 1);
@@ -419,6 +436,11 @@ function media_upload_form_handler() {
 
 	if ( !empty($_POST['attachments']) ) foreach ( $_POST['attachments'] as $attachment_id => $attachment ) {
 		$post = $_post = get_post($attachment_id, ARRAY_A);
+		$post_type_object = get_post_type_object( $post[ 'post_type' ] );
+
+		if ( !current_user_can( $post_type_object->cap->edit_post, $attachment_id ) )
+			continue;
+
 		if ( isset($attachment['post_content']) )
 			$post['post_content'] = $attachment['post_content'];
 		if ( isset($attachment['post_title']) )
@@ -1350,7 +1372,7 @@ function get_media_item( $attachment_id, $args = null ) {
 			if ( user_can_richedit() ) { // textarea_escaped when user_can_richedit() = false
 				$field['value'] = esc_textarea( $field['value'] );
 			}
-			$item .= "<textarea type='text' id='$name' name='$name' $aria_required>" . $field['value'] . '</textarea>';
+			$item .= "<textarea id='$name' name='$name' $aria_required>" . $field['value'] . '</textarea>';
 		} else {
 			$item .= "<input type='text' class='text' id='$name' name='$name' value='" . esc_attr( $field['value'] ) . "' $aria_required />";
 		}
@@ -1551,7 +1573,7 @@ SWFUpload.onload = function() {
 </div>
 <?php endif; // $flash ?>
 
-<div id="html-upload-ui">
+<div id="html-upload-ui" <?php if ( $flash ) echo 'class="hide-if-js"'; ?>>
 <?php do_action('pre-html-upload-ui'); ?>
 	<p id="async-upload-wrap">
 		<label class="screen-reader-text" for="async-upload"><?php _e('Upload'); ?></label>

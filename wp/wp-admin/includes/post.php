@@ -25,9 +25,16 @@ function _wp_translate_postdata( $update = false, $post_data = null ) {
 
 	if ( $update )
 		$post_data['ID'] = (int) $post_data['post_ID'];
-	$post_data['post_content'] = isset($post_data['content']) ? $post_data['content'] : '';
-	$post_data['post_excerpt'] = isset($post_data['excerpt']) ? $post_data['excerpt'] : '';
-	$post_data['post_parent'] = isset($post_data['parent_id'])? $post_data['parent_id'] : '';
+
+	if ( isset( $post_data['content'] ) )
+		$post_data['post_content'] = $post_data['content'];
+
+	if ( isset( $post_data['excerpt'] ) )
+		$post_data['post_excerpt'] = $post_data['excerpt'];
+
+	if ( isset( $post_data['parent_id'] ) )
+		$post_data['post_parent'] = (int) $post_data['parent_id'];
+
 	if ( isset($post_data['trackback_url']) )
 		$post_data['to_ping'] = $post_data['trackback_url'];
 
@@ -134,6 +141,9 @@ function edit_post( $post_data = null ) {
 
 	if ( empty($post_data) )
 		$post_data = &$_POST;
+
+	// Clear out any data in internal vars.
+	unset( $post_data['filter'] );
 
 	$post_ID = (int) $post_data['post_ID'];
 	$post = get_post( $post_ID );
@@ -341,7 +351,8 @@ function bulk_edit_posts( $post_data = null ) {
 			continue;
 		}
 
-		$tax_names = get_object_taxonomies( get_post($post_ID) );
+		$post = get_post( $post_ID );
+		$tax_names = get_object_taxonomies( $post );
 		foreach ( $tax_names as $tax_name ) {
 			$taxonomy_obj = get_taxonomy($tax_name);
 			if (  isset( $tax_input[$tax_name]) && current_user_can( $taxonomy_obj->cap->assign_terms ) )
@@ -362,6 +373,9 @@ function bulk_edit_posts( $post_data = null ) {
 			$post_data['post_category'] = array_unique( array_merge($cats, $new_cats) );
 			unset( $post_data['tax_input']['category'] );
 		}
+
+		$post_data['post_mime_type'] = $post->post_mime_type;
+		$post_data['guid'] = $post->guid;
 
 		$post_data['ID'] = $post_ID;
 		$updated[] = wp_update_post( $post_data );
@@ -534,6 +548,9 @@ function wp_write_post() {
 
 	$_POST['post_mime_type'] = '';
 
+	// Clear out any data in internal vars.
+	unset( $_POST['filter'] );
+
 	// Check for autosave collisions
 	// Does this need to be updated? ~ Mark
 	$temp_id = false;
@@ -551,6 +568,15 @@ function wp_write_post() {
 			update_user_option( $user_ID, 'autosave_draft_ids', $draft_ids );
 			return edit_post();
 		}
+	}
+
+	// Edit don't write if we have a post id.
+	if ( isset( $_POST['ID'] ) ) {
+		$_POST['post_ID'] = $_POST['ID'];
+		unset ( $_POST['ID'] );
+	}
+	if ( isset( $_POST['post_ID'] ) ) {
+		return edit_post();
 	}
 
 	$translated = _wp_translate_postdata( false );
@@ -997,9 +1023,9 @@ function wp_edit_attachments_query( $q = false ) {
 	$q['cat'] = isset( $q['cat'] ) ? (int) $q['cat'] : 0;
 	$q['post_type'] = 'attachment';
 	$post_type = get_post_type_object( 'attachment' );
-	$states = array( 'inherit' );
+	$states = 'inherit';
 	if ( current_user_can( $post_type->cap->read_private_posts ) )
-		$states[] = 'private';
+		$states .= ',private';
 
 	$q['post_status'] = isset( $q['status'] ) && 'trash' == $q['status'] ? 'trash' : $states;
 	$media_per_page = (int) get_user_option( 'upload_per_page' );
@@ -1029,7 +1055,7 @@ function _edit_attachments_query_helper($where) {
 }
 
 /**
- * {@internal Missing Short Description}}
+ * Returns the list of classes to be used by a metabox
  *
  * @uses get_user_option()
  * @since 2.5.0
@@ -1039,17 +1065,20 @@ function _edit_attachments_query_helper($where) {
  * @return unknown
  */
 function postbox_classes( $id, $page ) {
-	if ( isset( $_GET['edit'] ) && $_GET['edit'] == $id )
-		return '';
-
-	if ( $closed = get_user_option('closedpostboxes_'.$page ) ) {
+	if ( isset( $_GET['edit'] ) && $_GET['edit'] == $id ) {
+		$classes = array( '' );
+	} elseif ( $closed = get_user_option('closedpostboxes_'.$page ) ) {
 		if ( !is_array( $closed ) ) {
-			return '';
+			$classes = array( '' );
+		} else {
+			$classes = in_array( $id, $closed ) ? array( 'closed' ) : array( '' );
 		}
-		return in_array( $id, $closed )? 'closed' : '';
 	} else {
-		return '';
+		$classes = array( '' );
 	}
+
+	$classes = apply_filters( "postbox_classes_{$page}_{$id}", $classes );
+	return implode( ' ', $classes );
 }
 
 /**
@@ -1100,6 +1129,7 @@ function get_sample_permalink($id, $title = null, $name = null) {
 		$uri = untrailingslashit($uri);
 		$uri = strrev( stristr( strrev( $uri ), '/' ) );
 		$uri = untrailingslashit($uri);
+		$uri = apply_filters( 'editable_slug', $uri );
 		if ( !empty($uri) )
 			$uri .= '/';
 		$permalink = str_replace('%pagename%', "{$uri}%pagename%", $permalink);
@@ -1418,7 +1448,7 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 		$plugins = apply_filters( 'teeny_mce_plugins', array('inlinepopups', 'fullscreen', 'wordpress', 'wplink', 'wpdialogs') );
 		$ext_plugins = '';
 	} else {
-		$plugins = array( 'inlinepopups', 'spellchecker', 'paste', 'wordpress', 'fullscreen', 'wpeditimage', 'wpgallery', 'tabfocus', 'wplink', 'wpdialogs' );
+		$plugins = array( 'inlinepopups', 'spellchecker', 'tabfocus', 'paste', 'media', 'wordpress', 'wpfullscreen', 'wpeditimage', 'wpgallery', 'wplink', 'wpdialogs' );
 
 		/*
 		The following filter takes an associative array of external plugins for TinyMCE in the form 'plugin_name' => 'url'.
@@ -1559,6 +1589,7 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 		'apply_source_formatting' => false,
 		'remove_linebreaks' => true,
 		'gecko_spellcheck' => true,
+		'keep_styles' => false,
 		'entities' => '38,amp,60,lt,62,gt',
 		'accessibility_focus' => true,
 		'tabfocus_elements' => 'major-publishing-actions',
@@ -1567,7 +1598,9 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 		'paste_remove_spans' => true,
 		'paste_strip_class_attributes' => 'all',
 		'paste_text_use_dialog' => true,
+		'extended_valid_elements' => 'article[*],aside[*],audio[*],canvas[*],command[*],datalist[*],details[*],embed[*],figcaption[*],figure[*],footer[*],header[*],hgroup[*],keygen[*],mark[*],meter[*],nav[*],output[*],progress[*],section[*],source[*],summary,time[*],video[*],wbr',
 		'wpeditimage_disable_captions' => $no_captions,
+		'wp_fullscreen_content_css' => "$baseurl/plugins/wpfullscreen/css/wp-fullscreen.css",
 		'plugins' => implode( ',', $plugins ),
 	);
 
@@ -1622,7 +1655,7 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 	$language = $initArray['language'];
 
 	$compressed = $compress_scripts && $concatenate_scripts && isset($_SERVER['HTTP_ACCEPT_ENCODING'])
-		&& false !== strpos( strtolower($_SERVER['HTTP_ACCEPT_ENCODING']), 'gzip');
+		&& false !== stripos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip');
 
 	/**
 	 * Deprecated
@@ -1643,7 +1676,7 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 			$val = $v ? 'true' : 'false';
 			$mce_options .= $k . ':' . $val . ', ';
 			continue;
-		} elseif ( !empty($v) && is_string($v) && ( '{' == $v{0} || '[' == $v{0} ) ) {
+		} elseif ( !empty($v) && is_string($v) && ( ('{' == $v{0} && '}' == $v{strlen($v) - 1}) || ('[' == $v{0} && ']' == $v{strlen($v) - 1}) || preg_match('/^\(?function ?\(/', $v) ) ) {
 			$mce_options .= $k . ':' . $v . ', ';
 			continue;
 		}
@@ -1651,7 +1684,9 @@ function wp_tiny_mce( $teeny = false, $settings = false ) {
 		$mce_options .= $k . ':"' . $v . '", ';
 	}
 
-	$mce_options = rtrim( trim($mce_options), '\n\r,' ); ?>
+	$mce_options = rtrim( trim($mce_options), '\n\r,' );
+
+	do_action('before_wp_tiny_mce', $initArray); ?>
 
 <script type="text/javascript">
 /* <![CDATA[ */
@@ -1692,20 +1727,138 @@ tinyMCE.init(tinyMCEPreInit.mceInit);
 </script>
 <?php
 
-	// Load additional inline scripts based on active plugins.
-	if ( in_array( 'wpdialogs', $plugins ) ) {
-		wp_print_scripts( array( 'wpdialogs-popup' ) );
+do_action('after_wp_tiny_mce', $initArray);
+}
+
+// Load additional inline scripts based on active plugins.
+function wp_preload_dialogs($init) {
+	$plugins = preg_split('/[ ,-]+/', $init['plugins']);
+
+	if ( in_array( 'wpdialogs', $plugins, true ) ) {
+		wp_print_scripts('wpdialogs-popup');
 		wp_print_styles('wp-jquery-ui-dialog');
 	}
-	if ( in_array( 'wplink', $plugins ) ) {
+
+	if ( in_array( 'wplink', $plugins, true ) ) {
 		require_once ABSPATH . 'wp-admin/includes/internal-linking.php';
-		add_action('tiny_mce_preload_dialogs', 'wp_link_dialog');
+		?><div style="display:none;"><?php wp_link_dialog(); ?></div><?php
 		wp_print_scripts('wplink');
 		wp_print_styles('wplink');
 	}
+
+	// Distraction Free Writing mode
+	if ( in_array( 'wpfullscreen', $plugins, true ) ) {
+		wp_fullscreen_html();
+		wp_print_scripts('wp-fullscreen');
+	}
+
+	wp_print_scripts('word-count');
 }
-function wp_tiny_mce_preload_dialogs() { ?>
-	<div id="preloaded-dialogs" style="display:none;">
-<?php 	do_action('tiny_mce_preload_dialogs'); ?>
+
+function wp_quicktags() {
+	global $tinymce_version;
+
+	wp_preload_dialogs( array( 'plugins' => 'wpdialogs,wplink,wpfullscreen' ) );
+
+	if ( !user_can_richedit() ) {
+		wp_enqueue_style( 'tinymce-buttons', includes_url('js/tinymce/themes/advanced/skins/wp_theme/ui.css'), array(), $tinymce_version );
+		wp_print_styles('tinymce-buttons');
+	}
+}
+
+function wp_print_editor_js() {
+	wp_print_scripts('editor');
+}
+
+function wp_fullscreen_html() {
+	global $content_width, $post;
+
+	$width = isset($content_width) && 800 > $content_width ? $content_width : 800;
+	$width = $width + 10; // compensate for the padding
+	$dfw_width = get_user_setting( 'dfw_width', $width );
+	$save = isset($post->post_status) && $post->post_status == 'publish' ? __('Update') : __('Save');
+?>
+<div id="wp-fullscreen-body">
+<div id="fullscreen-topbar">
+	<div id="wp-fullscreen-toolbar">
+		<div id="wp-fullscreen-close"><a href="#" onclick="fullscreen.off();return false;"><?php _e('Exit fullscreen'); ?></a></div>
+		<div id="wp-fullscreen-central-toolbar" style="width:<?php echo $width; ?>px;">
+
+		<div id="wp-fullscreen-mode-bar"><div id="wp-fullscreen-modes">
+			<a href="#" onclick="fullscreen.switchmode('tinymce');return false;"><?php _e('Visual'); ?></a>
+			<a href="#" onclick="fullscreen.switchmode('html');return false;"><?php _e('HTML'); ?></a>
+		</div></div>
+
+		<div id="wp-fullscreen-button-bar"><div id="wp-fullscreen-buttons" class="wp_themeSkin">
+<?php
+
+	$media_link_type = 'image';
+	if ( is_multisite() && ( ( ! $mu_media_buttons = get_site_option( 'mu_media_buttons' ) ) || empty( $mu_media_buttons['image'] ) ) )
+		$media_link_type = 'media';
+
+	$buttons = array(
+		// format: title, onclick, show in both editors
+		'bold' => array( 'title' => __('Bold (Ctrl + B)'), 'onclick' => 'fullscreen.b();', 'both' => false ),
+		'italic' => array( 'title' => __('Italic (Ctrl + I)'), 'onclick' => 'fullscreen.i();', 'both' => false ),
+		'0' => 'separator',
+		'bullist' => array( 'title' => __('Unordered list (Alt + Shift + U)'), 'onclick' => 'fullscreen.ul();', 'both' => false ),
+		'numlist' => array( 'title' => __('Ordered list (Alt + Shift + O)'), 'onclick' => 'fullscreen.ol();', 'both' => false ),
+		'1' => 'separator',
+		'blockquote' => array( 'title' => __('Blockquote (Alt+Shift+Q)'), 'onclick' => 'fullscreen.blockquote();', 'both' => false ),
+		'image' => array( 'title' => __('Insert/edit image (Alt + Shift + M)'), 'onclick' => "jQuery('#add_{$media_link_type}').click();", 'both' => true ),
+		'2' => 'separator',
+		'link' => array( 'title' => __('Insert/edit link (Alt + Shift + A)'), 'onclick' => 'fullscreen.link();', 'both' => true ),
+		'unlink' => array( 'title' => __('Unlink (Alt + Shift + S)'), 'onclick' => 'fullscreen.unlink();', 'both' => false ),
+		'3' => 'separator',
+		'help' => array( 'title' => __('Help (Alt + Shift + H)'), 'onclick' => 'fullscreen.help();', 'both' => false )
+	);
+
+	$buttons = apply_filters( 'wp_fullscreen_buttons', $buttons );
+
+	foreach ( $buttons as $button => $args ) {
+		if ( 'separator' == $args ) { ?>
+			<div><span aria-orientation="vertical" role="separator" class="mceSeparator"></span></div>
+<?php		continue;
+		} ?>
+
+		<div<?php if ( $args['both'] ) { ?> class="wp-fullscreen-both"<?php } ?>>
+		<a title="<?php echo $args['title']; ?>" onclick="<?php echo $args['onclick']; ?>return false;" class="mceButton mceButtonEnabled mce_<?php echo $button; ?>" href="#" id="wp_fs_<?php echo $button; ?>" role="button" aria-pressed="false">
+		<span class="mceIcon mce_<?php echo $button; ?>"></span>
+		</a>
+		</div>
+<?php
+	} ?>
+
+		</div></div>
+
+		<div id="wp-fullscreen-save">
+			<span><?php if ( $post->post_status == 'publish' ) _e('Updated.'); else _e('Saved.'); ?></span>
+			<img src="images/wpspin_light.gif" alt="" />
+			<input type="button" class="button-primary" value="<?php echo $save; ?>" onclick="fullscreen.save();" />
+		</div>
+
+		</div>
 	</div>
-<?php }
+</div>
+
+<div id="wp-fullscreen-wrap" style="width:<?php echo $dfw_width; ?>px;">
+	<label id="wp-fullscreen-title-prompt-text" for="wp-fullscreen-title"><?php echo apply_filters( 'enter_title_here', __( 'Enter title here' ), $post ); ?></label>
+	<input type="text" id="wp-fullscreen-title" value="" autocomplete="off" />
+
+	<div id="wp-fullscreen-container">
+		<textarea id="wp_mce_fullscreen"></textarea>
+	</div>
+
+	<div id="wp-fullscreen-status">
+		<div id="wp-fullscreen-count"><?php printf( __( 'Word count: %s' ), '<span class="word-count">0</span>' ); ?></div>
+		<div id="wp-fullscreen-tagline"><?php _e('Just write.'); ?></div>
+	</div>
+</div>
+</div>
+
+<div class="fullscreen-overlay" id="fullscreen-overlay"></div>
+<div class="fullscreen-overlay fullscreen-fader fade-600" id="fullscreen-fader"></div>
+<?php
+}
+
+
