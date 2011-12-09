@@ -1,12 +1,15 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 
 $API = \obo\API::getInstance();
+<<<<<<< HEAD
 $result = $API->getSessionRoleValid(array('SuperUser'));
 if(! in_array('SuperUser', $result['hasRoles']) )
 {
 	exit();
 }
+=======
+
+>>>>>>> f3353fe... Adding plugin to execute admin scripts
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST,\AppCfg::DB_USER,\AppCfg::DB_PASS,\AppCfg::DB_NAME,\AppCfg::DB_TYPE));
 //if(!$DBM->db_select('los_backup')) exit('unable to connect to backup database');

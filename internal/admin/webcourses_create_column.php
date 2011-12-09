@@ -3,12 +3,6 @@ require_once(dirname(__FILE__)."/../../internal/app.php");
 // Check for super user
 $API = \obo\API::getInstance();
 
-if(!$API->getSessionValid(\cfg_obo_Role::EMPLOYEE_ROLE))
-{
-	header('HTTP/1.0 404 Not Found');
-	exit();
-}
-
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"

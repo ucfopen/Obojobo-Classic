@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<form action="<?php echo $_SERVER['PHP_SEFL']; ?>" method="post" accept-charset="utf-8">
+<form action="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"]; ?>" method="post" accept-charset="utf-8">
 	<h1>Decode a pasted value</h1>
 	<label for="rawinput">Paste Encoded Data:</label><br><textarea rows="10" cols="100" name="rawinput" id="rawinput"></textarea><br>
 	<label for="base_64_decode">base 64 decode?</label><input type="checkbox" name="base_64_decode" id="base_64_decode"><br>
@@ -38,7 +38,6 @@
 	
 	if($_POST['page_id'])
 	{
-		require_once(dirname(__FILE__)."/../../internal/app.php");
 		$PM = \obo\lo\PageManager::getInstance();
 		$data = $PM->getPage($_POST['page_id']);
 		$_POST['base_64_decode'] = 0;
@@ -48,7 +47,6 @@
 
 	if($_POST['question_id'])
 	{
-		require_once(dirname(__FILE__)."/../../internal/app.php");
 		$QM = \obo\lo\QuestionManager::getInstance();
 		$data = $QM->getQuestion($_POST['question_id']);
 		$_POST['base_64_decode'] = 0;
@@ -58,7 +56,6 @@
 	
 	if($_POST['loid'])
 	{
-		require_once(dirname(__FILE__)."/../../internal/app.php");
 		$DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 		$data = new \obo\lo\LO();
 		$data->dbGetFull($DBM, $_POST['loid']);
@@ -79,7 +76,6 @@
 
 	if($_POST['unserialize'])
 	{
-		require_once(dirname(__FILE__)."/../../internal/app.php");
 		$data = unserialize($data);
 	}
 	
