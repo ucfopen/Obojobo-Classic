@@ -32,8 +32,7 @@ elseif($_REQUEST['inst_id'])
 else
 {
 	echo "else";
-	
-	$track = $TM->getInteractionLogTotals($_REQUEST['inst_id']);
+	// $track = $TM->getInteractionLogTotals($_REQUEST['inst_id']);
 }
 
 if($_REQUEST['formatTime'] == true)
