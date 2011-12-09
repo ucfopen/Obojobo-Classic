@@ -35,7 +35,6 @@ if(!window.obo)
 	window.obo = {};
 }
 
-
 obo.view = function()
 {
 	// @PRIVATE:
@@ -108,6 +107,7 @@ obo.view = function()
 		if(Modernizr.history)
 		{
 			window.onpopstate = function(event) {
+				debug.log('_________________________ASDFSADFSDAFSD');
 				preventUpdateHistoryOnNextRender = true;
 				gotoPageFromURL();
 			};
@@ -122,10 +122,19 @@ obo.view = function()
 				obo.model.gotoStartPageOfNextSection();
 			}
 		}).on('mouseenter', '.subnav-list.assessment li:has(ul)', function(event) {
-			console.log('mouseenter');
-			hideSWFs();
+			debug.log('mouseenter');
+			$ul = $(this).find('ul');
+			$('object').each(function(i, e) {
+				// hide swfs if alts menu would overlap
+				// 40 is a fudge value to account for padding
+				if($ul.offset().top + $ul.height() + 40 >= $(e).offset().top)
+				{
+					hideSWFs();
+					return false; //break
+				}
+			});
 		}).on('mouseleave', '.subnav-list.assessment li:has(ul)', function(event) {
-			console.log('mouseleave');
+			debug.log('mouseleave');
 			unhideSWFs();
 		}).on('click', '.begin-section-button', function(event) {
 			event.preventDefault();
@@ -699,6 +708,7 @@ obo.view = function()
 			if(String(page.layoutID) === '8')
 			{
 				$pageHTML.append($target);
+				$pageHTML.append('<span class="attribution">' + obo.util.createCombinedAttributionString(page.items) + '</span>');
 			}
 			
 			//$('#content').append($pageHTML);
@@ -1308,19 +1318,20 @@ obo.view = function()
 	//var formatPageItemMediaView = function(pageItem)
 	{
 		//var mediaHTML = displayMedia(pageItem.media[0]);
-		$media = obo.media.createMedia(pageItem.media[0], $target, pageItem.options);
-		
-		if(pageItem.options)
+		if($media = obo.media.createMedia(pageItem.media[0], $target, pageItem.options))
 		{
-			$media.addClass('custom-page-item');
-			formatCustomLayoutPageItem($media, pageItem);
+			if(pageItem.options)
+			{
+				$media.addClass('custom-page-item');
+				formatCustomLayoutPageItem($media, pageItem);
+			}
+			else
+			{
+				$media.addClass('page-item');
+			}
+			
+			return $media;
 		}
-		else
-		{
-			$media.addClass('page-item');
-		}
-		
-		return $media;
 	};
 	
 	var formatCustomLayoutPageItem = function(pageItemHTML, pageItem)
@@ -1841,6 +1852,13 @@ obo.view = function()
 		$('object').parent().addClass('stripe-bg');
 	};
 	
+	// returns the currently overlayed swf (if there is one)
+	// in the practice or assessment sections
+	var getOverlayedSWF = function()
+	{
+		return $('#swf-holder .media-for-page-' + obo.model.getSection() + obo.model.getPage() + ' object');
+	}
+	
 	var unhideSWFs = function()
 	{
 		// unhide all content objects:
@@ -1848,8 +1866,7 @@ obo.view = function()
 		$('#content object').parent().removeClass('stripe-bg');
 		
 		// unhide overlay swfs for the current page
-		var s = $('#swf-holder .media-for-page-' + obo.model.getSection() + obo.model.getPage() + ' object');
-		s.css('visibility', 'visible').parent().removeClass('stripe-bg');
+		getOverlayedSWF().css('visibility', 'visible').parent().removeClass('stripe-bg');
 	};
 	
 	// tosses up a error dialog. error can be a string message or an error object

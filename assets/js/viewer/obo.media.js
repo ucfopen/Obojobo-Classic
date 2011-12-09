@@ -159,7 +159,7 @@ obo.media = function()
 	*/
 	var swfize = function()
 	{
-		debug.log('swfize');
+		debug.log('___SWFIZE___');
 		//return;
 		if(AUTOLOAD_FLASH)
 		{
@@ -300,387 +300,383 @@ obo.media = function()
 	// pageItemOptions is for custom layout page items only
 	var createMedia = function(mediaObject, $target, pageItemOptions)
 	{
-		debug.log('createMedia', mediaObject.width, mediaObject.height, mediaObject);
-		//alert(mediaObject.width + ',' + mediaObject.height);
-		var section = obo.model.getSection();
-		var page = obo.model.getPage();
-		
-		var $mediaElement = $('<div class="media-item"></div>');
-		//obo.util.doLater(function() { alert($mediaElement.css('list-style-type')); });
-		
-		
-		//debug.log('createMedia', mediaObject, $target);
-		//mediaObject.itemType = 'cap5';
-		
-		// some useful attributes - we also include page and section for flash overlay hack purposes
-		$mediaElement.attr('data-media-width', mediaObject.width).attr('data-media-height', mediaObject.height);
-		$mediaElement.addClass('media-for-page-' + section + page);
-		
-		switch(mediaObject.itemType.toLowerCase())
+		if(mediaObject)
 		{
-			case 'pic':
-				$target.append($mediaElement);
-				$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
-				$img.one('load', function() {
-					debug.log($(this).parent());
-					$(this).css('background', 'white');
-				}).each(function() {
-					if(this.complete)
-					{
-						$(this).trigger('load');
-					}
-				});
-				$mediaElement.append($img);
-				//$mediaElement.width(mediaObject.width).height(mediaObject.height);
-				break;
-			case 'cap5': // @TODO - is 'cap5' used?
-			case 'swf':
-				// standin represents our media stand-in - where the swf would be placed normally.
-				// we define standin if needed to act as a positioning guide for captivates.
-				var $standin = null;
-				
-				// we assume this is a captivate if it is a swf in an interactive question
-				var isCaptivate = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
-				
-				debug.log(obo.model.getPageObject());
-				debug.log($('.question-page').hasClass('question-type-Media'));
-				debug.log($('.question-page'));
-				// we need to do our swf hack for practice and assessment interactive-only questions
-				
-				if(isCaptivate)
-				{
-					$('#swap-cap').show();
-					
-					// add our swf holder mechanism if it doesn't exist already:
-					if($('#swf-holder-' + section).length === 0)
-					{
-						if($('#swf-holder').length === 0)
-						{
-							$('body').append($('<div id="swf-holder"></div>'));
-						}
-						
-						$('#swf-holder').append($('<div id="swf-holder-' + section + '"></div>'));
-					}
-					
-					// define standin, since we need to overlay captivates
-					$standin = $('<div class="media-item-standin"></div>');
-					
-					// if this captivate already is being overlayed then don't overlay it again!
-					if($('.media-for-page-' + section + page).length > 0)
-					{
-						$mediaElement = $($('.media-for-page-' + section + page)[0]);
-						// @HACK we turn both parent and object visible for Safari
-						$mediaElement.css('visibility', 'visible');
-						$mediaElement.find('object').css('visibility', 'visible');
-					}
-					else
-					{
-						$('#swf-holder-' + section).append($mediaElement);
-					}
-					
-					$target.append($standin);
-					
-				}
-				else
-				{
+			debug.log('createMedia', mediaObject.width, mediaObject.height, mediaObject);
+			//alert(mediaObject.width + ',' + mediaObject.height);
+			var section = obo.model.getSection();
+			var page = obo.model.getPage();
+		
+			var $mediaElement = $('<figure class="media-item"></figure>');
+			//obo.util.doLater(function() { alert($mediaElement.css('list-style-type')); });
+		
+		
+			//debug.log('createMedia', mediaObject, $target);
+			//mediaObject.itemType = 'cap5';
+		
+			// some useful attributes - we also include page and section for flash overlay hack purposes
+			$mediaElement.attr('data-media-width', mediaObject.width).attr('data-media-height', mediaObject.height);
+			$mediaElement.addClass('media-for-page-' + section + page);
+		
+			switch(mediaObject.itemType.toLowerCase())
+			{
+				case 'pic':
 					$target.append($mediaElement);
-				}
-				/*
-				var maxWidth = parseInt($mediaElement.css('max-width').replace('px', ''));
-				if(isNaN(maxWidth))
-				{
-					maxWidth = 9999999;
-				}
-				alert('now=',maxWidth);
-				var mediaWidth = Math.min(maxWidth, mediaObject.width);
-				var scaleFactor = mediaWidth / mediaObject.width;
-				var mediaHeight = Math.ceil(mediaObject.height * scaleFactor);
-				debug.log('mediaObject', mediaObject, 'maxWidth', maxWidth, 'mediaWidth', mediaWidth, 'mediaHeight', mediaHeight);
-				*/
-				//$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder" style="height:' + mediaHeight + 'px;width:' + mediaWidth + 'px;"></div>');
-				$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder"></div>');
-				if(isCaptivate)
-				{
-					// there are two captivate connection methods - version 2-4 or version 5.
-					//$swf.attr('data-captivate-version', mediaObject.itemType.toLowerCase() === 'cap5' ? '5' : '2');
-					$swf.attr('data-as-version', '3');
-				}
+					$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
+					$img.one('load', function() {
+						debug.log($(this).parent());
+						$(this).css('background', 'white');
+					}).each(function() {
+						if(this.complete)
+						{
+							$(this).trigger('load');
+						}
+					});
+					$mediaElement.append($img);
+					//$mediaElement.width(mediaObject.width).height(mediaObject.height);
+					break;
+				case 'cap5': // @TODO - is 'cap5' used?
+				case 'swf':
+					// standin represents our media stand-in - where the swf would be placed normally.
+					// we define standin if needed to act as a positioning guide for captivates.
+					var $standin = null;
 				
-				// append swf unless it's already there, which is the case if we're using hack overlays
-				// @TODO - can't rely on <object> since IE might use something else
-				if($mediaElement.find('object').length === 0)
-				{
-					$mediaElement.append($swf);
-				}
+					// we assume this is a captivate if it is a swf in an interactive question
+					var isCaptivate = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
 				
-				if($standin != null)
-				{
-					$standin.width(mediaObject.width).height(mediaObject.height);
-					
-					//setTimeout(function() {
-						var o = $('.media-item-standin').offset();
-						//alert('O='+ o.left + ',' + o.top);
-						$('.media-item').offset({left: o.left});
-						$('#swf-holder').offset({top: o.top});
-					//}, 1);
-				}
-				else
-				{
-					$mediaElement.width(mediaObject.width).height(mediaObject.height);
-				}
+					debug.log(obo.model.getPageObject());
+					debug.log($('.question-page').hasClass('question-type-Media'));
+					debug.log($('.question-page'));
+					// we need to do our swf hack for practice and assessment interactive-only questions
 				
-				
-				/*
-				//$('.media-item').click(function(event) {
-				setTimeout(function () {
-					debug.log('click');
-					var $media = $target;
-					$media.css('max-width', '');
-					$('body').append($media);
-					$media.css('position', 'absolute');
-					$media.css('left', 0);
-					$media.css('top', 0);
-					$media.css('width', mediaObject.width + 'px');
-					$media.css('height', mediaObject.height + 'px');
-				}, 2000);
-				//});*/
-				
-				// popout:
-				
-				// @TODO: Testing
-				/*
-				$('#preview-mode-notification').click(function() {
-					var objects = document.getElementsByTagName('object');
-					alert(objects);
-					document.body.appendChild(objects[0]);
-					/*
-					$('.question').addClass('modal');
-					$('.media-item').attr('data-page-width', $('.media-item').width());
-					$('.media-item').attr('data-page-height', $('.media-item').height());
-					$('.media-item').css('max-width', '9999px');
-					$('.media-item').width($('.media-item').attr('data-media-width')).height($('.media-item').attr('data-media-height'));
-					$('.question').click(function() {
-						$('.question').removeClass('modal');
-						$('.media-item').css('max-width', '850px');
-						$('.media-item').width($('.media-item').attr('data-page-width'));
-						$('.media-item').height($('.media-item').attr('data-page-height'));
-					});*/
-					/*
-					$('.media-item').css('position', 'fixed');
-					$('.media-item').css('left', 0);
-					$('.media-item').css('top', 0);
-					$('.media-item').css('z-index', '9999');
-					//$.modal($('.media-item'));*/
-				//});
-				
-				
-				break;/*
-			case 'cap':
-				$target.append('<div id="cap-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="cap-placeholder" style="height:' + mediaObject.height + 'px;width:' + mediaObject.width + 'px;">SWF ' + mediaObject.title + '</div>');
-				$target.children('#cap-' + mediaCount).load('/assets/templates/viewer.html #swf-alt-text', capize);
-				//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
-				break;*/
-			case 'kogneato':
-				// @TODO: Dimensions???
-				//$target.append('<iframe src="https://kogneato.ucf.edu/embed/' + mediaObject.url + '" width="800" height="622" style="margin:0;padding:0;border:0;"></iframe>');
-				break;
-			case 'youtube':
-				var $youtube = $('<div id="youtube-' + mediaCount + '" data-youtube-id="' + mediaObject.url + '" data-media-id="' + mediaObject.mediaID + '" class="youtube-placeholder"></div>');
-				
-				// @TODO - should all of these media types check for pageItemOptions?
-				// if pageItemOptions has width and height defined then this is a custom layout item,
-				// so define the dimensions based off of the pageItem
-				if(pageItemOptions != null && pageItemOptions.width > 0 && pageItemOptions.height > 0)
-				{
-					$youtube.width(pageItemOptions.width - pageItemOptions.padding * 2).height(pageItemOptions.height - pageItemOptions.padding * 2);
-				}
-				else
-				{
-					// otherwise use default youtube dimensions
-					if(obo.model.getSection() === 'content')
+					if(isCaptivate)
 					{
-						//$youtube.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
-						//$mediaElement.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
-						mediaObject.width = YOUTUBE_WIDTH_FOR_CONTENT_PAGE;
-						mediaObject.height = YOUTUBE_HEIGHT_FOR_CONTENT_PAGE;
+						$('#swap-cap').show();
+					
+						// add our swf holder mechanism if it doesn't exist already:
+						if($('#swf-holder-' + section).length === 0)
+						{
+							if($('#swf-holder').length === 0)
+							{
+								$('body').append($('<div id="swf-holder"></div>'));
+							}
+						
+							$('#swf-holder').append($('<div id="swf-holder-' + section + '"></div>'));
+						}
+					
+						// define standin, since we need to overlay captivates
+						$standin = $('<div class="media-item-standin"></div>');
+					
+						// if this captivate already is being overlayed then don't overlay it again!
+						if($('.media-for-page-' + section + page).length > 0)
+						{
+							$mediaElement = $($('.media-for-page-' + section + page)[0]);
+							// @HACK we turn both parent and object visible for Safari
+							$mediaElement.css('visibility', 'visible');
+							$mediaElement.find('object').css('visibility', 'visible');
+						}
+						else
+						{
+							$('#swf-holder-' + section).append($mediaElement);
+						}
+					
+						$target.append($standin);
+					
 					}
 					else
 					{
-						//$youtube.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
-						//$mediaElement.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
-						mediaObject.width = YOUTUBE_WIDTH_FOR_QUIZ;
-						mediaObject.height = YOUTUBE_HEIGHT_FOR_QUIZ;
+						$target.append($mediaElement);
 					}
-				}
-				$target.append($mediaElement);
-				$mediaElement.append($youtube);
+					/*
+					var maxWidth = parseInt($mediaElement.css('max-width').replace('px', ''));
+					if(isNaN(maxWidth))
+					{
+						maxWidth = 9999999;
+					}
+					alert('now=',maxWidth);
+					var mediaWidth = Math.min(maxWidth, mediaObject.width);
+					var scaleFactor = mediaWidth / mediaObject.width;
+					var mediaHeight = Math.ceil(mediaObject.height * scaleFactor);
+					debug.log('mediaObject', mediaObject, 'maxWidth', maxWidth, 'mediaWidth', mediaWidth, 'mediaHeight', mediaHeight);
+					*/
+					//$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder" style="height:' + mediaHeight + 'px;width:' + mediaWidth + 'px;"></div>');
+					$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder"></div>');
+					if(isCaptivate)
+					{
+						// there are two captivate connection methods - version 2-4 or version 5.
+						//$swf.attr('data-captivate-version', mediaObject.itemType.toLowerCase() === 'cap5' ? '5' : '2');
+						$swf.attr('data-as-version', '3');
+					}
 				
-				//@TODO - This is iFrame embed code which doesn't play nice with IE8
+					// append swf unless it's already there, which is the case if we're using hack overlays
+					// @TODO - can't rely on <object> since IE might use something else
+					if($mediaElement.find('object').length === 0)
+					{
+						$mediaElement.append($swf);
+					}
+				
+					if($standin != null)
+					{
+						$standin.width(mediaObject.width).height(mediaObject.height);
+					
+						//setTimeout(function() {
+							var o = $('.media-item-standin').offset();
+							//alert('O='+ o.left + ',' + o.top);
+							$('.media-item').offset({left: o.left});
+							$('#swf-holder').offset({top: o.top});
+						//}, 1);
+					}
+					else
+					{
+						$mediaElement.width(mediaObject.width).height(mediaObject.height);
+					}
+				
+				
+					/*
+					//$('.media-item').click(function(event) {
+					setTimeout(function () {
+						debug.log('click');
+						var $media = $target;
+						$media.css('max-width', '');
+						$('body').append($media);
+						$media.css('position', 'absolute');
+						$media.css('left', 0);
+						$media.css('top', 0);
+						$media.css('width', mediaObject.width + 'px');
+						$media.css('height', mediaObject.height + 'px');
+					}, 2000);
+					//});*/
+				
+					// popout:
+				
+					// @TODO: Testing
+					/*
+					$('#preview-mode-notification').click(function() {
+						var objects = document.getElementsByTagName('object');
+						alert(objects);
+						document.body.appendChild(objects[0]);
+						/*
+						$('.question').addClass('modal');
+						$('.media-item').attr('data-page-width', $('.media-item').width());
+						$('.media-item').attr('data-page-height', $('.media-item').height());
+						$('.media-item').css('max-width', '9999px');
+						$('.media-item').width($('.media-item').attr('data-media-width')).height($('.media-item').attr('data-media-height'));
+						$('.question').click(function() {
+							$('.question').removeClass('modal');
+							$('.media-item').css('max-width', '850px');
+							$('.media-item').width($('.media-item').attr('data-page-width'));
+							$('.media-item').height($('.media-item').attr('data-page-height'));
+						});*/
+						/*
+						$('.media-item').css('position', 'fixed');
+						$('.media-item').css('left', 0);
+						$('.media-item').css('top', 0);
+						$('.media-item').css('z-index', '9999');
+						//$.modal($('.media-item'));*/
+					//});
+				
+				
+					break;/*
+				case 'cap':
+					$target.append('<div id="cap-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="cap-placeholder" style="height:' + mediaObject.height + 'px;width:' + mediaObject.width + 'px;">SWF ' + mediaObject.title + '</div>');
+					$target.children('#cap-' + mediaCount).load('/assets/templates/viewer.html #swf-alt-text', capize);
+					//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
+					break;*/
+				case 'kogneato':
+					// @TODO: Dimensions???
+					//$target.append('<iframe src="https://kogneato.ucf.edu/embed/' + mediaObject.url + '" width="800" height="622" style="margin:0;padding:0;border:0;"></iframe>');
+					break;
+				case 'youtube':
+					var $youtube = $('<div id="youtube-' + mediaCount + '" data-youtube-id="' + mediaObject.url + '" data-media-id="' + mediaObject.mediaID + '" class="youtube-placeholder"></div>');
+				
+					// @TODO - should all of these media types check for pageItemOptions?
+					// if pageItemOptions has width and height defined then this is a custom layout item,
+					// so define the dimensions based off of the pageItem
+					if(pageItemOptions != null && pageItemOptions.width > 0 && pageItemOptions.height > 0)
+					{
+						$youtube.width(pageItemOptions.width - pageItemOptions.padding * 2).height(pageItemOptions.height - pageItemOptions.padding * 2);
+					}
+					else
+					{
+						// otherwise use default youtube dimensions
+						if(obo.model.getSection() === 'content')
+						{
+							//$youtube.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
+							//$mediaElement.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
+							mediaObject.width = YOUTUBE_WIDTH_FOR_CONTENT_PAGE;
+							mediaObject.height = YOUTUBE_HEIGHT_FOR_CONTENT_PAGE;
+						}
+						else
+						{
+							//$youtube.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
+							//$mediaElement.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
+							mediaObject.width = YOUTUBE_WIDTH_FOR_QUIZ;
+							mediaObject.height = YOUTUBE_HEIGHT_FOR_QUIZ;
+						}
+					}
+					$target.append($mediaElement);
+					$mediaElement.append($youtube);
+				
+					//@TODO - This is iFrame embed code which doesn't play nice with IE8
+					/*
+					if(!youTubeAPIReady)
+					{
+						obo.loader.loadScript('http://www.youtube.com/player_api');
+					}
+					else
+					{
+						setTimeout(function() {
+							youtubeize();
+						}, 1);
+					}*/
+					//youtubeize();
+				
+					break;
+				case 'flv':
+					var style = '';
+					if(mediaObject.width > 0 && mediaObject.height > 0)
+					{
+						 style = 'style="height:' + mediaObject.height + 'px;width:' + mediaObject.width + 'px;"';
+					}
+					$target.append($mediaElement);
+					$mediaElement.append('<div id="flv-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="flv-placeholder" ' + style + '></div>');
+					$mediaElement.children('#flv-' + mediaCount).load('/assets/templates/viewer.html #flv-alt-text', jwplayerize);
+					break;
+				default:
+					return false;
+			}
+		
+			// @TODO
+			//alert(parseInt($mediaElement.css('max-width').replace('px', '')));
+			//alert($mediaElement.css('max-height'));
+		
+			// calculate dimensions, based on the media object and max-widths/max-heights.
+			// this results in us being able to create the media-item container at the
+			// correct dimensions so we don't have flashy expanding divs.
+			// we don't need to do this if we use inline-block or table displays for media-items,
+			// but that causes other problems!
+			if(pageItemOptions === null || pageItemOptions === false)
+			{
+				debug.log('BEGIN!');
+				// @TODO - Get this data from the stylesheet!
+				var layoutID = obo.model.getPageObject().layoutID;
+				var targetWidth = $target.width();
 				/*
-				if(!youTubeAPIReady)
+				var maxWidth;
+				var maxHeight = 600;
+				if(section === 'content')
 				{
-					obo.loader.loadScript('http://www.youtube.com/player_api');
+					switch(layoutID.toString())
+					{
+						// media left or right
+						case '2':
+						case '4':
+							maxWidth = Math.floor(targetWidth * .6); break;
+						default:
+							maxWidth = targetWidth; break;
+					}
 				}
 				else
 				{
-					setTimeout(function() {
-						youtubeize();
-					}, 1);
+					maxWidth = 500;
 				}*/
-				//youtubeize();
-				
-				break;
-			case 'flv':
-				var style = '';
-				if(mediaObject.width > 0 && mediaObject.height > 0)
+			
+				debug.log('1. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
+			
+				var maxWidth = $mediaElement.css('max-width');
+				var maxHeight = $mediaElement.css('max-height');
+			
+				//alert('maxW'+maxWidth+',maxH'+maxHeight);
+				debug.log('2. maxWidth', maxWidth, 'maxHeight', maxHeight);
+				if(maxWidth.indexOf('px') != -1)
 				{
-					 style = 'style="height:' + mediaObject.height + 'px;width:' + mediaObject.width + 'px;"';
+					maxWidth = parseInt(maxWidth.substr(0, maxWidth.length - 2));
 				}
-				$target.append($mediaElement);
-				$mediaElement.append('<div id="flv-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="flv-placeholder" ' + style + '></div>');
-				$mediaElement.children('#flv-' + mediaCount).load('/assets/templates/viewer.html #flv-alt-text', jwplayerize);
-				break;
-			default:
-				return false;
-		}
-		
-		// @TODO
-		//alert(parseInt($mediaElement.css('max-width').replace('px', '')));
-		//alert($mediaElement.css('max-height'));
-		
-		
-		// calculate dimensions, based on the media object and max-widths/max-heights.
-		// this results in us being able to create the media-item container at the
-		// correct dimensions so we don't have flashy expanding divs.
-		// we don't need to do this if we use inline-block or table displays for media-items,
-		// but that causes other problems!
-		if(pageItemOptions === null || pageItemOptions === false)
-		{
-			debug.log('BEGIN!');
-			// @TODO - Get this data from the stylesheet!
-			var layoutID = obo.model.getPageObject().layoutID;
-			var targetWidth = $target.width();
-			/*
-			var maxWidth;
-			var maxHeight = 600;
-			if(section === 'content')
-			{
-				switch(layoutID.toString())
+				else if(maxWidth.indexOf('%') != -1)
 				{
-					// media left or right
-					case '2':
-					case '4':
-						maxWidth = Math.floor(targetWidth * .6); break;
-					default:
-						maxWidth = targetWidth; break;
+					maxWidth = maxWidth.substr(0, maxWidth.length - 1);
+					debug.log('ok, now', maxWidth);
+					maxWidth = targetWidth * parseInt(maxWidth) / 100;
+				}
+				if(maxHeight.indexOf('px') != -1)
+				{
+					maxHeight = parseInt(maxHeight.substr(0, maxHeight.length - 2));
+				}
+				else if(maxHeight.indexOf('%') != -1)
+				{
+					maxHeight = maxHeight.substr(0, maxHeight.length - 1);
+					maxHeight = targetHeight * parseInt(maxHeight) / 100;
+				}
+			
+				if(maxWidth <= 0)
+				{
+					maxWidth = 999999999;
+				}
+				if(maxHeight <= 0)
+				{
+					maxHeight = 999999999;
+				}
+			
+				debug.log('3. maxWidth', maxWidth, 'maxHeight', maxHeight);
+			
+				if(mediaObject.width > maxWidth)
+				{
+					mediaObject.height = Math.floor(mediaObject.height * maxWidth / mediaObject.width);
+					mediaObject.width = maxWidth;
+				}
+			
+				if(mediaObject.height > maxHeight)
+				{
+					mediaObject.width = Math.floor(mediaObject.width * maxHeight / mediaObject.height);
+					mediaObject.height = maxHeight;
+				}
+			
+				debug.log('4. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
+			
+				$mediaElement.width(mediaObject.width).height(mediaObject.height);
+			
+				if(typeof $youtube !== 'undefined')//if(mediaObject.itemType.toLowerCase() === 'youtube')
+				{
+					$youtube.width(mediaObject.width).height(mediaObject.height);
+				}
+			
+				if(typeof $swf !== 'undefined')
+				{
+					$swf.width(mediaObject.width).height(mediaObject.height);
+				}
+			
+				if(typeof $img !== 'undefined')
+				{
+					$img.width(mediaObject.width).height(mediaObject.height);
+					$img = undefined;
+				}
+				debug.log('6. $mediaElement.width', $mediaElement.width(), '$mediaElement.height', $mediaElement.height());
+			
+				// attribution
+				if(true || mediaObject.attribution === true || mediaObject.attribution.toString() === '1')
+				{
+					$caption = $('<figcaption>' + obo.util.cleanAttributionCopyrightHTML(mediaObject.copyright) + '</figcaption>');
+					$mediaElement.append($caption);
+					$mediaElement.height($mediaElement.height() + $caption.height());
 				}
 			}
-			else
-			{
-				maxWidth = 500;
-			}*/
-			
-			debug.log('1. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
-			
-			var maxWidth = $mediaElement.css('max-width');
-			var maxHeight = $mediaElement.css('max-height');
-			
-			//alert('maxW'+maxWidth+',maxH'+maxHeight);
-			debug.log('2. maxWidth', maxWidth, 'maxHeight', maxHeight);
-			if(maxWidth.indexOf('px') != -1)
-			{
-				maxWidth = parseInt(maxWidth.substr(0, maxWidth.length - 2));
-			}
-			else if(maxWidth.indexOf('%') != -1)
-			{
-				maxWidth = maxWidth.substr(0, maxWidth.length - 1);
-				debug.log('ok, now', maxWidth);
-				maxWidth = targetWidth * parseInt(maxWidth) / 100;
-			}
-			if(maxHeight.indexOf('px') != -1)
-			{
-				maxHeight = parseInt(maxHeight.substr(0, maxHeight.length - 2));
-			}
-			else if(maxHeight.indexOf('%') != -1)
-			{
-				maxHeight = maxHeight.substr(0, maxHeight.length - 1);
-				maxHeight = targetHeight * parseInt(maxHeight) / 100;
-			}
-			
-			if(maxWidth <= 0)
-			{
-				maxWidth = 999999999;
-			}
-			if(maxHeight <= 0)
-			{
-				maxHeight = 999999999;
-			}
-			//alert('maxW'+maxWidth+',maxH'+maxHeight);
-			/*
-			//adjust for youtube:
-			if(mediaObject.itemType.toLowerCase() === 'youtube')
-			{
-				if(maxWidth === '' || maxWidth > YOUTUBE_WIDTH_FOR_CONTENT_PAGE)
-			}*/
-			
-			debug.log('3. maxWidth', maxWidth, 'maxHeight', maxHeight);
-			
-			if(mediaObject.width > maxWidth)
-			{
-				mediaObject.height = Math.floor(mediaObject.height * maxWidth / mediaObject.width);
-				mediaObject.width = maxWidth;
-			}
-			
-			if(mediaObject.height > maxHeight)
-			{
-				mediaObject.width = Math.floor(mediaObject.width * maxHeight / mediaObject.height);
-				mediaObject.height = maxHeight;
-			}
-			
-			debug.log('4. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
-			
-			//mediaObject.width = 10;
-		//	mediaObject.height = 10;
-			$mediaElement.width(mediaObject.width).height(mediaObject.height);
-			
-			//alert(mediaObject.itemType.toLowerCase());
+		
 			if(typeof $youtube !== 'undefined')//if(mediaObject.itemType.toLowerCase() === 'youtube')
 			{
-				//alert('yup');
-				debug.log('youtube fix');
-				$youtube.width(mediaObject.width).height(mediaObject.height);
 				$youtube.load('/assets/templates/viewer.html #swf-alt-text', youtubeize);
-				
 				$youtube = undefined;
 			}
-			//alert('begin');
-			//alert('typeof' + typeof $swf);
 			if(typeof $swf !== 'undefined')
 			{
-				//alert('!!!!!!!!!!!swf fix');
-				$swf.width(mediaObject.width).height(mediaObject.height);
 				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
-				
 				$swf = undefined;
 			}
-			//alert('5. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
-			
-			debug.log('6. $mediaElement.width', $mediaElement.width(), '$mediaElement.height', $mediaElement.height());
+		
+		
+		
+			mediaCount++;
+			return $mediaElement;
 		}
-		
-		/*alert('b' + mediaObject.width + ',' + mediaObject.height);
-		alert('c' + $mediaElement.width() + ',' + $mediaElement.height());
-		alert('d' + $standin.width() + ',' + $standin.height());
-		*/
-		
-		// attribution
-		if(true || mediaObject.attribution === true || mediaObject.attribution.toString() === '1')
-		{
-			$mediaElement.append('<span class="attribution">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>');
-		}
-		
-		mediaCount++;
-		return $mediaElement;
 	};
 	
 	// (you don't need to call this directly)
