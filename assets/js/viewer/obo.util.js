@@ -50,6 +50,11 @@ obo.util = function()
 	var patternAddUL = /<LI>([\s\S]*?)<\/LI>/gi;
 	var patternRemoveExtraUL = /<\/ul><ul>/gi;
 	
+	var patternAttributionOpen = /<u><a /gi;
+	var patternAttributionClose = /<\/a>\s*?<\/u>/gi;
+	var patternAttributionTarget = /target\s*?=\s*?(?:"|').*?/gi;
+	var patternAttributionHref = / href\s*?=\s*?(?:"|')event:/gi;
+	
 	// @TODO ul and p should have margin = 0
 	/** This attempts to recreate HTML from flash HTML exactly **/
 	var cleanFlashHTMLStrict = function(input)
@@ -319,6 +324,61 @@ obo.util = function()
 
 		return input;
 	};
+
+	createCombinedAttributionString = function(items)
+	{
+		var a = [];
+		var item;
+		for(var i in items)
+		{
+			item = items[i];
+			if(typeof item.media === 'object' && item.media.length && item.media.length > 0 && item.media[0].attribution === 1)
+			{
+				a.push(item.media[0].copyright);
+			}
+		}
+
+		debug.log(a);
+
+		var r = '';
+		if(a.length == 1)
+		{
+			r = a[0];
+		}
+		else if(a.length > 1)
+		{
+			r = 'Photos used under Creative Commons from ';
+			var len = a.length;
+			var join = ', ';
+			for(var i = 0; i < len; i++)
+			{
+				if(i == len - 2)
+				{
+					join = ' and ';
+				}
+				else if(i == len - 1)
+				{
+					join = '';
+				}
+
+				r += a[i].substr(a[i].indexOf('<U>')) + join;
+			}
+		}
+
+		return cleanAttributionCopyrightHTML(r);
+	}
+	
+	// Modfies creative commons attributions to be standard
+	cleanAttributionCopyrightHTML = function(input)
+	{
+		//blah blah <U><A HREF="event:http://..."></U></A>
+		input = input.replace(patternAttributionOpen, '<a ');
+		input = input.replace(patternAttributionClose, '</a>');
+		input = input.replace(patternAttributionTarget, '');
+		input = input.replace(patternAttributionHref, ' target="_blank" href="');
+		
+		return input;
+	};
 	
 	strip = function(html)
 	{
@@ -376,9 +436,11 @@ obo.util = function()
 	return {
 		getRGBA: getRGBA,
 		cleanFlashHTML: cleanFlashHTML,
+		cleanAttributionCopyrightHTML: cleanAttributionCopyrightHTML,
 		strip: strip,
 		getAnswerByID: getAnswerByID,
 		isIOS: isIOS,
-		doLater: doLater
+		doLater: doLater,
+		createCombinedAttributionString: createCombinedAttributionString
 	};
 }();

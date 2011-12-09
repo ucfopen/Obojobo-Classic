@@ -20,7 +20,7 @@ obo.remote = function()
 		// we also automatically filter every call to check for errors
 		$.ajax(
 		{
-			url: "http://obo/assets/gateway-json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json',
+			url: "/assets/gateway-json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json',
 			context: document.body,
 			dataType: 'json',
 			success: callback
