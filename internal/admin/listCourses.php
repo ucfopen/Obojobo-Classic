@@ -1,5 +1,4 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 // Check for super user
 $API = \obo\API::getInstance();
 $result = $API->getSessionRoleValid(array('SuperUser'));
@@ -22,7 +21,7 @@ if(! in_array('SuperUser', $result['hasRoles']) )
 </head>
 <body>
 <h2>List A User's Courses:</h2>
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
+<form action="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"]; ?> method="get" accept-charset="utf-8">
 	<label for="nid">NID</label><input type="text" name="nid" value="" id="nid">
 	<p><input type="submit" value="Continue &rarr;"></p>
 </form>

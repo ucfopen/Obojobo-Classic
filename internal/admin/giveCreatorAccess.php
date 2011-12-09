@@ -1,5 +1,4 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 // ================ REQUIRE SU STATUS
 $API = \obo\API::getInstance();
 
@@ -24,7 +23,7 @@ if(!$API->getSessionValid(cfg_obo_Role::ADMIN))
 <body>
 <h1>Give a NID Content Creator Role</h1>
 <hr>
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" accept-charset="utf-8">
+<form action="<?php echo $_SERVER['PHP_SELF'] . '?' . $_SERVER["QUERY_STRING"]; ?>" method="get" accept-charset="utf-8">
 	<label for="instID">NID:</label><input type="text" name="NID" value="" id="NID"><br>
 	<input type="submit" name="submit" value="Give NID Content Creator Role" >
 </form>

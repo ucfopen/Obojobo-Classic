@@ -1,12 +1,6 @@
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 
 $API = \obo\API::getInstance();
-$result = $API->getSessionRoleValid(array('SuperUser'));
-if(! in_array('SuperUser', $result['hasRoles']) )
-{
-	exit();
-}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">

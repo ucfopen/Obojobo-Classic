@@ -1,6 +1,6 @@
 <?php
 //namespace RD;
-require_once('config/cfgBase.php'); // default config
+require_once('config/cfg.php'); // default config
 require_once('config/cfgLocal.php'); // local config
 
 /*

@@ -1,6 +1,5 @@
 <pre>
 <?php
-require_once(dirname(__FILE__)."/../../internal/app.php");
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
