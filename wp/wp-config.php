@@ -19,41 +19,41 @@
 
 
 // require_once(__DIR__.'/../internal/config/cfgLocal.php'); // local config
-define('DB_NAME', 'obo_wordpress');
+// define('DB_NAME', 'obo_wordpress');
+// 
+// /** MySQL database username */
+// define('DB_USER', 'root');
+// 
+// /** MySQL database password */
+// define('DB_PASSWORD', 'root');
+// 
+// /** MySQL hostname */
+// define('DB_HOST', 'vm');
+// 
+// /** Database Charset to use in creating database tables. */
+// define('DB_CHARSET', 'utf8');
+// 
+// /** The Database Collate type. Don't change this if in doubt. */
+// define('DB_COLLATE', '');
+
+// OBOJOBO configuration 
+require_once(__DIR__.'/../internal/config/cfgLocal.php'); // local config
+define('DB_NAME', AppCfg::DB_WP_NAME);
 
 /** MySQL database username */
-define('DB_USER', 'root');
+define('DB_USER', AppCfg::DB_WP_USER);
 
 /** MySQL database password */
-define('DB_PASSWORD', 'root');
+define('DB_PASSWORD', AppCfg::DB_WP_PASS);
 
 /** MySQL hostname */
-define('DB_HOST', 'vm');
+define('DB_HOST', AppCfg::DB_WP_HOST);
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
 
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
-
-// // OBOJOBO configuration 
-// require_once(__DIR__.'/../internal/config/cfgLocal.php'); // local config
-// define('DB_NAME', AppCfg::DB_WP_NAME);
-
-// /** MySQL database username */
-// define('DB_USER', AppCfg::DB_WP_USER);
-
-// /** MySQL database password */
-// define('DB_PASSWORD', AppCfg::DB_WP_PASS);
-
-// /** MySQL hostname */
-// define('DB_HOST', AppCfg::DB_WP_HOST);
-
-// /** Database Charset to use in creating database tables. */
-// define('DB_CHARSET', 'utf8');
-
-// /** The Database Collate type. Don't change this if in doubt. */
-// define('DB_COLLATE', '');
 
 /**#@+
  * Authentication Unique Keys and Salts.
