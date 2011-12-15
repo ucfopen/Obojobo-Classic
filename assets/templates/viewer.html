@@ -8,7 +8,6 @@
 <link rel="stylesheet" type="text/css" href="/assets/css/themes/classic.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="/assets/css/viewer-phone.css" media="screen and (max-device-width: 500px) and (orientation: portrait)" />
 -->
-
 </head>
 <body>
 <div id="template-main">
@@ -179,13 +178,41 @@
 	<a id="submit-assessment-button" class="button" href="#" role="button" title="Submit incomplete assessment" >Submit incomplete assessment</a>
 </div>
 
-<div class="page-centered" id="scores-page">
-	<h2>Scores:</h2>
-	<ul id="scores-list"></ul>
-	<a class="button" id="return-to-overview-button" href="#" role="button" title="Return to the Assessment Overview page" >Return to the Assessment Overview page</a>
+<div class="page-centered" id="score-results">
+	<div id="recent-attempt">
+		<div id="attempt-score-result">
+			<h2>Attempt 1 Score:</h2>
+			<span id="attempt-score">0%</span>
+		</div>
+		<div id="recorded-score-container">
+			<span>Recorded Score: <span class="recorded-score">0%</span></span>
+			<span id="recorded-score-note">(This is your highest attempt score)</span>
+		</div>
+		<h3>Details:</h3>
+		<p class="assessment-open">
+			You have <span class="attempts-remaining">1 attempt</span> remaining.  If you'd like to try for a higher score than <span class="recorded-score">0%</span> then return to the assessment overview page to begin another attempt.  Otherwise you may close this window or review the other sections.
+		</p>
+		<p class="out-of-attempts">
+			You have completed this learning object as you have no attempts remaining. You may now close this window or review the other sections.
+		</p>
+		<p class="assessment-closed">
+			You have a <span class="recorded-score">0%</span> for this object. This assessment closed on <span class="assessment-close-date"></span>.
+		</p>
+		<div id="assessment-close-notice">The assessment will close on <span class="assessment-close-date"></span>.</div>
+		<a class="button" id="return-to-overview-button" href="#" role="button" title="Return to the Assessment Overview page" >Return to the Assessment Overview page</a>
+	</div>
+	<div id="all-attempts">
+		<h3>All Attempt Scores:</h3>
+		<div>(<span class="attempts-remaining">1 Attempt</span> Available)</div>
+		<table id="attempt-history">
+			<tbody>
+				<tr>
+					<th>#</th><th>Score</th><th>Time</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>
-
-
 
 </body>
 </html>

@@ -18,7 +18,7 @@ obo.captivate = function()
 	// look in the CaptivateSpy fla files for the ExternalInterface code
 	var onCaptivateSpyEvent = function(event)
 	{
-		console.log('onCaptivateSpyEvent',event, event.type, event.id,scoreDatas);
+		debug.log('onCaptivateSpyEvent',event, event.type, event.id,scoreDatas);
 		
 		/*
 		// if this event is for a different id then reset our data
