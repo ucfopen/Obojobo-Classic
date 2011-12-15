@@ -6,7 +6,10 @@ RewriteBase /
 RewriteRule ^(manager|assets) - [L]
 
 # Preview LO links
-# RewriteRule ^preview/([0-9]*)$ index.php?q=viewer&newest=true&preview=$1 [L,QSA]
+RewriteRule ^preview/([0-9]*)/?$ viewer.php?loID=$1 [L,QSA]
+
+# Preview LO links
+RewriteRule ^view/([0-9]*)/?$ viewer.php?instID=$1 [L,QSA]
 
 # OBOJOBO media
 RewriteRule ^media/([0-9]*)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]

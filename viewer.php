@@ -1,17 +1,8 @@
-<?php
-/*
-Template Name: HTML Viewer
-*/
-add_filter('show_admin_bar', '__return_false');
-
-?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<!DOCTYPE html>
+<html
 <head>
-
-<meta charset="<?php bloginfo( 'charset' ); ?>" />
 <title></title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
-<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
 <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> -->
 <script type="text/javascript" src="/assets/js/jquery/1.7/jquery.min.js"></script>
 <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>-->
@@ -67,68 +58,68 @@ add_filter('show_admin_bar', '__return_false');
 
 <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
-
 <script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
 
-<?php wp_head(); ?>
 <script type="text/javascript">
 /*	
-	if(!console)
-	{
-		console = {log:function() { }};
-	}
+  	if(!console)
+  	{
+  		console = {log:function() { }};
+  	}
 */	
-	//setTimeout(function() {
-	
-	// Polyfills:
-	Modernizr.load({
-		test: Modernizr.multiplebgs,
-		nope: '/assets/css/multiplebgfix.css'
-	});
-	
-	
-	$(function() {
-		debug.log('ready');
-		
-		
-		// @TODO: are these the right params?
-		var params = {
-			loID:'<?php echo $wp_query->query_vars['loID']; ?>',
-			instID:'<?php echo $wp_query->query_vars['instID']; ?>'
-		};
-		/*
-		// @TODO - this syntax is weird
-		obo.model = obo.model(obo.view, {});
-		obo.model.loadLO(loID, function() {
-			obo.view.init($('body'));
-		});*/
-		obo.model.init(obo.view, {});
-		debug.log(obo.model);
-		obo.model.load(params, function() {
-			obo.view.init($('body'));
-		});
-		/*obo.model.loadInstance('1937', function() {
-			obo.view.init($('body'));
-		});*/
-		
-		document.onkeypress = function(event)
-		{
-			if(event.ctrlKey && event.keyCode == 44)
-			{
-				obo.model.gotoPrevPage();
-			}
-			else if(event.ctrlKey && event.keyCode == 46)
-			{
-				obo.model.gotoNextPage();
-			}
-		}
-	});
-	//}, 3000);
-	
-	
-	//alert('you tube and obo.video.js');
+  	//setTimeout(function() {
+  	
+  	// Polyfills:
+  	Modernizr.load({
+  		test: Modernizr.multiplebgs,
+  		nope: '/assets/css/multiplebgfix.css'
+  	});
+  	
+  	
+  	$(function() {
+  		debug.log('ready');
+  		
+  		
+  		// @TODO: are these the right params?
+  		var params = {
+  			loID:'<?php echo $_REQUEST['loID']; ?>',
+  			instID:'<?php echo $_REQUEST['instID']; ?>'
+  		};
+  		/*
+  		// @TODO - this syntax is weird
+  		obo.model = obo.model(obo.view, {});
+  		obo.model.loadLO(loID, function() {
+  			obo.view.init($('body'));
+  		});*/
+  		obo.model.init(obo.view, {});
+  		debug.log(obo.model);
+  		obo.model.load(params, function() {
+  			obo.view.init($('body'));
+  		});
+  		/*obo.model.loadInstance('1937', function() {
+  			obo.view.init($('body'));
+  		});*/
+  		
+  		document.onkeypress = function(event)
+  		{
+  			if(event.ctrlKey && event.keyCode == 44)
+  			{
+  				obo.model.gotoPrevPage();
+  			}
+  			else if(event.ctrlKey && event.keyCode == 46)
+  			{
+  				obo.model.gotoNextPage();
+  			}
+  		}
+  	});
+  	//}, 3000);
+  	
+  	
+  	//alert('you tube and obo.video.js');
 </script>
 </head>
-<body <?php body_class(); ?>>
+<body>
 
-<?php get_footer('html-viewer'); ?>
+
+</body>
+</html>
