@@ -308,9 +308,37 @@ obo.util = function()
 		input = input.replace(patternFontClose, "</span>");
 
 		// find empty tags keeping space in them
-		input = input.replace(patternEmpty1, "$2");
-		input = input.replace(patternEmpty2, "$2");
-
+		// we loop here to help transform nested empty tags such as "<li><b></b></li>"
+		var matchFound = true;
+		while(matchFound)
+		{
+			patternEmpty1.lastIndex = 0;
+			groups = patternEmpty1.exec(input);
+			if(groups && groups.length >= 2)
+			{
+				input = input.replace(patternEmpty1, "$2");
+			}
+			else
+			{
+				matchFound = false;
+			}
+		}
+		
+		matchFound = true;
+		while(matchFound)
+		{
+			patternEmpty2.lastIndex = 0;
+			groups = patternEmpty2.exec(input);
+			if(groups && groups.length >= 2)
+			{
+				input = input.replace(patternEmpty2, "$2");
+			}
+			else
+			{
+				matchFound = false;
+			}
+		}
+		
 		// remove any previously added ul tags
 		input = input.replace(patternRemoveUL, "");
 
