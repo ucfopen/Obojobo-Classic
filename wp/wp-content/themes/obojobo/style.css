@@ -1276,6 +1276,12 @@ code {
 }
 
 
+/* =Obojobo Custom Elements
+-------------------------------------------------------------- */
+body{
+	background:url('images/main-background.png') center top repeat-y;
+}
+
 /* =Print Style
 -------------------------------------------------------------- */
 
