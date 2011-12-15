@@ -29,8 +29,9 @@ obo.model = function()
 	// the lo data object
 	var lo;
 	
-	var scores = [];
-	
+	var scores = [{score:55, startTime:0, endTime:443848530},{score:96, startTime:0, endTime:0},{score:88, startTime:0, endTime:0}];
+	//var scores = [];
+
 	// we store practice and assessment questions in a special array.
 	// useful for preview mode (we group qalts so we can display those easier)
 	var questions = {
@@ -417,6 +418,12 @@ obo.model = function()
 				{
 					activequestions.assessment[assessPageIndex.index] = assessPageIndex.altIndex;
 				}
+
+				// special case - can't view scores page when no scores exist
+				if(newSection === 'assessment' && newPage === 'scores' && obo.model.getScores().length === 0)
+				{
+					newPage = 'start';
+				}
 				
 				section = newSection;
 				pages[section] = newPage;
@@ -576,6 +583,20 @@ obo.model = function()
 	{
 		return inAssessmentQuiz;
 	};
+
+	var getInstanceCloseDate = function()
+	{
+		if(mode === 'instance')
+		{
+			return new Date(parseInt(lo.instanceData.endTime) * 1000);
+		}
+		else
+		{
+			var d = new Date();
+			d.setTime(d.getTime() + 1209600); // two weeks from now
+			return d;
+		}
+	}
 	
 	var instanceIsClosed = function()
 	{
@@ -1178,11 +1199,6 @@ obo.model = function()
 		
 		return total;
 	};
-	/*
-	var getResponses = function(section)
-	{
-		return responses[section];
-	};*/
 	
 	return {
 		init: init,
@@ -1227,6 +1243,7 @@ obo.model = function()
 		isPageAnswered: isPageAnswered,
 		getNumPagesAnswered: getNumPagesAnswered,
 		//getResponses: getResponses,
-		currentQuestionIsAlternate: currentQuestionIsAlternate
+		currentQuestionIsAlternate: currentQuestionIsAlternate,
+		getInstanceCloseDate: getInstanceCloseDate
 	};
 }();
