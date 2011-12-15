@@ -876,23 +876,89 @@ obo.view = function()
 				hideSubnav();
 				hideNextPrevNav();
 				
-				$('#content').load('/assets/templates/viewer.html #scores-page', function() {
-					var $ul = $('#scores-list');
-					var scores = obo.model.getScores();
-					var $li;
-					var t;
-					for(var i = 0; i < scores.length; i++)
-					{
-						t = scores[i].endTime - scores[i].startTime;
-						$ul.append($('<li>#' + (i + 1) + ' | ' + t + " duration | submitted " + scores[i].endTime + " | " + scores[i].score + '</li>'));
-					}
-					$ul.append($('<li>' + getScoreMethodString() + ' score: ' + obo.model.getFinalCalculatedScore() + '%</li>'));
-					
-					// we clear out the subnav so no item looks to be 'answered'
-					// we could delete the subnav instead if that's faster
-					resetSubnav('answered');
-					resetSubnav('visited');
-				});
+				var scores = obo.model.getScores();
+				if(scores.length > 0)
+				{
+					$('#content').load('/assets/templates/viewer.html #score-results', function() {
+						var recentScore = scores[scores.length - 1].score;
+						var recordedScore = obo.model.getFinalCalculatedScore();
+						var attemptsRemaining = obo.model.getNumAttemptsRemaining();
+
+						if(scores.length > 1)
+						{
+							$('#score-results').addClass('multiple-attempts');
+
+							// build score table
+							var endDate;
+							for(i in scores)
+							{
+								endDate = new Date(scores[i].endTime * 1000);
+								$('#attempt-history').append(
+									'<tr><td>' + (parseInt(i) + 1) + '.</td>' + 
+									'<td>' + scores[i].score + '%</td>' + 
+									'<td>' + endDate.format('mm/dd/yy - h:MM:ss TT') + '</td></tr>'
+								);
+							}
+						}
+						debug.log('scores equals ', scores);
+						
+						$('#attempt-score-result h2').html('Attempt ' + scores.length + ' Score:');
+						$('#attempt-score').html(recentScore + '%');
+						$('.recorded-score').html(recordedScore + '%');
+						$('.attempts-remaining').html(attemptsRemaining + ' Attempt' + (attemptsRemaining === 1 ? '' : 's'));
+						var note = '';
+						switch(obo.model.getScoreMethod())
+						{
+							case 'h': //highest
+								note = '(This is your highest attempt score)';
+								break;
+							case 'r': //recent
+								note = '(This is your latest attempt score)';
+								break;
+							case 'm': //mean
+								note = '(This is your attempt score average)';
+								break;
+						}
+						$('#recorded-score-note').html(note);
+
+						if(obo.model.instanceIsClosed())
+						{
+							$('#recent-attempt p.assessment-closed').show();
+						}
+						else if(attemptsRemaining == 0)
+						{
+							$('#recent-attempt p.out-of-attempts').show();
+						}
+						else
+						{
+							$('#recent-attempt p.assessment-open').show();
+						}
+
+						$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
+						/*
+						var $ul = $('#scores-list');
+						var scores = obo.model.getScores();
+						var $li;
+						var t;
+						for(var i = 0; i < scores.length; i++)
+						{
+							t = scores[i].endTime - scores[i].startTime;
+							$ul.append($('<li>#' + (i + 1) + ' | ' + t + " duration | submitted " + scores[i].endTime + " | " + scores[i].score + '</li>'));
+						}
+						$ul.append($('<li>' + getScoreMethodString() + ' score: ' + obo.model.getFinalCalculatedScore() + '%</li>'));
+						*/
+						// we clear out the subnav so no item looks to be 'answered'
+						// we could delete the subnav instead if that's faster
+						resetSubnav('answered');
+						resetSubnav('visited');
+					});
+				}
+				else
+				{
+					// we should never get here
+					obo.model.gotoPage('start');
+				}
+				
 				break;
 			default:
 				showSubnav();
