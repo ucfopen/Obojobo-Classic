@@ -653,7 +653,7 @@ obo.media = function()
 				debug.log('6. $mediaElement.width', $mediaElement.width(), '$mediaElement.height', $mediaElement.height());
 			
 				// attribution
-				if(true || mediaObject.attribution === true || mediaObject.attribution.toString() === '1')
+				if(typeof mediaObject.attribution !== 'undefined' && mediaObject.attribution !== null && (mediaObject.attribution === true || mediaObject.attribution.toString() === '1'))
 				{
 					$caption = $('<figcaption>' + obo.util.cleanAttributionCopyrightHTML(mediaObject.copyright) + '</figcaption>');
 					$mediaElement.append($caption);

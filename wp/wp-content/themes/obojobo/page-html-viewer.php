@@ -26,6 +26,7 @@ add_filter('show_admin_bar', '__return_false');
 <!--<script type="text/javascript" src="/assets/flowplayer/flowplayer-3.2.6.min.js"></script>-->
 <script type="text/javascript" src="/assets/js/swfobject.js"></script>
 <!--<script type="text/javascript" src="/assets/jwplayer/jwplayer.js"></script>-->
+<script type="text/javascript" src="/assets/js/date.format.js"></script>
 
 <script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
 <script type="text/javascript" src="/assets/js/viewer/obo.util.js"></script>
