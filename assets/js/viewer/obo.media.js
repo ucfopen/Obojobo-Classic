@@ -157,6 +157,32 @@ obo.media = function()
 		return player;
 	};
 	*/
+	var kogneatoize = function()
+	{
+		debug.log('kogneatoize');
+		if(AUTOLOAD_FLASH)
+		{
+			$('.kogneato-placeholder').each(function(index, placeholder)
+			{
+				var $placeholder = $(placeholder);
+				$placeholder.removeClass('kogneato-placeholder').addClass('kogneato-container');
+				var giid = $placeholder.attr('data-giid');
+				obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [giid, true]], function(event) {
+					debug.log('kogneatoize 2');
+					debug.log(event);
+					$('.kogneato-container').each(function(index, container)
+					{
+						var $container = $(container);
+						var w = $container.width();
+						var h = $container.height();
+						debug.log(w, h);
+						swfobject.embedSWF(event.url, container.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
+					});
+				});
+			});
+		}
+	};
+	
 	var swfize = function()
 	{
 		debug.log('___SWFIZE___');
@@ -353,16 +379,7 @@ obo.media = function()
 					{
 						$('#swap-cap').show();
 					
-						// add our swf holder mechanism if it doesn't exist already:
-						if($('#swf-holder-' + section).length === 0)
-						{
-							if($('#swf-holder').length === 0)
-							{
-								$('body').append($('<div id="swf-holder"></div>'));
-							}
-						
-							$('#swf-holder').append($('<div id="swf-holder-' + section + '"></div>'));
-						}
+						createSwfHolder();
 					
 						// define standin, since we need to overlay captivates
 						$standin = $('<div class="media-item-standin"></div>');
@@ -483,8 +500,64 @@ obo.media = function()
 					//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
 					break;*/
 				case 'kogneato':
-					// @TODO: Dimensions???
-					//$target.append('<iframe src="https://kogneato.ucf.edu/embed/' + mediaObject.url + '" width="800" height="622" style="margin:0;padding:0;border:0;"></iframe>');
+					// standin represents our media stand-in - where the swf would be placed normally.
+					// we define standin if needed to act as a positioning guide for captivates.
+					var $standin = null;
+				
+					// we need to do our swf hack for practice and assessment interactive-only questions
+					
+					var inQuiz = section === 'practice' || section === 'assessment';
+					if(inQuiz)
+					{
+						$('#swap-cap').show();
+					
+						createSwfHolder();
+					
+						// define standin, since we need to overlay captivates
+						$standin = $('<div class="media-item-standin"></div>');
+					
+					// if this kogneato already is being overlayed then don't overlay it again!
+						if($('.media-for-page-' + section + page).length > 0)
+						{
+							$mediaElement = $($('.media-for-page-' + section + page)[0]);
+							// @HACK we turn both parent and object visible for Safari
+							$mediaElement.css('visibility', 'visible');
+							$mediaElement.find('object').css('visibility', 'visible');
+						}
+						else
+						{
+							$('#swf-holder-' + section).append($mediaElement);
+						}
+					
+						$target.append($standin);
+					
+					}
+					else
+					{
+						$target.append($mediaElement);
+					}
+					
+					$kogneato = $('<div id="kogneato-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" data-giid="' + mediaObject.url + '" class="kogneato-placeholder"></div>');
+					
+					// append swf unless it's already there, which is the case if we're using hack overlays
+					// @TODO - can't rely on <object> since IE might use something else
+					if($mediaElement.find('object').length === 0)
+					{
+						$mediaElement.append($kogneato);
+					}
+				
+					if($standin != null)
+					{
+						$standin.width(mediaObject.width).height(mediaObject.height);
+					
+						var o = $('.media-item-standin').offset();
+						$('.media-item').offset({left: o.left});
+						$('#swf-holder').offset({top: o.top});
+					}
+					else
+					{
+						$mediaElement.width(mediaObject.width).height(mediaObject.height);
+					}
 					break;
 				case 'youtube':
 					var $youtube = $('<div id="youtube-' + mediaCount + '" data-youtube-id="' + mediaObject.url + '" data-media-id="' + mediaObject.mediaID + '" class="youtube-placeholder"></div>');
@@ -561,25 +634,6 @@ obo.media = function()
 				// @TODO - Get this data from the stylesheet!
 				var layoutID = obo.model.getPageObject().layoutID;
 				var targetWidth = $target.width();
-				/*
-				var maxWidth;
-				var maxHeight = 600;
-				if(section === 'content')
-				{
-					switch(layoutID.toString())
-					{
-						// media left or right
-						case '2':
-						case '4':
-							maxWidth = Math.floor(targetWidth * .6); break;
-						default:
-							maxWidth = targetWidth; break;
-					}
-				}
-				else
-				{
-					maxWidth = 500;
-				}*/
 			
 				debug.log('1. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
 			
@@ -671,9 +725,12 @@ obo.media = function()
 				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
 				$swf = undefined;
 			}
-		
-		
-		
+			if(typeof $kogneato !== 'undefined')
+			{
+				$kogneato.load('/assets/templates/viewer.html #swf-alt-text', kogneatoize);
+				$kogneato = undefined;
+			}
+
 			mediaCount++;
 			return $mediaElement;
 		}
@@ -704,6 +761,20 @@ obo.media = function()
 	{
 		youTubeAPIReady = val;
 	};*/
+
+	// add our swf holder mechanism if it doesn't exist already:
+	var createSwfHolder = function()
+	{
+		if($('#swf-holder-' + section).length === 0)
+		{
+			if($('#swf-holder').length === 0)
+			{
+				$('body').append($('<div id="swf-holder"></div>'));
+			}
+		
+			$('#swf-holder').append($('<div id="swf-holder-' + section + '"></div>'));
+		}
+	}
 	
 	return {
 		//setYouTubeAPIReady: setYouTubeAPIReady,
