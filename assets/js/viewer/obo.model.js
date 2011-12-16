@@ -10,6 +10,11 @@ if(!window.obo)
 	window.obo = {};
 }
 
+obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [1707, true]], function(event) {
+	debug.log('good job');
+	debug.log(event);
+});
+
 obo.model = function()
 {
 	var init = function(viewModule, options)
@@ -578,7 +583,6 @@ obo.model = function()
 		return mode === 'instance' && (attemptImportedThisVisit || (lo.tracking != null && lo.tracking.prevScores != null && lo.tracking.prevScores.length != null && lo.tracking.prevScores.length > 0 && lo.tracking.prevScores[0].linkedAttemptID != null && parseInt(lo.tracking.prevScores[0].linkedAttemptID) > 0));
 	};
 	
-	// @public
 	var isInAssessmentQuiz = function()
 	{
 		return inAssessmentQuiz;
@@ -723,7 +727,13 @@ obo.model = function()
 	
 	var getPage = function()
 	{
-		return pages[section];
+		// make sure that if this is a page number it should be returned as numeric
+		var p = pages[section];
+		if(!isNaN(p))
+		{
+			p = parseInt(p);
+		}
+		return p;
 	};
 	
 	// @TODO: use this more!
@@ -944,7 +954,7 @@ obo.model = function()
 		return section;
 	};
 	
-	var gotoPrevPage = function()
+	var getPrevPage = function()
 	{
 		var page = getPage();
 		var newPage;
@@ -961,13 +971,10 @@ obo.model = function()
 		}
 		else if(page === 1)
 		{
+			newPage = 'start';
 			if(section === 'content')
 			{
 				newSection = 'overview';
-			}
-			else
-			{
-				newPage = 'start';
 			}
 		}
 		else
@@ -1000,12 +1007,26 @@ obo.model = function()
 			}
 		}
 		
-		setLocation(newSection, newPage);
+		if(typeof newSection === 'undefined')
+		{
+			newSection = section;
+		}
+
+		return {
+			section: newSection,
+			page: newPage
+		}
 	};
+
+	var gotoPrevPage = function()
+	{
+		var p = getPrevPage();
+		setLocation(p.section, p.page);
+	}
 	
 	// go to the next page, slightly difficult since page can be
 	// 'start', 'end', or a number, or a qalt page
-	var gotoNextPage = function()
+	var getNextPage = function()
 	{
 		debug.log('gotoNextPage');
 		
@@ -1054,8 +1075,22 @@ obo.model = function()
 		{
 			newPage = parseInt(page) + 1;
 		}
-		
-		setLocation(newSection, newPage);
+
+		if(typeof newSection === 'undefined')
+		{
+			newSection = section;
+		}
+
+		return {
+			section: newSection,
+			page: newPage
+		}
+	};
+
+	var gotoNextPage = function()
+	{
+		var p = getNextPage();
+		setLocation(p.section, p.page);
 	};
 	
 	// advance to the start of next section
@@ -1214,6 +1249,8 @@ obo.model = function()
 		getFinalCalculatedScore: getFinalCalculatedScore,
 		getMode: getMode,
 		getPage: getPage,
+		getPrevPage: getPrevPage,
+		getNextPage: getNextPage,
 		getPageObject: getPageObject,
 		getPageObjects: getPageObjects,
 		getMediaObjectByID: getMediaObjectByID,

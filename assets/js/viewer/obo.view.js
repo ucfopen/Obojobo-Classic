@@ -201,9 +201,14 @@ obo.view = function()
 			}
 		}).on('focus', '#qa-input', function(event) {
 			$('#qa-input').unbind('keydown').keydown(function(event) {
+				debug.log('got a key down, keycode is ' + event.keyCode);
 				if(event.keyCode === 13) // enter
 				{
-					$($('#submit-qa-answer-button')[0]).click();
+					// opera crashes and FF doesn't work correctly
+					// without this 1ms delay:
+					setTimeout(function() {
+						$($('#submit-qa-answer-button')[0]).click();
+					}, 1);
 				}
 				else if(event.keyCode === 27) // ESC
 				{
@@ -277,10 +282,10 @@ obo.view = function()
 		$('#nav-content')[0].href = baseURL + 'page/1/';
 		$('#nav-practice')[0].href = baseURL + 'practice/start/';
 		$('#nav-assessment')[0].href = baseURL + 'assessment/start/';*/
-		$('#nav-overview').attr('href', baseURL + '#overview');
-		$('#nav-content').attr('href', baseURL + '#page/1');
-		$('#nav-practice').attr('href', baseURL + '#practice/start');
-		$('#nav-assessment').attr('href', baseURL + '#assessment/start');
+		$('#nav-overview').attr('href', baseURL + '#/overview');
+		$('#nav-content').attr('href', baseURL + '#/content/1');
+		$('#nav-practice').attr('href', baseURL + '#/practice/start');
+		$('#nav-assessment').attr('href', baseURL + '#/assessment/start');
 		/*
 		// navigation handlers:
 		$('.prev-page-button').click(function(event) {
@@ -409,6 +414,20 @@ obo.view = function()
 		return '/' + section + (page === 'start' && section === 'overview' ? '' : '/' + page);
 		//return '/' + obo.model.getSection() + '/' + obo.model.getPage();
 	}
+
+	// returns what the hash url should be for the previous page
+	var getPrevPageHashURL = function()
+	{
+		var p = obo.model.getPrevPage();
+		debug.log('p=', p);
+		return '/' + p.section + (typeof p.page === 'undefined' ? '' : '/' + p.page);
+	}
+
+	var getNextPageHashURL = function()
+	{
+		var p = obo.model.getNextPage();
+		return '/' + p.section + (typeof p.page === 'undefined' ? '' : '/' + p.page);
+	}
 	
 	var showThrobber = function()
 	{
@@ -480,10 +499,11 @@ obo.view = function()
 			$($('#content')[0]).css('margin-top', 0);
 	};
 
-	var showNextPrevNav = function()
+	var showAndUpdateNextPrevNav = function()
 	{
 		$('.page-navigation').show();
-		debug.log('show next prev nav');
+		$('.prev-page-button').attr('href', baseURL + '#' + getPrevPageHashURL());
+		$('.next-page-button').attr('href', baseURL + '#' + getNextPageHashURL());
 	};
 
 	var hideNextPrevNav = function()
@@ -560,7 +580,7 @@ obo.view = function()
 			$("#content-size").text(lo.summary.contentSize + ' Pages');
 			$("#practice-size").text(lo.summary.practiceSize + ' Questions');
 			$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');
-			//$('.next-section-button').button();
+			$('#get-started-button').attr('href', baseURL + '#/content/1');
 		});
 	};
 	
@@ -637,7 +657,10 @@ obo.view = function()
 			else
 			{
 				// some content pages missed
-				$('#content').load('/assets/templates/viewer.html #template-final-content-page-incomplete', createUnvisitedPageList);
+				$('#content').load('/assets/templates/viewer.html #template-final-content-page-incomplete', function() {
+					createUnvisitedPageList();
+					$('.next-section-button').attr('href', baseURL + '#/practice/start');
+				});
 				hideSubnav();
 			}
 			//curPageIndex = lo.pages.length;
@@ -645,7 +668,7 @@ obo.view = function()
 		// standard page (1 - n)
 		else
 		{
-			showNextPrevNav();
+			showAndUpdateNextPrevNav();
 			
 			var page = obo.model.getLO().pages[index - 1]
 			
@@ -738,6 +761,7 @@ obo.view = function()
 						$('#content').load('/assets/templates/viewer.html #practice-overview', function() {
 							var n = obo.model.getNumPagesOfSection('practice');
 							$('.icon-dynamic-background').text(n).next().prepend(n + ' ');
+							$('.begin-section-button').attr('href', baseURL + '#/practice/1');
 						});
 						break;
 					case 'assessment':
@@ -745,6 +769,8 @@ obo.view = function()
 							var numAssessment;
 							numAssessment = obo.model.getNumPagesOfSection('assessment');
 							var numAttempts = obo.model.getNumAttemptsRemaining();
+							$('#start-assessment-button').attr('href', baseURL + '#/assessment/1');
+							$('#view-scores-button').attr('href', baseURL + '#/assessment/scores/');
 
 							// set the dynamic icons
 							$('.icon-dynamic-background:eq(0)').text(numAssessment).next().prepend(numAssessment + ' ') // number of questions
@@ -851,7 +877,10 @@ obo.view = function()
 						else
 						{
 							// some practice questions not answered
-							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-incomplete', createUnansweredPageList);
+							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-incomplete', function() {
+								createUnansweredPageList();
+								$('.next-section-button').attr('href', baseURL + '#/assessment/start');
+							});
 							hideSubnav();
 						}
 						break;
@@ -866,7 +895,10 @@ obo.view = function()
 						else
 						{
 							// some practice questions missed
-							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-incomplete', createUnansweredPageList);
+							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-incomplete', function() {
+								createUnansweredPageList();
+								$('#submit-assessment-button').attr('href', baseURL + '#/assessment/scores');
+							});
 							hideSubnav();
 						}
 						break;
@@ -880,6 +912,7 @@ obo.view = function()
 				if(scores.length > 0)
 				{
 					$('#content').load('/assets/templates/viewer.html #score-results', function() {
+						$('#return-to-overview-button').attr('href', baseURL + '#/assessment/start');
 						var recentScore = scores[scores.length - 1].score;
 						var recordedScore = obo.model.getFinalCalculatedScore();
 						var attemptsRemaining = obo.model.getNumAttemptsRemaining();
@@ -962,7 +995,7 @@ obo.view = function()
 				break;
 			default:
 				showSubnav();
-				showNextPrevNav();
+				showAndUpdateNextPrevNav();
 				
 				//var question = obo.model.getQGroup().kids[index - 1];
 				var question = obo.model.getPageObject();
@@ -1516,14 +1549,6 @@ obo.view = function()
 		}
 	};
 	
-	// appends a 'Finish' button to $target subnav
-	var appendFinishButton = function($target)
-	{
-		$finishButton = $('<li><a id="finish-section-button" title="Finish this section" class="subnav-item" href="#">Finish</a></li>');
-		$finishButton.click(onFinishSectionButtonClick);
-		$target.append($finishButton);
-	}
-	
 	var makePageNav = function(section, $target)
 	{
 		// clear previous subnav
@@ -1551,7 +1576,7 @@ obo.view = function()
 			var lo = obo.model.getLO();
 			$(lo.pages).each(function(index, page){
 				index++
-				var pageHTML = $('<li ' + (isPageVisited('content', index) === true ? 'class="visited"' : '') + '><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'page/' + index + '" title="'+ obo.util.strip(page.title) +'">' + index +'</a></li>');
+				var pageHTML = $('<li ' + (isPageVisited('content', index) === true ? 'class="visited"' : '') + '><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'#/content/' + index + '" title="'+ obo.util.strip(page.title) +'">' + index +'</a></li>');
 				pList.append(pageHTML);
 				pageHTML.children('a').click(onNavPageLinkClick);
 			});
@@ -1577,7 +1602,7 @@ obo.view = function()
 			$(lo.pGroup.kids).each(function(index, page)
 			{
 				index++;
-				var qLink = $('<li '+(isPageVisited('practice', index) === true ? 'class="visited"' : '')+'><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
+				var qLink = $('<li '+(isPageVisited('practice', index) === true ? 'class="visited"' : '')+'><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'#/practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 				qListHTML.append(qLink)
 				qLink.children('a').click(onNavPageLinkClick);
 			});
@@ -1609,7 +1634,7 @@ obo.view = function()
 				{
 					$li.addClass('answered');
 				}
-				$li.append($('<a class="subnav-item nav-AQ-'+qIndex+'" href="'+ baseURL +'assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a>'));
+				$li.append($('<a class="subnav-item nav-AQ-'+qIndex+'" href="'+ baseURL +'#/assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a>'));
 				qListHTML.append($li);
 				$li.children('a').click(onNavPageLinkClick);
 				// add nav for preview mode to show alts
@@ -1626,13 +1651,17 @@ obo.view = function()
 						}
 
 						var altVersion = String.fromCharCode(altIndex + 97);
-						var altLink = $('<li><a class="subnav-item-alt nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
+						var altLink = $('<li><a class="subnav-item-alt nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'#/assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
 						altListHTML.append(altLink);
 						altLink.children('a').click(onNavPageLinkClick);
 					});
 				}
 			});
-			appendFinishButton(qListHTML);
+			
+			// append finish button:
+			$finishButton = $('<li><a id="finish-section-button" title="Finish this section" class="subnav-item" href="' + baseURL + '#/assessment/end/">Finish</a></li>');
+			$finishButton.click(onFinishSectionButtonClick);
+			qListHTML.append($finishButton);
 		}
 		
 	};
