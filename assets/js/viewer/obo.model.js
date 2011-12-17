@@ -735,6 +735,72 @@ obo.model = function()
 		}
 		return p;
 	};
+
+	var getFlashRequirementsForSection = function(section)
+	{
+		var highestVersion = getHighestFlashVersionInSection(section);
+		
+		return {
+			containsFlashContent: highestVersion > 0,
+			installedMajorVersion: swfobject.getFlashPlayerVersion().major,
+			highestMajorVersion: highestVersion
+		}
+	}
+
+	// Useful to determine if the section is "completeable"
+	// depending on what flash version the user has installed.
+	// Returns -1 if no flash is found.
+	var getHighestFlashVersionInSection = function(section)
+	{
+		var version = -1;
+
+		switch(section)
+		{
+			case 'content':
+				for(var i in lo.pages)
+				{
+					version = Math.max(version, getHighestFlashVersionInPage(lo.pages[i]));
+				}
+				break;
+			case 'practice':
+				for(var i in lo.pGroup.kids)
+				{
+					version = Math.max(version, getHighestFlashVersionInPage(lo.pGroup.kids[i]));
+				}
+				break;
+			case 'assessment':
+				for(var i in lo.aGroup.kids)
+				{
+					version = Math.max(version, getHighestFlashVersionInPage(lo.aGroup.kids[i]));
+				}
+				break;
+		}
+
+		return version;
+	};
+
+	// returns -1 if no flash found.
+	var getHighestFlashVersionInPage = function(page)
+	{
+		debug.log('GHFVIP');
+		var version = -1;
+		for(var i in page.items)
+		{
+			var pi = page.items[i];
+			if(	typeof pi.media !== 'undefined' &&
+				typeof pi.media.length !== 'undefined' &&
+				pi.media.length > 0 &&
+				typeof pi.media[0].itemType === 'string' &&
+				pi.media[0].itemType.toLowerCase() === 'swf' &&
+				typeof pi.media[0].version === 'string'
+			) {
+				version = Math.max(version, parseInt(pi.media[0].version));
+			}
+		}
+
+debug.log('getHighestFlashVersionInPage', version);
+		return version;
+	}
 	
 	// @TODO: use this more!
 	var getPageObject = function()
@@ -854,7 +920,7 @@ obo.model = function()
 			case 'assessment': return lo.aGroup;
 		}
 	};
-	
+
 	var getLO = function()
 	{
 		return lo;
@@ -1281,6 +1347,7 @@ obo.model = function()
 		getNumPagesAnswered: getNumPagesAnswered,
 		//getResponses: getResponses,
 		currentQuestionIsAlternate: currentQuestionIsAlternate,
-		getInstanceCloseDate: getInstanceCloseDate
+		getInstanceCloseDate: getInstanceCloseDate,
+		getFlashRequirementsForSection: getFlashRequirementsForSection
 	};
 }();

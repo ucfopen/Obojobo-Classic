@@ -321,6 +321,30 @@ obo.media = function()
 		ytPlayers = {};
 		youTubeVideoCount = 0;
 	};*/
+	var getMediaItemByMediaID = function(mediaID)
+	{
+		var mediaItems = $('.media-item');
+		for(var i in mediaItems)
+		{
+			var $e = $(mediaItems[i]);
+			if($e.attr('data-media-id') == mediaID)
+			{
+				return $e;
+			}
+		}
+
+		return undefined;
+	};
+
+	var reloadSWF = function($objectElement)
+	{
+		(function($objectElement) {
+			$objectElement.hide();
+			setTimeout(function() {
+				$objectElement.show();
+			}, 1);
+		})($objectElement);
+	};
 	
 	// creates either a YouTube or non-YouTube video, appends to $target
 	// pageItemOptions is for custom layout page items only
@@ -341,7 +365,7 @@ obo.media = function()
 			//mediaObject.itemType = 'cap5';
 		
 			// some useful attributes - we also include page and section for flash overlay hack purposes
-			$mediaElement.attr('data-media-width', mediaObject.width).attr('data-media-height', mediaObject.height);
+			$mediaElement.attr('data-media-width', mediaObject.width).attr('data-media-height', mediaObject.height).attr('data-media-id', mediaObject.mediaID);
 			$mediaElement.addClass('media-for-page-' + section + page);
 		
 			switch(mediaObject.itemType.toLowerCase())
@@ -379,7 +403,7 @@ obo.media = function()
 					{
 						$('#swap-cap').show();
 					
-						createSwfHolder();
+						createSwfHolder(section);
 					
 						// define standin, since we need to overlay captivates
 						$standin = $('<div class="media-item-standin"></div>');
@@ -491,7 +515,25 @@ obo.media = function()
 						$('.media-item').css('z-index', '9999');
 						//$.modal($('.media-item'));*/
 					//});
-				
+
+					$('.reload-media-button').remove();
+					if(isCaptivate)
+					{
+						var $reloadMediaButton = $('<a class="reload-media-button" role="button" data-media-id="' + mediaObject.mediaID + '" href="#">Reload media</a>');
+						$reloadMediaButton.click(function(event) {
+							event.preventDefault();
+							var $link = $(event.target);
+							var mediaID = $link.attr('data-media-id');
+							var $e = getMediaItemByMediaID(mediaID);
+							debug.log($e);
+							if(typeof $e !== 'undefined')
+							{
+								reloadSWF($e.find('object'));
+							}
+						});
+						$mediaElement.append($reloadMediaButton);
+					}
+					
 				
 					break;/*
 				case 'cap':
@@ -511,7 +553,7 @@ obo.media = function()
 					{
 						$('#swap-cap').show();
 					
-						createSwfHolder();
+						createSwfHolder(section);
 					
 						// define standin, since we need to overlay captivates
 						$standin = $('<div class="media-item-standin"></div>');
@@ -549,10 +591,8 @@ obo.media = function()
 					if($standin != null)
 					{
 						$standin.width(mediaObject.width).height(mediaObject.height);
-					
-						var o = $('.media-item-standin').offset();
-						$('.media-item').offset({left: o.left});
-						$('#swf-holder').offset({top: o.top});
+						
+						positionOverlayMedia();
 					}
 					else
 					{
@@ -735,6 +775,17 @@ obo.media = function()
 			return $mediaElement;
 		}
 	};
+
+	var positionOverlayMedia = function()
+	{
+		var $standin = $('.media-item-standin');
+		if($standin.length > 0)
+		{
+			var o = $('.media-item-standin').offset();
+			$('.media-item').offset({left: o.left});
+			$('#swf-holder').offset({top: o.top});
+		}
+	};
 	
 	// (you don't need to call this directly)
 	/*
@@ -763,7 +814,7 @@ obo.media = function()
 	};*/
 
 	// add our swf holder mechanism if it doesn't exist already:
-	var createSwfHolder = function()
+	var createSwfHolder = function(section)
 	{
 		if($('#swf-holder-' + section).length === 0)
 		{
@@ -778,7 +829,8 @@ obo.media = function()
 	
 	return {
 		//setYouTubeAPIReady: setYouTubeAPIReady,
-		createMedia: createMedia//,
+		createMedia: createMedia,
+		positionOverlayMedia: positionOverlayMedia
 		//youtubeize: youtubeize
 	};
 }();
