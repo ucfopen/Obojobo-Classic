@@ -77,7 +77,7 @@ else
 
 while($r = $DBM->fetch_obj($q))
 {
-	echo "Lo ID: " . $r->loID . "\n";
+	echo "LoID: " . $r->loID . "\n";
 	$loIDs [] = $r->loID;
 	$pages = $pm->getPagesForLOID($r->loID);
 	
@@ -91,10 +91,10 @@ while($r = $DBM->fetch_obj($q))
 			
 			if(is_array($item->media) && count($item->media) > 0)
 			{
+
 				foreach($item->media AS &$media)
 				{
-					
-					if(in_array($media->mediaID, $mediaIDs) && !isset($media->meta['asVersion']))
+					if($media->itemType == "swf")
 					{
 						if(!isset($medias[$media->mediaID]))
 						{
@@ -113,11 +113,12 @@ while($r = $DBM->fetch_obj($q))
 			echo "Page $page->pageID updated \n";
 			flush();
 			$qstr = "UPDATE ".\cfg_obo_Page::TABLE." SET ".\cfg_obo_Page::PAGE_DATA."='?' WHERE pageID = '?'";
-	 		$DBM->querySafe($qstr, base64_encode(serialize($page)), $page->pageID);
-			
+			$DBM->querySafe($qstr, base64_encode(serialize($page)), $page->pageID);
 		}
 
 	}
+	echo "CONTENT DONE \n";
+	flush();
 	
 	// Practice groups
 	$pGroup = $qgm->getGroup($r->pGroupID);
@@ -130,7 +131,7 @@ while($r = $DBM->fetch_obj($q))
 			{
 				foreach($item->media AS &$media)
 				{
-					if(in_array($media->mediaID, $mediaIDs) && !isset($media->meta['asVersion']))
+					if($media->itemType == "swf")
 					{
 						if(!isset($medias[$media->mediaID]))
 						{
@@ -147,11 +148,11 @@ while($r = $DBM->fetch_obj($q))
 				echo "Question $kid->questionID updated \n";
 				flush();
 				$qstr = "UPDATE ".\cfg_obo_Question::TABLE." SET ".\cfg_obo_Question::DATA."='?' WHERE ".\cfg_obo_Question::ID." = '?'";
-		 		$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
+				$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
 			}
 		}
 	}
-	echo "PRACTICe Questions complete \n";
+	echo "PRACTICE DONE \n";
 	flush();
 	// Assessment Groups
 	$aGroup = $qgm->getGroup($r->aGroupID);
@@ -164,7 +165,7 @@ while($r = $DBM->fetch_obj($q))
 			{
 				foreach($item->media AS &$media)
 				{
-					if(in_array($media->mediaID, $mediaIDs) && !isset($media->meta['asVersion']))
+					if($media->itemType == "swf")
 					{
 						if(!isset($medias[$media->mediaID]))
 						{
@@ -181,12 +182,14 @@ while($r = $DBM->fetch_obj($q))
 				echo "Question $kid->questionID updated \n";
 				flush();
 				$qstr = "UPDATE ".\cfg_obo_Question::TABLE." SET ".\cfg_obo_Question::DATA."='?' WHERE ".\cfg_obo_Question::ID." = '?'";
-		 		$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
+				$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
 			}
 		}
 	}
+	echo "ASSESSMENT DONE \n";
 	echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?loID=$r->loID');</script>\n";
 	echo "==========================\n";
+	flush();
 }
 echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?done=1');</script>\n";
 echo('DONE!');
