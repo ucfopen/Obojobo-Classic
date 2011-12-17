@@ -2,6 +2,9 @@
 RewriteEngine On
 RewriteBase /
 
+# MINIFY route minify urls to minify
+RewriteRule ^min/([bfg]=.*)  assets/min/index.php?$1 [L,QSA]
+
 # OBOJOBO dont rewrite these directories
 RewriteRule ^(manager|assets) - [L]
 
