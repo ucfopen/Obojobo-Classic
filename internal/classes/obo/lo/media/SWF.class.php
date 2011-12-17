@@ -132,11 +132,11 @@ class SWF
 		$dataSize = $this->readBits(self::GET_DATA_SIZE);
 		//echo 'dataSize = ['.$dataSize.']';
 		$rect = array(	'left' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS,
-						'right' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS,
-						'top' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS,
-						'bottom' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS);
-		$rect['width'] = $rect['bottom'] - $rect['top'];
-		$rect['height'] = $rect['right'] - $rect['left'];
+		              				'right' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS,
+		              				'top' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS,
+		              				'bottom' => $this->readBits($dataSize, true) * self::TWIPS_TO_PIXELS);
+		$rect['height'] = $rect['bottom'] - $rect['top'];
+		$rect['width'] = $rect['right'] - $rect['left'];
 		return $rect;
 	}
 	
