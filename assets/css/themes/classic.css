@@ -441,7 +441,8 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 
 .next-section-button:hover,
 .begin-section-button:hover,
-.button:hover
+.button:hover,
+.reload-media-button:hover
 {
 	background: -moz-linear-gradient(#b3cadb, #90adc1);
 	background: -ms-linear-gradient(#b3cadb, #90adc1);
@@ -740,6 +741,12 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 .page-layout-7
 {
 	/*text-align: center;*/
+}
+
+.page-layout-7 h2
+{
+	border-bottom: none;
+	padding-bottom: 8px;
 }
 
 .page-layout-7 .media-item
@@ -1991,7 +1998,7 @@ li:last-child > input[type="radio"]:checked+label
 	display: inline-block;
 	width: auto;
 	width: 60%;
-	
+	min-height: 150px;
 	-moz-border-radius: 20px;
 	
 	-webkit-border-radius: 20px;
@@ -2006,7 +2013,7 @@ li:last-child > input[type="radio"]:checked+label
 .assessment-missed-section p
 {
 	width:50%;
-	font-size:.8em;
+	font-size:.9em;
 }
 
 #page-navigation-bottom
@@ -2945,4 +2952,64 @@ a
 	font-size: 9pt;
 	width: 700px;
 	margin: 0 auto 15px auto;
+}
+
+.reload-media-button
+{
+	font-family: 'Lato', 'Arial';
+	font-weight: 900;
+	color: white;
+	text-align: center;
+	display: block;
+	position: relative;
+	top: 13px;
+	background: gray;
+	border-bottom: 1px solid gray;
+	border-top: 1px solid white;
+	
+	background: -moz-linear-gradient(#b0c8dd, #7198b4);
+	background: -ms-linear-gradient(#b0c8dd, #7198b4);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b0c8dd), color-stop(100%, #7198b4));
+	background: -webkit-linear-gradient(#b0c8dd, #7198b4);
+	background: -o-linear-gradient(#b0c8dd, #7198b4);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#b0c8dd', endColorstr='#7198b4');
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#b0c8dd', endColorstr='#7198b4')";
+	background: linear-gradient(#b0c8dd, #7198b4);
+
+	padding: 2px 12px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	-moz-box-shadow: 0 1px 1px #555;
+	-webkit-box-shadow: 0 1px 1px #555;
+	box-shadow: 0 1px 1px #555;
+	text-shadow: rgba(0, 0, 0, 0.3) 1px 1px 2px;
+	width: 120px;
+	text-decoration: none;
+	text-align: center;
+}
+
+.flash-notice
+{
+	width: 500px;
+	background: red;
+	color: white;
+	padding: 1em;
+	width: 700px;
+	font-family: 'Lato', 'Arial', sans;
+	display: none;
+	margin: 1em auto 0 auto;
+}
+
+.flash-notice p
+{
+	display: inline;
+}
+
+.flash-notice a,
+.flash-notice a:hover,
+.flash-notice a:visited,
+.flash-notice a:active
+{
+	color: white;
 }

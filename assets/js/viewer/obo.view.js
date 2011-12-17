@@ -258,6 +258,9 @@ obo.view = function()
 			$('#preview-mode-notification').click(function(event) {
 				event.preventDefault();
 				$(event.target).parent().hide();
+
+				// special case - reposition media if there is overlayed media on the page:
+				obo.media.positionOverlayMedia();
 			});
 		}
 		// for convience we map a H1 title click to the overview page
@@ -742,8 +745,8 @@ obo.view = function()
 	{
 		$target.append('<h2>' + title + '</h2>');
 		//$target.append('<nav id="page-navigation-top" class="page-navigation"><ul><li><a class="prev-page-button" href="#" role="button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>');
-	}
-	
+	};
+
 	var buildQuestionPage = function(section, index)
 	{
 		var sectionName = section.substr(0, 1).toUpperCase() + section.substr(1);
@@ -766,6 +769,9 @@ obo.view = function()
 						break;
 					case 'assessment':
 						$('#content').load('/assets/templates/viewer.html #assessment-overview', function() {
+							var flashRequirements = obo.model.getFlashRequirementsForSection('assessment');
+							var canViewFlash = !flashRequirements.containsFlashContent || flashRequirements.installedMajorVersion >= flashRequirements.highestMajorVersion;
+
 							var numAssessment;
 							numAssessment = obo.model.getNumPagesOfSection('assessment');
 							var numAttempts = obo.model.getNumAttemptsRemaining();
@@ -818,9 +824,30 @@ obo.view = function()
 
 							// disable button if they don't have any more attempts (0 if they have imported a score)
 							// or if the instance is closed
-							if(numAttempts === 0 || obo.model.instanceIsClosed())
+							// of they are missing flash or are on a flashless device
+							if(numAttempts === 0 || obo.model.instanceIsClosed() || !canViewFlash)
 							{
 								$('#start-assessment-button').addClass('disabled');
+							}
+
+debug.log(flashRequirements);
+							if(!canViewFlash)
+							{
+								if(flashRequirements.installedMajorVersion === 0)
+								{
+									if(obo.util.isIOS())
+									{
+										$('#ios-flash-notice').show();
+									}
+									else
+									{
+										$('#no-flash-notice').show();
+									}
+								}
+								else
+								{
+									$('#old-version-flash-notice').show();
+								}
 							}
 
 							// show/hide 'view scores' button
