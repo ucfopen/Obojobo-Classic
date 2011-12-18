@@ -13,7 +13,7 @@ date.format.js,
 swfobject.js,
 tipTipv13/jquery.tipTip.js,
 ba-debug.js"></script>
-
+<!--
 <script type="text/javascript" src="/min/b=assets/js&f=
 viewer/obo.util.js,
 viewer/obo.view.js,
@@ -24,9 +24,21 @@ viewer/obo.loader.js,
 viewer/obo.kogneato.js,
 viewer/obo.dialog.js,
 viewer/obo.captivate.js"></script>
+-->
+<script type="text/javascript" src="/assets/js/viewer/obo.util.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.view.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.model.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.loader.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.kogneato.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
+<script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
 
 <!-- Minify using Minify -->
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=classic.css,blue.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
+
+<link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
