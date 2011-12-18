@@ -148,11 +148,25 @@
 		
 		<!-- @TODO -->
 		<section class="assessment-import-score-section">
-			<h4>Import?</h4>
-			<p>Would you like to import your previous score of <span id="previous-score">
-</span>?</p>
-			<a id="do-import-previous-score-button" class="button" href="#" role="button">Yes, import</a>
-			<a id="dont-import-previous-score-button" class="button" href="#" role="button">Don't import</a>
+			<h3>Would you like to import your previous high score?</h3>
+			<p>
+				You have previously completed this Learning Object for another course with a high score of <strong><span class="previous-score"></span>%</strong>. Would you like to use that score for this course or ignore it and begin the Assessment?
+			</p>
+			<div class="assessment-import-score-options">
+				<div>
+					<a id="dont-import-previous-score-button" class="button" href="#" role="button">Do Not Import</a>
+					<div>
+						Do not import the previous score. Instead begin the assessment below.
+					</div>
+				</div>
+				<span>or</span>
+				<div>
+					<a id="do-import-previous-score-button" class="button" href="#" role="button">Import Score: <span class="previous-score"></span>%</a>
+					<div>
+						Import previous score. Your score for this learning object will be <span class="previous-score"></span>%.
+					</div>
+				</div>
+			</div>
 		</section>
 
 		<div id="assessment-info">
