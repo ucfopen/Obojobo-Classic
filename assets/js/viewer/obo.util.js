@@ -2,9 +2,9 @@
 	util simply contains helper functions
 */
 
-if(!window.obo)
+if(!window['obo'])
 {
-	window.obo = {};
+	window['obo'] = {};
 }
 
 obo.util = function()
