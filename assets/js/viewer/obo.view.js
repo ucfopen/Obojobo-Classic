@@ -50,6 +50,11 @@ obo.view = function()
 	// in this case we don't want to modify to the history stack,
 	// but move through it instead.
 	var preventUpdateHistoryOnNextRender = false;
+
+	// we need to keep track of the last url pushed to history.
+	// this is a workaround until all browsers support checking history.state
+	// this allows us to not push the same url twice
+	//var lastHistoryState = '';
 	
 	// some view-based state info - need to keep track of which pages have already been visited
 	var visited = {
@@ -142,6 +147,14 @@ obo.view = function()
 			if(!$(event.target).hasClass('disabled'))
 			{
 				obo.model.gotoPage(1);
+			}
+		}).on('click', '#start-practice-button', function(event) {
+			// start the practice
+			event.preventDefault();
+			
+			if(!$(event.target).hasClass('disabled'))
+			{
+				startPractice();
 			}
 		}).on('click', '#start-assessment-button', function(event) {
 			// start the assessment
@@ -352,7 +365,7 @@ obo.view = function()
 	// we assume the 'start' page is desired if no page index is specified
 	var gotoPageFromURL = function()
 	{
-		var rendered = false;
+		debug.log('GO TO PAGE FROM URL');
 		var section = '';
 		var pg = '';
 		
@@ -376,35 +389,33 @@ obo.view = function()
 			if(tokens.length > 0)
 			{
 				section = tokens[0].toLowerCase();
-				if(section === 'overview' || section === 'content' || section === 'practice' || section === 'assessment')
+				//if(section === 'overview' || section === 'content' || section === 'practice' || section === 'assessment')
+				//{
+				if(tokens.length > 1 && section != 'overview')
 				{
-					if(tokens.length > 1 && section != 'overview')
-					{
-						pg = tokens[1];
-						rendered = obo.model.gotoSectionAndPage(tokens[0].toLowerCase(), pg);
-					}
-					else
-					{
-						rendered = obo.model.gotoSection(tokens[0].toLowerCase());
-					}
+					pg = tokens[1];
+					obo.model.gotoSectionAndPage(tokens[0].toLowerCase(), pg, onGotoPageFromURL);
 				}
+				else
+				{
+					obo.model.gotoSection(tokens[0].toLowerCase(), onGotoPageFromURL);
+				}
+				//}
 			}
 		}
-		
-		if(!rendered)
+	}
+
+	var onGotoPageFromURL = function(successful)
+	{
+		debug.log('::::::::::::', successful);
+		if(successful)
 		{
-			/*
-			// we handle a special case for why the page wasn't rendered: user is attmpeting
-			// to access a specific assessment page but they aren't in the quiz
-			if(section === 'assessment' && pg.length > 0 && !obo.model.isInAssessmentQuiz())
-			{
-				// ...instead, take them to the start of the assessment.
-				obo.model.gotoSectionAndPage('assessment', 'start');
-			}
-			else
-			{*/
-				obo.model.gotoSection('overview');/*
-			}*/
+			render();
+		} 
+		else
+		{
+			obo.model.gotoPage('start');
+			//obo.model.gotoSection('overview');
 		}
 	}
 	
@@ -414,7 +425,8 @@ obo.view = function()
 		var section = obo.model.getSection();
 		var page = obo.model.getPage();
 		// for simplicity only we omit 'start' if in overview section
-		return '/' + section + (page === 'start' && section === 'overview' ? '' : '/' + page);
+		var url = '/' + section + (page === 'start' && section === 'overview' ? '' : '/' + page);
+		return url;
 		//return '/' + obo.model.getSection() + '/' + obo.model.getPage();
 	}
 
@@ -459,10 +471,18 @@ obo.view = function()
 		$('#content').css('opacity', 1); // remove opacity attribute (reset to 1)
 		$('#content-blocker').remove();
 	}
+
+	var startPractice = function()
+	{
+		showThrobber();
+		obo.model.startPractice();
+	}
 	
 	// @TODO instead of wrapper functions should these be callbacks from obo.model.startAssessment?
 	var startAssessment = function()
 	{
+		showThrobber();
+
 		// @HACK: wipe out practice captivate overlays
 		if($('#swf-holder-practice').length > 0)
 		{
@@ -705,6 +725,7 @@ obo.view = function()
 
 			var pageItems = [];
 
+/*
 			switch(page.layoutID)
 			{
 				case 4: case '4':
@@ -714,14 +735,16 @@ obo.view = function()
 				default:
 					pageItems = $(page.items);
 					break;
-			}
+			}*/
+
+			pageItems = $(page.items);
+
 			// loop through each page item
 			$(pageItems).each(function(itemIndex, item)
 			{
 				switch(item.component)
 				{
 					case 'MediaView':
-						//$target.append(formatPageItemMediaView(item));
 						createPageItemMediaView(item, $target);
 						break;
 					case 'TextArea':
@@ -764,7 +787,7 @@ obo.view = function()
 						$('#content').load('/assets/templates/viewer.html #practice-overview', function() {
 							var n = obo.model.getNumPagesOfSection('practice');
 							$('.icon-dynamic-background').text(n).next().prepend(n + ' ');
-							$('.begin-section-button').attr('href', baseURL + '#/practice/1');
+							$('#start-practice-button').attr('href', baseURL + '#/practice/1');
 						});
 						break;
 					case 'assessment':
@@ -1327,7 +1350,7 @@ debug.log(flashRequirements);
 		
 		var oldScore = obo.model.getPreviousResponse();
 		debug.log('updateInteractiveScore', score, oldScore);
-		obo.model.submitQuestion(score);
+		obo.model.submitQuestion(score, true);
 		
 		updateInteractiveScoreDisplay(score, oldScore);
 	}
@@ -1561,18 +1584,27 @@ debug.log(flashRequirements);
 	// browers that don't support it simply don't modify the history.
 	var updateHistory = function(url, replaceState)
 	{
-		debug.log('updateHistory', url, replaceState);
+		//alert('update history');
+		debug.log('______________updateHistory', baseURL + '#' + getHashURL(), replaceState);
 		if(Modernizr.history)
 		{
-			//debug.log('history.pushState', baseURL + '#' + getHashURL());
-			if(replaceState === true)
-			{
-				history.replaceState(null, null, baseURL + '#' + getHashURL());
-			}
-			else
-			{
-				history.pushState(null, null, baseURL + '#' + getHashURL());
-			}
+			var newURL = baseURL + '#' + getHashURL();
+			//console.log('compare newURL', newURL, ' to', lastHistoryState);
+			//if(newURL != lastHistoryState)
+			//{
+				if(replaceState === true)
+				{
+					history.replaceState(null, null, newURL);
+				}
+				// only push if we're not adding a duplicate url to the stack:
+				else
+				{
+					history.pushState(null, null, baseURL + '#' + getHashURL());
+				}
+			//}
+			
+			
+			//lastHistoryState = newURL;
 		}
 	};
 	
@@ -1626,7 +1658,7 @@ debug.log(flashRequirements);
 			var qListHTML = makePageNav('practice', $('#nav-practice').parent());
 			
 			var lo = obo.model.getLO();
-			$(lo.pGroup.kids).each(function(index, page)
+			$(obo.model.getPageObjects()).each(function(index, page)
 			{
 				index++;
 				var qLink = $('<li '+(isPageVisited('practice', index) === true ? 'class="visited"' : '')+'><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'#/practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
@@ -1804,6 +1836,7 @@ debug.log(flashRequirements);
 	
 	var render = function()
 	{
+		debug.log('VIEW.RENDER');
 		debug.time('render');
 		var section = obo.model.getSection();
 		
@@ -1946,6 +1979,9 @@ debug.log(flashRequirements);
 		}
 		else
 		{
+			debug.log('________History update prevented!');
+			// we still replace history to make sure we have a correct hash url:
+			updateHistory('whu', true);
 			preventUpdateHistoryOnNextRender = false;
 		}
 		
