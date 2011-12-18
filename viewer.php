@@ -85,5 +85,3 @@ else // not logged in
   // =============== RENDER LOGIN TEMPLATE ========================
   include("assets/templates/login.php");
 }
-
-?>
