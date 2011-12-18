@@ -144,5 +144,16 @@ h3
 	background: #444444;
 }
 
+#content-size {
+	left: 360px;
+}
 
+#practice-size
+{
+	left: 486px;
+}
 
+#assessment-size
+{
+	left: 609px;
+}

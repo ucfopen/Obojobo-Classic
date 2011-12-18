@@ -32,7 +32,7 @@ obo.dialog = function()
 		//var id = 'dialog-' + dialogID;
 		//dialogID++;
 		
-		options.width = 400;
+		//options.width = 400;
 		options.resizable = false;
 		options.modal = true;
 		
@@ -63,6 +63,8 @@ obo.dialog = function()
 		$dialog.append($title);
 		$dialog.append($p);
 		$dialog.append($buttons);
+
+		$dialog.width(typeof options.width === 'undefined' ? 400 : options.width);
 		
 		//$('body').append($dialog);
 		
