@@ -9,12 +9,12 @@ if(!window.obo)
 {
 	window.obo = {};
 }
-
+/*
 obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [1707, true]], function(event) {
 	debug.log('good job');
 	debug.log(event);
 });
-
+*/
 obo.model = function()
 {
 	var init = function(viewModule, options)
@@ -34,8 +34,8 @@ obo.model = function()
 	// the lo data object
 	var lo;
 	
-	var scores = [{score:55, startTime:0, endTime:443848530},{score:96, startTime:0, endTime:0},{score:88, startTime:0, endTime:0}];
-	//var scores = [];
+	//var scores = [{score:55, startTime:0, endTime:443848530},{score:96, startTime:0, endTime:0},{score:88, startTime:0, endTime:0}];
+	var scores = [];
 
 	// we store practice and assessment questions in a special array.
 	// useful for preview mode (we group qalts so we can display those easier)
@@ -135,6 +135,8 @@ obo.model = function()
 				return (_section === 'assessment' && (page === 'start' || page === 'scores')) || _section != 'assessment';
 			}
 		}
+
+		return false;
 	};
 	
 	// returns true if the page is a numeric type and is within the bounds
@@ -142,6 +144,7 @@ obo.model = function()
 	// a three question assessment)
 	var pageIsNumericWithinBounds = function(_section, page)
 	{
+		console.log('pageIsNumericWithinBounds', _section, page);
 		if(_section === undefined)
 		{
 			_section = section;
@@ -166,7 +169,9 @@ obo.model = function()
 			// @TODO - check the altIndex bounds
 		}
 		
-		return index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
+		var r = index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
+		debug.log(r);
+		return r;
 	};
 	
 	// utility function that turns a page like '2b' into {index:1, altIndex:1}
@@ -355,16 +360,25 @@ obo.model = function()
 		return errors;
 	};
 	
-	// this is only necessary in preview mode to show the multiple questions per index
+	// instead of looking into pGroup or aGroup use the questions object, which
+	// this function builds. in preview mode this will show multiple questions per index
+	// in a multi-dimensional array.
 	var processQuestions = function()
 	{
-		debug.log('processQuestions', lo.aGroup.kids);
-		
+		processPracticeQuestions();
+		processAssessmentQuestions();
+	};
+
+	var processPracticeQuestions = function()
+	{
 		questions.practice = [];
 		$(lo.pGroup.kids).each(function(index, page) {
 			questions.practice.push([page]);
 		});
-		
+	};
+	
+	var processAssessmentQuestions = function()
+	{	
 		questions.assessment = [];
 		var curQIndex = 0;
 		$(lo.aGroup.kids).each(function(index, page)
@@ -379,8 +393,14 @@ obo.model = function()
 		});
 	};
 	
-	var setLocation = function(newSection, newPage)
+	// attempts to set the location variables to new values.
+	// if callback is defined will call that function, returning
+	// true if successful, false otherwise. If not it will automatically
+	// call view.render if successful.
+	var setLocation = function(newSection, newPage, callback)
 	{
+		debug.log('>>>>>>>>>>>>>>>>>>>setLocation', newSection, newPage, callback);
+
 		if(newSection === undefined)
 		{
 			newSection = section;
@@ -402,7 +422,12 @@ obo.model = function()
 					}
 					else if(newPage != pages[section])
 					{
-						obo.remote.makeCall('trackPageChanged', [lo.viewID, getPageID(), getSectionIndex()], processResponse);
+						// we only track page changes on numeric pages:
+						var pageID = getPageID(newPage);
+						if(typeof pageID !== 'undefined')
+						{
+							obo.remote.makeCall('trackPageChanged', [lo.viewID, pageID, getSectionIndex()], processResponse);
+						}
 					}
 				}
 
@@ -432,22 +457,44 @@ obo.model = function()
 				
 				section = newSection;
 				pages[section] = newPage;
-				view.render();
-
-				return true;
+				
+				if(typeof callback === 'function')
+				{
+					debug.log('case 1')
+					callback(true);
+				}
+				else
+				{
+					debug.log('case 1b');
+					view.render();
+				}
 			}
 			// if can't access the page we want then at least attempt to access the start page of this section:
 			else if(canAccessPage(newSection, 'start'))
 			{
 				section = newSection;
 				pages[section] = section === 'content' ? 1 : 'start';
-				view.render();
-
-				return true;
+				
+				if(typeof callback === 'function')
+				{
+					debug.log('case 2');
+					callback(true);
+				}
+				else
+				{
+					debug.log('case 2b');
+					view.render();
+				}
 			}
 		}
-		
-		return false;
+		else
+		{
+			if(typeof callback === 'function')
+			{
+				debug.log('case 3');
+				callback(false);
+			}
+		}
 	}
 	
 	var getPrevSection = function()
@@ -484,16 +531,33 @@ obo.model = function()
 		
 		return -1;
 	};
+
+	var loadPractice = function(result)
+	{
+		// we'll have a result if this was called via trackSubmitStart
+		if(mode === 'preview' || (result && processResponse(result)))
+		{
+			if(mode === 'instance')
+			{
+				// overwrite our pGroup with the set from trackSubmitSTart
+				lo.pGroup.kids = result;
+				processPracticeQuestions();
+			}
+		}
+
+		setLocation('practice', 1);
+	}
 	
 	var loadAssessment = function(result)
 	{
 		// we'll have a result if this was called via trackSubmitStart
-		if(mode === 'preview' || result && processResponse(result))
+		if(mode === 'preview' || (result && processResponse(result)))
 		{
 			if(mode === 'instance')
 			{
 				// overwrite our aGroup with the set from trackSubmitStart
 				lo.aGroup.kids = result;
+				processAssessmentQuestions();
 				// tease out the saved answers from the response
 				for(var i in result)
 				{
@@ -733,6 +797,7 @@ obo.model = function()
 		{
 			p = parseInt(p);
 		}
+
 		return p;
 	};
 
@@ -803,9 +868,10 @@ debug.log('getHighestFlashVersionInPage', version);
 	}
 	
 	// @TODO: use this more!
-	var getPageObject = function()
+	// if page is not defined we use the current page
+	var getPageObject = function(page)
 	{
-		var i = getPage();
+		var i = typeof page === 'undefined' ? getPage() : page;
 		debug.log('getPageObject', i);
 		if(pageIsNumericWithinBounds(undefined, i))
 		{
@@ -863,31 +929,39 @@ debug.log('getHighestFlashVersionInPage', version);
 		return undefined;
 	};
 	
-	// return the page or question id of the current page
-	var getPageID = function()
+	// return the page or question id of a page
+	// if page is not defined we'll assume the current page.
+	// if page is a non-numeric page we return undefined
+	var getPageID = function(page)
 	{
-		var page = getPageObject();
+		var page = getPageObject(page);
 		
-		switch(section)
+		if(typeof page !== 'undefined')
 		{
-			case 'content':
-				return page.pageID;
-			case 'practice':
-			case 'assessment':
-				return page.questionID;
+			switch(section)
+			{
+				case 'content':
+					return page.pageID;
+				case 'practice':
+				case 'assessment':
+					return page.questionID;
+			}
 		}
+
+		return undefined;
 	};
 	
 	// return how many standard pages (not overview nor end) are in a section
 	// abstracts between instance summary data and lo data
 	var getNumPagesOfSection = function(_section)
 	{
+		debug.log('getNumPagesOfSection', questions);
 		switch(_section)
 		{
 			case 'overview': return 0;
 			case 'content': return mode === 'preview' ? lo.pages.length : parseInt(lo.summary.contentSize);
-			case 'practice': return questions.practice.length;
-			case 'assessment': return questions.assessment.length;
+			case 'practice': return mode === 'preview' ? questions.practice.length : parseInt(lo.summary.practiceSize);
+			case 'assessment': return mode === 'preview' ? questions.assessment.length : parseInt(lo.summary.assessmentSize);
 		}
 	};
 	
@@ -943,10 +1017,11 @@ debug.log('getHighestFlashVersionInPage', version);
 	{
 		if(params['instID'].length > 0)
 		{
-			obo.view.displayError('Only preview mode is enabled currently.');
-			return;
+			//obo.view.displayError('Only preview mode is enabled currently.');
+			//return;
+
 			// instance
-			//loadInstance(params['instID'], callback, opts);
+			loadInstance(params['instID'], callback, opts);
 		}
 		else if(params['loID'].length > 0)
 		{
@@ -1084,10 +1159,10 @@ debug.log('getHighestFlashVersionInPage', version);
 		}
 	};
 
-	var gotoPrevPage = function()
+	var gotoPrevPage = function(callback)
 	{
 		var p = getPrevPage();
-		setLocation(p.section, p.page);
+		setLocation(p.section, p.page, callback);
 	}
 	
 	// go to the next page, slightly difficult since page can be
@@ -1153,50 +1228,50 @@ debug.log('getHighestFlashVersionInPage', version);
 		}
 	};
 
-	var gotoNextPage = function()
+	var gotoNextPage = function(callback)
 	{
 		var p = getNextPage();
-		setLocation(p.section, p.page);
+		setLocation(p.section, p.page, callback);
 	};
 	
 	// advance to the start of next section
-	var gotoStartPageOfNextSection = function()
+	var gotoStartPageOfNextSection = function(callback)
 	{
-		return setLocation(getNextSection(), 'start');
+		setLocation(getNextSection(), 'start', callback);
 	};
 	
-	var gotoSectionAndPage = function(newSection, newPage)
+	var gotoSectionAndPage = function(newSection, newPage, callback)
 	{
-		return setLocation(newSection, newPage);
+		setLocation(newSection, newPage, callback);
 	};
 	
 	// jump to any section, but prevent this if they are in an assessment quiz!
 	// optionally you can supply a page as well
-	var gotoSection = function(newSection)
+	var gotoSection = function(newSection, callback)
 	{
-		return setLocation(newSection);
+		setLocation(newSection, undefined, callback);
 	};
 	
 	// navigates to a page for the current section.
 	// returns true if successful.
 	// page can either be 'start', 'end', 'scores', a number 1-n or a number with a letter suffix
 	// for question alternates in preview mode (2b, 3d, etc)
-	var gotoPage = function(newPage)
+	var gotoPage = function(newPage, callback)
 	{
-		return setLocation(undefined, newPage);
+		setLocation(undefined, newPage, callback);
 	};
 	
 	// use this to submit a MC, short answer or media question.
 	// for media, score = 0-100
-	var submitQuestion = function(answerID_or_shortAnswerResponse_or_score)
+	var submitQuestion = function(answerID_or_shortAnswerResponse_or_score, isMedia)
 	{
 		var page = getPage();
 		var qGroup = getQGroup();
-		
+
 		debug.log('submitQuestion(' + answerID_or_shortAnswerResponse_or_score + ')');
 		if(mode === 'instance')
 		{
-			obo.remote.makeCall(qGroup.itemType.toLowerCase() === 'media' ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
+			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
 		}
 		
 		// store this response
@@ -1219,6 +1294,18 @@ debug.log('getHighestFlashVersionInPage', version);
 		debug.log('getPreviousResponse');
 		debug.log(responses);
 		return responses[section][getPage()];
+	};
+
+	var startPractice = function()
+	{
+		if(mode === 'instance' && typeof lo.pGroup.kids === 'undefined')
+		{
+			obo.remote.makeCall('trackAttemptStart', [lo.viewID, lo.pGroup.qGroupID], loadPractice);
+		}
+		else
+		{
+			loadPractice();
+		}
 	};
 	
 	var startAssessment = function()
@@ -1250,7 +1337,8 @@ debug.log('getHighestFlashVersionInPage', version);
 			// @TODO: This is O(n^2)
 			for(var i in responses['assessment'])
 			{
-				curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
+				curQuestion = questions.assessment[i - 1];
+				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
 				debug.log('curQuestion=',curQuestion)
 				switch(curQuestion.itemType.toLowerCase())
@@ -1279,7 +1367,8 @@ debug.log('getHighestFlashVersionInPage', version);
 				}
 				
 			}
-			onSubmitAssessment(parseFloat(total) / parseFloat(lo.aGroup.kids.length));
+			//onSubmitAssessment(parseFloat(total) / parseFloat(lo.aGroup.kids.length));
+			onSubmitAssessment(parseFloat(total) / parseFloat(questions.assessment.length));
 		}
 	};
 	
@@ -1306,11 +1395,9 @@ debug.log('getHighestFlashVersionInPage', version);
 		isInAssessmentQuiz: isInAssessmentQuiz,
 		instanceIsClosed: instanceIsClosed,
 		getScores: getScores,
-		//getNumAttempts: getNumAttempts,
 		getNumAttemptsRemaining: getNumAttemptsRemaining,
 		getImportableScore: getImportableScore,
 		importPreviousScore: importPreviousScore,
-		//isPreviousScoreImported: isPreviousScoreImported,
 		getScoreMethod: getScoreMethod,
 		getFinalCalculatedScore: getFinalCalculatedScore,
 		getMode: getMode,
@@ -1320,12 +1407,8 @@ debug.log('getHighestFlashVersionInPage', version);
 		getPageObject: getPageObject,
 		getPageObjects: getPageObjects,
 		getMediaObjectByID: getMediaObjectByID,
-		//getPageID: getPageID,
 		getNumPagesOfSection: getNumPagesOfSection,
 		getNumPagesOfCurrentSection: getNumPagesOfCurrentSection,
-		//getquestions.assessment: getquestions.assessment,
-		//getCurrentquestions.assessment: getCurrentquestions.assessment,
-		//getQGroup: getQGroup,
 		getLO: getLO,
 		getTitle: getTitle,
 		isResumingPreviousAttempt: isResumingPreviousAttempt,
@@ -1342,10 +1425,10 @@ debug.log('getHighestFlashVersionInPage', version);
 		submitQuestion: submitQuestion,
 		getPreviousResponse: getPreviousResponse,
 		startAssessment: startAssessment,
+		startPractice: startPractice,
 		submitAssessment: submitAssessment,
 		isPageAnswered: isPageAnswered,
 		getNumPagesAnswered: getNumPagesAnswered,
-		//getResponses: getResponses,
 		currentQuestionIsAlternate: currentQuestionIsAlternate,
 		getInstanceCloseDate: getInstanceCloseDate,
 		getFlashRequirementsForSection: getFlashRequirementsForSection

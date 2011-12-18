@@ -8,7 +8,7 @@ obo.remote = function()
 {
 	var makeCall = function(method, args, callback)
 	{
-		debug.log('makeCall: ' + method + ', args: ' + args);
+		debug.log('__makeCall: ' + method + ', args: ' + args);
 		//debug.log("http://obo/assets/gateway-json.php/loRepository."+method+"/"+arguments.join("/")+'/?contentType=application/json');
 		
 		if(!callback)
