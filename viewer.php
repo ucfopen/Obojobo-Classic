@@ -8,10 +8,26 @@ $API = \obo\API::getInstance();
 if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
 {
   $loggedIn = $API->doLogin($_REQUEST['username'],  $_REQUEST['password']);
+  if($loggedIn !== true)
+  {
+    $notice = 'Invalid Login';
+  }
 }
 else
 {
   $loggedIn = $API->getSessionValid();  
+}
+
+// ================= CHECK FOR REQUIRED ROLE =======================
+
+if($loggedIn === true && isset($_REQUEST['loID']))
+{
+  $hasRole = $API->getSessionRoleValid(array(\cfg_obo_Role::CONTENT_CREATOR, \cfg_obo_Role::LIBRARY_USER));
+  if(!in_array(\cfg_obo_Role::LIBRARY_USER, $hasRole['hasRoles']) && !in_array(\cfg_obo_Role::CONTENT_CREATOR, $hasRole['hasRoles']))
+  {
+    $loggedIn = false;
+    $notice = 'You do not have permission to preview this learning lbject. For more information view our <a href="/help/faq/">FAQ</a>.';
+  }
 }
 
 // ================ DISPLAY OUTPUT =================================
@@ -50,6 +66,7 @@ else // not logged in
   {
     if($loMeta = $API->getLOMeta($_REQUEST['loID']))
     {
+
       $title = $loMeta->title . ' ' . $loMeta->version . '.' . $loMeta->subVersion;
       $course = 'PREVIEW ONLY';
       $instructor = 'only visible to authors';
