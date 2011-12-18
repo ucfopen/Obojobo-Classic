@@ -41,7 +41,7 @@ obo.view = function()
 	
 	// @TODO: Make sure this is defined when we set it
 	// for convience keep a reference to the URL sans fake # URL
-	var baseURL = location.href.substr(0, location.href.indexOf('#') === -1 ? location.href.length : location.href.indexOf('#'));
+	var baseURL = obo.util.getBaseURL();
 	//var baseURL = location.origin + location.pathname + location.search;
 	debug.log('location=');
 	debug.log(location);
@@ -273,6 +273,12 @@ obo.view = function()
 		});
 		// End live events.
 		
+		$('#log-out-button').click(function(event) {
+			event.preventDefault();
+
+			obo.model.logout();
+		});
+
 		// inject preview header if needed
 		if(obo.model.getMode() === 'preview')
 		{

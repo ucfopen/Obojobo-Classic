@@ -15,6 +15,11 @@ obo.remote = function()
 		{
 			callback = $.noop();
 		}
+
+		if(!args || typeof args === 'undefined')
+		{
+			args = [];
+		}
 		
 		// force content type to be json so we don't have to parse every return
 		// we also automatically filter every call to check for errors

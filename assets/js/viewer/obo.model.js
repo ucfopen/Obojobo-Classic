@@ -1447,6 +1447,13 @@ debug.log('getHighestFlashVersionInPage', version);
 		
 		return total;
 	};
+
+	var logout = function()
+	{
+		obo.remote.makeCall('doLogout', null, function(result) {
+			location.href = obo.util.getBaseURL();
+		});
+	};
 	
 	return {
 		init: init,
@@ -1489,6 +1496,7 @@ debug.log('getHighestFlashVersionInPage', version);
 		getNumPagesAnswered: getNumPagesAnswered,
 		currentQuestionIsAlternate: currentQuestionIsAlternate,
 		getInstanceCloseDate: getInstanceCloseDate,
-		getFlashRequirementsForSection: getFlashRequirementsForSection
+		getFlashRequirementsForSection: getFlashRequirementsForSection,
+		logout: logout
 	};
 }();
