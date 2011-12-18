@@ -1,17 +1,11 @@
 <html class="js history rgba multiplebgs"><head>
-<title>Evaluating Web Sites | Obojobo Learning Object</title>
+<title><?php echo $title; ?> | Obojobo Learning Object</title>
 <link rel="profile" href="http://gmpg.org/xfn/11">
 
 <!-- Minify using Minify -->
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery-1.7.js,
-jquery.simplemodal.1.4.1.js,
-modernizr-2.0.6.js,
-date.format.js,
-swfobject.js,
-jquery.infieldlabel.js,
-tipTipv13/jquery.tipTip.js,
-ba-debug.js"></script>
+jquery.infieldlabel.js"></script>
 
 
 
@@ -37,16 +31,9 @@ ba-debug.js"></script>
   // We check for IE <= 7 up in the IE conditionals.
   // We assume Chrome is up to date
 
-
   $('document').ready(function(){
-	$('#nav-list').hide();
-	$('#log-out-button').hide();
-
 	$("label").inFieldLabels(); 
   });
-
-
-
  
 </script>
 
@@ -263,6 +250,7 @@ form li {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='#48677f');
 	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#8ea4b8', endColorstr='#48677f')";
 	background: linear-gradient(#8ea4b8, #48677f);
+	border-bottom: 1px solid #111;
 }
 
 
@@ -277,11 +265,15 @@ form li {
 }
 
 #login-page h2.class-times{
-	margin-top:5px;
+	margin-top:0px;
 	margin-bottom:30px;
 	font-size:18px;
 	color:#555;
 	font-style:italic;
+	padding:5px 0;
+	border-top:1px solid #ddd;
+	border-bottom:1px solid #AAA;
+	background-color:#BBB;
 }
 
 #login-page h2 em{
@@ -302,58 +294,61 @@ html
 <body>
 <section id="content" style="margin-top: 0px; opacity: 1; ">
 
-<div id="login-page">
-<h1 id="lo-title" title="Evaluating Web Sites">Evaluating Web Sites And Other Stuff with very long titles</h1>
-	<h2 class="class-times" >for <em>EGY 3001</em> (Denise L Gammonley)</h2>
-		
-	<h3 >Begins: <em>08/17/10</em> at <em>8:52am</em></h3> 
-	<h3 >Closes: <em>12/17/15</em> at <em>8:52am</em></h3> 
+	<div id="login-page">
+	<h1 id="lo-title" title="<?php echo $title; ?>"><?php echo $title; ?></h1>
+		<h2 class="class-times" >for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
+			
+		<h3 >Begins: <em><?php echo $startDate; ?></em> at <em><?php echo $startTime; ?></em></h3> 
+		<h3 >Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
 
-	<div class="overview-details">
-		
-		<div class="main">
-			<div id="login-error">
-				UCF NID or Password Incorrect. <a href="help">Click Here For Help.</a>
-				<ul>
-					<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup your NID</a></li>
-					<li><a href="http://mynid.net.ucf.edu/">Reset your password</a></li>
-					<li><a href="http://learn.ucf.edu/support/">Contact Support</a></li>
-				</ul>
-			</div>
-			<div id="form">
-				<form method="post" class="form-content" action="">
-					<h2>Login to Begin</h2>
+		<div class="overview-details">
+			
+			<div class="main">
+				<div id="login-error">
+					UCF NID or Password Incorrect. <a href="help">Click Here For Help.</a>
 					<ul>
-						<li>
-							<label for="username">UCF NID</label><br>
-							<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
-						</li>
-						<li>
-							<label for="password">Password</label><br>
-							<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
-						</li>
-						<li>
-							<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3"> <div id="login-loading">Loading...</div>
-						</li>
+						<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup your NID</a></li>
+						<li><a href="http://mynid.net.ucf.edu/">Reset your password</a></li>
+						<li><a href="http://learn.ucf.edu/support/">Contact Support</a></li>
 					</ul>
-					<ul class="foot">
-						<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup NID</a></li>
-						<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
-						<li><a href="help">Help</a></li>
-					</ul>
-				</form>
+				</div>
+				<div id="form">
+					<form method="post" class="form-content" action="">
+						<h2>Login to Begin</h2>
+						<ul>
+							<li>
+								<label for="username">UCF NID</label><br>
+								<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
+							</li>
+							<li>
+								<label for="password">Password</label><br>
+								<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
+							</li>
+							<li>
+								<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3"> <div id="login-loading">Loading...</div>
+							</li>
+						</ul>
+						<ul class="foot">
+							<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup NID</a></li>
+							<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
+							<li><a href="/help">Help</a></li>
+						</ul>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-</section><nav id="page-navigation-bottom" class="page-navigation" style="display: none; "><ul><li><a href="http://obo/view/777#/content/3" role="button" class="prev-page-button">Prev</a></li><li><a class="next-page-button" href="http://obo/view/777#/content/5" role="button">Next</a></li></ul></nav><footer id="footer">
-		<div class="footer-container">
-			<div id="logo">powered by Obojobo</div>
-			<h5>© 2011 University of Central Florida</h5>
-			<p>Some content is used under Creative Commons.  <a href="#" role="button">View license details</a>.</p>
-			<p>Learning object created by: Ian Turgeon, Zach Berry, Francisca Yonekura, and Keegan Berry</p>
-		</div>
-	</footer><a href="#" id="go-left">Go left</a><a href="#" id="go-right">Go right</a><div id="tiptip_holder" style="max-width: 200px; margin-right: 0px; margin-bottom: 0px; margin-left: 657px; margin-top: 60px; display: none; " class="tip_top"><div id="tiptip_arrow" style="margin-left: 81.5px; margin-top: 22px; "><div id="tiptip_arrow_inner"></div></div><div id="tiptip_content">Getting Additional Help</div></div>
+</section>
 
-	</body></html>
+<footer id="footer">
+	<div class="footer-container">
+		<div id="logo">powered by Obojobo</div>
+		<h5>© 2011 University of Central Florida</h5>
+		<p></p>
+		<p></p>
+	</div>
+</footer>
+
+</body>
+</html>
