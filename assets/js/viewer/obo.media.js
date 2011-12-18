@@ -167,7 +167,7 @@ obo.media = function()
 				var $placeholder = $(placeholder);
 				$placeholder.removeClass('kogneato-placeholder').addClass('kogneato-container');
 				var giid = $placeholder.attr('data-giid');
-				obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [giid, true]], function(event) {
+				obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [giid]], function(event) {
 					debug.log('kogneatoize 2');
 					debug.log(event);
 					$('.kogneato-container').each(function(index, container)
