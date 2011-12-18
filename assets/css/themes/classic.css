@@ -430,6 +430,12 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	margin: 15px 0 100px 0 !important;
 }
 
+#get-started-button
+{
+	font-size: 20pt;
+	letter-spacing: 0;
+}
+
 #return-to-overview-button
 {
 	margin: 15px 0 0 0 !important;
