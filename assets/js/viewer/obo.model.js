@@ -820,7 +820,7 @@ obo.model = function()
 				s = s / parseFloat(scores.length);
 				break;
 			case 'r': // most recent
-				s = scores.length === 0 ? 0 : parseFloat(scores[scores.length - 1].scores);
+				s = scores.length === 0 ? 0 : parseFloat(scores[scores.length - 1].score);
 				break;
 			case 'h': // highest
 			default:

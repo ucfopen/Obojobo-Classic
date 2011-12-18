@@ -412,6 +412,10 @@ obo.view = function()
 				//}
 			}
 		}
+		else
+		{
+			render();
+		}
 	}
 
 	var onGotoPageFromURL = function(successful)
@@ -804,8 +808,7 @@ obo.view = function()
 							var flashRequirements = obo.model.getFlashRequirementsForSection('assessment');
 							var canViewFlash = !flashRequirements.containsFlashContent || flashRequirements.installedMajorVersion >= flashRequirements.highestMajorVersion;
 
-							var numAssessment;
-							numAssessment = obo.model.getNumPagesOfSection('assessment');
+							var numAssessment = obo.model.getNumPagesOfSection('assessment');
 							var numAttempts = obo.model.getNumAttemptsRemaining();
 							$('#start-assessment-button').attr('href', baseURL + '#/assessment/1');
 							$('#view-scores-button').attr('href', baseURL + '#/assessment/scores/');
@@ -813,6 +816,20 @@ obo.view = function()
 							// set the dynamic icons
 							$('.icon-dynamic-background:eq(0)').text(numAssessment).next().prepend(numAssessment + ' ') // number of questions
 							$('.assessment-attempt-count').prepend(numAttempts + ' '); // number of assessments remaining
+							var s;
+							switch(obo.model.getScoreMethod())
+							{
+								case 'h': //highest
+									s = 'Your highest attempt score counts';
+									break;
+								case 'm': //mean
+									s = 'Your final score is the average of your attempt scores';
+									break;
+								case 'r': //most recent
+									s = 'Your last attempt score counts';
+									break;
+							}
+							$('.final-score-method').html(s);
 
 							var showMissingPractice = false;
 							var showMissingPages = false;
@@ -852,6 +869,17 @@ obo.view = function()
 								{
 									$('.icon-missed-count:eq(0)').text(contentMissed)
 								}
+							}
+
+							if(obo.model.instanceIsClosed())
+							{
+								$('#assessment-info').hide();
+								$('#assessment-info-closed').show();
+							}
+							else if(numAttempts === 0)
+							{
+								$('#assessment-info').hide();
+								$('#assessment-info-no-attempts').show();
 							}
 
 							// disable button if they don't have any more attempts (0 if they have imported a score)
@@ -1016,6 +1044,7 @@ debug.log(flashRequirements);
 						if(obo.model.instanceIsClosed())
 						{
 							$('#recent-attempt p.assessment-closed').show();
+							$('#assessment-close-notice').hide();
 						}
 						else if(attemptsRemaining == 0)
 						{
@@ -1204,6 +1233,7 @@ debug.log(flashRequirements);
 	// graphically selects an mc answer. doesn't call remote.
 	var selectMCAnswer = function(answerID)
 	{
+		debug.time('mc');
 		// hide existing score bubble:
 		$('.answer-preview').remove();
 		
@@ -1219,7 +1249,7 @@ debug.log(flashRequirements);
 		var $ansLi = $ans.parent();
 		var answer = obo.util.getAnswerByID(obo.model.getPageObject().answers, answerID);
 		
-		if(answer != undefined)
+		if(typeof answer !== 'undefined')
 		{
 			// automatically check the radio button if it's not already checked.
 			// (if we need to check it then we assume we are displaying a previous response,
@@ -1227,7 +1257,8 @@ debug.log(flashRequirements);
 			var useAnimations = $ans.prop('checked');
 			$ans.prop('checked', true);
 			
-			if(obo.model.getMode() === 'preview')
+			// only show if we are in practice or we are in preview mode
+			if(obo.model.getSection() === 'practice' || obo.model.getMode() === 'preview')
 			{
 				var weightCSS = ''
 				switch(answer.weight)
@@ -1248,6 +1279,7 @@ debug.log(flashRequirements);
 			// animate show feedback if it exists:
 			if(answer.feedback)
 			{
+				//@TODO - this is probably slowing this function way down, need to cache this
 				var feedbackText = obo.util.cleanFlashHTML(answer.feedback);
 				if(feedbackText.length > 0)
 				{
@@ -1257,6 +1289,7 @@ debug.log(flashRequirements);
 				}
 			}
 		}
+		debug.timeEnd('mc');
 	};
 	
 	var saveQAResponse = function()

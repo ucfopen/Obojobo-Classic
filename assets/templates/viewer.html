@@ -133,7 +133,7 @@
 		<ul class="overview-feature-list">
 			<li><figure><span class="icon-dynamic-background"></span><figcaption> Questions</figcaption></figure></li>
 			<li><figure><span class="icon-dynamic-background assessment-attempt-count"></span><figcaption class="assessment-attempt-count"> Attempts remaining</figcaption></figure></li>
-			<li><figure><img src="/assets/images/viewer/icon-scores-are-recorded.png"><figcaption>Your highest attempt score counts</figcaption></figure></li>
+			<li><figure><img src="/assets/images/viewer/icon-scores-are-recorded.png"><figcaption class="final-score-method">Your highest attempt score counts</figcaption></figure></li>
 			<li><figure><img src="/assets/images/viewer/icon-cant-review-content.png"><figcaption>Content section closed</figcaption></figure></li>
 		</ul>
 		
@@ -155,8 +155,26 @@
 			<a id="dont-import-previous-score-button" class="button" href="#" role="button">Don't import</a>
 		</section>
 
-		<h3>How Assessment Works</h3>
-		<p>You have <span class="assessment-attempt-count"></span> attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.</p>
+		<div id="assessment-info">
+			<h3>How Assessment Works</h3>
+			<p>
+				You have <span class="assessment-attempt-count"></span> attempts for this assessment.  Once you begin, you cannot leave the assessment.  If your browser closes while taking the assessment you can continue where you left off.  You will receive a score at the end of each attempt, as well as an e-mail confirmation.
+			</p>
+		</div>
+		
+		<div id="assessment-info-no-attempts">
+			<h3>No Attempts Remaining</h3>
+			<p>
+				You do not have any remaining attempts for this object. Click on '<strong>View Your Scores</strong>' below to review how you did.
+			</p>
+		</div>
+
+		<div id="assessment-info-closed">
+			<h3>Assessment Closed</h3>
+			<p>
+				The assessment close date has passed for this object.
+			</p>
+		</div>
 
 		<div class="flash-notice" id="no-flash-notice">
 			<p>
