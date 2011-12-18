@@ -61,6 +61,10 @@ obo.model = function()
 		practice: 'start',
 		assessment: 'start'
 	};
+
+	// keep track of which practice page we are attempting to view when the questions
+	// haven't been loaded yet.
+	var pendingPracticeQuestionsLoadedForPage;
 	
 	// flag to represent if they are currently taking the assessment
 	var inAssessmentQuiz = false;
@@ -400,7 +404,6 @@ obo.model = function()
 	var setLocation = function(newSection, newPage, callback)
 	{
 		debug.log('>>>>>>>>>>>>>>>>>>>setLocation', newSection, newPage, callback);
-
 		if(newSection === undefined)
 		{
 			newSection = section;
@@ -408,6 +411,31 @@ obo.model = function()
 		if(newPage === undefined)
 		{
 			newPage = pages[newSection];
+		}
+
+		// if the user is resuming a previous attempt, but they are not
+		// yet in the assessment quiz then only allow them to view
+		// the overview page, the start assessment page or the scores page:
+		if(isResumingPreviousAttempt() && !inAssessmentQuiz)
+		{
+			if(newSection !== 'overview')
+			{
+				if(newSection === 'assessment')
+				{
+					if(newPage !== 'start' && newPage !== 'scores')
+					{
+						newPage = 'start'
+					}
+				}
+				else
+				{
+					newSection = 'overview';
+				}
+			}
+			else
+			{
+				newPage = 'start';
+			}
 		}
 		
 		if(canAccessSection(newSection))
@@ -453,6 +481,14 @@ obo.model = function()
 				if(newSection === 'assessment' && newPage === 'scores' && obo.model.getScores().length === 0)
 				{
 					newPage = 'start';
+				}
+
+				// special case - attempting to view practice page but practice questions not loaded
+				if(newSection === 'practice' && !isNaN(newPage) && typeof lo.pGroup.kids === 'undefined')
+				{
+					pendingPracticeQuestionsLoadedForPage = newPage;
+					startPractice();
+					return;
 				}
 				
 				section = newSection;
@@ -545,7 +581,15 @@ obo.model = function()
 			}
 		}
 
-		setLocation('practice', 1);
+		if(!isNaN(pendingPracticeQuestionsLoadedForPage))
+		{
+			setLocation('practice', pendingPracticeQuestionsLoadedForPage);
+			pendingPracticeQuestionsLoadedForPage = undefined;
+		}
+		else
+		{
+			setLocation('practice', 1);
+		}
 	}
 	
 	var loadAssessment = function(result)
@@ -600,6 +644,12 @@ obo.model = function()
 					// @TODO - how does this work in preview mode?
 					// clear out responses
 					responses.assessment = [];
+
+					// we are no longer resuming an attempt
+					if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.isInAttempt != 'undefined')
+					{
+						lo.tracking.isInAttempt = false;
+					}
 				}
 			}
 		}

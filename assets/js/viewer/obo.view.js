@@ -126,6 +126,15 @@ obo.view = function()
 			{
 				obo.model.gotoStartPageOfNextSection();
 			}
+		}).on('click', '#get-started-button', function(event) {
+			event.preventDefault();
+
+			if(!$(event.target).hasClass('disabled'))
+			{
+				// @TODO instead of doing this hack the model should
+				// let gotoNextPage take you to the nextPage you can access
+				obo.model.isResumingPreviousAttempt() ? obo.model.gotoSectionAndPage('assessment', 'start') : obo.model.gotoStartPageOfNextSection();
+			}
 		}).on('mouseenter', '.subnav-list.assessment li:has(ul)', function(event) {
 			debug.log('mouseenter');
 			$ul = $(this).find('ul');
@@ -603,7 +612,7 @@ obo.view = function()
 			$("#content-size").text(lo.summary.contentSize + ' Pages');
 			$("#practice-size").text(lo.summary.practiceSize + ' Questions');
 			$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');
-			$('#get-started-button').attr('href', baseURL + '#/content/1');
+			$('#get-started-button').attr('href', baseURL + obo.model.isResumingPreviousAttempt() ? '#/assessment/start' : '#/content/1');
 		});
 	};
 	
@@ -1840,6 +1849,11 @@ debug.log(flashRequirements);
 		debug.time('render');
 		var section = obo.model.getSection();
 		
+		if(unrendered)
+		{
+			
+		}
+
 		// clear out old content
 		// @TODO wht is this ??? selectedLinkID = '.nav-P-' + page;
 		$('#content').empty();
@@ -1932,13 +1946,18 @@ debug.log(flashRequirements);
 					lockoutSections(['content', 'practice']);
 					obo.model.gotoSection('assessment');
 				});*/
+				/*The last time you visited "Citing Sources Using MLA Style" you were in the middle of an assessment attempt, navigate to the assessment section to continue where you left off.*/
 				obo.dialog.showDialog({
 					title: 'Resume assessment attempt',
-					contents: 'You are in the middle of an assessment attempt.',
+					contents: 'The last time you visited <strong>"' + obo.model.getTitle() + '"</strong> you were in the middle of an assessment attempt. Visit the assessment section to continue where you left off.',
 					modal: true,
+					width: 600,
 					buttons: [
 						{label: 'Jump to Assessment', action: function() {
-							obo.model.gotoSection('assessment');
+							if(!(obo.model.getSection() === 'assessment' && obo.model.getPage() === 'start'))
+							{
+								obo.model.gotoSectionAndPage('assessment', 'start');
+							}
 						}}
 					]
 				});
