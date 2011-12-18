@@ -29,68 +29,46 @@ jquery.infieldlabel.js"></script>
 <!-- END IE CONDITIONALS -->
 
 <script type="text/javascript">
-  // Guess if they have an old browser
-  // We check for IE <= 7 up in the IE conditionals.
-  // We assume Chrome is up to date
-
   $('document').ready(function(){
 	$("label").inFieldLabels(); 
   });
- 
 </script>
 
 
-</style>
 </head>
-<body>
-<section id="content" style="margin-top: 0px; opacity: 1; ">
+<body id="login-page">
 
-	<div id="login-page">
-	<h1 id="lo-title" title="<?php echo $title; ?>"><?php echo $title; ?></h1>
-		<h2 class="class-times" >for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
-			
-		<h3 >Begins: <em><?php echo $startDate; ?></em> at <em><?php echo $startTime; ?></em></h3> 
-		<h3 >Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
+<header id="login-header">
+	<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
 
-		<div class="overview-details">
-			
-			<div class="main">
-				<div id="login-error">
-					UCF NID or Password Incorrect. <a href="help">Click Here For Help.</a>
-					<ul>
-						<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup your NID</a></li>
-						<li><a href="http://mynid.net.ucf.edu/">Reset your password</a></li>
-						<li><a href="http://learn.ucf.edu/support/">Contact Support</a></li>
-					</ul>
-				</div>
-				<div id="form">
-					<form method="post" class="form-content" action="">
-						<h2>Login to Begin</h2>
-						<ul>
-							<li>
-								<label for="username">UCF NID</label><br>
-								<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
-							</li>
-							<li>
-								<label for="password">Password</label><br>
-								<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
-							</li>
-							<li>
-								<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3"> <div id="login-loading">Loading...</div>
-							</li>
-						</ul>
-						<ul class="foot">
-							<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup NID</a></li>
-							<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
-							<li><a href="/help">Help</a></li>
-						</ul>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+	<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
+		
+	<h3>Begins: <em><?php echo $startDate; ?></em> at <em><?php echo $startTime; ?></em></h3> 
+	<h3>Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
+</header>
 
-</section>
+<form id="login-form" class="overview-details " method="post" action="">
+	<h1>Login to Begin</h1>
+	<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
+	<ul>
+		<li>
+			<label for="username">UCF NID</label><br>
+			<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
+		</li>
+		<li>
+			<label for="password">Password</label><br>
+			<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
+		</li>
+		<li>
+			<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3">
+		</li>
+	</ul>
+	<ul class="foot">
+		<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup NID</a></li>
+		<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
+		<li><a href="/help">Help</a></li>
+	</ul>
+</form>
 
 <footer id="footer">
 	<div class="footer-container">
