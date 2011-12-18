@@ -460,6 +460,11 @@ obo.util = function()
 	{
 		setTimeout(func, 1);
 	};
+
+	getBaseURL = function()
+	{
+		return location.href.substr(0, location.href.indexOf('#') === -1 ? location.href.length : location.href.indexOf('#'));
+	};
 	
 	return {
 		getRGBA: getRGBA,
@@ -469,6 +474,7 @@ obo.util = function()
 		getAnswerByID: getAnswerByID,
 		isIOS: isIOS,
 		doLater: doLater,
-		createCombinedAttributionString: createCombinedAttributionString
+		createCombinedAttributionString: createCombinedAttributionString,
+		getBaseURL: getBaseURL
 	};
 }();
