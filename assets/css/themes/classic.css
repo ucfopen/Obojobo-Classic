@@ -3020,3 +3020,14 @@ a
 {
 	color: white;
 }
+
+#assessment-info-no-attempts,
+#assessment-info-closed
+{
+	display: none;
+}
+
+#assessment-info-closed p
+{
+	text-align: center;
+}
