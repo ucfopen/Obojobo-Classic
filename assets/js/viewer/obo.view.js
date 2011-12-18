@@ -920,22 +920,52 @@ debug.log(flashRequirements);
 							var importableScore = obo.model.getImportableScore();
 							if(importableScore != -1)
 							{
-								$('#previous-score').html(importableScore);
+								$('.assessment-import-score-section').show();
+								$('.assessment-missed-section').hide();
+
+								$('.previous-score').html(importableScore);
 								$('#do-import-previous-score-button').click(function(event) {
-									showThrobber();
-									obo.model.importPreviousScore();
+									event.preventDefault();
+
+									var score = obo.model.getImportableScore(); 
+									obo.dialog.showDialog({
+										title: 'Confirm Score Importing: ' + score + '%',
+										contents: '<strong>WARNING:</strong> Importing will forfeit of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
+										modal: true,
+										width: 600,
+										buttons: [
+											{label: 'Cancel'},
+											{label: 'Import Score: ' + score + '%', action: function() {
+												showThrobber();
+												obo.model.importPreviousScore();
+											}}
+										]
+									});
+									
 								});
 								$('#dont-import-previous-score-button').click(function(event) {
-									$('.assessment-import-score-section').remove();
-									$('#start-assessment-button').removeClass('disabled');
+									event.preventDefault();
+
+									obo.dialog.showDialog({
+										title: 'Are You Sure?',
+										contents: 'By choosing not to import you will need to complete the assessment attempt. Once you begin an attempt you can no longer import your previous score.<br><br>Are you sure you don\'t want to import?',
+										modal: true,
+										width: 600,
+										buttons: [
+											{label: 'Cancel'},
+											{label: 'Do Not Import', action: function() {
+												$('.assessment-import-score-section').remove();
+												$('.assessment-missed-section').show();
+												$('#start-assessment-button').removeClass('disabled');
+											}}
+										]
+									});
+									//$('.assessment-import-score-section').remove();
+									//$('#start-assessment-button').removeClass('disabled');
 								});
 
 								// disable start assessment until they choose an option
 								$('#start-assessment-button').addClass('disabled');
-							}
-							else
-							{
-								$('.assessment-import-score-section').remove();
 							}
 
 							// modify 'start assessment' button if they are resuming assessment
@@ -2007,10 +2037,16 @@ debug.log(flashRequirements);
 					});*/
 					obo.dialog.showDialog({
 						title: 'Import previous score',
-						contents: 'You already take this, import?',
+						contents: 'You have previously completed this Learning Object for a different course and your instructor is allowing you to import your high score of <strong>' + importableScore + '%</strong>.<br><br>Visit the Assessment section to view your scoring options.',
+						width: 570,
 						buttons: [
 							{label:'Review Content'},
-							{label: 'Jump to Assessment', action: function() { obo.model.gotoSection('assessment'); }}
+							{label: 'Jump to Assessment', action: function() {
+								if(!(obo.model.getSection() === 'assessment' && obo.model.getPage() === 'start'))
+								{
+									obo.model.gotoSectionAndPage('assessment', 'start');
+								}
+							}}
 						]
 					})
 				}

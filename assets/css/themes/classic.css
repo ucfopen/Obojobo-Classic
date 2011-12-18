@@ -443,7 +443,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 
 .button.simplemodal-close
 {
-	margin: 15px 0 15px 0 !important;
+	margin: 15px 5px 15px 5px !important;
 }
 
 .next-section-button:hover,
@@ -1182,6 +1182,42 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	margin-bottom: -4px;
 	width: 80px;
 	background: url('/assets/images/viewer/themes/classic/nav-line.png') left repeat-y;
+}
+
+.assessment-import-score-section
+{
+	display: none;
+	background: #F6F0D2;
+	padding: 0.1em 0 1em 0;
+	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+	border-radius: 15px;
+	box-shadow: #CCCCCC 0px 3px 2px;
+}
+
+.assessment-import-score-options
+{
+	display: inline-block;
+}
+
+.assessment-import-score-options > div
+{
+	width: 210px;
+	font-size: 9pt;
+	float: left;
+	margin: 0 20px 0 20px;
+}
+
+.assessment-import-score-options > span
+{
+	float: left;
+	padding-top: 2em;
+}
+
+.assessment-import-score-options a
+{
+	margin-bottom: 0.5em;
+	width: 155px;
 }
 
 /*
@@ -2419,7 +2455,7 @@ a
 .dialog p
 {
 	margin: 0;
-	padding: .8em;
+	padding: 1em;
 }
 
 .dialog-title-bar

@@ -759,7 +759,15 @@ obo.model = function()
 	// if the importable score is 0 we treat this as non-importable (why would you want to import a failing grade?)
 	var getImportableScore = function()
 	{
-		if(mode === 'instance' && !isResumingPreviousAttempt() && lo.instanceData != null && lo.instanceData.allowScoreImport != null && lo.instanceData.allowScoreImport === 1 && scores.length === 0 && lo.equivalentAttempt != null && lo.equivalentAttempt.score != null && lo.equivalentAttempt.score > 0)
+		if(	mode === 'instance' &&
+			!isResumingPreviousAttempt() &&
+			typeof lo.instanceData !== 'undefined' &&
+			typeof lo.instanceData.allowScoreImport !== 'undefined' && 
+			(lo.instanceData.allowScoreImport === '1' || lo.instanceData.allowScoreImport === 1) &&
+			scores.length === 0 &&
+			typeof lo.equivalentAttempt !== 'undefined' &&
+			typeof lo.equivalentAttempt.score !== 'undefined' &&
+			parseFloat(lo.equivalentAttempt.score) > 0)
 		{
 			return lo.equivalentAttempt.score;
 		}
