@@ -738,7 +738,7 @@ obo.view = function()
 
 			var pageItems = [];
 
-/*
+
 			switch(page.layoutID)
 			{
 				case 4: case '4':
@@ -748,9 +748,9 @@ obo.view = function()
 				default:
 					pageItems = $(page.items);
 					break;
-			}*/
+			}
 
-			pageItems = $(page.items);
+			//pageItems = $(page.items);
 
 			// loop through each page item
 			$(pageItems).each(function(itemIndex, item)
