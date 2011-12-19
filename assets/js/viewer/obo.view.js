@@ -2164,6 +2164,8 @@ debug.log(flashRequirements);
 		unhideSWFs: unhideSWFs,
 		displayError: displayError,
 		displayGenericError: displayGenericError,
-		updateInteractiveScore: updateInteractiveScore
+		updateInteractiveScore: updateInteractiveScore,
+		showThrobber: showThrobber,
+		hideThrobber: hideThrobber
 	};
 }();

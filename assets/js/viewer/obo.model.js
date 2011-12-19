@@ -17,11 +17,82 @@ obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [1707
 */
 obo.model = function()
 {
+	var VERIFY_TIME_SECONDS = 30;
+	var IDLE_TIME_BEFORE_WARN_SECONDS = 1800000; //30 mins
+	var IDLE_TIME_BEFORE_LOGOUT_SECONDS = 120; //1 minute
+
+	var verifyTimeIntervalID;
+
+	var $idleCountdown;
+
 	var init = function(viewModule, options)
 	{
 		view = viewModule;
 		opts = options;
+
+		// start the verify timer
+		verifyTimeIntervalID = setInterval(onVerifyTime, VERIFY_TIME_SECONDS * 1000);
+
+		// start the idle timer
+		$.idleTimeout('body', '#continue-session-button', {
+			idleAfter: IDLE_TIME_BEFORE_WARN_SECONDS,
+			warningLength: IDLE_TIME_BEFORE_LOGOUT_SECONDS,
+			pollingInterval: 2,
+			onIdle: function() {
+				obo.dialog.showDialog({
+					title: 'Your session is about to expire',
+					contents: 'You will be logged off in <span class="idle-countdown">' + IDLE_TIME_BEFORE_LOGOUT_SECONDS + ' seconds</span>.<br><br>Do you want to continue your session?',
+					modal: true,
+					closeButton: false,
+					escClose: false,
+					buttons: [
+						{label: 'No, Logout', action:function() {
+							logout();
+						}},
+						{label: 'Yes, Continue', id:'continue-session-button'}
+					]
+				});
+			},
+			onTimeout: function() {
+				$idleCountdown = undefined;
+				logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
+			},
+			onCountdown: function(counter) {
+				$('.idle-countdown').html(counter == 1 ? counter + ' second' : counter + ' seconds');
+			}
+		});
+	/*
+
+		startIdleTimer();
+		$(document).bind('idle.idleTimer', function() {
+			debug.log('IDLE!');
+			$.idleTimer('destroy');
+			logoutAfterIdleIntervalID = setTimeout(function() {
+				console.log('IDLE - LOGOUT!!!');
+				//logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
+			}, IDLE_TIME_BEFORE_LOGOUT_SECONDS);
+			debug.log('interval now = ' + logoutAfterIdleIntervalID);
+			obo.dialog.showDialog({
+				title: 'Your session is about to expire',
+				contents: 'You will be logged off in <span class="idle-countdown"></span> seconds.<br><br>Do you want to continue your session?',
+				modal: true,
+				width: 500,
+				buttons: [
+					{label: 'Yes, Continue', action:function() {
+						debug.log('IDLE continue', logoutAfterIdleIntervalID);
+						clearTimeout(logoutAfterIdleIntervalID);
+						startIdleTimer();
+					}},
+					{label: 'No, Logout', action:function() {
+						logout();
+					}}
+				]
+			});
+		});*/
+
+
 	};
+	var logoutMessage = '';
 	
 	// @PRIVATE
 	
@@ -79,6 +150,40 @@ obo.model = function()
 	// when we first load.
 	var attemptImportedThisVisit;
 	
+	var onVerifyTime = function()
+	{
+		if(mode == 'instance')
+		{
+			obo.remote.makeCall('getSessionValid', null, onGetSessionValid);
+		}
+		else
+		{
+			obo.remote.makeCall('getSessionRoleValid', ['LibraryUser','ContentCreator'], onGetSessionValid);
+		}
+	}
+
+	var onGetSessionValid = function(result)
+	{
+		debug.log(result);
+		if(!(	result === true ||
+				(	typeof result !== 'undefined' &&
+					typeof result.validSession !== 'undefined' &&
+					result.validSession === true &&
+					typeof result.hasRoles === 'object' &&
+					typeof result.hasRoles.length !== 'undefined' &&
+					result.hasRoles.length > 0
+				)
+		)) {
+			logout("You've been logged out. Click 'OK' to login again.");
+		}
+	}
+
+	var startIdleTimer = function()
+	{
+		console.log('IDLE - startTimer');
+		$.idleTimer(IDLE_TIME_BEFORE_WARN_SECONDS * 1000);
+	}
+
 	var isValidSection = function(_section)
 	{
 		return _section === 'overview' || _section === 'content' || _section === 'practice' || _section === 'assessment';
@@ -1448,12 +1553,48 @@ debug.log('getHighestFlashVersionInPage', version);
 		return total;
 	};
 
-	var logout = function()
+	// if logoutMessage is defined then the user will be shown a dialog first.
+	// otherwise they will be kicked to the login page.
+	var logout = function(_logoutMessage)
 	{
+		clearInterval(verifyTimeIntervalID);
+
+		if(typeof _logoutMessage === 'undefined')
+		{
+			_logoutMessage = '';
+		}
+		logoutMessage = _logoutMessage
+
+		obo.view.showThrobber();
 		obo.remote.makeCall('doLogout', null, function(result) {
-			location.href = obo.util.getBaseURL();
+			obo.view.hideThrobber();
+
+			if(logoutMessage.length == 0)
+			{
+				redirectToLoginPage();
+			}
+			else
+			{
+				obo.dialog.showDialog({
+					title: 'Logout',
+					contents: logoutMessage,
+					modal: true,
+					closeCallback: function(dialog) {
+						$.modal.close();
+						redirectToLoginPage();
+					},
+					buttons: [
+						{label: 'OK'}
+					]
+				});
+			}
 		});
 	};
+
+	var redirectToLoginPage = function()
+	{
+		location.href = obo.util.getBaseURL();
+	}
 	
 	return {
 		init: init,
