@@ -55,6 +55,7 @@ class AppCfg extends AppCfgDefault
 	
 	const SSO_SECRET = ""; // SSO Secret key used for the single sign on script
 	
+	const KOGNEATO_JSON_URL = 'https://kogneato.ucf.edu/gs-amfphp/json.php/GSPlayer.';
 
 }
 ?>
