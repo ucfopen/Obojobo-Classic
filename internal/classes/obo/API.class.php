@@ -46,16 +46,25 @@ class API extends \rocketD\db\DBEnabled
 
 	/**
 	 * Verifies session and role with a more granular return then verifySession
-	 * @param	$roleNames (array)	Role names to check for current session
+	 * @param	(args - either one array or multiple strings)	Role names to check for current session
 	 * @return 	(array)	array with the following keys: validSession (bool, user currently has a valid session), roleName (string, name of role checked), hasRole (bool, user is in the role returned in roleName).   
 	 */
-	public function getSessionRoleValid($roleNames='')
+	public function getSessionRoleValid()
 	{
+		// role names come from the arguments.
+		// this function either takes in an array of strings as one argument
+		// or multiple strings in multiple arguments (to support Flex and JSON gateways)
+		$roleNames = func_get_args();
+		if(count($roleNames) > 0 && is_array($roleNames[0]))
+		{
+			$roleNames = $roleNames[0];
+		}
 
-		if(!is_array($roleNames))
+		if(count($roleNames) == 0)
 		{
 			return \rocketD\util\Error::getError(2);
-		}		
+		}
+		
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$return = array();
 		$return['validSession'] = $AM->verifySession();	

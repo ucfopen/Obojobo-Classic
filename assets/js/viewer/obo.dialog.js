@@ -22,11 +22,11 @@ obo.dialog = function()
 	
 	var showDialog = function(options)
 	{
-		if($('#content-blocker').length === 0)
-		{
-			//$('body').append($('<div id="content-blocker"></div>'));
-		}
-		
+		debug.log('obo.dialog::showDialog');
+		//close any existing dialogs first:
+		$.modal.close();
+
+
 		obo.view.hideSWFs();
 		
 		//var id = 'dialog-' + dialogID;
@@ -42,7 +42,10 @@ obo.dialog = function()
 		/*$close.click(function(event) {
 			obo.dialog.closeDialog($(event.target).parent().parent().attr('id'));
 		});*/
-		$title.append($close);
+		if(typeof options.closeButton === 'undefined' || options.closeButton !== false)
+		{
+			$title.append($close);
+		}
 		var $p = $('<p>' + options.contents + '</p>');
 		var $buttons = $('<div class="dialog-buttons"></div>');
 		var $curButton;
@@ -56,6 +59,10 @@ obo.dialog = function()
 				}
 				obo.dialog.closeDialog($(event.target).parent().parent().attr('id'));
 			});*/
+			if(typeof options.buttons[i].id !== 'undefined')
+			{
+				$curButton.attr('id', options.buttons[i].id);
+			}
 			$curButton.click(options.buttons[i].action);
 			$buttons.append($curButton);
 			$curButton.addClass('simplemodal-close');
@@ -72,12 +79,20 @@ obo.dialog = function()
 		//$dialog.css("left", (($(window).width() - $dialog.outerWidth()) / 2) + $(window).scrollLeft() + "px");
 		
 		//dialogs[id] = $dialog;
-		
-		$.modal($dialog, {onClose: function(dialog) {
+
+		var closeCallback = typeof options.closeCallback !== 'undefined' ? options.closeCallback : function(dialog) {
 			obo.view.unhideSWFs();
 			$.modal.close();
-		}});
-		
+		};
+
+		// @HACK
+		// we wait since the close method of simple modal waits for 10ms
+		// without this we'd never see a second dialog if another one already 
+		// existed
+		setTimeout(function() {
+			$.modal($dialog, {escClose: options.escClose, onClose: closeCallback});
+		}, 15);
+
 		//$('<div>' + options.contents + '</div>').dialog(options);
 		return;
 	};
