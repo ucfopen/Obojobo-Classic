@@ -572,6 +572,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	word-wrap:break-word;
 	
 	padding-bottom: 40px;
+	border-bottom: 1px solid gray;
 	border-bottom: 1px solid rgba(0, 0, 0, .1);
 	margin:31px 0 20px 0;
 }
