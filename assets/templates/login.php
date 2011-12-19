@@ -7,12 +7,15 @@
 <!-- Minify using Minify -->
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery-1.7.js,
+modernizr-2.0.6.js,
 jquery.infieldlabel.js"></script>
 
 
 <!-- Minify using Minify -->
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&amp;f=default.css" media="screen">
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=login.css" media="screen">
+
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
@@ -28,10 +31,57 @@ jquery.infieldlabel.js"></script>
 <![endif]-->
 <!-- END IE CONDITIONALS -->
 
+<style type="text/css">.oldBrowser { background: #eeeeee; }</style>
+
 <script type="text/javascript">
-  $('document').ready(function(){
-	$("label").inFieldLabels(); 
-  });
+// Guess if they have an old browser
+// We check for IE <= 7 up in the IE conditionals.
+// We assume Chrome is up to date
+if(typeof navigator.userAgent !== 'undefined')
+{
+	var ua = navigator.userAgent;
+	// find firefox version 3.5 and below:
+	var oldFirefox = /firefox\/(3\.[0-5]|[0-2]\.)/gi;
+	// find opera version 10 and below:
+	var oldOpera = /opera (10|[0-9])\.|opera.*?version\/(10|[0-9])\./gi;
+	// find safari version 3 and below:
+	var oldSafari = /safari\/[0-3]\./gi;
+
+	if(oldFirefox.test(ua) || oldOpera.test(ua) || oldSafari.test(ua))
+	{
+		oldBrowser = true;
+	}
+}
+
+$('document').ready(function()
+{
+	if(typeof oldBrowser !== 'undefined' && oldBrowser === true)
+	{
+		$('body *').hide();
+		$('html').addClass('older-browser-background');
+		$('body').attr('id', '');
+		$('body').append('<div id="older-browser-container"></div>');
+		$('#older-browser-container').load('/assets/templates/viewer.html #older-browser-dialog', function() {
+			$('#ignore-older-browser-warning').click(function(event) {
+				event.preventDefault();
+				$('body').attr('id', 'login-page');
+				$('html').removeClass('older-browser-background');
+				$('#older-browser-dialog').remove();
+				$('body *').show();
+				initLoginScreen();
+			});
+		});
+	}
+	else
+	{
+		initLoginScreen();
+	}
+});
+
+function initLoginScreen()
+{
+	$("label").inFieldLabels();
+}
 </script>
 
 
@@ -47,7 +97,7 @@ jquery.infieldlabel.js"></script>
 	<h3>Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
 </header>
 
-<form id="login-form" class="overview-details " method="post" action="">
+<form id="login-form" class="overview-details " method="post">
 	<h1>Login to Begin</h1>
 	<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
 	<ul>
@@ -73,7 +123,7 @@ jquery.infieldlabel.js"></script>
 <footer id="footer">
 	<div class="footer-container">
 		<div id="logo">powered by Obojobo</div>
-		<h5>&copy; 2011 University of Central Florida</h5>
+		<h5>&copy; <?php echo date("Y"); ?> University of Central Florida</h5>
 		<p></p>
 		<p></p>
 	</div>

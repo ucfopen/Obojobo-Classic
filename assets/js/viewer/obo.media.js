@@ -7,13 +7,14 @@
 // @TODO - Provide alternate API backup?
 
 // @TODO - Hack captivate switch
-var asVersions = {};
-var mediaIDs = {};
+//var asVersions = {};
+//var mediaIDs = {};
+/*
 function switchCaptivateSpy(event)
 {
 	event.preventDefault();
 	
-	var $link = $('#swap-cap');
+	//var $link = $('#swap-cap');
 	var $mediaItem = $('.media-for-page-' + obo.model.getSection() + obo.model.getPage());
 	var $element = $($mediaItem.children()[0]);
 	var eid = $element.attr('id');
@@ -21,13 +22,6 @@ function switchCaptivateSpy(event)
 	var height = $mediaItem.height();
 	var curVersion = asVersions[eid];//$link.attr('data-cur-version');
 	var mediaID = mediaIDs[eid];//$link.attr('data-media-id');
-	
-	debug.log($mediaItem);
-	debug.log($element);
-	debug.log(eid);
-	
-	debug.log(asVersions);
-	debug.log(mediaIDs);
 	
 	$element.remove();
 	var $new = $('<div id="' + eid + '"></div>');
@@ -64,7 +58,7 @@ function switchCaptivateSpy(event)
 	});
 	
 	//$link.attr('data-cur-version', curVersion === '2' ? '3' : '2');
-}
+}*/
 
 if(!window.obo)
 {
@@ -185,35 +179,19 @@ obo.media = function()
 	
 	var swfize = function()
 	{
-		debug.log('___SWFIZE___');
 		//return;
 		if(AUTOLOAD_FLASH)
 		{
 			$('.swf-placeholder').each(function(index, placeholder)
 			{
 				var $placeholder = $(placeholder);
-				debug.log($placeholder);
 				$placeholder.removeClass('swf-placeholder').addClass('swf-container');
 				var mediaID = $placeholder.attr('data-media-id'); //placeholder.id.split('media-')[1];	
 				//$placeholder.parent('.media-item').css('height', $placeholder.css('height')).css('width', $placeholder.css('width'));
 				var url = '/media/';
 				var asVersion = $placeholder.attr('data-as-version');
-				debug.log('here0');
 				if(asVersion && asVersion.length > 0)
 				{
-					debug.log('asVersion', asVersion);
-					asVersions[placeholder.id] = 3;
-					mediaIDs[placeholder.id] = mediaID;
-					
-					debug.log('here');
-					debug.log($('#swap-cap').length);
-					if($('#swap-cap').length === 0)
-					{
-						debug.log('APPENDING!!!');
-						$('#swf-holder').append('<a id="swap-cap" style="position:relative; top:-25px;" href="#" onclick="switchCaptivateSpy(event)">(Toggle)</a>');
-					}
-					$('#swap-cap').show();
-					
 					switch(asVersion)
 					{
 						case '2':
@@ -231,7 +209,6 @@ obo.media = function()
 				//alert('placeholder:'+ $placeholder.width()+','+ $placeholder.height());
 				var w = $placeholder.width();
 				var h = $placeholder.height();
-				debug.log(w, h);
 				//swfobject.embedSWF(url + mediaID, placeholder.id, '100%', '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
 				swfobject.embedSWF(url + mediaID, placeholder.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
 			});
@@ -280,7 +257,6 @@ obo.media = function()
 	
 	var youtubeizeIFrame = function()
 	{
-		debug.log('youtubeize');
 		if(AUTOLOAD_FLASH)
 		{
 			$('.youtube-placeholder').each(function(index, element) {
@@ -323,17 +299,15 @@ obo.media = function()
 	};*/
 	var getMediaItemByMediaID = function(mediaID)
 	{
-		var mediaItems = $('.media-item');
-		for(var i in mediaItems)
+		var result = $('.media-item[data-media-id="' + mediaID + '"]');
+		if(result.length > 0)
 		{
-			var $e = $(mediaItems[i]);
-			if($e.attr('data-media-id') == mediaID)
-			{
-				return $e;
-			}
+			return $(result[0]);
 		}
-
-		return undefined;
+		else
+		{
+			return undefined;
+		}
 	};
 
 	var reloadSWF = function($objectElement)
@@ -352,8 +326,6 @@ obo.media = function()
 	{
 		if(mediaObject)
 		{
-			debug.log('createMedia', mediaObject.width, mediaObject.height, mediaObject);
-			//alert(mediaObject.width + ',' + mediaObject.height);
 			var section = obo.model.getSection();
 			var page = obo.model.getPage();
 		
@@ -374,7 +346,6 @@ obo.media = function()
 					$target.append($mediaElement);
 					$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
 					$img.one('load', function() {
-						debug.log($(this).parent());
 						$(this).css('background', 'white');
 					}).each(function() {
 						if(this.complete)
@@ -394,14 +365,11 @@ obo.media = function()
 					// we assume this is a captivate if it is a swf in an interactive question
 					var isCaptivate = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
 				
-					debug.log(obo.model.getPageObject());
-					debug.log($('.question-page').hasClass('question-type-Media'));
-					debug.log($('.question-page'));
 					// we need to do our swf hack for practice and assessment interactive-only questions
 				
 					if(isCaptivate)
 					{
-						$('#swap-cap').show();
+						//$('#swap-cap').show();
 					
 						createSwfHolder(section);
 					
@@ -446,7 +414,8 @@ obo.media = function()
 					{
 						// there are two captivate connection methods - version 2-4 or version 5.
 						//$swf.attr('data-captivate-version', mediaObject.itemType.toLowerCase() === 'cap5' ? '5' : '2');
-						$swf.attr('data-as-version', '3');
+						// assume AS3 if no version found
+						$swf.attr('data-as-version', (typeof mediaObject.meta !== 'undefined' && mediaObject.meta !== null && typeof mediaObject.meta.asVersion !== 'undefined' ? mediaObject.meta.asVersion : '3'));
 					}
 				
 					// append swf unless it's already there, which is the case if we're using hack overlays
@@ -525,7 +494,6 @@ obo.media = function()
 							var $link = $(event.target);
 							var mediaID = $link.attr('data-media-id');
 							var $e = getMediaItemByMediaID(mediaID);
-							debug.log($e);
 							if(typeof $e !== 'undefined')
 							{
 								reloadSWF($e.find('object'));
@@ -542,6 +510,8 @@ obo.media = function()
 					//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
 					break;*/
 				case 'kogneato':
+					mediaObject.width = 800;
+					mediaObject.height = 600;
 					// standin represents our media stand-in - where the swf would be placed normally.
 					// we define standin if needed to act as a positioning guide for captivates.
 					var $standin = null;
@@ -551,7 +521,7 @@ obo.media = function()
 					var inQuiz = section === 'practice' || section === 'assessment';
 					if(inQuiz)
 					{
-						$('#swap-cap').show();
+						//$('#swap-cap').show();
 					
 						createSwfHolder(section);
 					
@@ -670,18 +640,13 @@ obo.media = function()
 			// but that causes other problems!
 			if(pageItemOptions === null || pageItemOptions === false)
 			{
-				debug.log('BEGIN!');
 				// @TODO - Get this data from the stylesheet!
 				var layoutID = obo.model.getPageObject().layoutID;
 				var targetWidth = $target.width();
 			
-				debug.log('1. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
-			
 				var maxWidth = $mediaElement.css('max-width');
 				var maxHeight = $mediaElement.css('max-height');
 			
-				//alert('maxW'+maxWidth+',maxH'+maxHeight);
-				debug.log('2. maxWidth', maxWidth, 'maxHeight', maxHeight);
 				if(maxWidth.indexOf('px') != -1)
 				{
 					maxWidth = parseInt(maxWidth.substr(0, maxWidth.length - 2));
@@ -689,7 +654,6 @@ obo.media = function()
 				else if(maxWidth.indexOf('%') != -1)
 				{
 					maxWidth = maxWidth.substr(0, maxWidth.length - 1);
-					debug.log('ok, now', maxWidth);
 					maxWidth = targetWidth * parseInt(maxWidth) / 100;
 				}
 				if(maxHeight.indexOf('px') != -1)
@@ -711,8 +675,6 @@ obo.media = function()
 					maxHeight = 999999999;
 				}
 			
-				debug.log('3. maxWidth', maxWidth, 'maxHeight', maxHeight);
-			
 				if(mediaObject.width > maxWidth)
 				{
 					mediaObject.height = Math.floor(mediaObject.height * maxWidth / mediaObject.width);
@@ -724,8 +686,6 @@ obo.media = function()
 					mediaObject.width = Math.floor(mediaObject.width * maxHeight / mediaObject.height);
 					mediaObject.height = maxHeight;
 				}
-			
-				debug.log('4. mediaObject.width', mediaObject.width, 'mediaObject.height', mediaObject.height);
 			
 				$mediaElement.width(mediaObject.width).height(mediaObject.height);
 			
@@ -744,8 +704,7 @@ obo.media = function()
 					$img.width(mediaObject.width).height(mediaObject.height);
 					$img = undefined;
 				}
-				debug.log('6. $mediaElement.width', $mediaElement.width(), '$mediaElement.height', $mediaElement.height());
-			
+
 				// attribution
 				if(typeof mediaObject.attribution !== 'undefined' && mediaObject.attribution !== null && (mediaObject.attribution === true || mediaObject.attribution.toString() === '1'))
 				{

@@ -13,7 +13,7 @@
 .subnav-list > li > a
 {
 	/*behavior: url(/assets/htc/PIE.htc);*/
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') 0 0 !important;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') 0 0 !important;
 }
 
 /* alter dots in content for page views, in quizzes if they answered the question */
@@ -21,13 +21,13 @@
 #nav-list .subnav-list.practice li.answered > a,
 #nav-list .subnav-list.assessment li.answered > a
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -27px 0;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -27px 0;
 }
 
 #nav-list .subnav-list  li.selected > a,
 #nav-list .subnav-list > li > a:hover
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -54px 0 !important;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -54px 0 !important;
 }
 
 #nav-list > li
@@ -43,24 +43,24 @@
 
 .subnav-list-alts > li > a
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') 0 -27px !important;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') 0 -27px !important;
 }
 
 .subnav-list-alts > li > a:hover
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -46px -27px !important;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -46px -27px !important;
 }
 
 .missed-pages-list > li > a
 {
 	/*behavior: url(/assets/htc/PIE.htc);*/
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -81px 0;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -81px 0;
 	width: 38px;
 }
 
 .missed-pages-list li > a:hover
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -119px 0;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -119px 0;
 }
 
 .next-section-button,
@@ -73,7 +73,7 @@
 
 .icon-missed-count
 {
-	background: url('/assets/images/viewer/themes/blue/ie-nav-list-item-sprites.png') -157px 0;
+	background: url('/assets/images/viewer/themes/default/ie-nav-list-item-sprites.png') -157px 0;
 	width: 58px;
 }
 

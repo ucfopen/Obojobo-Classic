@@ -17,11 +17,52 @@ obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [1707
 */
 obo.model = function()
 {
+	var VERIFY_TIME_SECONDS = 30;
+	var IDLE_TIME_BEFORE_WARN_SECONDS = 1800000; //30 mins
+	var IDLE_TIME_BEFORE_LOGOUT_SECONDS = 120; //1 minute
+
+	var verifyTimeIntervalID;
+
+	var $idleCountdown;
+
 	var init = function(viewModule, options)
 	{
 		view = viewModule;
 		opts = options;
+
+		// start the verify timer
+		verifyTimeIntervalID = setInterval(onVerifyTime, VERIFY_TIME_SECONDS * 1000);
+
+		// start the idle timer
+		$.idleTimeout('body', '#continue-session-button', {
+			idleAfter: IDLE_TIME_BEFORE_WARN_SECONDS,
+			warningLength: IDLE_TIME_BEFORE_LOGOUT_SECONDS,
+			pollingInterval: 2,
+			onIdle: function() {
+				obo.dialog.showDialog({
+					title: 'Your session is about to expire',
+					contents: 'You will be logged off in <span class="idle-countdown">' + IDLE_TIME_BEFORE_LOGOUT_SECONDS + ' seconds</span>.<br><br>Do you want to continue your session?',
+					modal: true,
+					closeButton: false,
+					escClose: false,
+					buttons: [
+						{label: 'No, Logout', action:function() {
+							logout();
+						}},
+						{label: 'Yes, Continue', id:'continue-session-button'}
+					]
+				});
+			},
+			onTimeout: function() {
+				$idleCountdown = undefined;
+				logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
+			},
+			onCountdown: function(counter) {
+				$('.idle-countdown').html(counter == 1 ? counter + ' second' : counter + ' seconds');
+			}
+		});
 	};
+	var logoutMessage = '';
 	
 	// @PRIVATE
 	
@@ -79,6 +120,38 @@ obo.model = function()
 	// when we first load.
 	var attemptImportedThisVisit;
 	
+	var onVerifyTime = function()
+	{
+		if(mode == 'instance')
+		{
+			obo.remote.makeCall('getSessionValid', null, onGetSessionValid);
+		}
+		else
+		{
+			obo.remote.makeCall('getSessionRoleValid', ['LibraryUser','ContentCreator'], onGetSessionValid);
+		}
+	}
+
+	var onGetSessionValid = function(result)
+	{
+		if(!(	result === true ||
+				(	typeof result !== 'undefined' &&
+					typeof result.validSession !== 'undefined' &&
+					result.validSession === true &&
+					typeof result.hasRoles === 'object' &&
+					typeof result.hasRoles.length !== 'undefined' &&
+					result.hasRoles.length > 0
+				)
+		)) {
+			logout("You've been logged out. Click 'OK' to login again.");
+		}
+	}
+
+	var startIdleTimer = function()
+	{
+		$.idleTimer(IDLE_TIME_BEFORE_WARN_SECONDS * 1000);
+	}
+
 	var isValidSection = function(_section)
 	{
 		return _section === 'overview' || _section === 'content' || _section === 'practice' || _section === 'assessment';
@@ -148,7 +221,6 @@ obo.model = function()
 	// a three question assessment)
 	var pageIsNumericWithinBounds = function(_section, page)
 	{
-		console.log('pageIsNumericWithinBounds', _section, page);
 		if(_section === undefined)
 		{
 			_section = section;
@@ -173,9 +245,7 @@ obo.model = function()
 			// @TODO - check the altIndex bounds
 		}
 		
-		var r = index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
-		debug.log(r);
-		return r;
+		return index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
 	};
 	
 	// utility function that turns a page like '2b' into {index:1, altIndex:1}
@@ -206,23 +276,23 @@ obo.model = function()
 	var processResponse = function(response)
 	{
 		debug.log('processResponse', response);
-		
 		if(obo.remote.isError(response))
 		{
 			switch(response.errorID)
 			{
 				case 1: // not logged in
-					view.displayError('You are not logged in!');
+					//view.displayError('You are not logged in! Click OK to login');
+					logout("You are not logged in. Click 'OK' to login again.");
 					// @TODO: Log the user out
 					// @TODO: send client error
 					break;
 				case 4: // insufficient permissions
-					view.displayError('You do not have permissions!');
+					killPage('You do not have permissions to access this object.');
 					// @TODO: Log the user out
 					// @TODO: send client error
 					break;
 				case 5: // bad visit key
-					view.displayError('You already have this object open!');
+					killPage('You have already opened this learning object in another viewer window.  Only one viewer window per learning object is allowed open at a time.');
 					// @TODO: send client error
 					break;
 				default:
@@ -239,12 +309,12 @@ obo.model = function()
 	// event handler to get the lo
 	var onGetLO = function(result)
 	{
-		debug.log('onGetLO', result);
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'lo').length > 0)
 			{
-				view.displayError('This is not a valid LO!');
+				//view.displayError('This is not a valid LO!');
+				killPage('This Learning Object is not valid. Ensure that the URL is correct and try again.');
 			}
 			else
 			{
@@ -274,9 +344,6 @@ obo.model = function()
 	
 	var onLoadInstance = function(result)
 	{
-		debug.log('onLoadInstance');
-		debug.log(result);
-		
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'instance').length > 0)
@@ -403,7 +470,6 @@ obo.model = function()
 	// call view.render if successful.
 	var setLocation = function(newSection, newPage, callback)
 	{
-		debug.log('>>>>>>>>>>>>>>>>>>>setLocation', newSection, newPage, callback);
 		if(newSection === undefined)
 		{
 			newSection = section;
@@ -496,12 +562,10 @@ obo.model = function()
 				
 				if(typeof callback === 'function')
 				{
-					debug.log('case 1')
 					callback(true);
 				}
 				else
 				{
-					debug.log('case 1b');
 					view.render();
 				}
 			}
@@ -513,12 +577,10 @@ obo.model = function()
 				
 				if(typeof callback === 'function')
 				{
-					debug.log('case 2');
 					callback(true);
 				}
 				else
 				{
-					debug.log('case 2b');
 					view.render();
 				}
 			}
@@ -527,7 +589,6 @@ obo.model = function()
 		{
 			if(typeof callback === 'function')
 			{
-				debug.log('case 3');
 				callback(false);
 			}
 		}
@@ -905,7 +966,6 @@ obo.model = function()
 	// returns -1 if no flash found.
 	var getHighestFlashVersionInPage = function(page)
 	{
-		debug.log('GHFVIP');
 		var version = -1;
 		for(var i in page.items)
 		{
@@ -921,7 +981,6 @@ obo.model = function()
 			}
 		}
 
-debug.log('getHighestFlashVersionInPage', version);
 		return version;
 	}
 	
@@ -930,7 +989,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	var getPageObject = function(page)
 	{
 		var i = typeof page === 'undefined' ? getPage() : page;
-		debug.log('getPageObject', i);
 		if(pageIsNumericWithinBounds(undefined, i))
 		{
 			switch(section)
@@ -944,12 +1002,8 @@ debug.log('getHighestFlashVersionInPage', version);
 					}
 					else
 					{
-						debug.log('L@@K');
-						
 						// need to handle question alternates
 						var pageIndex = getAssessmentPageIndex(i);
-						debug.log(pageIndex);
-						debug.log(questions.assessment);
 						return questions.assessment[pageIndex.index][pageIndex.altIndex];
 					}
 			}
@@ -1013,7 +1067,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// abstracts between instance summary data and lo data
 	var getNumPagesOfSection = function(_section)
 	{
-		debug.log('getNumPagesOfSection', questions);
 		switch(_section)
 		{
 			case 'overview': return 0;
@@ -1227,8 +1280,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// 'start', 'end', or a number, or a qalt page
 	var getNextPage = function()
 	{
-		debug.log('gotoNextPage');
-		
 		var page = getPage();
 		var newPage;
 		var newSection = undefined;
@@ -1326,7 +1377,6 @@ debug.log('getHighestFlashVersionInPage', version);
 		var page = getPage();
 		var qGroup = getQGroup();
 
-		debug.log('submitQuestion(' + answerID_or_shortAnswerResponse_or_score + ')');
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
@@ -1339,9 +1389,7 @@ debug.log('getHighestFlashVersionInPage', version);
 		{
 			page = getAssessmentPageIndex(page).index + 1;
 		}
-		debug.log('STORING ', answerID_or_shortAnswerResponse_or_score, ' WITH SECTION ', section, ' PAGE ', page);
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
-		debug.log('responses:', responses);
 	};
 	
 	// return the previous response, if it exists, for the current question
@@ -1349,8 +1397,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// note that for media questions the previous response is really the score
 	var getPreviousResponse = function()
 	{
-		debug.log('getPreviousResponse');
-		debug.log(responses);
 		return responses[section][getPage()];
 	};
 
@@ -1380,8 +1426,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	
 	var submitAssessment = function()
 	{
-		debug.log('submitAssessment');
-		
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptEnd', [lo.viewID, lo.aGroup.qGroupID], onSubmitAssessment);
@@ -1398,7 +1442,6 @@ debug.log('getHighestFlashVersionInPage', version);
 				curQuestion = questions.assessment[i - 1];
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
-				debug.log('curQuestion=',curQuestion)
 				switch(curQuestion.itemType.toLowerCase())
 				{
 					case 'mc':
@@ -1432,8 +1475,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	
 	var isPageAnswered = function(section, page)
 	{
-		debug.log('model.isPageAnswered(',section,page);
-		debug.log(responses[section]);
 		return responses[section][parseInt(page)] != undefined;
 	};
 	
@@ -1448,12 +1489,67 @@ debug.log('getHighestFlashVersionInPage', version);
 		return total;
 	};
 
-	var logout = function()
+	// if logoutMessage is defined then the user will be shown a dialog first.
+	// otherwise they will be kicked to the login page.
+	var logout = function(_logoutMessage)
 	{
+		clearInterval(verifyTimeIntervalID);
+
+		if(typeof _logoutMessage === 'undefined')
+		{
+			_logoutMessage = '';
+		}
+		logoutMessage = _logoutMessage
+
+		obo.view.showThrobber();
 		obo.remote.makeCall('doLogout', null, function(result) {
-			location.href = obo.util.getBaseURL();
+			obo.view.hideThrobber();
+
+			if(logoutMessage.length == 0)
+			{
+				redirectToLoginPage();
+			}
+			else
+			{
+				obo.dialog.showDialog({
+					title: 'Logout',
+					contents: logoutMessage,
+					modal: true,
+					closeButton: false,
+					escClose: false,
+					closeCallback: function(dialog) {
+						$.modal.close();
+						redirectToLoginPage();
+					},
+					buttons: [
+						{label: 'OK'}
+					]
+				});
+			}
 		});
 	};
+
+	// doesn't log the user out, but wipes out the content
+	// and displays a message as to why the page was killed
+	var killPage = function(message)
+	{
+		clearInterval(verifyTimeIntervalID);
+		$('body').empty();
+		$('html').addClass('older-browser-background');
+		//view.displayError(message);
+		obo.dialog.showDialog({
+			title: 'Error',
+			contents: message,
+			closeButton: false,
+			escClose: false,
+			modal: false
+		});
+	}
+
+	var redirectToLoginPage = function()
+	{
+		location.href = obo.util.getBaseURL();
+	}
 	
 	return {
 		init: init,
