@@ -34,7 +34,8 @@ obo.dialog = function()
 		
 		//options.width = 400;
 		options.resizable = false;
-		options.modal = true;
+		options.modal = typeof options.modal === 'undefined' ? true : options.modal;
+		options.escClose = typeof options.escClose === 'undefined' ? true : options.escClose;
 		
 		var $dialog = $('<div class="dialog"></div>');
 		var $title = $('<div class="dialog-title-bar">' + options.title + '</div>');
@@ -90,7 +91,7 @@ obo.dialog = function()
 		// without this we'd never see a second dialog if another one already 
 		// existed
 		setTimeout(function() {
-			$.modal($dialog, {escClose: options.escClose, onClose: closeCallback});
+			$.modal($dialog, {modal: options.modal, escClose: options.escClose, onClose: closeCallback});
 		}, 15);
 
 		//$('<div>' + options.contents + '</div>').dialog(options);
