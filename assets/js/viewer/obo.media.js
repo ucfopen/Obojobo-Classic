@@ -510,8 +510,13 @@ obo.media = function()
 					//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
 					break;*/
 				case 'kogneato':
-					mediaObject.width = 800;
-					mediaObject.height = 600;
+					// some sanity values in case we're getting bad sizes back.
+					if(mediaObject.width < 100 || mediaObject.height < 100)
+					{
+						mediaObject.width = 800;
+						mediaObject.height = 600;
+					}
+
 					// standin represents our media stand-in - where the swf would be placed normally.
 					// we define standin if needed to act as a positioning guide for captivates.
 					var $standin = null;
