@@ -1,6 +1,5 @@
 <?php
 require_once("internal/app.php");
-
 $API = \obo\API::getInstance();
 
 
