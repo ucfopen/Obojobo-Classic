@@ -12,7 +12,9 @@ modernizr-2.0.6.js,
 date.format.js,
 swfobject.js,
 tipTipv13/jquery.tipTip.js,
-ba-debug.js"></script>
+ba-debug.js,
+jquery.idletimer.js,
+jquery.idletimeout.js"></script>
 <!--
 <script type="text/javascript" src="/min/b=assets/js&f=
 viewer/obo.util.js,
@@ -106,8 +108,8 @@ viewer/obo.captivate.js"></script>
     debug.log('ready');
     
     var params = {
-        loID:'<?php echo $_REQUEST['loID']; ?>',
-        instID:'<?php echo $_REQUEST['instID']; ?>'
+        loID:'<?php echo(isset($_REQUEST["loID"]) ? $_REQUEST["loID"] : ''); ?>',
+        instID:'<?php echo(isset($_REQUEST["instID"]) ? $_REQUEST["instID"] : ''); ?>'
       };
 
     obo.model.init(obo.view, {});

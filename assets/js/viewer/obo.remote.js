@@ -21,11 +21,13 @@ obo.remote = function()
 			args = [];
 		}
 		
+		var callURL = "/assets/gateway-json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json';
+		debug.log(callURL);
 		// force content type to be json so we don't have to parse every return
 		// we also automatically filter every call to check for errors
 		$.ajax(
 		{
-			url: "/assets/gateway-json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json',
+			url: callURL,
 			context: document.body,
 			dataType: 'json',
 			success: callback
