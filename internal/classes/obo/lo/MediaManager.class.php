@@ -505,7 +505,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::HEIGHT."='?', 
 				".\cfg_obo_Media::WIDTH."='?', 
 				".\cfg_obo_Media::URL."='?',
-				".\cfg_obo_Media::META."='?', 
+				".\cfg_obo_Media::META."='?'
 				WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1";
 			if( !($q = $this->DBM->querySafe($qstr, $mediaObj->title, $mediaObj->descText, $mediaObj->copyright, $mediaObj->length, $mediaObj->height, $mediaObj->width, $mediaObj->url, base64_encode(serialize($mediaObj->meta)), $mediaObj->mediaID)))
 	        {
