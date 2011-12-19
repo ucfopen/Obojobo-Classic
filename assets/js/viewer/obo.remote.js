@@ -37,7 +37,7 @@ obo.remote = function()
 	// return true if jsonResult is an error object
 	var isError = function(jsonResult)
 	{
-		return jsonResult && jsonResult.hasOwnProperty('errorID');
+		return typeof jsonResult !== 'undefined' && typeof jsonResult.errorID !== 'undefined';
 	};
 	
 	return {
