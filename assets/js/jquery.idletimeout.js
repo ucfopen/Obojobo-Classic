@@ -46,8 +46,6 @@
 			});
 			
 			// bind continue link
-			debug.log('RESUME==');
-			debug.log(resume);
 			$(document).on('click', resume, function(e) {
 			//this.resume.bind("click", function(e){
 				e.preventDefault();

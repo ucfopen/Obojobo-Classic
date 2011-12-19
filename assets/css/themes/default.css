@@ -2202,6 +2202,8 @@ li:last-child > input[type="radio"]:checked+label
 	/*background-color: rgba(0, 0, 0, .1);*/
 	/*overflow: hidden;*/
 	position: relative;
+	-moz-transform: translate(-50px, 0) scale(.9);
+	-o-transform: translate(-50px, 0) scale(.9);
 	zoom: .9;
 }
 

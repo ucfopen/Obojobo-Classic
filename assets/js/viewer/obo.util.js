@@ -365,9 +365,7 @@ obo.util = function()
 				a.push(item.media[0].copyright);
 			}
 		}
-
-		debug.log(a);
-
+		
 		var r = '';
 		if(a.length == 1)
 		{
