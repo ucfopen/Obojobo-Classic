@@ -236,7 +236,6 @@ obo.util = function()
 		return input;
 	};
 	
-	// @TODO: This runs very very slow in FF
 	var generateStyleFromFlashHTMLTag = function(attribs, rules)
 	{
 		var style = '';
