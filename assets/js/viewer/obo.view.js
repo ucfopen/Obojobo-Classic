@@ -879,11 +879,13 @@ obo.view = function()
 
 							if(obo.model.instanceIsClosed())
 							{
+								$('.assessment-missed-section').hide();
 								$('#assessment-info').hide();
 								$('#assessment-info-closed').show();
 							}
 							else if(numAttempts === 0)
 							{
+								$('.assessment-missed-section').hide();
 								$('#assessment-info').hide();
 								$('#assessment-info-no-attempts').show();
 							}
@@ -926,7 +928,8 @@ debug.log(flashRequirements);
 							var importableScore = obo.model.getImportableScore();
 							if(importableScore != -1)
 							{
-								$('.assessment-import-score-section').show();
+								// we use css() instead of show() due to a FF 3.6 bug that was setting display to 'inline'
+								$('.assessment-import-score-section').css('display', 'block');
 								$('.assessment-missed-section').hide();
 
 								$('.previous-score').html(importableScore);
@@ -2122,7 +2125,8 @@ debug.log(flashRequirements);
 	};
 	
 	// tosses up a error dialog. error can be a string message or an error object
-	var displayError = function(error)
+	// calls closeCallback if defined
+	var displayError = function(error, closeCallback)
 	{
 		// @TODO: make it better:
 		var m = '';
@@ -2138,10 +2142,15 @@ debug.log(flashRequirements);
 		debug.log('ERROR: ' + error + ',' + m);
 		
 		//obo.dialog.showOKDialog('ERROR', $('<p>' + m + '</p>'), false, 'OK');
-		obo.dialog.showOKDialog({
+		var opts = {
 			title: 'ERROR',
 			contents: m
-		});
+		};
+		if(typeof callback !== 'undefined')
+		{
+			opts.closeCallback = closeCallback;
+		}
+		obo.dialog.showOKDialog(opts);
 		
 		hideThrobber();
 	};

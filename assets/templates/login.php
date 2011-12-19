@@ -7,12 +7,15 @@
 <!-- Minify using Minify -->
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery-1.7.js,
+modernizr-2.0.6.js,
 jquery.infieldlabel.js"></script>
 
 
 <!-- Minify using Minify -->
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&amp;f=default.css" media="screen">
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=login.css" media="screen">
+
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
@@ -47,7 +50,7 @@ jquery.infieldlabel.js"></script>
 	<h3>Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
 </header>
 
-<form id="login-form" class="overview-details " method="post" action="">
+<form id="login-form" class="overview-details " method="post">
 	<h1>Login to Begin</h1>
 	<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
 	<ul>

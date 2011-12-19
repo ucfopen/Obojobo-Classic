@@ -5,6 +5,7 @@
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 
 <!-- Minify using Minify -->
+
 <script type="text/javascript" src="/min/b=assets/js&f=
 jquery-1.7.js,
 jquery.simplemodal.1.4.1.js,
@@ -15,6 +16,19 @@ tipTipv13/jquery.tipTip.js,
 ba-debug.js,
 jquery.idletimer.js,
 jquery.idletimeout.js"></script>
+
+<!--
+<script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.js"></script>
+<script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
+<script type="text/javascript" src="/assets/js/date.format.js"></script>
+<script type="text/javascript" src="/assets/js/swfobject.js"></script>
+<script type="text/javascript" src="/assets/js/tipTipv13/jquery.tipTip.js"></script>
+<script type="text/javascript" src="/assets/js/ba-debug.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.idletimer.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.idletimeout.js"></script>
+-->
+
 <!--
 <script type="text/javascript" src="/min/b=assets/js&f=
 viewer/obo.util.js,
@@ -41,6 +55,7 @@ viewer/obo.captivate.js"></script>
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
 
 <link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>

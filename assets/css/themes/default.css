@@ -57,7 +57,7 @@ h2
 {
 	text-align:center;
 	color: #86273d;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	font-weight:900;
 	font-size:1.6em;
 }
@@ -66,7 +66,7 @@ h3
 {
 	text-align:center;
 	color:#555;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	font-weight:bold;
 	font-size:1.5em;
 }
@@ -86,7 +86,7 @@ h3
 	color: rgba(0, 0, 0, .7);
 	border-bottom: thin solid rgba(0, 0, 0, .3);
 	height: 26px;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	font-weight: bold;
 	width: 100%;
 	text-align: center;
@@ -273,7 +273,7 @@ h3
 	padding: 0 10px 0 10px;
 	position: relative;
 	
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
 	background-clip:padding-box;
 	text-align: center;
@@ -414,7 +414,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	/*padding:15px 24px;*/
 	padding: 10px 24px;
 	text-decoration:none;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	letter-spacing:.05em;
 	line-height: 1em;
 	margin:15px 4px 100px 4px;
@@ -1084,7 +1084,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	-webkit-box-shadow: 0 1px 1px #555;
 	box-shadow: 0 1px 1px #555;
 	text-align:center;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	font-weight: bold;
 	cursor: default;
 }
@@ -1195,6 +1195,8 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
 	border-radius: 15px;
+	-moz-box-shadow: #CCCCCC 0px 3px 2px;
+	-webkit-box-shadow: #CCCCCC 0px 3px 2px;
 	box-shadow: #CCCCCC 0px 3px 2px;
 }
 
@@ -1205,7 +1207,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 
 .assessment-import-score-options > div
 {
-	width: 210px;
+	width: 230px;
 	font-size: 9pt;
 	float: left;
 	margin: 0 20px 0 20px;
@@ -1220,7 +1222,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 .assessment-import-score-options a
 {
 	margin-bottom: 0.5em;
-	width: 155px;
+	width: 175px;
 }
 
 /*
@@ -1265,7 +1267,7 @@ body
 
 .answer-feedback h4
 {
-	font-family: 'Lato';
+	font-family: 'Lato', Arial;
 	font-weight: bold;
 	font-size: 0.8em;
 	text-transform: uppercase;
@@ -1560,7 +1562,7 @@ body
 {
 	width: 50%;
 	margin: 14px 0 10px 259px;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	font-size:1.2em;
 }
 #content .assessment-missed-section p
@@ -2007,7 +2009,7 @@ li:last-child > input[type="radio"]:checked+label
 
 .missed-pages-list li a 
 {
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
 	height: 35px;
 	width: 40px;
@@ -2015,7 +2017,7 @@ li:last-child > input[type="radio"]:checked+label
 	-webkit-border-radius: 40px;
 	border-radius: 40px;
 	font-size: 1.5em;
-	font-family: "lato", Arial;
+	font-family: "Lato", Arial;
 	text-shadow: rgba(0, 0, 0, .5) 0px 1px 1px;
 	text-decoration:none;
 }
@@ -2101,7 +2103,7 @@ li:last-child > input[type="radio"]:checked+label
 
 .page-navigation li a
 {
-	font-family: 'Lato';
+	font-family: 'Lato', Arial;
 	text-transform: uppercase;
 	color:#888;
 	text-decoration: none;
@@ -2482,7 +2484,7 @@ a
 	border: 0;
 	border-bottom: 1px solid rgba(0, 0, 0, .6);
 	color: white;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	font-size: 13pt;
 	text-shadow: rgba(0, 0, 0, .2) 0px 1px 1px;
 	font-weight: 600;
@@ -2631,7 +2633,7 @@ a
 	color: black;
 	width: auto;
 	margin-bottom: 20px;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	margin-left: 1em;
 }
 /*
@@ -2724,7 +2726,7 @@ a
 	margin: 0;
 	text-align: center;
 	line-height: 1px; /* opera doesn't like 0 */
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	background: -moz-linear-gradient(#b7d1dd, #4d8dab);
 	background: -ms-linear-gradient(#b7d1dd, #4d8dab);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b7d1dd), color-stop(100%, #4d8dab));
@@ -2749,7 +2751,7 @@ a
 	text-align: center;
 	font-size: 40pt;
 	line-height: 1px; /* opera doesn't like 0 */
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	font-weight: bold;
 }
 
@@ -2773,7 +2775,7 @@ a
 	padding: 3px;
 	margin: 2px;
 	background: #fffcc8;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 }
 
 .recorded-score
@@ -2794,7 +2796,7 @@ a
 	padding-bottom: 0.5em;
 	margin-bottom: 0.5em;
 	text-align: left;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 }
 
 #score-results p
@@ -2846,7 +2848,7 @@ a
 	display: inline-block;
 	margin: 1em 0 0 0;
 	padding: 0;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 }
 
 #all-attempts div
@@ -2875,7 +2877,7 @@ a
 
 #all-attempts table th
 {
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	color: white;
 	font-size: 10pt;
 	background: #6d98ae;
@@ -2936,7 +2938,7 @@ a
 
 #older-browser-dialog h1
 {
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	font-size: 14pt;
 	padding: 0;
 	margin: 0;
@@ -2963,7 +2965,7 @@ a
 	margin: 0 5px 0 5px;
 	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center 5px;
 	border-radius: 4px;
-	font-family: 'Lato';
+	font-family: 'Lato',Arial;
 	cursor: pointer;
 }
 
@@ -3005,7 +3007,7 @@ a
 
 .reload-media-button
 {
-	font-family: 'Lato', 'Arial';
+	font-family: 'Lato', Arial;
 	font-weight: 900;
 	color: white;
 	text-align: center;
@@ -3045,7 +3047,7 @@ a
 	color: white;
 	padding: 1em;
 	width: 700px;
-	font-family: 'Lato', 'Arial', sans;
+	font-family: 'Lato', Arial, sans;
 	display: none;
 	margin: 1em auto 0 auto;
 }
