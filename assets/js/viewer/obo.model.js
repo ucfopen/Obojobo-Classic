@@ -61,36 +61,6 @@ obo.model = function()
 				$('.idle-countdown').html(counter == 1 ? counter + ' second' : counter + ' seconds');
 			}
 		});
-	/*
-
-		startIdleTimer();
-		$(document).bind('idle.idleTimer', function() {
-			debug.log('IDLE!');
-			$.idleTimer('destroy');
-			logoutAfterIdleIntervalID = setTimeout(function() {
-				console.log('IDLE - LOGOUT!!!');
-				//logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
-			}, IDLE_TIME_BEFORE_LOGOUT_SECONDS);
-			debug.log('interval now = ' + logoutAfterIdleIntervalID);
-			obo.dialog.showDialog({
-				title: 'Your session is about to expire',
-				contents: 'You will be logged off in <span class="idle-countdown"></span> seconds.<br><br>Do you want to continue your session?',
-				modal: true,
-				width: 500,
-				buttons: [
-					{label: 'Yes, Continue', action:function() {
-						debug.log('IDLE continue', logoutAfterIdleIntervalID);
-						clearTimeout(logoutAfterIdleIntervalID);
-						startIdleTimer();
-					}},
-					{label: 'No, Logout', action:function() {
-						logout();
-					}}
-				]
-			});
-		});*/
-
-
 	};
 	var logoutMessage = '';
 	
@@ -164,7 +134,6 @@ obo.model = function()
 
 	var onGetSessionValid = function(result)
 	{
-		debug.log(result);
 		if(!(	result === true ||
 				(	typeof result !== 'undefined' &&
 					typeof result.validSession !== 'undefined' &&
@@ -180,7 +149,6 @@ obo.model = function()
 
 	var startIdleTimer = function()
 	{
-		console.log('IDLE - startTimer');
 		$.idleTimer(IDLE_TIME_BEFORE_WARN_SECONDS * 1000);
 	}
 
@@ -253,7 +221,6 @@ obo.model = function()
 	// a three question assessment)
 	var pageIsNumericWithinBounds = function(_section, page)
 	{
-		console.log('pageIsNumericWithinBounds', _section, page);
 		if(_section === undefined)
 		{
 			_section = section;
@@ -278,9 +245,7 @@ obo.model = function()
 			// @TODO - check the altIndex bounds
 		}
 		
-		var r = index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
-		debug.log(r);
-		return r;
+		return index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
 	};
 	
 	// utility function that turns a page like '2b' into {index:1, altIndex:1}
@@ -311,7 +276,6 @@ obo.model = function()
 	var processResponse = function(response)
 	{
 		debug.log('processResponse', response);
-		//response.errorID = 4;
 		if(obo.remote.isError(response))
 		{
 			switch(response.errorID)
@@ -345,7 +309,6 @@ obo.model = function()
 	// event handler to get the lo
 	var onGetLO = function(result)
 	{
-		debug.log('onGetLO', result);
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'lo').length > 0)
@@ -381,9 +344,6 @@ obo.model = function()
 	
 	var onLoadInstance = function(result)
 	{
-		debug.log('onLoadInstance');
-		debug.log(result);
-		
 		if(processResponse(result) === true)
 		{
 			if(checkForValidLO(result, 'instance').length > 0)
@@ -510,7 +470,6 @@ obo.model = function()
 	// call view.render if successful.
 	var setLocation = function(newSection, newPage, callback)
 	{
-		debug.log('>>>>>>>>>>>>>>>>>>>setLocation', newSection, newPage, callback);
 		if(newSection === undefined)
 		{
 			newSection = section;
@@ -603,12 +562,10 @@ obo.model = function()
 				
 				if(typeof callback === 'function')
 				{
-					debug.log('case 1')
 					callback(true);
 				}
 				else
 				{
-					debug.log('case 1b');
 					view.render();
 				}
 			}
@@ -620,12 +577,10 @@ obo.model = function()
 				
 				if(typeof callback === 'function')
 				{
-					debug.log('case 2');
 					callback(true);
 				}
 				else
 				{
-					debug.log('case 2b');
 					view.render();
 				}
 			}
@@ -634,7 +589,6 @@ obo.model = function()
 		{
 			if(typeof callback === 'function')
 			{
-				debug.log('case 3');
 				callback(false);
 			}
 		}
@@ -1012,7 +966,6 @@ obo.model = function()
 	// returns -1 if no flash found.
 	var getHighestFlashVersionInPage = function(page)
 	{
-		debug.log('GHFVIP');
 		var version = -1;
 		for(var i in page.items)
 		{
@@ -1028,7 +981,6 @@ obo.model = function()
 			}
 		}
 
-debug.log('getHighestFlashVersionInPage', version);
 		return version;
 	}
 	
@@ -1037,7 +989,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	var getPageObject = function(page)
 	{
 		var i = typeof page === 'undefined' ? getPage() : page;
-		debug.log('getPageObject', i);
 		if(pageIsNumericWithinBounds(undefined, i))
 		{
 			switch(section)
@@ -1051,12 +1002,8 @@ debug.log('getHighestFlashVersionInPage', version);
 					}
 					else
 					{
-						debug.log('L@@K');
-						
 						// need to handle question alternates
 						var pageIndex = getAssessmentPageIndex(i);
-						debug.log(pageIndex);
-						debug.log(questions.assessment);
 						return questions.assessment[pageIndex.index][pageIndex.altIndex];
 					}
 			}
@@ -1120,7 +1067,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// abstracts between instance summary data and lo data
 	var getNumPagesOfSection = function(_section)
 	{
-		debug.log('getNumPagesOfSection', questions);
 		switch(_section)
 		{
 			case 'overview': return 0;
@@ -1334,8 +1280,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// 'start', 'end', or a number, or a qalt page
 	var getNextPage = function()
 	{
-		debug.log('gotoNextPage');
-		
 		var page = getPage();
 		var newPage;
 		var newSection = undefined;
@@ -1433,7 +1377,6 @@ debug.log('getHighestFlashVersionInPage', version);
 		var page = getPage();
 		var qGroup = getQGroup();
 
-		debug.log('submitQuestion(' + answerID_or_shortAnswerResponse_or_score + ')');
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
@@ -1446,9 +1389,7 @@ debug.log('getHighestFlashVersionInPage', version);
 		{
 			page = getAssessmentPageIndex(page).index + 1;
 		}
-		debug.log('STORING ', answerID_or_shortAnswerResponse_or_score, ' WITH SECTION ', section, ' PAGE ', page);
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
-		debug.log('responses:', responses);
 	};
 	
 	// return the previous response, if it exists, for the current question
@@ -1456,8 +1397,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	// note that for media questions the previous response is really the score
 	var getPreviousResponse = function()
 	{
-		debug.log('getPreviousResponse');
-		debug.log(responses);
 		return responses[section][getPage()];
 	};
 
@@ -1487,8 +1426,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	
 	var submitAssessment = function()
 	{
-		debug.log('submitAssessment');
-		
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptEnd', [lo.viewID, lo.aGroup.qGroupID], onSubmitAssessment);
@@ -1505,7 +1442,6 @@ debug.log('getHighestFlashVersionInPage', version);
 				curQuestion = questions.assessment[i - 1];
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
-				debug.log('curQuestion=',curQuestion)
 				switch(curQuestion.itemType.toLowerCase())
 				{
 					case 'mc':
@@ -1539,8 +1475,6 @@ debug.log('getHighestFlashVersionInPage', version);
 	
 	var isPageAnswered = function(section, page)
 	{
-		debug.log('model.isPageAnswered(',section,page);
-		debug.log(responses[section]);
 		return responses[section][parseInt(page)] != undefined;
 	};
 	
@@ -1581,6 +1515,8 @@ debug.log('getHighestFlashVersionInPage', version);
 					title: 'Logout',
 					contents: logoutMessage,
 					modal: true,
+					closeButton: false,
+					escClose: false,
 					closeCallback: function(dialog) {
 						$.modal.close();
 						redirectToLoginPage();

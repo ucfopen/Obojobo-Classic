@@ -15,7 +15,6 @@ obo.loader = function()
 	
 	var loadFunction = function(url)
 	{
-		debug.log('loadFunction', url);
 		if(scripts[url] != undefined)
 		{
 			scripts[url].status = 'loaded';
@@ -33,12 +32,8 @@ obo.loader = function()
 	// callback if the script has already loaded.
 	var loadScript = function(url, callback)
 	{
-		debug.log('obo.loader.loadScript', url);
-		
 		if(scripts[url] == undefined)
 		{
-			debug.log('new script, loading');
-			
 			//load
 			var script = document.createElement('script');
 			script.setAttribute('src', url);
@@ -52,8 +47,6 @@ obo.loader = function()
 		}
 		else if(scripts[url].status == 'loaded')
 		{
-			debug.log('loaded');
-			
 			if(scripts[url].callback)
 			{
 				scripts[url].callback();
@@ -61,8 +54,6 @@ obo.loader = function()
 		}
 		else if(scripts[url].status == 'loading')
 		{
-			debug.log('waiting...');
-			
 			// do nothing
 		}
 	}
