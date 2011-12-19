@@ -1,8 +1,14 @@
 <?php
 ini_set('display_errors', '1');
 
+
 echo '<pre>';
 require(__DIR__ . '/../../internal/app.php');
+
+if(\AppCfg::CACHE_MEMCACHE == true)
+{
+	die("TURN OFF MEMCACHE FIRST");
+}
 
 $DBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::DB_HOST, \AppCfg::DB_USER, \AppCfg::DB_PASS, \AppCfg::DB_NAME, \AppCfg::DB_TYPE));
 
@@ -195,7 +201,7 @@ while($r = $DBM->fetch_obj($q))
 			
 			if($qHasUpdate)
 			{
-				echo "Question $kid->questionID updated \n";
+				echo "Question $kid->questionID ($media->itemType) updated \n";
 				flush();
 				$qstr = "UPDATE ".\cfg_obo_Question::TABLE." SET ".\cfg_obo_Question::DATA."='?' WHERE ".\cfg_obo_Question::ID." = '?'";
 				$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
@@ -229,13 +235,14 @@ while($r = $DBM->fetch_obj($q))
 			
 			if($qHasUpdate)
 			{
-				echo "Question $kid->questionID updated \n";
+				echo "Question $kid->questionID ($media->itemType) updated \n";
 				flush();
 				$qstr = "UPDATE ".\cfg_obo_Question::TABLE." SET ".\cfg_obo_Question::DATA."='?' WHERE ".\cfg_obo_Question::ID." = '?'";
 				$DBM->querySafe($qstr, base64_encode(serialize($kid)), $kid->questionID);
 			}
 		}
 	}
+	
 	echo "ASSESSMENT DONE \n";
 	echo "<script type='text/javascript'>history.replaceState(null, null, '{$_SERVER['PHP_SELF']}?loID=$r->loID');</script>\n";
 	echo "==========================\n";
