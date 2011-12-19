@@ -15,7 +15,7 @@ RewriteRule ^preview/([0-9]+)/?$ viewer.php?loID=$1 [L,QSA]
 RewriteRule ^view/([0-9]+)/?$ viewer.php?instID=$1 [L,QSA]
 
 # OBOJOBO Repository
-RewriteRule ^repository/?(index\.html)?$ repository.php [L,QSA]
+RewriteRule ^repository/?$ repository.php [L,QSA]
 
 # OBOJOBO  Media
 RewriteRule ^media/([0-9]+)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
