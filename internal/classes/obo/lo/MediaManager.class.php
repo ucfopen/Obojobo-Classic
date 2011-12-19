@@ -177,6 +177,31 @@ class MediaManager extends \rocketD\db\DBEnabled
 			return \rocketD\util\Error::getError(2);
 		}
 	    
+
+	    // TODO: THIS SHOULDNT BE HARD CODED- ANY PLUGIN SHOULD BE ABLE REGISTER FOR THIS EVENT
+	    if($media->itemType == 'kogneato')
+	    {
+			$PM = \rocketD\plugin\PluginManager::getInstance();
+			$result = $PM->callAPI('Kogneato', 'getKogneatoWidgetInfo', $media->url, true);
+
+			// Fail if we cant talk to Kogneato
+			if($result === false)
+			{
+				return false;
+			}
+
+			// copy all of our data into Obojobo
+			$media->title = $result['title'];
+			$media->height = $result['height'];
+			$media->width = $result['width'];
+			$media->meta['version'] = $result['flashVersion'];
+			$media->meta['owner'] = $result['owner'];
+			$media->meta['widget'] = $result['type'];
+			$media->meta['asVersion'] = 3;
+			$media->meta['container'] = 'flash';
+	    }
+
+
 		$media->createTime = time();
 		$qstr = "INSERT INTO ".\cfg_obo_Media::TABLE." 
 			SET 
