@@ -40,7 +40,7 @@ obo.util = function()
 	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/page\]/gi;
 	
 	var patternTF = /<\/?textformat\s?.*?>/gi;
-	var patternPFont = /<p\s?(.*?)><font.*?>/gi;
+	var patternPFont = /<\s*p(\s+align=(?:"|')(left|right|center|justify)(?:"|'))?\s*><\s*font(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
 	var patternPFontClose = /<\/font><\/p>/gi;
 	var patternFont = /<font.*?>/gi;
 	var patternFontClose = /<\/font>/gi;
@@ -297,7 +297,51 @@ obo.util = function()
 
 		// combine <p><font>...</font></p> tags to just <p></p>
 		// input = input.replace(pattern, '<p style="font-family:$2;font-size:$3px;color:$4;">');
-		input = input.replace(patternPFont, '<p>');
+		//input = input.replace(patternPFont, '<p>');
+		var matchFound = true;
+		var groups;
+		var lastIndex;
+		while(matchFound)
+		{
+			patternPFont.lastIndex = 0;
+			groups = patternPFont.exec(input);
+			lastIndex = patternPFont.lastIndex;
+			if(groups && groups.length >= 0)
+			{
+				if(groups.length >= 3)
+				{
+					var align = groups[2].toLowerCase();
+					//input = input.replace(patternPFont, '<p style="text-align:' + align + ';">');
+					input = input.substr(0, lastIndex).replace(patternPFont, '<p style="text-align:' + align + ';">') + input.substr(lastIndex);
+				}
+				else
+				{
+					input = input.substr(0, lastIndex).replace(patternPFont, '<p>') + input.substr(lastIndex);
+				}
+			}
+			else
+			{
+				matchFound = false;
+			}
+		}
+
+		/*//Convert single <font> into <span>
+		var matchFound = true;
+		while(matchFound)
+		{
+			groups = patternStrictFont.exec(input);
+			lastIndex = patternStrictFont.lastIndex;
+			if(groups && groups.length >= 2)
+			{
+				groupString = groups[1];
+				input = input.substr(0, lastIndex).replace(patternStrictFont, '<span style="' + generateStyleFromFlashHTMLTag(groupString, pReplaceRules) + '">') + input.substr(lastIndex);
+			}
+			else
+			{
+				matchFound = false;
+			}
+			//matchFound = false; // @TODO
+		}*/
 
 		input = input.replace(patternPFontClose, "</p>");
 
@@ -309,7 +353,7 @@ obo.util = function()
 
 		// find empty tags keeping space in them
 		// we loop here to help transform nested empty tags such as "<li><b></b></li>"
-		var matchFound = true;
+		matchFound = true;
 		while(matchFound)
 		{
 			patternEmpty1.lastIndex = 0;
@@ -365,7 +409,7 @@ obo.util = function()
 				a.push(item.media[0].copyright);
 			}
 		}
-		
+
 		var r = '';
 		if(a.length == 1)
 		{
