@@ -22,7 +22,6 @@ obo.dialog = function()
 	
 	var showDialog = function(options)
 	{
-		debug.log('obo.dialog::showDialog');
 		//close any existing dialogs first:
 		$.modal.close();
 
