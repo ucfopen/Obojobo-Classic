@@ -311,23 +311,24 @@ obo.model = function()
 	var processResponse = function(response)
 	{
 		debug.log('processResponse', response);
-		
+		//response.errorID = 4;
 		if(obo.remote.isError(response))
 		{
 			switch(response.errorID)
 			{
 				case 1: // not logged in
-					view.displayError('You are not logged in!');
+					//view.displayError('You are not logged in! Click OK to login');
+					logout("You are not logged in. Click 'OK' to login again.");
 					// @TODO: Log the user out
 					// @TODO: send client error
 					break;
 				case 4: // insufficient permissions
-					view.displayError('You do not have permissions!');
+					killPage('You do not have permissions to access this object.');
 					// @TODO: Log the user out
 					// @TODO: send client error
 					break;
 				case 5: // bad visit key
-					view.displayError('You already have this object open!');
+					killPage('You have already opened this learning object in another viewer window.  Only one viewer window per learning object is allowed open at a time.');
 					// @TODO: send client error
 					break;
 				default:
@@ -349,7 +350,8 @@ obo.model = function()
 		{
 			if(checkForValidLO(result, 'lo').length > 0)
 			{
-				view.displayError('This is not a valid LO!');
+				//view.displayError('This is not a valid LO!');
+				killPage('This Learning Object is not valid. Ensure that the URL is correct and try again.');
 			}
 			else
 			{
@@ -1590,6 +1592,23 @@ debug.log('getHighestFlashVersionInPage', version);
 			}
 		});
 	};
+
+	// doesn't log the user out, but wipes out the content
+	// and displays a message as to why the page was killed
+	var killPage = function(message)
+	{
+		clearInterval(verifyTimeIntervalID);
+		$('body').empty();
+		$('html').addClass('older-browser-background');
+		//view.displayError(message);
+		obo.dialog.showDialog({
+			title: 'Error',
+			contents: message,
+			closeButton: false,
+			escClose: false,
+			modal: false
+		});
+	}
 
 	var redirectToLoginPage = function()
 	{
