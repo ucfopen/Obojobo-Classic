@@ -9,6 +9,16 @@
 if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 {
   ?>
+
+    <!-- DEV OBOJOBO CSS -->
+  <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
+
+  <!-- DEV LIBRARY CSS -->
+  <link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
+
+  <!-- GOOGLE FONTS -->
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+  
   <!-- DEV JAVASCRIPT LIBRARIES -->
   <script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
   <script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.js"></script>
@@ -30,21 +40,17 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
 
-  <!-- DEV OBOJOBO CSS -->
-  <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
-
-  <!-- DEV LIBRARY CSS -->
-  <link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
-
-  <!-- GOOGLE FONTS -->
-  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
-
   <?php
 }
 // =========================== PRODUCTION ENVIRONMENT =============================
 else
 {
   ?>
+
+<link type="text/css" rel="stylesheet" href="/min/b=assets&f=css/themes/default.css,js/tipTipv13/tipTip.css" media="screen" />
+
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+
 <script type="text/javascript" src="/min/b=assets/js&f=
 jquery-1.7.js,
 jquery.simplemodal.1.4.1.js,
@@ -64,9 +70,7 @@ viewer/obo.kogneato.js,
 viewer/obo.dialog.js,
 viewer/obo.captivate.js"></script>
 
-<link type="text/css" rel="stylesheet" href="/min/b=assets&f=css/themes/default.css,js/tipTipv13/tipTip.css" media="screen" />
 
-<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
   <?php
 }
