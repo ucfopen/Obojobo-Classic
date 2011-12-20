@@ -21,6 +21,14 @@ class AppCfgDefault
 	// Minimum Flash Version to show a warning for
 	const FLASH_VER_WARN = '10.0.12.36';
 
+	// constants for testing the current environment
+	const ENV_DEV = 'dev';
+	const ENV_TEST = 'test';
+	const ENV_PROD = 'prod';
+
+	// set the default environment
+	const ENVIRONMENT = 'prod';
+
 	//--------------------   DIRECTORYS & PATHS  -----------------------//
 	// Define output of all php errors
 	const DIR_LOGS = 'internal/logs/';
