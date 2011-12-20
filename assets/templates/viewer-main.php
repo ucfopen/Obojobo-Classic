@@ -83,7 +83,7 @@ viewer/obo.captivate.js"></script>
 </script>
 <![endif]-->
 <!--[if lte IE 8]>
-<link rel="stylesheet" type="text/css" href="/assets/css/ie.css" media="screen" />
+<link id="ie-8-stylesheet" rel="stylesheet" type="text/css" href="/assets/css/ie.css" media="screen" />
 <![endif]-->
 <!--[if lte IE 9]>
 <link id="ie-custom-layout-fix-stylesheet" rel="stylesheet" type="text/css" href="/assets/css/ie-custom-layout-fix.css" media="screen" />
