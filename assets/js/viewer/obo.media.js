@@ -333,7 +333,7 @@ obo.media = function()
 			var $mediaElement = $('<figure class="media-item"></figure>');
 			//obo.util.doLater(function() { alert($mediaElement.css('list-style-type')); });
 		
-		
+			debug.log('create media', mediaObject.width, mediaObject.height);
 			//debug.log('createMedia', mediaObject, $target);
 			//mediaObject.itemType = 'cap5';
 		
@@ -740,6 +740,8 @@ obo.media = function()
 				$kogneato.load('/assets/templates/viewer.html #swf-alt-text', kogneatoize);
 				$kogneato = undefined;
 			}
+
+			debug.log('dimensions', $mediaElement.width(), $mediaElement.height());
 
 			mediaCount++;
 			return $mediaElement;

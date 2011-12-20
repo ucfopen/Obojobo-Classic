@@ -666,9 +666,30 @@ obo.model = function()
 				// tease out the saved answers from the response
 				for(var i in result)
 				{
-					if(result[i].savedAnswer && result[i].savedAnswer.answerID)
+					if(typeof result[i].savedAnswer !== 'undefined' && result[i].savedAnswer !== null)
 					{
-						responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.answerID;
+						switch(result[i].itemType.toLowerCase())
+						{
+							case 'mc':
+								if(typeof result[i].savedAnswer.answerID !== 'undefined' && result[i].savedAnswer.answerID !== null)
+								{
+									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.answerID;
+								}
+								break;
+							case 'qa':
+								if(typeof result[i].savedAnswer.user_answer !== 'undefined' && result[i].savedAnswer.user_answer !== null)
+								{
+									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.user_answer;
+								}
+								break;
+							case 'media':
+								if(typeof result[i].savedAnswer.user_answer !== 'undefined' && result[i].savedAnswer.user_answer !== null)
+								{
+									responses['assessment'][parseInt(i) + 1] = parseInt(result[i].savedAnswer.user_answer);
+								}
+								break;
+						}
+						
 					}
 				}
 			}
