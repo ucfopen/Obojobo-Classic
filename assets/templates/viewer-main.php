@@ -4,8 +4,47 @@
 <title></title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 
-<!-- Minify using Minify -->
-<!--
+<?php
+// =========================== DEV AND TEST ENVIRONMENTS =============================
+if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
+{
+  ?>
+  <!-- DEV JAVASCRIPT LIBRARIES -->
+  <script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.js"></script>
+  <script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
+  <script type="text/javascript" src="/assets/js/date.format.js"></script>
+  <script type="text/javascript" src="/assets/js/swfobject.js"></script>
+  <script type="text/javascript" src="/assets/js/tipTipv13/jquery.tipTip.js"></script>
+  <script type="text/javascript" src="/assets/js/ba-debug.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery.idletimer.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery.idletimeout.js"></script>
+
+  <!-- DEV OBOJOBO LIBRARIES -->
+  <script type="text/javascript" src="/assets/js/viewer/obo.util.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.view.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.model.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.kogneato.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
+  <script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
+
+  <!-- DEV OBOJOBO CSS -->
+  <link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
+
+  <!-- DEV LIBRARY CSS -->
+  <link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
+
+  <!-- GOOGLE FONTS -->
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+
+  <?php
+}
+// =========================== PRODUCTION ENVIRONMENT =============================
+else
+{
+  ?>
 <script type="text/javascript" src="/min/b=assets/js&f=
 jquery-1.7.js,
 jquery.simplemodal.1.4.1.js,
@@ -15,22 +54,7 @@ swfobject.js,
 tipTipv13/jquery.tipTip.js,
 ba-debug.js,
 jquery.idletimer.js,
-jquery.idletimeout.js"></script>
--->
-
-<script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.js"></script>
-<script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
-<script type="text/javascript" src="/assets/js/date.format.js"></script>
-<script type="text/javascript" src="/assets/js/swfobject.js"></script>
-<script type="text/javascript" src="/assets/js/tipTipv13/jquery.tipTip.js"></script>
-<script type="text/javascript" src="/assets/js/ba-debug.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.idletimer.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.idletimeout.js"></script>
-
-
-<!--
-<script type="text/javascript" src="/min/b=assets/js&f=
+jquery.idletimeout.js,
 viewer/obo.util.js,
 viewer/obo.view.js,
 viewer/obo.remote.js,
@@ -39,21 +63,14 @@ viewer/obo.media.js,
 viewer/obo.kogneato.js,
 viewer/obo.dialog.js,
 viewer/obo.captivate.js"></script>
--->
-<script type="text/javascript" src="/assets/js/viewer/obo.util.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.view.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.model.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.kogneato.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
-<script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
 
-<!-- Minify using Minify -->
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
+<link type="text/css" rel="stylesheet" href="/min/b=assets&f=css/themes/default.css,js/tipTipv13/tipTip.css" media="screen" />
 
-<link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
 <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+
+  <?php
+}
+?>
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>

@@ -3,7 +3,7 @@ require_once("internal/app.php");
 $API = \obo\API::getInstance();
 
 
-// ================ LOGIN OR CHECK LOGIN ===========================
+// ================ LOGIN OR CHECK EXISTING LOGIN ===========================
 if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
 {
   $loggedIn = $API->doLogin($_REQUEST['username'],  $_REQUEST['password']);
@@ -25,16 +25,20 @@ if($loggedIn === true && isset($_REQUEST['loID']))
   if(!in_array(\cfg_obo_Role::LIBRARY_USER, $hasRole['hasRoles']) && !in_array(\cfg_obo_Role::CONTENT_CREATOR, $hasRole['hasRoles']))
   {
     $loggedIn = false;
-    $notice = 'You do not have permission to preview this learning lbject. For more information view our <a href="/help/faq/">FAQ</a>.';
+    $notice = 'You do not have permission to preview this learning object. For more information view our <a href="/help/faq/">FAQ</a>.';
   }
 }
 
 // ================ DISPLAY OUTPUT =================================
-if($loggedIn === true) // logged in, show the viewer
+
+// logged in, show the viewer
+if($loggedIn === true) 
 {
   include("assets/templates/viewer-main.php");
 }
-else // not logged in
+
+// not logged in, show login screen
+else 
 {
 
   // ================ PREPARE VARS FOR THE TEMPLATE ================
@@ -65,7 +69,6 @@ else // not logged in
   {
     if($loMeta = $API->getLOMeta($_REQUEST['loID']))
     {
-
       $title = $loMeta->title . ' ' . $loMeta->version . '.' . $loMeta->subVersion;
       $course = 'PREVIEW ONLY';
       $instructor = 'only visible to authors';
