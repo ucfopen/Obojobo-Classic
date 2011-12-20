@@ -1183,7 +1183,6 @@ obo.view = function()
 	var selectPreviousAnswer = function()
 	{
 		var prevResponse = obo.model.getPreviousResponse();
-		
 		if(prevResponse != undefined)
 		{
 			switch(obo.model.getPageObject().itemType.toLowerCase())
