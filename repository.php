@@ -31,7 +31,7 @@
    }
 
   function confirmExit(){
-    $isCloseable = thisMovie("Repository_1_8_2.swf").isCloseable();
+    $isCloseable = thisMovie("Repository_1_8_5.swf").isCloseable();
     if($isCloseable !== true){
       return $isCloseable;
     }
@@ -52,10 +52,10 @@
   params.bgcolor = "#869ca7";
 
   var attributes = new Object(); 
-  attributes.id = "Repository_1_8_2.swf";
-  attributes.name = "Repository_1_8_2.swf";
+  attributes.id = "Repository_1_8_5.swf";
+  attributes.name = "Repository_1_8_5.swf";
 
-  swfobject.embedSWF( "/assets/flash/Repository_1_8_2.swf", "flexApp", "100%", "100%", "10",  "/assets/flash/expressInstall.swf", flashvars, params, attributes);
+  swfobject.embedSWF( "/assets/flash/Repository_1_8_5.swf", "flexApp", "100%", "100%", "10",  "/assets/flash/expressInstall.swf", flashvars, params, attributes);
 </script>
 </head>
 <body >
