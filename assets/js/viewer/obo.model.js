@@ -41,7 +41,7 @@ obo.model = function()
 			onIdle: function() {
 				obo.dialog.showDialog({
 					title: 'Your session is about to expire',
-					contents: 'You will be logged off in <span class="idle-countdown">' + IDLE_TIME_BEFORE_LOGOUT_SECONDS + ' seconds</span>.<br><br>Do you want to continue your session?',
+					contents: 'This learning object will be locked in <span class="idle-countdown">' + IDLE_TIME_BEFORE_LOGOUT_SECONDS + ' seconds</span>.<br><br>Do you want to continue your session?',
 					modal: true,
 					closeButton: false,
 					escClose: false,
@@ -55,7 +55,8 @@ obo.model = function()
 			},
 			onTimeout: function() {
 				$idleCountdown = undefined;
-				logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
+				//logout("You have been logged out due to inactivity. Click 'OK' to log in again.");
+				killPage("This learning object has been locked due to inactivity. Refresh this page to continue viewing this object.");
 			},
 			onCountdown: function(counter) {
 				$('.idle-countdown').html(counter == 1 ? counter + ' second' : counter + ' seconds');
