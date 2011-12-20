@@ -4,18 +4,44 @@
 <title><?php echo $title; ?> | Obojobo Learning Object</title>
 <link rel="profile" href="http://gmpg.org/xfn/11">
 
-<!-- Minify using Minify -->
+<?php
+// =========================== DEV AND TEST ENVIRONMENTS =============================
+if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
+{
+	?>
+	<!-- DEV JAVASCRIPT LIBRARIES -->
+	<script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
+	<script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.infieldlabel.js"></script>
+
+	<!-- DEV OBOJOBO CSS -->
+	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" media="screen">
+
+	<!-- DEV OBOJOBO LOGIN CSS -->
+	<link type="text/css" rel="stylesheet" href="/assets/css/login.css" media="screen">
+
+	<!-- GOOGLE FONTS -->
+	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+
+  <?php
+}
+// =========================== PRODUCTION ENVIRONMENT =============================
+else
+{
+  ?>
+
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery-1.7.js,
 modernizr-2.0.6.js,
 jquery.infieldlabel.js"></script>
 
-
-<!-- Minify using Minify -->
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&amp;f=default.css" media="screen">
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=login.css" media="screen">
-
+<link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
 <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+
+  <?php
+}
+?>
+
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
