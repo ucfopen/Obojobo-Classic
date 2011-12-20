@@ -1,0 +1,5 @@
+/* Page-list plugin styles (wordpress.org/extend/plugins/page-list/) */
+
+.page-list-ext .page-list-ext-item {clear:both; margin:10px 0 20px 0;}
+.page-list-ext .page-list-ext-image {float:left; display:inline; margin:5px 10px 10px 0;}
+.page-list-ext .page-list-ext-title {clear:none;}
