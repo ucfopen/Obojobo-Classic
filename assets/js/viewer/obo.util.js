@@ -49,6 +49,8 @@ obo.util = function()
 	var patternRemoveUL = /<\/?ul>/gi;
 	var patternAddUL = /<LI>([\s\S]*?)<\/LI>/gi;
 	var patternRemoveExtraUL = /<\/ul><ul>/gi;
+
+	var patternIE8ConvertApos = /&apos;/gi;
 	
 	var patternAttributionOpen = /<u><a /gi;
 	var patternAttributionClose = /<\/a>\s*?<\/u>/gi;
@@ -286,6 +288,12 @@ obo.util = function()
 	// Old learning objects were saved using flash's textfields - which suck at html
 	cleanFlashHTML = function(input, strict)
 	{
+		// first, handle a special case where IE8 can't handle &apos;
+		if($('#ie-8-stylesheet'))
+		{
+			input = input.replace(patternIE8ConvertApos, "'");
+		}
+
 		if(strict === true)
 		{
 			return cleanFlashHTMLStrict(input);
