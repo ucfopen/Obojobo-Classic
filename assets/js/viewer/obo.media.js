@@ -170,7 +170,8 @@ obo.media = function()
 						var w = $container.width();
 						var h = $container.height();
 						debug.log(w, h);
-						swfobject.embedSWF(event.url, container.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
+						var url = '/assets/flash/kogneato-widget.swf?id=' + container.id + '&callback=obo.kogneato.onKogneatoEvent&kogneatoURL=' + event.url;
+						swfobject.embedSWF(url, container.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
 					});
 				});
 			});
@@ -516,7 +517,12 @@ obo.media = function()
 						mediaObject.width = 800;
 						mediaObject.height = 600;
 					}
-
+					/*
+					mediaObject.width = 640;
+					mediaObject.height = 480;
+					mediaObject.width = 1000;
+					mediaObject.height = 1000;
+*/
 					// standin represents our media stand-in - where the swf would be placed normally.
 					// we define standin if needed to act as a positioning guide for captivates.
 					var $standin = null;
