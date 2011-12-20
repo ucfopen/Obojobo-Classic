@@ -95,7 +95,7 @@ viewer/obo.captivate.js"></script>
   });
   
   // disable logs by defualt
-  //debug.setLevel(0);
+  debug.setLevel(0);
   
   $(function() {
     if(typeof oldBrowser !== 'undefined' && oldBrowser === true)
