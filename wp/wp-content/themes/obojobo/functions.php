@@ -38,6 +38,9 @@
  * @since Twenty Ten 1.0
  */
 
+// TURN OFF THE ADMIN BAR
+add_filter('show_admin_bar', '__return_false');  
+
 /**
  * Set the content width based on the theme's design and stylesheet.
  *
