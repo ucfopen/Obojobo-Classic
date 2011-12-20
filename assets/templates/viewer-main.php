@@ -17,7 +17,7 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <link type="text/css" rel="stylesheet" href="/assets/js/tipTipv13/tipTip.css" media="screen" />
 
   <!-- GOOGLE FONTS -->
-  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
   
   <!-- DEV JAVASCRIPT LIBRARIES -->
   <script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
@@ -49,7 +49,7 @@ else
 
 <link type="text/css" rel="stylesheet" href="/min/b=assets&f=css/themes/default.css,js/tipTipv13/tipTip.css" media="screen" />
 
-<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 <script type="text/javascript" src="/min/b=assets/js&f=
 jquery-1.7.js,
