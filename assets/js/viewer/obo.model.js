@@ -974,10 +974,10 @@ obo.model = function()
 				typeof pi.media.length !== 'undefined' &&
 				pi.media.length > 0 &&
 				typeof pi.media[0].itemType === 'string' &&
-				pi.media[0].itemType.toLowerCase() === 'swf' &&
-				typeof pi.media[0].version === 'string'
+				(pi.media[0].itemType.toLowerCase() === 'swf' || pi.media[0].itemType.toLowerCase() === 'kogneato')
 			) {
-				version = Math.max(version, parseInt(pi.media[0].version));
+				//@TODO - Assume kogneato is flash version 10
+				version = Math.max(version, pi.media[0].itemType.toLowerCase() === 'swf' ? parseInt(pi.media[0].version) : 10);
 			}
 		}
 
@@ -1426,6 +1426,8 @@ obo.model = function()
 	
 	var submitAssessment = function()
 	{
+		debug.log('submitAssessment');
+
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptEnd', [lo.viewID, lo.aGroup.qGroupID], onSubmitAssessment);
@@ -1435,11 +1437,13 @@ obo.model = function()
 			var total = 0;
 			var curQuestion;
 			var curResponse;
-			
 			// @TODO: This is O(n^2)
 			for(var i in responses['assessment'])
 			{
-				curQuestion = questions.assessment[i - 1];
+				// @TODO:
+				// This always grabs the first assessment question.
+				// The result is that, if you have alternates, you are only graded on the first question.
+				curQuestion = questions.assessment[i - 1][0];
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
 				switch(curQuestion.itemType.toLowerCase())
