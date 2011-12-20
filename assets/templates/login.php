@@ -21,7 +21,7 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 	<link type="text/css" rel="stylesheet" href="/assets/css/login.css" media="screen">
 
 	<!-- GOOGLE FONTS -->
-	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
   <?php
 }
@@ -36,7 +36,7 @@ modernizr-2.0.6.js,
 jquery.infieldlabel.js"></script>
 
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
-<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
   <?php
 }
