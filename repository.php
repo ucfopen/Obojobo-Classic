@@ -5,9 +5,9 @@
 <title>Repository | Obojobo&#8482;</title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 
-<script type='text/javascript' src='http://obo/wp/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
+<script type='text/javascript' src='/wp/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
 
-<script type='text/javascript' src='http://obo/wp/wp-includes/js/swfobject.js?ver=2.2'></script>
+<script type='text/javascript' src='/wp/wp-includes/js/swfobject.js?ver=2.2'></script>
 
 <style type="text/css" media="screen">
   html, body{
@@ -68,6 +68,6 @@
       <div style="clear:both;"></div>
     </div>
   </div>
-  <script type='text/javascript' src='http://obo/wp/wp-includes/js/admin-bar.js?ver=20111130'></script>
+  <script type='text/javascript' src='/wp/wp-includes/js/admin-bar.js?ver=20111130'></script>
 </body>
 </html>
