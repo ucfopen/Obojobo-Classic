@@ -468,7 +468,9 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	public function setGlobalPerms($itemID=0, $itemType='l', $permObj)
 	{
 		$userID = $_SESSION['userID'];
-		if($itemID != 0 && $this->getUserPerm($itemID, $itemType, 'giveGlobal', $userID))
+
+
+		if(\obo\perms\RoleManager::getInstance()->isSuperUser() || ($itemID != 0 && $this->getUserPerm($itemID, $itemType, 'giveGlobal', $userID)))
 		{
 			return $this->setPerms($itemID, $itemType, $permObj);
 		}
