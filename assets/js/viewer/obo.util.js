@@ -284,6 +284,24 @@ obo.util = function()
 			return '#' + ('000000' + colorInt.toString(16)).slice(-6);
 		}
 	};
+
+	getURLFromEmbeddedSwf = function($objectElement)
+	{
+		if(typeof $objectElement.attr('data') !== 'undefined')
+		{
+			return $objectElement.attr('data')
+		}
+		else
+		{
+			$param = $objectElement.find('param[name="movie"]');
+			if(typeof $param !== 'undefined' && typeof $param.attr('value') !== 'undefined' && $param.attr('value') !== null)
+			{
+				return $param.attr('value');
+			}
+		}
+
+		return undefined;
+	}
 	
 	// Old learning objects were saved using flash's textfields - which suck at html
 	cleanFlashHTML = function(input, strict)
@@ -524,6 +542,7 @@ obo.util = function()
 		isIOS: isIOS,
 		doLater: doLater,
 		createCombinedAttributionString: createCombinedAttributionString,
-		getBaseURL: getBaseURL
+		getBaseURL: getBaseURL,
+		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf
 	};
 }();
