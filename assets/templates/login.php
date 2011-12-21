@@ -2,8 +2,6 @@
 <html>
 <head>
 <title><?php echo $title; ?> | Obojobo Learning Object</title>
-<link rel="profile" href="http://gmpg.org/xfn/11">
-
 <?php
 // =========================== DEV AND TEST ENVIRONMENTS =============================
 if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
