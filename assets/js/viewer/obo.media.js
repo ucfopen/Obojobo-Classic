@@ -313,12 +313,28 @@ obo.media = function()
 
 	var reloadSWF = function($objectElement)
 	{
+		/*
 		(function($objectElement) {
 			$objectElement.hide();
 			setTimeout(function() {
 				$objectElement.show();
 			}, 1);
-		})($objectElement);
+		})($objectElement);*/
+		var url = obo.util.getURLFromEmbeddedSwf($objectElement);
+		if(typeof url !== 'undefined')
+		{
+			var width = $objectElement.width();
+			var height = $objectElement.height();
+			var id = $objectElement.attr('id');
+			var $parent = $($objectElement).parent();
+			$objectElement.remove();
+			var $new = $('<div></div>');
+			$new.attr('id', id);
+			$parent.prepend($new);
+
+			//@TODO - This simply requires flash 10, but we know what it should require
+			swfobject.embedSWF(url, id, width, height, "10",  "/assets/flash/expressInstall.swf", {}, getParams(), {});
+		}
 	};
 	
 	// creates either a YouTube or non-YouTube video, appends to $target
