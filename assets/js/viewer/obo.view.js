@@ -890,7 +890,7 @@ obo.view = function()
 									var score = obo.model.getImportableScore(); 
 									obo.dialog.showDialog({
 										title: 'Confirm Score Importing: ' + score + '%',
-										contents: '<strong>WARNING:</strong> Importing will forfeit of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
+										contents: '<strong>WARNING:</strong> Importing will forfeit all of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
 										modal: true,
 										width: 600,
 										buttons: [
