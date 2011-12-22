@@ -810,7 +810,12 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 /*Override margin settings when using strict html conversion: */
 .page-layout-8 .text-item p:first-child
 {
-	margin-top: 0;
+	/*margin-top: 0;*/
+}
+
+.page-layout-8 .text-item p
+{
+	margin: 0;
 }
 
 .page-layout-8 .media-item {
