@@ -85,9 +85,6 @@ viewer/obo.captivate.js"></script>
 <!--[if lte IE 8]>
 <link id="ie-8-stylesheet" rel="stylesheet" type="text/css" href="/assets/css/ie.css" media="screen" />
 <![endif]-->
-<!--[if lte IE 9]>
-<link id="ie-custom-layout-fix-stylesheet" rel="stylesheet" type="text/css" href="/assets/css/ie-custom-layout-fix.css" media="screen" />
-<![endif]-->
 <!-- END IE CONDITIONALS -->
 <script type="text/javascript">
   // Guess if they have an old browser

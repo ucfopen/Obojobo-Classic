@@ -794,6 +794,17 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 {
 	position: absolute;
 	overflow-y: auto;
+	font-size: 14px;
+	line-height: normal;
+	max-height: none;
+	max-width: none;
+	-moz-border-radius: 4px;
+	
+	
+	-webkit-border-radius: 4px;
+	
+	
+	border-radius: 4px;
 }
 
 /*Override margin settings when using strict html conversion: */
@@ -817,7 +828,8 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	overflow-y: auto;
 	text-align: left;
 	margin: 0;
-	
+	max-height: none;
+	max-width: none;
 }
 
 .page-layout-8 .media-item *
@@ -2198,14 +2210,13 @@ li:last-child > input[type="radio"]:checked+label
 {
 	padding: 20px 0 15px 0;
 	float: left;
-	width: 1064px;
-	height: 798px;
-	/*background-color: rgba(0, 0, 0, .1);*/
-	/*overflow: hidden;*/
+	width: 958px;
+	height: 718px;
 	position: relative;
+	/*
 	-moz-transform: translate(-50px, 0) scale(.9);
 	-o-transform: translate(-50px, 0) scale(.9);
-	zoom: .9;
+	zoom: .9;*/
 }
 
 /*--- oml ---*/
