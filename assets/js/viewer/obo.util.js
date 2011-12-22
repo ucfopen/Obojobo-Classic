@@ -14,7 +14,7 @@ obo.util = function()
 		['align', 'text-align', ''],
 		['face', 'font-family', ''],
 		['color', 'color', ''],
-		['size', 'font-size', 'px'],
+		['size', 'font-size', '%'],
 		['letterspacing', 'letter-spacing', 'px']
 	];
 
@@ -38,6 +38,7 @@ obo.util = function()
 	var patternStrictEmpty2 = /<(\w+)>(\s*?)<\/\1>/gi;
 	var patternStrictOMLTooltip = /\[\s*?tooltip\s+?text\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/tooltip\]/gi;
 	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/page\]/gi;
+	var patternStrictRemainingTf = /<\/?textformat.*?>/gi;
 	
 	var patternTF = /<\/?textformat\s?.*?>/gi;
 	var patternPFont = /<\s*p(\s+align=(?:"|')(left|right|center|justify)(?:"|'))?\s*><\s*font(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
@@ -232,7 +233,7 @@ obo.util = function()
 			}
 			//matchFound = false; // @TODO
 		}
-
+		input = input.replace(patternStrictRemainingTf, '')
 		input = createOMLTags(input);
 
 		return input;
@@ -249,7 +250,16 @@ obo.util = function()
 			match = reg.exec(attribs)
 			if(match != null && match.length >= 2)
 			{
-				style += rules[a][1] + ':' + match[1] + rules[a][2] + ';';
+				// special case: convert px to % for font size
+				if(rules[a][0] === 'size')
+				{
+					// we multiply by 90 to make 14px = 90%
+					style += rules[a][1] + ':' + ((parseFloat(match[1]) / 14) * 90) + rules[a][2] + ';';
+				}
+				else
+				{
+					style += rules[a][1] + ':' + match[1] + rules[a][2] + ';';
+				}
 			}
 		}
 		return style;
