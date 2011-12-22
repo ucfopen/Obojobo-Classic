@@ -139,7 +139,7 @@ try
 		{
 			?>
 			<h2>Are you an incoming student?</h2>
-			<p>If you are a New Undergraduate Student or a New Master's Program student you are required to complete all the Academic Integrity Modules listed below in your group.</p>
+			<p>If you are a New Undergraduate Student or a New Master's Program Student you are required to complete all the Academic Integrity Modules listed below in your group.</p>
 			<p>You need to score <strong><?php echo $minScore; ?>% or higher on all required modules before January 23, 2012</strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
 			
 			<h3>New Undergraduate Students</h3>
