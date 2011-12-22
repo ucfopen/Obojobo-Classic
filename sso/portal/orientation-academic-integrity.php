@@ -74,16 +74,11 @@ try
 	$minScore = 80;
 	$isDevEnvironment = false;
 
-	// Testing for ian's user
-	// if($_SERVER['HTTP_REMOTE_USER'] == 'i0396856')
-	// {
-	// }
-
+	// figure out if this is being accessed via the test or dev portals
 	$isDevEnvironment = preg_match('/^https:\/\/(patest|padev)\d*?\.net\.ucf\.edu\/psp\/PA(TEST|DEV)/', $_SERVER['HTTP_REFERER']);
-	// show a default set of learning objects in a dev environment
 	if($isDevEnvironment)
 	{
-		$los = array('2329','2329','2330','2330','2328','2328','2328','2328');
+		$los = array('2329','2329','2330','2330');
 	}
 	else
 	{
@@ -91,12 +86,14 @@ try
 	}
 
 	// ************* TESTING CODE ************
-	// $targetURL = 'http://obo/sso/portal/redirect.php';
-	// $nid = 'iturgeon';
-	// $timestamp = time();
-	// $hash = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
-	// $los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
-	
+	if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
+	{
+		$targetURL = 'http://obo/sso/portal/redirect.php';
+		$nid = 'iturgeon';
+		$timestamp = time();
+		$hash = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET);
+		$los = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
+	}
 	
 	// valid hash
 	if(md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
@@ -114,8 +111,11 @@ try
 	// invalid hash
 	else
 	{
-		$nm = \obo\util\NotificationManager::getInstance();
-		$nm->sendCriticalError('Pagelet - invalid hash', ' calculated hash: '. md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
+		if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_PROD)
+		{
+			$nm = \obo\util\NotificationManager::getInstance();
+			$nm->sendCriticalError('Pagelet - invalid hash', ' calculated hash: '. md5($nid.$timestamp.\AppCfg::UCF_PORTAL_SECRET) . ' given hash ' . $hash . ' timed out: ' . ($timestamp >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes') );
+		}
 		echo "Session timed out or invalid, refresh the page to update.";
 		exit();
 	}
@@ -139,10 +139,10 @@ try
 		{
 			?>
 			<h2>Are you an incoming student?</h2>
-			<p>If so, you're required to complete <strong>one group</strong> of the Academic Integrity Modules listed below.</p>
-
-			<p>You need to score <strong><?php echo $minScore; ?>% or higher</strong> before <strong>Jan 23, 2012</strong>.  Otherwise you will receive a hold that prevents you from registering for classes.</p>
-			<h3>First-time College Students</h3>
+			<p>If you are a New Undergraduate Student or a New Master's Program student you are required to complete all the Academic Integrity Modules listed below in your group.</p>
+			<p>You need to score <strong><?php echo $minScore; ?>% or higher on all required modules before January 23, 2012</strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
+			
+			<h3>New Undergraduate Students</h3>
 				<ul>
 				<?php
 					echo $output[0];
@@ -150,23 +150,12 @@ try
 					echo $output[2];
 				?>
 				</ul>
-			<h3>New Transfer Students</h3>
+			<h3>New Master's Program Students</h3>
 				<ul>
 				<?php
 					echo $output[3];
-					echo $output[4];
-					echo $output[5];
 				?>
 				</ul>
-			<h3>New Graduate Students</h3>
-				<ul>
-				<?php
-					echo $output[6];
-					echo $output[7];
-					echo $output[8];
-				?>
-				</ul>
-
 			<?php
 			if($isDevEnvironment)
 			{
