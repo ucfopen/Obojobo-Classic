@@ -10,6 +10,8 @@ obo.remote = function()
 	{
 		debug.log('makeCall: ' + method + ', args: ' + args);
 		
+
+
 		if(!callback)
 		{
 			callback = $.noop();
@@ -19,8 +21,19 @@ obo.remote = function()
 		{
 			args = [];
 		}
+			
+		// allow us to load a flat json learning object in preview mode
+		// ?loID=local19203 will load /19203.json from the server
+		if(method == 'getLO' && args[0].substr(0,5) == 'local')
+		{
+			var callURL = "/"+args[0].substring(5)+'.json';
+		}
+		else
+		{
+			var callURL = "/api/json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json';
+		}
 		
-		var callURL = "/api/json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json';
+
 		// force content type to be json so we don't have to parse every return
 		// we also automatically filter every call to check for errors
 		$.ajax(

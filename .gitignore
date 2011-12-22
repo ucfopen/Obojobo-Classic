@@ -43,3 +43,5 @@ internal/templates/compiled/
 
 # ignore test files
 internal/DELETEME/tests/*
+
+/*.json
