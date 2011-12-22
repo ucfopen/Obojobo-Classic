@@ -99,7 +99,7 @@ jquery.simplemodal.1.4.1.js,modernizr-2.0.6.js,date.format.js,jquery.tipTip.js,b
   });
   
   // disable logs by defualt
-  debug.setLevel(0);
+  debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
   
   $(function() {
     if(typeof oldBrowser !== 'undefined' && oldBrowser === true)
