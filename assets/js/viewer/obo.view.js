@@ -1506,17 +1506,13 @@ obo.view = function()
 	
 	var formatCustomLayoutPageItem = function(pageItemHTML, pageItem)
 	{
-		//@HACK - IE9 doesn't like absoluetly positioned elements in a relative container when that container
-		// has a zoom defined. For IE9 we instead zoom the children, but this means we need to manually
-		// position the children as if the container was zoomed to 90% instead of letting the browser do it.
-		// we know that this is IE9 if the conditional IE9 stylesheet is included.
-		var positionFactor = $('#ie-custom-layout-fix-stylesheet').length == 0 ? 1 : 0.9;
+		var scaleFactor = .9;
 		var p = Number(pageItem.options.padding);
-		pageItemHTML.width(pageItem.options.width - p * 2);
-		pageItemHTML.height(pageItem.options.height - p * 2);
-		pageItemHTML.css('left', pageItem.options.x * positionFactor);
-		pageItemHTML.css('top', pageItem.options.y * positionFactor);
-		pageItemHTML.css('padding', p);
+		pageItemHTML.width((pageItem.options.width - p * 2) * scaleFactor);
+		pageItemHTML.height((pageItem.options.height - p * 2) * scaleFactor);
+		pageItemHTML.css('left', pageItem.options.x * scaleFactor);
+		pageItemHTML.css('top', pageItem.options.y * scaleFactor);
+		pageItemHTML.css('padding', p * scaleFactor);
 		if(pageItem.options.borderColor != -1)
 		{
 			pageItemHTML.css('border', '1px solid ' + obo.util.getRGBA(pageItem.options.borderColor, pageItem.options.borderAlpha));
