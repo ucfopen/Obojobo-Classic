@@ -24,6 +24,7 @@ obo.util = function()
 		['rightmargin', 'margin-right', 'px']
 	];
 	
+	var patternEmptyTFsToBrs = /<font[^>]*(?:\/>|>(?:\s|&nbsp;)*<\/font>)/gi;
 	var patternStrictTfToLI = /<\s*textformat([a-z=A-Z"'0-9 ]*)?\s*><\s*li\s*>/gi;
 	var patternStrictTfToDiv = /<\s*textformat(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
 	var patternStrictTFClose = /<\/li><\/textformat>/gi;
@@ -65,11 +66,13 @@ obo.util = function()
 		var groups;
 		var groupString;
 		var lastIndex;
-		
+		//convert <textformat><p><font></font></p></textformat> into <br>
+		input = input.replace(patternEmptyTFsToBrs, "<br>");
 		//Convert <textformat ...><li> into <li style='...'>
 		var matchFound = true;
 		while(matchFound)
 		{
+			patternStrictTfToLI.lastIndex = 0;
 			groups = patternStrictTfToLI.exec(input);
 			lastIndex = patternStrictTfToLI.lastIndex;
 			if(groups && groups.length >= 2)
@@ -105,6 +108,7 @@ obo.util = function()
 			matchFound = false;
 			//console.log('i >    =====' + i);
 			i = i + 1;
+			patternStrictTfToDiv.lastIndex = 0;
 			groups = patternStrictTfToDiv.exec(input);
 			lastIndex = patternStrictTfToDiv.lastIndex;
 			if(groups && groups.length >= 2)
@@ -140,7 +144,7 @@ obo.util = function()
 		{
 				//console.log('j >    =====' + j);
 				j = j + 1;
-			
+			patternStrictPFont.lastIndex = 0;
 			groups = patternStrictPFont.exec(input);
 			lastIndex = patternStrictPFont.lastIndex;
 			if(groups && groups.length >= 3)
@@ -170,6 +174,7 @@ obo.util = function()
 		var matchFound = true;
 		while(matchFound)
 		{
+			patternStrictFont.lastIndex = 0;
 			groups = patternStrictFont.exec(input);
 			lastIndex = patternStrictFont.lastIndex;
 			if(groups && groups.length >= 2)
@@ -203,6 +208,7 @@ obo.util = function()
 		while(matchFound)
 		{
 			// find empty tags keeping space in them
+			patternStrictEmpty1.lastIndex = 0;
 			groups = patternStrictEmpty1.exec(input);
 			lastIndex = patternStrictEmpty1.lastIndex;
 			if(groups && groups.length >= 3)
@@ -220,6 +226,7 @@ obo.util = function()
 		var matchFound = true;
 		while(matchFound)
 		{
+			patternStrictEmpty2.lastIndex = 0;
 			groups = patternStrictEmpty2.exec(input);
 			lastIndex = patternStrictEmpty2.lastIndex;
 			if(groups && groups.length >= 3)
