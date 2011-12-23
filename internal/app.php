@@ -59,8 +59,11 @@ function classAutoLoader($className)
 	if(!@include($file))
 	{
 		// log error on failure
-		@$dt = debug_backtrace();
-		error_log('autoload failed to load class "'. basename($className) . '" referenced from ' . basename($dt[2]['file']) . '#' . $dt[2]['line'] . ' -> ' . $dt[2]['function']);
+		if(\AppCfg::DEBUG_MODE == true)
+		{
+			@$dt = debug_backtrace();
+			error_log('autoload failed to load class "'. basename($className) . '" referenced from ' . basename($dt[2]['file']) . '#' . $dt[2]['line'] . ' -> ' . $dt[2]['function']);
+		}
 	}
 }
 ?>
