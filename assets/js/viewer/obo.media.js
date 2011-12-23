@@ -1,65 +1,5 @@
 // utility class for handling media
 
-// this class uses the iframe API for YouTube, which doesn't work with IE7:
-// "The end user must be using a browser that supports the HTML5 postMessage feature.
-// Most modern browsers support postMessage, though Internet Explorer 7 does not support it."
-// -from http://code.google.com/apis/youtube/iframe_api_reference.html
-// @TODO - Provide alternate API backup?
-
-// @TODO - Hack captivate switch
-//var asVersions = {};
-//var mediaIDs = {};
-/*
-function switchCaptivateSpy(event)
-{
-	event.preventDefault();
-	
-	//var $link = $('#swap-cap');
-	var $mediaItem = $('.media-for-page-' + obo.model.getSection() + obo.model.getPage());
-	var $element = $($mediaItem.children()[0]);
-	var eid = $element.attr('id');
-	var width = $mediaItem.width();
-	var height = $mediaItem.height();
-	var curVersion = asVersions[eid];//$link.attr('data-cur-version');
-	var mediaID = mediaIDs[eid];//$link.attr('data-media-id');
-	
-	$element.remove();
-	var $new = $('<div id="' + eid + '"></div>');
-	$new.width(width).height(height);
-	$mediaItem.prepend($new);
-	
-	//alert('ok');
-	var url = '';
-	if(curVersion === 3)
-	{
-		asVersions[eid] = 2;
-		url = '/assets/flash/captivateSpyCP2.swf?id=' + eid + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
-		//$link.html('Loaded as AS2 - Click to reload as AS3')
-	}
-	else
-	{
-		asVersions[eid] = 3;
-		url = '/assets/flash/captivateSpyCP5.swf?id=' + eid + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
-		//$link.html('Loaded as AS3 - Click to reload as AS2');
-	}
-	//debug.log(url);
-	//debug.log(mediaID);
-	//debug.log(eid);
-	swfobject.embedSWF(url + mediaID, eid, width > 0 ? width : '100%', height > 0 ? height : '100%', "10",  "/assets/flash/expressInstall.swf", {}, {
-		menu: 'false',
-		allowScriptAccess: 'sameDomain',
-		allowFullScreen: 'true',
-		bgcolor: '#FFFFFF',
-		align: 't',
-		salign: 't',
-		// we want high performance gpu, but in preview mode the popups for the subnavs (question alts)
-		// can be blocked by the swf (gpu/direct swfs are the front most layer)
-		wmode: obo.model.getMode() === 'preview' ? 'opaque' : 'direct'
-	});
-	
-	//$link.attr('data-cur-version', curVersion === '2' ? '3' : '2');
-}*/
-
 if(!window.obo)
 {
 	window.obo = {};
@@ -78,7 +18,7 @@ obo.media = function()
 	
 	// @private
 	
-	var youTubeAPIReady = false;
+	//var youTubeAPIReady = false;
 	
 	// we store a reference to the YT player instances and media objects
 	//var ytPlayers = {};

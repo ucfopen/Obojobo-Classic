@@ -605,11 +605,6 @@ obo.view = function()
 	
 	var buildPage = function(section, index)
 	{
-		// clean up any overlayed captivates
-		// @HACK we turn both parent and object visible for Safari
-		$('#swf-holder object').css('visibility', 'hidden');
-		$('#swf-holder .media-item').css('visibility', 'hidden');
-		
 		// @TODO captivateSwitch
 		// $('#swap-cap').hide();
 		
@@ -1797,14 +1792,15 @@ obo.view = function()
 		debug.time('render');
 		var section = obo.model.getSection();
 		
-		if(unrendered)
-		{
-			
-		}
-
-		// clear out old content
-		// @TODO wht is this ??? selectedLinkID = '.nav-P-' + page;
+		// clean up page:
 		$('#content').empty();
+		// clean up any overlayed captivates
+		// @HACK we turn both parent and object visible for Safari
+		$('#swf-holder object').css('visibility', 'hidden');
+		$('#swf-holder .media-item').css('visibility', 'hidden');
+		// we also remove any flash alt text placeholders in the swf-holder
+		// in case the user doesn't have flash installed
+		$('#swf-holder .swf-placeholder').remove();
 		
 		var p = obo.model.getPage();
 		

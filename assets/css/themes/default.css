@@ -938,7 +938,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	max-height: 600px;
 }
 
-.question-page .media-item *
+.question-page .media-item > *
 {
 	width: 100%;
 }
