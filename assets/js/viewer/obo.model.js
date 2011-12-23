@@ -1242,6 +1242,10 @@ obo.model = function()
 		else if(page === 'end')
 		{
 			newPage = getNumPagesOfCurrentSection();
+			if(mode === 'preview' && section === 'assessment' && questions.assessment[newPage - 1].length > 1)
+			{
+				newPage = String(newPage) + String.fromCharCode(questions.assessment[newPage - 1].length - 1 + 97);
+			}
 		}
 		else if(page === 1)
 		{
@@ -1257,23 +1261,17 @@ obo.model = function()
 			if(mode === 'preview' && section === 'assessment')
 			{
 				var assessIndex = getAssessmentPageIndex(page);
-				if(assessIndex.altIndex === 0)
+				if(assessIndex.altIndex >= 1)
 				{
-					newPage = String(assessIndex.index);
-					var altIndex = questions.assessment[assessIndex.index - 1].length - 1;
-					if(altIndex > 0)
-					{
-						newPage += String.fromCharCode(altIndex + 97);
-					}
-				}
-				else if(assessIndex.altIndex === 1)
-				{
-					newPage = assessIndex.index - 1;
+					assessIndex.altIndex--;
 				}
 				else
 				{
-					newPage = String(assessIndex.index - 1) + String.fromCharCode(assessIndex.altIndex + 96);
+					assessIndex.index--;
+					assessIndex.altIndex = questions.assessment[assessIndex.index].length - 1;
 				}
+
+				newPage = (assessIndex.index + 1).toString() + (assessIndex.altIndex == 0 ? '' : String.fromCharCode(assessIndex.altIndex + 97));
 			}
 			else
 			{
