@@ -2292,6 +2292,11 @@ a
 	color: #5572a2;
 }
 
+.text-item ul
+{
+	overflow: hidden;
+}
+
 .text-item li
 {
 	list-style-position: outside;
