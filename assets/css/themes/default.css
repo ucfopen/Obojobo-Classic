@@ -466,6 +466,13 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	
 	background-color:#849bc9;
 }
+
+
+.page-navigation.disabled
+{
+	display: none;
+}
+
 .next-section-button:active,
 .begin-section-button:active,
 .button:active {
@@ -474,7 +481,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 }
 .next-section-button.disabled,
 .begin-section-button.disabled,
-.button.disabled {
+.button.disabled{
 	background: -moz-linear-gradient(#d3d3d3, #acacac);
 	background: -ms-linear-gradient(#d3d3d3, #acacac);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d3d3d3), color-stop(100%, #acacac));
