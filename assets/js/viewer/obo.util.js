@@ -26,25 +26,25 @@ obo.util = function()
 	
 	var patternEmptyTFsToBrs = /<font[^>]*(?:\/>|>(?:\s|&nbsp;)*<\/font>)/gi;
 	var patternStrictTfToLI = /<\s*textformat([a-z=A-Z"'0-9 ]*)?\s*><\s*li\s*>/gi;
-	var patternStrictTfToDiv = /<\s*textformat(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
+	var patternStrictTfToDiv = /<\s*textformat(\s+[\s\S]*?=(?:"|')[\s\S]*?(?:"|'))\s*>/gi;
 	var patternStrictTFClose = /<\/li><\/textformat>/gi;
-	var patternStrictPFont = /<\s*p(\s+align=(?:"|')(?:left|right|center|justify)(?:"|'))?\s*><\s*font(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
+	var patternStrictPFont = /<\s*p(\s+align=(?:"|')(?:left|right|center|justify)(?:"|'))?\s*><\s*font(\s+[\s\S]*?=(?:"|')[\s\S]*?(?:"|'))\s*>/gi;
 	var patternStrictPFontClose = /<\/font><\/p>/gi;
-	var patternStrictFont = /<\s*font(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
+	var patternStrictFont = /<\s*font(\s+[\s\S]*?=(?:"|')[\s\S]*?(?:"|'))\s*>/gi;
 	var patternStrictFontClose = /<\/font>/gi;
 	var patternStrictRemoveUL = /<\/?ul>/gi;
-	var patternStrictAddUL = /(<li(.*?)?>([\s\S]*?)<\/li>)/gi;
+	var patternStrictAddUL = /(<li([\s\S]*?)?>([\s\S]*?)<\/li>)/gi;
 	var patternStrictRemoveExtraUL = /<\/ul><ul>/gi;
 	var patternStrictEmpty1 = /<(\w+?)[^>]*?>(\s*?)<\/\1>/gi;
 	var patternStrictEmpty2 = /<(\w+)>(\s*?)<\/\1>/gi;
-	var patternStrictOMLTooltip = /\[\s*?tooltip\s+?text\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/tooltip\]/gi;
-	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')(.+?)(?:"|')\s*?](.+?)\[\/page\]/gi;
-	var patternStrictRemainingTf = /<\/?textformat.*?>/gi;
+	var patternStrictOMLTooltip = /\[\s*?tooltip\s+?text\s*?=\s*?(?:"|')([\s\S]+?)(?:"|')\s*?]([\s\S]+?)\[\/tooltip\]/gi;
+	var patternStrictOMLPageLink = /\[\s*?page\s+?id\s*?=\s*?(?:"|')([\s\S]+?)(?:"|')\s*?]([\s\S]+?)\[\/page\]/gi;
+	var patternStrictRemainingTf = /<\/?textformat[\s\S]*?>/gi;
 	
-	var patternTF = /<\/?textformat\s?.*?>/gi;
-	var patternPFont = /<\s*p(\s+align=(?:"|')(left|right|center|justify)(?:"|'))?\s*><\s*font(\s+.*?=(?:"|').*?(?:"|'))\s*>/gi;
+	var patternTF = /<\/?textformat\s?[\s\S]*?>/gi;
+	var patternPFont = /<\s*p(\s+align=(?:"|')(left|right|center|justify)(?:"|'))?\s*><\s*font(\s+[\s\S]*?=(?:"|')[\s\S]*?(?:"|'))\s*>/gi;
 	var patternPFontClose = /<\/font><\/p>/gi;
-	var patternFont = /<font.*?>/gi;
+	var patternFont = /<font[\s\S]*?>/gi;
 	var patternFontClose = /<\/font>/gi;
 	var patternEmpty1 = /<(\w+?)[^>]*?>(\s*?)<\/\1>/gi;
 	var patternEmpty2 = /<(\w+)>(\s*?)<\/\1>/gi;
@@ -56,7 +56,7 @@ obo.util = function()
 	
 	var patternAttributionOpen = /<u><a /gi;
 	var patternAttributionClose = /<\/a>\s*?<\/u>/gi;
-	var patternAttributionTarget = /target\s*?=\s*?(?:"|').*?/gi;
+	var patternAttributionTarget = /target\s*?=\s*?(?:"|')[\s\S]*?/gi;
 	var patternAttributionHref = / href\s*?=\s*?(?:"|')event:/gi;
 	
 	// @TODO ul and p should have margin = 0
@@ -386,13 +386,13 @@ obo.util = function()
 		}*/
 
 		input = input.replace(patternPFontClose, "</p>");
-
+		debug.log(input)
 		// convert lone <font>...</font> tags to spans
 		// input = input.replace(pattern, '<span style="font-family:$1;font-size:$2px;color:$3;">');
 		input = input.replace(patternFont, '<span>');
 
 		input = input.replace(patternFontClose, "</span>");
-
+		debug.log(input)
 		// find empty tags keeping space in them
 		// we loop here to help transform nested empty tags such as "<li><b></b></li>"
 		matchFound = true;
