@@ -726,7 +726,7 @@ obo.model = function()
 				{
 					// update our 'local' score record
 					var s = scores[scores.length - 1];
-					s.score = result;
+					s.score = Math.round(result);
 					s.endTime = parseInt(new Date().getTime() / 1000);
 				
 					// @TODO - how does this work in preview mode?
