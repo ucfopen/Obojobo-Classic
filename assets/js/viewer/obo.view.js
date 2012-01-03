@@ -375,7 +375,8 @@ obo.view = function()
 		}
 		else
 		{
-			render();
+			obo.model.gotoSection('overview');
+			//render();
 		}
 	}
 
