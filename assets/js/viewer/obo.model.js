@@ -692,7 +692,7 @@ obo.model = function()
 							case 'mc':
 								if(typeof result[i].savedAnswer.answerID !== 'undefined' && result[i].savedAnswer.answerID !== null)
 								{
-									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.answerID;
+									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.user_answer;
 								}
 								break;
 							case 'qa':
