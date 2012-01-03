@@ -453,16 +453,29 @@ obo.model = function()
 	{	
 		questions.assessment = [];
 		var curQIndex = 0;
-		$(lo.aGroup.kids).each(function(index, page)
+
+		if(mode === 'preview')
 		{
-			index++;
-			if(curQIndex != page.questionIndex || page.questionIndex === 0)
+			$(lo.aGroup.kids).each(function(index, page)
 			{
-				curQIndex++
-				questions.assessment.push([]);
-			}
-			questions.assessment[curQIndex - 1].push(page);
-		});
+				index++;
+				if(curQIndex != page.questionIndex || page.questionIndex === 0)
+				{
+					curQIndex++;
+					questions.assessment.push([]);
+				}
+				questions.assessment[curQIndex - 1].push(page);
+			});
+		}
+		else
+		{
+			$(lo.aGroup.kids).each(function(index, page)
+			{
+				questions.assessment[curQIndex] = [];
+				questions.assessment[curQIndex].push(page);
+				curQIndex++;
+			});
+		}
 	};
 	
 	// attempts to set the location variables to new values.
