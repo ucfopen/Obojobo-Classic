@@ -94,7 +94,7 @@ obo.model = function()
 	};
 	
 	// the current section ('overview', 'content', 'practice' or 'assessment')
-	var section = 'overview';
+	var section = '';
 	
 	// store which page is active for each section ('start', 'end', or 1-n)
 	var pages = {
@@ -513,7 +513,7 @@ obo.model = function()
 				{
 					if(newSection != section)
 					{
-						obo.remote.makeCall('trackSectionChanged', [lo.viewID, getSectionIndex()], processResponse);
+						obo.remote.makeCall('trackSectionChanged', [lo.viewID, getSectionIndex(newSection)], processResponse);
 					}
 					else if(newPage != pages[section])
 					{
@@ -617,9 +617,14 @@ obo.model = function()
 		}
 	};
 	
-	var getSectionIndex = function()
+	var getSectionIndex = function(_section)
 	{
-		switch(section)
+		if(typeof _section === 'undefined')
+		{
+			_section = section;
+		}
+
+		switch(_section)
 		{
 			case 'overview': return 0;
 			case 'content': return 1;
