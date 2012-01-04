@@ -1427,16 +1427,31 @@ obo.model = function()
 		
 		// store this response
 		// (for question alternates in preview mode we just store one response -
-		//	the last response)
+		//	the last response, therefore we need to remove other alternates for
+		// the same question)
 		if(mode === 'preview' && section === 'assessment')
 		{
 			var pageIndex = getAssessmentPageIndex(page);
-			page = pageIndex.index + 1;
-			lastResponse[page] = pageIndex.altIndex;
+			clearAssessmentAltResponses(pageIndex.index);
 		}
 
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
 	};
+
+	// for preview mode this removes all alt responses for a given question index 
+	var clearAssessmentAltResponses = function(questionIndex)
+	{
+		if(mode === 'preview')
+		{
+			responses['assessment'][parseInt(questionIndex) + 1] = undefined;
+
+			var numAlts = questions.assessment[questionIndex].length;
+			for(var i = 1; i < numAlts; i++)
+			{
+				responses['assessment'][String(parseInt(questionIndex) + 1) + String.fromCharCode(i + 97)] = undefined;
+			}
+		}
+	}
 	
 	// return the previous response, if it exists, for the current question
 	// return 'undefined' if it doesn't exist
@@ -1483,14 +1498,16 @@ obo.model = function()
 			var total = 0;
 			var curQuestion;
 			var curResponse;
-			var lastResponseAltIndex;
+			var assessmentIndex;
 			// @TODO: This is O(n^2)
 			for(var i in responses['assessment'])
 			{
-				lastResponseAltIndex = lastResponse[i];
-				curQuestion = questions.assessment[i - 1][lastResponseAltIndex];
+				//lastResponseAltIndex = lastResponse[i];
+				
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
+				assessmentIndex = getAssessmentPageIndex(i);
+				curQuestion = questions.assessment[assessmentIndex.index][assessmentIndex.altIndex];
 				switch(curQuestion.itemType.toLowerCase())
 				{
 					case 'mc':
