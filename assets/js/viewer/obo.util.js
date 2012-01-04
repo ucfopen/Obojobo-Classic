@@ -386,13 +386,11 @@ obo.util = function()
 		}*/
 
 		input = input.replace(patternPFontClose, "</p>");
-		debug.log(input)
 		// convert lone <font>...</font> tags to spans
 		// input = input.replace(pattern, '<span style="font-family:$1;font-size:$2px;color:$3;">');
 		input = input.replace(patternFont, '<span>');
 
 		input = input.replace(patternFontClose, "</span>");
-		debug.log(input)
 		// find empty tags keeping space in them
 		// we loop here to help transform nested empty tags such as "<li><b></b></li>"
 		matchFound = true;
