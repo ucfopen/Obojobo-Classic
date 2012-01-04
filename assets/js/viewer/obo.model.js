@@ -1443,12 +1443,12 @@ obo.model = function()
 	{
 		if(mode === 'preview')
 		{
-			responses['assessment'][parseInt(questionIndex) + 1] = undefined;
+			delete responses['assessment'][parseInt(questionIndex) + 1];
 
 			var numAlts = questions.assessment[questionIndex].length;
 			for(var i = 1; i < numAlts; i++)
 			{
-				responses['assessment'][String(parseInt(questionIndex) + 1) + String.fromCharCode(i + 97)] = undefined;
+				delete responses['assessment'][String(parseInt(questionIndex) + 1) + String.fromCharCode(i + 97)];
 			}
 		}
 	}
@@ -1487,8 +1487,6 @@ obo.model = function()
 	
 	var submitAssessment = function()
 	{
-		debug.log('submitAssessment');
-
 		if(mode === 'instance')
 		{
 			obo.remote.makeCall('trackAttemptEnd', [lo.viewID, lo.aGroup.qGroupID], onSubmitAssessment);
