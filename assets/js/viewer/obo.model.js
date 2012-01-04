@@ -92,6 +92,10 @@ obo.model = function()
 		practice: [],
 		assessment: []
 	};
+
+	// track the last answered question alternate for each assessment question
+	// for preview mode.
+	var lastResponse = [];
 	
 	// the current section ('overview', 'content', 'practice' or 'assessment')
 	var section = '';
@@ -745,6 +749,7 @@ obo.model = function()
 					// @TODO - how does this work in preview mode?
 					// clear out responses
 					responses.assessment = [];
+					lastResponse = [];
 
 					// we are no longer resuming an attempt
 					if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.isInAttempt != 'undefined')
@@ -1425,8 +1430,11 @@ obo.model = function()
 		//	the last response)
 		if(mode === 'preview' && section === 'assessment')
 		{
-			page = getAssessmentPageIndex(page).index + 1;
+			var pageIndex = getAssessmentPageIndex(page);
+			page = pageIndex.index + 1;
+			lastResponse[page] = pageIndex.altIndex;
 		}
+
 		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
 	};
 	
@@ -1475,13 +1483,12 @@ obo.model = function()
 			var total = 0;
 			var curQuestion;
 			var curResponse;
+			var lastResponseAltIndex;
 			// @TODO: This is O(n^2)
 			for(var i in responses['assessment'])
 			{
-				// @TODO:
-				// This always grabs the first assessment question.
-				// The result is that, if you have alternates, you are only graded on the first question.
-				curQuestion = questions.assessment[i - 1][0];
+				lastResponseAltIndex = lastResponse[i];
+				curQuestion = questions.assessment[i - 1][lastResponseAltIndex];
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
 				curResponse = responses['assessment'][i];
 				switch(curQuestion.itemType.toLowerCase())
