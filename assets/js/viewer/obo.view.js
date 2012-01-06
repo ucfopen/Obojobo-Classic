@@ -1940,6 +1940,8 @@ obo.view = function()
 	{
 		$('object').css('visibility', 'hidden');
 		$('object').parent().addClass('stripe-bg');
+
+		$('iframe').hide();
 	};
 	
 	// returns the currently overlayed swf (if there is one)
@@ -1957,6 +1959,8 @@ obo.view = function()
 		
 		// unhide overlay swfs for the current page
 		getOverlayedSWF().css('visibility', 'visible').parent().removeClass('stripe-bg');
+
+		$('iframe').show();
 	};
 	
 	// tosses up a error dialog. error can be a string message or an error object
