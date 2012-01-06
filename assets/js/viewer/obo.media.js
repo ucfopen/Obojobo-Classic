@@ -299,6 +299,11 @@ obo.media = function()
 		
 			switch(mediaObject.itemType.toLowerCase())
 			{
+				case 'embed':
+					var $embed = $(mediaObject.descText);
+					$mediaElement.append($embed);
+					$target.append($mediaElement);
+					break;
 				case 'pic':
 					$target.append($mediaElement);
 					$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
