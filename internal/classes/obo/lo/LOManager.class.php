@@ -576,8 +576,11 @@ class LOManager extends \rocketD\db\DBEnabled
 		foreach($publicMasters as $loID)
 		{
 			$lo = $this->getLO($loID, 'meta');
-			$lo->globalPerms = $permman->getGlobalPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO); // add in globalPerms
-			$loArr[] = $lo; 
+			if($lo instanceof \obo\lo\LO)
+			{
+				$lo->globalPerms = $permman->getGlobalPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO); // add in globalPerms
+				$loArr[] = $lo; 
+			}
 		}
 		return $loArr;
 	}
