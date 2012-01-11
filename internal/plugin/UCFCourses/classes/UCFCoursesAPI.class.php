@@ -253,19 +253,33 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 *	4, Gradebook column with specified name already exists
 	 *	7, Unable to create gradebook column
 	 *
-	 * @param string $instID	Instance ID for the instance
+	 * @param string $instID    	Instance ID for the instance
 	 * @param string $sectionID 	Webcourses Vista learning context id
-	 * @param string $columnName 	desired grade book column name will be prefixed with 'obo:'
+	 * @param string $columnName	desired grade book column name will be prefixed with 'obo:'
+	 * @param string $userID    	If you are super user, pass the userID of the owner of the instance
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	public function createColumn($instID, $sectionID, $columnName)
+	public function createColumn($instID, $sectionID, $columnName, $userID=0)
 	{
 		// TODO: require user to have rights to the instance
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		if($AM->verifySession())
 		{
-			$userID = $AM->getSessionUserID();
+
+			// allow super users to create columns for other users
+			// if userID is set, its a positive int, and current user is SU.. allow it
+			$roleMan = \obo\perms\RoleManager::getInstance();
+			if( $userID != 0 && \obo\util\Validator::isPosInt($userID) && $roleMan->isSuperUser() )
+			{
+				// $userID = $userID;  keep the same value
+			}
+			// if the previous fails for any reason, assume the existing user
+			else
+			{
+				$userID = $AM->getSessionUserID();
+			}
+
 			// current user must have a UCF NID to create a course column
 			if(!$this->isNIDAccount($userID))
 			{
@@ -378,7 +392,6 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 
 
 		$postVars = array('wc_instructor_id' => $NID, 'wc_section_id' => $sectionID, 'column_name' => $columnName);
-		
 		$result = $this->send($REQUESTURL, $postVars);
 		
 		// check for http response code of 200, TRY AGAIN if so
