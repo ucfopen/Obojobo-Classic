@@ -488,6 +488,8 @@ obo.model = function()
 	// call view.render if successful.
 	var setLocation = function(newSection, newPage, callback)
 	{
+		debug.log('setLocation', newSection, newPage);
+
 		if(newSection === undefined)
 		{
 			newSection = section;
@@ -495,6 +497,18 @@ obo.model = function()
 		if(newPage === undefined)
 		{
 			newPage = pages[newSection];
+
+			// special case: if user is navigating to a new section
+			// make sure they don't return to the end page.
+			// instead take them to the last page of that section.
+			if(newPage === 'end')
+			{
+				switch(newSection)
+				{
+					case 'content': newPage = getNumPagesOfSection('content'); break;
+					case 'practice': newPage = getNumPagesOfSection('practice'); break;
+				}
+			}
 		}
 
 		// if the user is resuming a previous attempt, but they are not
@@ -574,6 +588,8 @@ obo.model = function()
 					startPractice();
 					return;
 				}
+
+				debug.log('setLocation complete', newSection, newPage);
 				
 				section = newSection;
 				pages[section] = newPage;
