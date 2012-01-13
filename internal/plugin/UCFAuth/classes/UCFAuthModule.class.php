@@ -191,6 +191,9 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// required stuff not sent, CHECK IF A SINGLE SIGN ON METHOD IS BEING USED
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
 		{
+
+			// filter the username to be all lowercase
+			$requestVars['userName'] = strtolower($requestVars['userName']);
 			// *********** Sammy's SSO Hash for system to system single sign on ****************//
 			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 			{
