@@ -138,7 +138,7 @@ function initLoginScreen()
 		</li>
 	</ul>
 	<ul class="foot">
-		<li><a href="https://my.ucf.edu/static_support/pidnidwrapper.html">Lookup NID</a></li>
+		<li><a href="https://my.ucf.edu/nid.html">Lookup NID</a></li>
 		<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
 		<li><a href="/help">Help</a></li>
 	</ul>
