@@ -18,7 +18,8 @@
   }
 </style>
 <script type="text/javascript">
-    
+  var SWF_URL = "Repository_2_0_1.swf";
+
   // START PREVENT CLOSE
   window.onbeforeunload = confirmExit;
 
@@ -31,7 +32,7 @@
    }
 
   function confirmExit(){
-    $isCloseable = thisMovie("Repository_2_0.swf").isCloseable();
+    $isCloseable = thisMovie(SWF_URL).isCloseable();
     if($isCloseable !== true){
       return $isCloseable;
     }
@@ -52,10 +53,10 @@
   params.bgcolor = "#869ca7";
 
   var attributes = new Object(); 
-  attributes.id = "Repository_2_0.swf";
-  attributes.name = "Repository_2_0.swf";
+  attributes.id = SWF_URL;
+  attributes.name = SWF_URL;
 
-  swfobject.embedSWF( "/assets/flash/Repository_2_0.swf", "flexApp", "100%", "100%", "10",  "/assets/flash/expressInstall.swf", flashvars, params, attributes);
+  swfobject.embedSWF( "/assets/flash/" + SWF_URL, "flexApp", "100%", "100%", "10",  "/assets/flash/expressInstall.swf", flashvars, params, attributes);
 </script>
 </head>
 <body >
