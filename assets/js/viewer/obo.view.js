@@ -720,6 +720,15 @@ obo.view = function()
 				}
 
 			});
+
+			$('.text-item li').each(function(index, item)
+			{
+				if($(item).height() >= 30)
+				{
+					$(item).parent().find('li').css('padding-bottom', '.8em');
+					return true;
+				}
+			});
 			
 			if(String(page.layoutID) === '8')
 			{
