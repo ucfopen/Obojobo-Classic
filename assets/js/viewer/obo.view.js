@@ -149,7 +149,7 @@ obo.view = function()
 			event.preventDefault();
 			
 			// @TODO- check to see if this works
-			var pageID = $(event.target).attr('data-page-id');
+			var pageID = $(event.currentTarget).attr('data-page-id');
 			if(obo.model.getSection() != 'content')
 			{
 				obo.model.gotoSectionAndPage('content', pageID);
