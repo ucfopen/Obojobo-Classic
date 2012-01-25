@@ -282,7 +282,12 @@ obo.util = function()
 
 		/*Find OML page links*/
 		// @TODO: Left or right arrow depending on if that would be foward or back
-		input = input.replace(patternStrictOMLPageLink, '<a class="oml oml-page-link" data-page-id="$1" href="' + location.href + 'page/$1" title="' + '&rarr; Page $1">$2</a>');
+		var l = getBaseURL();
+		if(l.substr(l.length - 1, 1) != '/')
+		{
+			l += '/';
+		}
+		input = input.replace(patternStrictOMLPageLink, '<a class="oml oml-page-link" data-page-id="$1" href="' + l + '#/content/$1" title="' + '&rarr; Page $1">$2</a>');
 		/*input = input.replace(pattern, '<a class="oml oml-page-link" data-page-id="$1" href="http://www.google.com/" title="Go to page $1">$2</a>');*/
 		// @TODO: Fix quote issues (" --> &quot;)
 
