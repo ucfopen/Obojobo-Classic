@@ -2994,7 +2994,7 @@ a
 	border: 1px solid rgba(0, 0, 0, .2);
 	padding: 70px 0 0 0;
 	margin: 0 5px 0 5px;
-	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center 5px;
+	background: url('/assets/images/viewer/browser_logos-64.png') no-repeat center 5px;
 	border-radius: 4px;
 	font-family: 'Lato',Arial;
 	cursor: pointer;
@@ -3002,22 +3002,22 @@ a
 
 #older-browser-dialog li.firefox
 {
-	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center -115px;
+	background: url('/assets/images/viewer/browser_logos-64.png') no-repeat center -115px;
 }
 
 #older-browser-dialog li.opera
 {
-	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center -234px;
+	background: url('/assets/images/viewer/browser_logos-64.png') no-repeat center -234px;
 }
 
 #older-browser-dialog li.ie
 {
-	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center -477px;
+	background: url('/assets/images/viewer/browser_logos-64.png') no-repeat center -477px;
 }
 
 #older-browser-dialog li.safari
 {
-	background: url('http://sandbox/tmp/assets/images/browser_logos-64.png') no-repeat center -354px;
+	background: url('/assets/images/viewer/browser_logos-64.png') no-repeat center -354px;
 }
 
 #older-browser-dialog li:hover
