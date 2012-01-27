@@ -560,48 +560,58 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 */
 	protected function sendScoreSetRequest($instructorNID, $studentNID, $sectionID, $columnID, $score)
 	{		
-		
-		// Check to see if the instructor is the student, if it is, just claim failure
-		if($instructorNID == $studentNID)
+		// Make sure that pushing isnt disabled
+		if(\AppCfg::UCFCOURSES_DISABLE_SCORE_PUSH != true)
 		{
-			return array('scoreSent' => false, 'errors' => array());
-		}
-		// Begin the service request
-		
-		$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
-		
-		$postVars = array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score);
-		
-		$result = $this->send($REQUESTURL, $postVars);
-	
-		// check for http response code of 200, TRY AGAIN if so
-		if($result['responseCode'] != 200)
-		{
-			// log error
-			\rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
-			trace('HTTP FAILURE ' . $REQUESTURL, true);
-			trace($postVars, true);
-
-			sleep(1); 
 			
-			// Send the score set request again
+			// Check to see if the instructor is the student, if it is, just claim failure
+			if($instructorNID == $studentNID)
+			{
+				return array('scoreSent' => false, 'errors' => array());
+			}
+			// Begin the service request
+			
+			$REQUESTURL = \AppCfg::UCFCOURSES_URL_WEB . '/obojobo/v1/webcourses/gradebook/column/update?app_key='.\AppCfg::UCFCOURSES_APP_KEY;
+			
+			$postVars = array('wc_instructor_id' => $instructorNID, 'wc_student_id' => $studentNID, 'wc_section_id' => $sectionID, 'column_id' => $columnID, 'score' => $score);
+			
 			$result = $this->send($REQUESTURL, $postVars);
+		
+			// check for http response code of 200, TRY AGAIN if so
 			if($result['responseCode'] != 200)
 			{
-				return array('scoreSent' => false, 'errors' => array(\rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
-			}
-		}
-	
-		$response = $this->decodeJSON($result['body']);
-		
-		$scoreSent = false;
-		// look to see if the msg was successfull
-		if(isset($response->msgs[0]) && substr($response->msgs[0], 0, 1) == "1")
-		{
-			$scoreSent = true;
-		}
+				// log error
+				\rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body']);
+				trace('HTTP FAILURE ' . $REQUESTURL, true);
+				trace($postVars, true);
 
-		$errors = $this->parseErrors($response->errors);
+				sleep(1); 
+				
+				// Send the score set request again
+				$result = $this->send($REQUESTURL, $postVars);
+				if($result['responseCode'] != 200)
+				{
+					return array('scoreSent' => false, 'errors' => array(\rocketD\util\Error::getError(1008, 'HTTP RESPONSE: ' . $result['responseCode'] . ' body: ' . $result['body'])));
+				}
+			}
+		
+			$response = $this->decodeJSON($result['body']);
+			
+			$scoreSent = false;
+			// look to see if the msg was successfull
+			if(isset($response->msgs[0]) && substr($response->msgs[0], 0, 1) == "1")
+			{
+				$scoreSent = true;
+			}
+
+			$errors = $this->parseErrors($response->errors);
+		}
+		// Score push is disabled via config variable
+		else
+		{
+			$scoreSent = false;
+			$errors = array();
+		}
 
 		return array('scoreSent' => $scoreSent, 'errors' => $errors);
 	}
@@ -616,72 +626,77 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 */
 	public function syncFailedInstanceScores($instID)
 	{
-		
-		$AM = \rocketD\auth\AuthManager::getInstance();
-		// logged in
-		if($AM->verifySession() === true)
+		// Check the disable flag first
+		if(\AppCfg::UCFCOURSES_DISABLE_SCORE_PUSH != true)
 		{
-			// invalid instID value
-			if(!\obo\util\Validator::isPosInt($instID))
+			$AM = \rocketD\auth\AuthManager::getInstance();
+			// logged in
+			if($AM->verifySession() === true)
 			{
-				trace($instID);
-				return \rocketD\util\Log::getError(2);
-			}
-			
-			// everything is valid
-			$IM = \obo\lo\InstanceManager::getInstance();
-			// user has rights
-			if($IM->userCanEditInstance($AM->getSessionUserID(), $instID))
-			{
-				$total = 0;
-				$updated = 0;
-				// attempt to push every score from the instance that hasnt been.
-				// get the sync failure queue
-				$sql = "SELECT
-							M.*,
-							L.".\cfg_plugin_UCFCourses::STUDENT.",
-							L.".\cfg_plugin_UCFCourses::SCORE.",
-							L.".\cfg_plugin_UCFCourses::ATTEMPT."
-						FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
-						JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
-						ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
-						WHERE
-							L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
-							AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
-							AND L.".\cfg_obo_Instance::ID." = '?' ";
-
-				$q = $this->DBM->querySafe($sql, $instID);
-				while($r = $this->DBM->fetch_obj($q))
+				// invalid instID value
+				if(!\obo\util\Validator::isPosInt($instID))
 				{
-					$total++;
-					$instID = $r->{\cfg_obo_Instance::ID};
-					$instructor = $AM->fetchUserByID($r->{\cfg_core_User::ID});
-					$sectionID = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
-					$columnID = $r->{\cfg_plugin_UCFCourses::MAP_COL_ID};
-					$columnName = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
-					$student = $AM->fetchUserByID($r->{\cfg_plugin_UCFCourses::STUDENT});
-					$score = $r->{\cfg_plugin_UCFCourses::SCORE};
-					$attempts = $r->{\cfg_plugin_UCFCourses::ATTEMPT};
-
-					$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
-					// log the result and store status in db
-					$this->logScoreSet($instID, $AM->getSessionUserID(), $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
-
-					// FAILED!, increment the attempt counter and send an email if its at the limit
-					if($result['scoreSent'] == true)
-					{
-						$updated++;
-						
-						// clear cached scores for this instance
-						\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
-						\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
-					}
+					trace($instID);
+					return \rocketD\util\Log::getError(2);
 				}
 				
-				return array('updated' => $updated, 'total' => $total);
+				// everything is valid
+				$IM = \obo\lo\InstanceManager::getInstance();
+				// user has rights
+				if($IM->userCanEditInstance($AM->getSessionUserID(), $instID))
+				{
+					$total = 0;
+					$updated = 0;
+					// attempt to push every score from the instance that hasnt been.
+					// get the sync failure queue
+					$sql = "SELECT
+								M.*,
+								L.".\cfg_plugin_UCFCourses::STUDENT.",
+								L.".\cfg_plugin_UCFCourses::SCORE.",
+								L.".\cfg_plugin_UCFCourses::ATTEMPT."
+							FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
+							JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
+							ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
+							WHERE
+								L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+								AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
+								AND L.".\cfg_obo_Instance::ID." = '?' ";
+
+					$q = $this->DBM->querySafe($sql, $instID);
+					while($r = $this->DBM->fetch_obj($q))
+					{
+						$total++;
+						$instID = $r->{\cfg_obo_Instance::ID};
+						$instructor = $AM->fetchUserByID($r->{\cfg_core_User::ID});
+						$sectionID = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
+						$columnID = $r->{\cfg_plugin_UCFCourses::MAP_COL_ID};
+						$columnName = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
+						$student = $AM->fetchUserByID($r->{\cfg_plugin_UCFCourses::STUDENT});
+						$score = $r->{\cfg_plugin_UCFCourses::SCORE};
+						$attempts = $r->{\cfg_plugin_UCFCourses::ATTEMPT};
+
+						$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+						// log the result and store status in db
+						$this->logScoreSet($instID, $AM->getSessionUserID(), $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+						// FAILED!, increment the attempt counter and send an email if its at the limit
+						if($result['scoreSent'] == true)
+						{
+							$updated++;
+							
+							// clear cached scores for this instance
+							\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+							\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
+						}
+					}
+					
+					return array('updated' => $updated, 'total' => $total);
+				}
 			}
+			return \rocketD\util\Error::getError(4);
 		}
-		return \rocketD\util\Error::getError(4);
+		// sending scores disabled
+		return array('updated' => 0, 'total' => 0);
 	}
 	
 	/**
@@ -695,68 +710,74 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	 */
 	public function sendFailedScoreSetRequests($limit=10)
 	{
-		$updated = 0;
-		$total = 0;
-		$attemptLimit = 5;
-		
-		// get the sync failure queue
-		$sql = "SELECT
-					M.*,
-					L.".\cfg_plugin_UCFCourses::STUDENT.",
-					L.".\cfg_plugin_UCFCourses::SCORE.",
-					L.".\cfg_plugin_UCFCourses::ATTEMPT."
-				FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
-				JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
-				ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
-					AND L.".\cfg_plugin_UCFCourses::MAP_COL_ID." = M.". \cfg_plugin_UCFCourses::MAP_COL_ID ."
-				WHERE
-					L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
-					AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
-					AND L.".\cfg_plugin_UCFCourses::ATTEMPT." < $attemptLimit
-				LIMIT $limit";
-
-		$q = $this->DBM->querySafe($sql);
-		while($r = $this->DBM->fetch_obj($q))
+		// Check the disable flag first
+		if(\AppCfg::UCFCOURSES_DISABLE_SCORE_PUSH != true)
 		{
-			$total++;
-			// grab all the info
-			$AM = \rocketD\auth\AuthManager::getInstance();
+			$updated = 0;
+			$total = 0;
+			$attemptLimit = 5;
 			
-			$instID = $r->{\cfg_obo_Instance::ID};
-			$instructor = $AM->fetchUserByID($r->{\cfg_core_User::ID});
-			$sectionID = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
-			$columnID = $r->{\cfg_plugin_UCFCourses::MAP_COL_ID};
-			$columnName = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
-			$student = $AM->fetchUserByID($r->{\cfg_plugin_UCFCourses::STUDENT});
-			$score = $r->{\cfg_plugin_UCFCourses::SCORE};
-			$attempts = $r->{\cfg_plugin_UCFCourses::ATTEMPT};
-			
-			$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
-			// log the result and store status in db
-			$this->logScoreSet($instID, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+			// get the sync failure queue
+			$sql = "SELECT
+						M.*,
+						L.".\cfg_plugin_UCFCourses::STUDENT.",
+						L.".\cfg_plugin_UCFCourses::SCORE.",
+						L.".\cfg_plugin_UCFCourses::ATTEMPT."
+					FROM ".\cfg_plugin_UCFCourses::LOG_TABLE." AS L
+					JOIN ".\cfg_plugin_UCFCourses::MAP_TABLE." AS M
+					ON L.".\cfg_obo_Instance::ID." = M.".\cfg_obo_Instance::ID."
+						AND L.".\cfg_plugin_UCFCourses::MAP_COL_ID." = M.". \cfg_plugin_UCFCourses::MAP_COL_ID ."
+					WHERE
+						L.".\cfg_plugin_UCFCourses::MAP_COL_ID." > 0
+						AND L.".\cfg_plugin_UCFCourses::SUCCESS." != '1'
+						AND L.".\cfg_plugin_UCFCourses::ATTEMPT." < $attemptLimit
+					LIMIT $limit";
 
-			// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
-			if($result['scoreSent'] != true && $instructor->login != $student->login)
+			$q = $this->DBM->querySafe($sql);
+			while($r = $this->DBM->fetch_obj($q))
 			{
-				$attempts++;
-				if($attempts >= $attemptLimit)
+				$total++;
+				// grab all the info
+				$AM = \rocketD\auth\AuthManager::getInstance();
+				
+				$instID = $r->{\cfg_obo_Instance::ID};
+				$instructor = $AM->fetchUserByID($r->{\cfg_core_User::ID});
+				$sectionID = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
+				$columnID = $r->{\cfg_plugin_UCFCourses::MAP_COL_ID};
+				$columnName = $r->{\cfg_plugin_UCFCourses::MAP_COL_NAME};
+				$student = $AM->fetchUserByID($r->{\cfg_plugin_UCFCourses::STUDENT});
+				$score = $r->{\cfg_plugin_UCFCourses::SCORE};
+				$attempts = $r->{\cfg_plugin_UCFCourses::ATTEMPT};
+				
+				$result = $this->sendScoreSetRequest($instructor->login, $student->login, $sectionID, $columnID, $score);
+				// log the result and store status in db
+				$this->logScoreSet($instID, 0, $student->userID, $sectionID, $columnID, $columnName, $score, ($result['scoreSent'] === true) );
+
+				// FAILED AGAIN!, increment the attempt counter and send an email if its at the limit
+				if($result['scoreSent'] != true && $instructor->login != $student->login)
 				{
-					$IM = \obo\lo\InstanceManager::getInstance();
-					$instData = $IM->getInstanceData($instID);
-					$NM = \obo\util\NotificationManager::getInstance();
-					$NM->sendScoreFailureNotice($instructor, $student, $instData);
+					$attempts++;
+					if($attempts >= $attemptLimit)
+					{
+						$IM = \obo\lo\InstanceManager::getInstance();
+						$instData = $IM->getInstanceData($instID);
+						$NM = \obo\util\NotificationManager::getInstance();
+						$NM->sendScoreFailureNotice($instructor, $student, $instData);
+					}
+				}
+				// Increment success counter
+				else
+				{
+					$updated++;
+					// clear cached scores for this instance
+					\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+					\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
 				}
 			}
-			// Increment success counter
-			else
-			{
-				$updated++;
-				// clear cached scores for this instance
-				\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
-				\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $student->userID);
-			}
+			return array('updated' => $updated, 'total' => $total);
 		}
-		return array('updated' => $updated, 'total' => $total);
+		// sending scores disabled
+		return array('updated' => 0, 'total' => 0);
 	}
 	
 	/**
@@ -797,7 +818,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 				".\cfg_core_User::ID." = '?',
 				".\cfg_plugin_UCFCourses::TIME." = '?',
 				".\cfg_plugin_UCFCourses::SUCCESS." = '?',
-				".\cfg_plugin_UCFCourses::ATTEMPT." = IF(".\cfg_plugin_UCFCourses::SCORE." = '?', ".\cfg_plugin_UCFCourses::ATTEMPT." + 1, '0'),
+				".\cfg_plugin_UCFCourses::ATTEMPT." = IF(".\cfg_plugin_UCFCourses::SCORE." = '?', ".\cfg_plugin_UCFCourses::ATTEMPT . ( \AppCfg::UCFCOURSES_DISABLE_SCORE_PUSH == true ? '' :  ' + 1' ) .", '0'),
 				".\cfg_plugin_UCFCourses::SCORE." = '?'
 				";
 		$q = $this->DBM->querySafe($sql, $instID, $currentUserID, $studentUserID, $time, $sectionID, $columnID, $columnName, $score, (int)$success, /* on duplicate -> */ $currentUserID, $time, (int)$success, $score, $score);
