@@ -112,10 +112,14 @@ function rocketD_auth_check_password($user, $username, $password)
 			{
 				$groups[] = $role->name;
 			}
-		
+
 			if(in_array('Administrator', $groups))
 			{
 				$wpUser->set_role('administrator');
+			}
+			else if(in_array('SuperStats', $groups))
+			{
+				$wpUser->set_role('super_stats');
 			}
 			else
 			{
