@@ -10,43 +10,6 @@ Author: Ian Turgeon
 Version: 1
 */
 
-add_filter('rewrite_rules_array', 'rocketD_modify_rewrite_rules');
-add_filter('query_vars', 'rocketD_add_query_vars');
-add_action('wp_loaded', 'rocketD_flush_rewrite_rules');
-
-// changes to these require you to update permalinks in wp admin
-function rocketD_modify_rewrite_rules($rules)
-{
-	$newrules = array();
-	// add rule for viewing instances
-	//$newrules['view/(\d+?)/?$'] = 'index.php?pagename=view&instID=$matches[1]';
-	$newrules['view/(\d+?)/?$'] = 'index.php?pagename=view&instID=$matches[1]';
-	// add rule for previewing los
-	// $newrules['preview/(\d+?)/?$'] = 'index.php?pagename=view&loID=$matches[1]';
-	$newrules['preview/(\d+?)/?$'] = 'index.php?pagename=view&loID=$matches[1]';
-	// add rule for previewing previous draft los
-	$newrules['preview/(\d+)/history/(\d+?)/?$'] = 'index.php?pagename=view&loID=$matches[2]';
-	$rules =  $newrules + $rules;
-	
-	return $rules;
-}
-
-function rocketD_flush_rewrite_rules(){
-	$rules = get_option('rewrite_rules');
-	if(!isset( $rules['view/(\d+?)/?$'] ) ) 
-	{
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-	}
-}
-
-function rocketD_add_query_vars($vars)
-{
-	array_push($vars, 'instID');
-	array_push($vars, 'loID');
-	return $vars;
-}
-
 
 // LISTEN TO THE AUTHENTICATE FILTER - USE Obojobo to see if the user's crudentials are right
 // If they are - give them the proper role, create a wordpress user, and log em in to both systems
@@ -154,8 +117,8 @@ function rocketD_admin_tool_get_form_page_input()
 
 // create custom plugin settings menu
 add_action('admin_menu', 'rocketD_plugin_menu');
-
-function rocketD_plugin_menu() {
+function rocketD_plugin_menu() 
+{
 	//create custom post type menu
 	add_menu_page('Obo Admin Tools', 'Obo Admin Tools', 'administrator', 'rocketD_admin_tools_menu', 'rocketD_tools_scripts');	
 	
@@ -175,7 +138,8 @@ function rocketD_plugin_menu() {
 	}
 }
 
-function rocketD_admin_tool_run() {
+function rocketD_admin_tool_run() 
+{
 	if(strpos($_REQUEST['page'], 'rocketD_admin_tool_') !== false )
 	{
 		$page = explode('rocketD_admin_tool_', $_REQUEST['page']);
@@ -243,39 +207,3 @@ function writeLog($output, $fileName=false)
 	fclose($fh);
 	
 }
-
-
-
-/*
-https://obojobo.ucf.edu/view/3921
-
-https://obojobo.ucf.edu/lo/evaluating-web-sites/2.342
-
-https://obojobo.ucf.edu/inst/evaluating-web-sites/2.342
-
-https://obojobo.ucf.edu/view/evaluating-web-sites/2.342
-
-https://obojobo.ucf.edu/evaluating-web-sites/preview/3.23
-
-https://obojobo.ucf.edu/evaluating-web-sites/11Spring/AML3930H-0001
-
-https://obojobo.ucf.edu/11Spring/AML3930H-0001/evaluating-web-sites
-
-https://obojobo.ucf.edu/view/evaluating-web-sites/3234/
-
-https://obojobo.ucf.edu/view/3123/evaluationg-web-sites/
-
-https://obojobo.ucf.edu/inst/3123/evaluationg-web-sites/
-
-https://obojobo.ucf.edu/evaluationg-web-sites/AML3930H-0001-11Spring
-
-https://obojobo.ucf.edu/view/evaluationg-web-sites/in/idv-essentials-11Summer(3)
-
-https://obojobo.ucf.edu/evaluationg-web-sites/idv-essentials-11Summer
-
-https://obojobo.ucf.edu/lo/3123/evaluationg-web-sites/
-
-https://obojobo.ucf.edu/preview/3123/evaluationg-web-sites/
-
-*/
-?>

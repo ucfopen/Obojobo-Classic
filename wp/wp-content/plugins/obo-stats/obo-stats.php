@@ -32,41 +32,33 @@ function on_deactivate()
 	$role->remove_cap('view_obo_data');
 }
 
+// ====================  BUILDING THE ADMIN MENU ===============================
 add_action('admin_menu', 'on_admin_menu');
-
 function on_admin_menu()
 {
-	//@TODO: check role/cap
+	$user = wp_get_current_user();
 
-	//remove WP update message:
-	remove_action('admin_notices', 'update_nag', 3);
-
-	//add the stats page
-	add_menu_page('Obojobo Stats', 'Obojobo Stats', 'view_obo_data', 'obojobo_stats', 'write_stats_page');
-
-	// remove dashboard:
-	global $menu;//, $submenu, $user_ID;
-	//$user = new WP_User($user_ID);
-	foreach($menu as $menu_index=>$menu_item_arr)
+	// does the user have 'super_stats' role?
+	if(isset($user) && is_array($user->roles) && in_array('super_stats', $user->roles))
 	{
-		if($menu_item_arr[0] == 'Dashboard' || $menu_item_arr[0] == 'Profile')
+		echo('hiding stufff');
+		//remove WP update message:
+		remove_action('admin_notices', 'update_nag', 3);
+
+		//add the stats page
+		add_menu_page('Obojobo Stats', 'Obojobo Stats', 'view_obo_data', 'obojobo_stats', 'write_stats_page');
+
+		// remove dashboard:
+		global $menu;
+
+		foreach($menu as $menu_index=>$menu_item_arr)
 		{
-			unset($menu[$menu_index]);
+			if($menu_item_arr[0] == 'Dashboard' || $menu_item_arr[0] == 'Profile')
+			{
+				unset($menu[$menu_index]);
+			}
 		}
 	}
-	//wp_redirect('/wp/wp-admin/admin.php?page=obo_data_menu');
-	/*
-
-        $the_user = new WP_User($user_ID);
-        reset($menu); $page = key($menu);
-        while ((__('Dashboard') != $menu[$page][0]) && next($menu))
-                $page = key($menu);
-        if (__('Dashboard') == $menu[$page][0]) unset($menu[$page]);
-        reset($menu); $page = key($menu);
-        while (!$the_user->has_cap($menu[$page][1]) && next($menu))
-                $page = key($menu);
-        //if (preg_match('#wp-admin/?(index.php)?$#',$_SERVER['REQUEST_URI']) && ('index.php' != $menu[$page][2]))
-                //wp_redirect(get_option('siteurl') . '/wp-admin/post-new.php');*/
 }
 
 function write_stats_page()
@@ -74,31 +66,23 @@ function write_stats_page()
 	require_once('includes/stats.php');
 }
 
-/*
-add_action('admin_menu', 'my_users_menu');
 
-function my_users_menu()
+// ======================== SUPER STATS REDIRECT DIRECTLY TO THE STATS PAGE ===============
+add_filter('login_redirect', 'your_login_redirect');
+function your_login_redirect()
 {
-	// Page only visible to those who can add_users (typically SuperAdmins and Admins)
-	add_users_page('Obojobo Stats Access Whitelist', 'Obojobo Stats Access Whitelist', 'add_users', 'obo-stats-menu', 'my_plugin_function');
+	global $user;   
+
+	// does the user have 'super_stats' role?
+	if(isset($user) && is_array($user->roles) && in_array('super_stats', $user->roles))
+	{
+		return admin_url('admin.php?page=obojobo_stats');
+	}
+	else
+	{
+		return admin_url();	
+	}
 }
 
-function my_plugin_function()
-{
-	// grab the whitelisted users who have the custom 'view_obo_stats' capability
-	$search = new WP_User_Query(array('role' => 'administrator'));
-	$users = $search->get_results();
-print_r($users);
-	echo '<h1>Whitelist:</h1>';
-	echo '<ul>';
-	foreach($users as $user)
-	{
-		echo '<li>Guy</li>';
-		print_r($user);
-	}
-	echo '</ul>';
-
-	echo '<h2>Add/Remove:</h2>';
-}*/
 
 ?>
