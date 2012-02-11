@@ -39,23 +39,24 @@ function on_admin_menu()
 	$user = wp_get_current_user();
 
 	// does the user have 'super_stats' role?
-	if(isset($user) && is_array($user->roles) && in_array('super_stats', $user->roles))
+	if(isset($user) && is_array($user->roles) && in_array('view_obo_data', $user->allcaps))
 	{
-		echo('hiding stufff');
-		//remove WP update message:
-		remove_action('admin_notices', 'update_nag', 3);
-
 		//add the stats page
 		add_menu_page('Obojobo Stats', 'Obojobo Stats', 'view_obo_data', 'obojobo_stats', 'write_stats_page');
 
-		// remove dashboard:
-		global $menu;
-
-		foreach($menu as $menu_index=>$menu_item_arr)
+		if(in_array('super_stats', $user->roles))
 		{
-			if($menu_item_arr[0] == 'Dashboard' || $menu_item_arr[0] == 'Profile')
+			//remove WP update message:
+			remove_action('admin_notices', 'update_nag', 3);
+			// remove dashboard:
+			global $menu;
+
+			foreach($menu as $menu_index=>$menu_item_arr)
 			{
-				unset($menu[$menu_index]);
+				if($menu_item_arr[0] == 'Dashboard' || $menu_item_arr[0] == 'Profile')
+				{
+					unset($menu[$menu_index]);
+				}
 			}
 		}
 	}
