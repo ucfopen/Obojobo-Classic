@@ -1,13 +1,23 @@
 <?php
-// Check for super user
+// Check that user has capability
+if(!current_user_can('view_obo_data'))
+{
+	header('HTTP/1.0 404 Not Found');
+	die();
+}
+
 $API = \obo\API::getInstance();
 $gateway = \AppCfg::URL_WEB . \AppCfg::JSON_GATEWAY;
 
 // @TODO - Require role!
 
 wp_enqueue_script( 'jquery-ui-datepicker', plugins_url( 'jquery.ui.datepicker.min.js', __FILE__ ));
+wp_enqueue_script('tablesorter', '/../assets/js/jquery.tablesorter.min.js');
+//wp_enqueue_script('tablesorter-pager', '/../assets/js/jquery.tablesorter.pager.js');
 
 wp_enqueue_style('jquery-ui', '/wp-content/plugins/obo-stats/css/jquery-ui-1.8.17.custom.css');
+wp_enqueue_style('tablesorter', '/../assets/images/tablesorter/style.css');
+
 //wp_enqueue_style('jquery-ui-datepicker-css', plugins_url('../css/jquery-ui-1.8.17.custom.css', __FILE__));
 
 wp_print_styles();
@@ -16,6 +26,9 @@ wp_print_styles();
 	<script type="text/javascript" charset="utf-8">
 		jQuery(window).load(function()
 		{
+			window.loOptions = {};
+			window.loSelected = [];
+
 			// REMOTE - GET USER
 			jQuery.ajax({
 				url: "<?php echo $gateway; ?>/loRepository.getUser/",
@@ -34,7 +47,35 @@ wp_print_styles();
 			jQuery("#button-download").click(function(){
 				downloadCSV();
 			});
+
+			jQuery('#filter').keyup(filterOptions);
 			
+			function filterOptions()
+			{
+				//grab selected items
+				loSelected = [];
+				jQuery('#mylos option:selected').each(function(key, val) {
+					loSelected.push(jQuery(this).val())
+				});
+
+				var rxp = new RegExp(jQuery('#filter').val(), 'i');
+				var optlist = jQuery('#mylos').empty();
+				for(t in loOptions)
+				{
+					var loID = loOptions[t];
+					if (rxp.test(t))
+					{
+						optlist.append(jQuery('<option/>').attr('value', loID).text(t));
+					}
+				};
+
+				//reselected selected items
+				for(var i in loSelected)
+				{
+					jQuery('#mylos option[value="' + loSelected[i] + '"]').attr('selected', true);
+				}
+			};
+
 			// REMOTE - GET LEARNING OBJECTS
 			function getMyLOs()
 			{
@@ -50,7 +91,7 @@ wp_print_styles();
 			function onGetMyLOs(los)
 			{
 				var loBox = jQuery('#mylos');
-				var options = document.getElementById('mylos').options;
+				loOptions = {};//document.getElementById('mylos').options;
 
 				// sort alphabetically
 				los = jQuery(los).sort(function(a,b){
@@ -73,9 +114,12 @@ wp_print_styles();
 					if(lo.version > 0 && lo.subVersion == 0)
 					{
 						var d = new Date(lo.createTime * 1000);
-						options[options.length] = new Option(lo.title + " v." + lo.version + "." + lo.subVersion + ' ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear(), lo.loID);
+						var t = lo.title + " v." + lo.version + "." + lo.subVersion + ' ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' [' + lo.loID + ']';
+						loOptions[t] = lo.loID;//new Option(t, lo.loID);
 					}
 				});
+
+				filterOptions();
 			}
 		
 			// ON SUBMIT
@@ -259,13 +303,20 @@ wp_print_styles();
 		select#mylos
 		{
 			height:200px;
+			min-width:200px;
+		}
+		#filter
+		{
+			display: block;
 		}
 	</style>
 <h2>Choose Learning Object(s)</h2>
 <form id="protostats" action="protostats_submit" method="get" accept-charset="utf-8">
 
-<select name="mylos" id="mylos" multiple onchange="" size="15"></select><br>
-
+<input placeholder="search..." type="text" id="filter" />
+<select name="mylos" id="mylos" multiple onchange="" size="15">
+	<option value="-1">Loading...</option>
+</select><br>
 <h2>Choose Stat</h2>
 	<input type="radio" name="stat" value="10" id="instance_count" CHECKED><label for="instance_count">10. Total Instances Created</label><br>
 	<input type="radio" name="stat" value="20" id="student_count"><label for="student_count">20. Total Views <span style="color:red;">[slow]</span></label><br>
