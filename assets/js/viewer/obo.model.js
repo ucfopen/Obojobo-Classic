@@ -37,7 +37,7 @@ obo.model = function()
 		$.idleTimeout('body', '#continue-session-button', {
 			idleAfter: IDLE_TIME_BEFORE_WARN_SECONDS,
 			warningLength: IDLE_TIME_BEFORE_LOGOUT_SECONDS,
-			pollingInterval: 2,
+			failedRequests: 0, //hackish way to disable keepalive functionality
 			onIdle: function() {
 				obo.dialog.showDialog({
 					title: 'Your session is about to expire',
