@@ -328,7 +328,7 @@ obo.view = function()
 		// the back button
 		preventUpdateHistoryOnNextRender = true;
 		gotoPageFromURL();
-		updateHistory(true);
+		//updateHistory(true);
 	}
 	
 	// grabs the hash url and navigates to the page specified.
@@ -345,7 +345,6 @@ obo.view = function()
 		{
 			var hashURL = location.hash.substr(1); //chop off '#'
 			var rawTokens = hashURL.split('/');
-			
 			// need to remove empty strings
 			var tokens = [];
 			for(var i in rawTokens)
@@ -355,42 +354,25 @@ obo.view = function()
 					tokens.push(rawTokens[i]);
 				}
 			}
-			
 			if(tokens.length > 0)
 			{
 				section = tokens[0].toLowerCase();
-				//if(section === 'overview' || section === 'content' || section === 'practice' || section === 'assessment')
-				//{
 				if(tokens.length > 1 && section != 'overview')
 				{
 					pg = tokens[1];
-					obo.model.gotoSectionAndPage(tokens[0].toLowerCase(), pg, onGotoPageFromURL);
+					obo.model.gotoSectionAndPage(tokens[0].toLowerCase(), pg);
 				}
 				else
 				{
-					obo.model.gotoSection(tokens[0].toLowerCase(), onGotoPageFromURL);
+					obo.model.gotoSection(tokens[0].toLowerCase());
 				}
-				//}
+
+				return;
 			}
 		}
-		else
-		{
-			obo.model.gotoSection('overview');
-			//render();
-		}
-	}
 
-	var onGotoPageFromURL = function(successful)
-	{
-		if(successful)
-		{
-			render();
-		} 
-		else
-		{
-			obo.model.gotoPage('start');
-			//obo.model.gotoSection('overview');
-		}
+		// catchall:
+		obo.model.gotoSection('overview');
 	}
 	
 	// generates the fake # URL which gotoPageFromURL can use to navigate to the page
@@ -398,6 +380,7 @@ obo.view = function()
 	{
 		var section = obo.model.getSection();
 		var page = obo.model.getPage();
+
 		// for simplicity only we omit 'start' if in overview section
 		var url = '/' + section + (page === 'start' && section === 'overview' ? '' : '/' + page);
 		return url;
@@ -1888,21 +1871,23 @@ obo.view = function()
 				// @TODO - we lock out assessment but they could still get in?
 				lockoutSections(['content', 'practice']);
 				
-				/*The last time you visited "Citing Sources Using MLA Style" you were in the middle of an assessment attempt, navigate to the assessment section to continue where you left off.*/
-				obo.dialog.showDialog({
-					title: 'Resume assessment attempt',
-					contents: 'The last time you visited <strong>"' + obo.model.getTitle() + '"</strong> you were in the middle of an assessment attempt. Visit the assessment section to continue where you left off.',
-					modal: true,
-					width: 600,
-					buttons: [
-						{label: 'Jump to Assessment', action: function() {
-							if(!(obo.model.getSection() === 'assessment' && obo.model.getPage() === 'start'))
-							{
-								obo.model.gotoSectionAndPage('assessment', 'start');
-							}
-						}}
-					]
-				});
+				if(section !== 'assessment')
+				{
+					obo.dialog.showDialog({
+						title: 'Resume assessment attempt',
+						contents: 'The last time you visited <strong>"' + obo.model.getTitle() + '"</strong> you were in the middle of an assessment attempt. Visit the assessment section to continue where you left off.',
+						modal: true,
+						width: 600,
+						buttons: [
+							{label: 'Jump to Assessment', action: function() {
+								if(!(obo.model.getSection() === 'assessment' && obo.model.getPage() === 'start'))
+								{
+									obo.model.gotoSectionAndPage('assessment', 'start');
+								}
+							}}
+						]
+					});
+				}
 			}
 			else
 			{

@@ -236,6 +236,7 @@ obo.model = function()
 		}
 		
 		var index = page;
+		var altIndex = undefined;
 		//var altIndex = '';
 		// test to see if page is in the format <Number><Letter>
 		/*
@@ -244,20 +245,33 @@ obo.model = function()
 			index = page.substr(0, page.length - 1);
 			//altIndex = page.substr(page.length);
 		}*/
-		if(_section === 'assessment' && isNaN(page))
+		// special case to allow '1b' for assessment in preview mode
+		if(mode === 'preview' && _section === 'assessment' && isNaN(page))
 		{
-			index = getAssessmentPageIndex(page).index + 1;
-			// @TODO - check the altIndex bounds
+			var o = getAssessmentPageIndex(page);
+			index = o.index + 1;
+			altIndex = o.altIndex;
 		}
 		
-		return index !== false && !isNaN(index) && index > 0 && index - 1 < getNumPagesOfSection(_section);
+		return 	index !== false &&
+				!isNaN(index) &&
+				index > 0 &&
+				index - 1 < getNumPagesOfSection(_section) &&
+				(altIndex === undefined || altIndex < questions.assessment[index - 1].length);
 	};
 	
 	// utility function that turns a page like '2b' into {index:1, altIndex:1}
+	//@TODO: currently only works up to 'z' (not 'aa', 'ab', etc)
 	var getAssessmentPageIndex = function(page)
 	{
+		if(typeof page !== 'string')
+		{
+			page = String(page);
+		}
+		page = page.toLowerCase();
+
 		// @TODO - save this regex maybe?
-		var regex = /([0-9]+)([b-z]?)/;
+		var regex = /([0-9]+)([a-z]*)/;
 		var match = regex.exec(page);
 		
 		if(match === null)
@@ -268,8 +282,8 @@ obo.model = function()
 		{
 			return {
 				index: parseInt(match[1]) - 1,
-				altIndex: match[2] === '' ? 0 : match[2].charCodeAt(0) - 97
-			};
+				altIndex: (match[2] === '' || match[2].length > 1) ? 0 : match[2].charCodeAt(0) - 97
+			}
 		}
 	};
 	
@@ -483,16 +497,28 @@ obo.model = function()
 	};
 	
 	// attempts to set the location variables to new values.
-	// if callback is defined will call that function, returning
-	// true if successful, false otherwise. If not it will automatically
-	// call view.render if successful.
-	var setLocation = function(newSection, newPage, callback)
+	// will "downgrade" to the start page of sections
+	// or go to the overview section if all else fails.
+	// calls view.render when finished.
+	var setLocation = function(newSection, newPage)
 	{
+		// we store where we are now, so we can send tracking logs
+		// at the end if needed.
+		var currentSection = section;
+		var currentPage = pages[currentSection];
+
 		debug.log('setLocation', newSection, newPage);
 
 		if(newSection === undefined)
 		{
 			newSection = section;
+		}
+		// special case: if we have a garbage section then simply
+		// redirect to the overview section.
+		if(!isValidSection(newSection))
+		{
+			newSection = 'overview';
+			newPage = 'start';
 		}
 		if(newPage === undefined)
 		{
@@ -509,6 +535,17 @@ obo.model = function()
 					case 'practice': newPage = getNumPagesOfSection('practice'); break;
 				}
 			}
+		}
+
+		// special case - overview only has a start page
+		if(newSection === 'overview')
+		{
+			newPage = 'start';
+		}
+		// special case - no start page for content
+		if(newSection === 'content' && newPage === 'start')
+		{
+			newPage = 1;
 		}
 
 		// if the user is resuming a previous attempt, but they are not
@@ -535,44 +572,36 @@ obo.model = function()
 				newPage = 'start';
 			}
 		}
-		
+
+		// special case - attempting to view practice page but practice questions not loaded
+		if(!inAssessmentQuiz && newSection === 'practice' && !isNaN(newPage) && typeof lo.pGroup.kids === 'undefined')
+		{
+			pendingPracticeQuestionsLoadedForPage = newPage;
+			newSection = 'practice';
+			newPage = 'start';
+			//page = newPage;
+			
+		}
+
 		if(canAccessSection(newSection))
 		{
 			if(canAccessPage(newSection, newPage))
 			{
-				if(mode === 'instance')
-				{
-					if(newSection != section)
-					{
-						obo.remote.makeCall('trackSectionChanged', [lo.viewID, getSectionIndex(newSection)], processResponse);
-					}
-					else if(newPage != pages[section])
-					{
-						// we only track page changes on numeric pages:
-						var pageID = getPageID(newPage);
-						if(typeof pageID !== 'undefined')
-						{
-							obo.remote.makeCall('trackPageChanged', [lo.viewID, pageID, getSectionIndex()], processResponse);
-						}
-					}
-				}
-
-				// special case - overview only has a start page
-				if(newSection === 'overview')
-				{
-					newPage = 'start';
-				}
-				// special case - no start page for content
-				if(newSection === 'content' && newPage === 'start')
-				{
-					newPage = 1;
-				}
-
 				// special case - dealing with question alternates:
 				var assessPageIndex = getAssessmentPageIndex(newPage);
-				if(assessPageIndex.altIndex && assessPageIndex.altIndex.length > 0)
+				if(typeof assessPageIndex.altIndex !== 'undefined')
 				{
-					activequestions.assessment[assessPageIndex.index] = assessPageIndex.altIndex;
+					//activequestions.assessment[assessPageIndex.index] = assessPageIndex.altIndex;
+
+					// simplify "5a" to "5", "5B" to "5b"
+					if(typeof newPage === 'string')
+					{
+						newPage = newPage.toLowerCase();
+						if(newPage.indexOf("a") == newPage.length - 1)
+						{
+							newPage = newPage.substr(0, newPage.length - 1);
+						}
+					}
 				}
 
 				// special case - can't view scores page when no scores exist
@@ -581,19 +610,11 @@ obo.model = function()
 					newPage = 'start';
 				}
 
-				// special case - attempting to view practice page but practice questions not loaded
-				if(newSection === 'practice' && !isNaN(newPage) && typeof lo.pGroup.kids === 'undefined')
-				{
-					pendingPracticeQuestionsLoadedForPage = newPage;
-					startPractice();
-					return;
-				}
-
 				debug.log('setLocation complete', newSection, newPage);
 				
 				section = newSection;
 				pages[section] = newPage;
-				
+				/*
 				if(typeof callback === 'function')
 				{
 					callback(true);
@@ -601,30 +622,73 @@ obo.model = function()
 				else
 				{
 					view.render();
-				}
+				}*/
 			}
 			// if can't access the page we want then at least attempt to access the start page of this section:
-			else if(canAccessPage(newSection, 'start'))
+			else if(newSection !== 'content' && canAccessPage(newSection, 'start'))
 			{
 				section = newSection;
-				pages[section] = section === 'content' ? 1 : 'start';
-				
-				if(typeof callback === 'function')
-				{
-					callback(true);
-				}
-				else
-				{
-					view.render();
-				}
+				pages[section] = 'start';
+			}
+			else if(newSection === 'content' && canAccessPage(newSection, 1))
+			{
+				section = newSection;
+				pages[section] = 1;
 			}
 		}
 		else
 		{
-			if(typeof callback === 'function')
+		}
+
+		// update, if needed
+		if(section != currentSection || pages[section] != currentPage)
+		{
+			// send tracking logs
+			if(mode === 'instance')
 			{
-				callback(false);
+				// track both if section changed
+				if(section != currentSection)
+				{
+					var sectionIndex = getSectionIndex(newSection);
+					var pageID = getPageID();
+					
+					// In order to make two consecutive tracking calls we wrap
+					// them in a closure:
+					var Caller = function(viewID, pageID, sectionIndex) {
+						obo.remote.makeCall('trackSectionChanged', [viewID, sectionIndex], function(result) {
+							if(processResponse(result))
+							{
+								if(typeof pageID !== 'undefined')
+								{
+									obo.remote.makeCall('trackPageChanged', [lo.viewID, pageID, sectionIndex], processResponse);
+								}
+							}
+						});
+					};
+					new Caller(lo.viewID, pageID, sectionIndex);
+				}
+				else if(pages[section] != currentPage)
+				{
+					// we only track page changes on numeric pages:
+					var pageID = getPageID();
+					if(typeof pageID !== 'undefined')
+					{
+						obo.remote.makeCall('trackPageChanged', [lo.viewID, pageID, getSectionIndex()], processResponse);
+					}
+				}
 			}
+		}
+
+		debug.log('setLocation result', section, pages[section]);
+
+		if(!isNaN(pendingPracticeQuestionsLoadedForPage))
+		{
+			startPractice();
+		}
+		else
+		{
+			// render
+			view.render();
 		}
 	}
 	
@@ -683,8 +747,10 @@ obo.model = function()
 
 		if(!isNaN(pendingPracticeQuestionsLoadedForPage))
 		{
-			setLocation('practice', pendingPracticeQuestionsLoadedForPage);
+			var newPage = pendingPracticeQuestionsLoadedForPage;
 			pendingPracticeQuestionsLoadedForPage = undefined;
+			setLocation('practice', newPage);
+			
 		}
 		else
 		{
@@ -1047,12 +1113,18 @@ obo.model = function()
 	
 	// @TODO: use this more!
 	// if page is not defined we use the current page
-	var getPageObject = function(page)
+	var getPageObject = function(page, _section)
 	{
 		var i = typeof page === 'undefined' ? getPage() : page;
-		if(pageIsNumericWithinBounds(undefined, i))
+
+		if(typeof _section === 'undefined')
 		{
-			switch(section)
+			_section = section;
+		}
+
+		if(pageIsNumericWithinBounds(_section, i))
+		{
+			switch(_section)
 			{
 				case 'content': return lo.pages[i - 1];
 				case 'practice': return questions.practice[i - 1][0];
@@ -1105,13 +1177,17 @@ obo.model = function()
 	// return the page or question id of a page
 	// if page is not defined we'll assume the current page.
 	// if page is a non-numeric page we return undefined
-	var getPageID = function(page)
+	var getPageID = function(pageIndex, _section)
 	{
-		var page = getPageObject(page);
+		var page = getPageObject(pageIndex, _section);
+		if(typeof _section === 'undefined')
+		{
+			_section = section;
+		}
 		
 		if(typeof page !== 'undefined')
 		{
-			switch(section)
+			switch(_section)
 			{
 				case 'content':
 					return page.pageID;
@@ -1329,10 +1405,10 @@ obo.model = function()
 		}
 	};
 
-	var gotoPrevPage = function(callback)
+	var gotoPrevPage = function()
 	{
 		var p = getPrevPage();
-		setLocation(p.section, p.page, callback);
+		setLocation(p.section, p.page);
 	}
 	
 	// go to the next page, slightly difficult since page can be
@@ -1396,37 +1472,37 @@ obo.model = function()
 		}
 	};
 
-	var gotoNextPage = function(callback)
+	var gotoNextPage = function()
 	{
 		var p = getNextPage();
-		setLocation(p.section, p.page, callback);
+		setLocation(p.section, p.page);
 	};
 	
 	// advance to the start of next section
-	var gotoStartPageOfNextSection = function(callback)
+	var gotoStartPageOfNextSection = function()
 	{
-		setLocation(getNextSection(), 'start', callback);
+		setLocation(getNextSection(), 'start');
 	};
 	
-	var gotoSectionAndPage = function(newSection, newPage, callback)
+	var gotoSectionAndPage = function(newSection, newPage)
 	{
-		setLocation(newSection, newPage, callback);
+		setLocation(newSection, newPage);
 	};
 	
 	// jump to any section, but prevent this if they are in an assessment quiz!
 	// optionally you can supply a page as well
-	var gotoSection = function(newSection, callback)
+	var gotoSection = function(newSection)
 	{
-		setLocation(newSection, undefined, callback);
+		setLocation(newSection, undefined);
 	};
 	
 	// navigates to a page for the current section.
 	// returns true if successful.
 	// page can either be 'start', 'end', 'scores', a number 1-n or a number with a letter suffix
 	// for question alternates in preview mode (2b, 3d, etc)
-	var gotoPage = function(newPage, callback)
+	var gotoPage = function(newPage)
 	{
-		setLocation(undefined, newPage, callback);
+		setLocation(undefined, newPage);
 	};
 	
 	// use this to submit a MC, short answer or media question.
