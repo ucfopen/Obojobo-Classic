@@ -18,8 +18,8 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
   
   <!-- DEV JAVASCRIPT LIBRARIES -->
-  <script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
-  <script type="text/javascript" src="/assets/js/jquery.simplemodal.1.4.1.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery-1.7.1.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
   <script type="text/javascript" src="/assets/js/modernizr-2.0.6.js"></script>
   <script type="text/javascript" src="/assets/js/date.format.js"></script>
   <script type="text/javascript" src="/assets/js/swfobject.js"></script>
@@ -54,7 +54,7 @@ else
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 <script type="text/javascript" src="/min/b=assets/js&f=
-jquery.simplemodal.1.4.1.js,modernizr-2.0.6.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.kogneato.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
+jquery-ui-1.8.18.custom.min.js,modernizr-2.0.6.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.kogneato.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
 
 
@@ -136,13 +136,16 @@ jquery.simplemodal.1.4.1.js,modernizr-2.0.6.js,date.format.js,jquery.tipTip.js,b
     
     document.onkeypress = function(event)
     {
-      if(event.ctrlKey && event.keyCode == 44)
+      if(typeof event !== 'undefined' && typeof event.ctrlKey !== 'undefined' && event.ctrlKey && typeof event.keyCode !== 'undefined')
       {
-        obo.model.gotoPrevPage();
-      }
-      else if(event.ctrlKey && event.keyCode == 46)
-      {
-        obo.model.gotoNextPage();
+        if(event.keyCode === 44)
+        {
+          obo.model.gotoPrevPage();
+        }
+        else if(event.keyCode === 46)
+        {
+          obo.model.gotoNextPage();
+        }
       }
     }
   }

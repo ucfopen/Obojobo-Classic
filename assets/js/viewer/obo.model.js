@@ -1674,7 +1674,7 @@ obo.model = function()
 					closeButton: false,
 					escClose: false,
 					closeCallback: function(dialog) {
-						$.modal.close();
+						obo.dialog.closeDialogs();
 						redirectToLoginPage();
 					},
 					buttons: [
@@ -1698,7 +1698,8 @@ obo.model = function()
 			contents: message,
 			closeButton: false,
 			escClose: false,
-			modal: false
+			modal: false,
+			activelyHideSWFs: false
 		});
 	}
 
