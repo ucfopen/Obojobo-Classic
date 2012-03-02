@@ -57,6 +57,10 @@ obo.view = function()
 	// flag used to specify the first time render() is called.
 	// the view is 'unrendered' until the first render() completes.
 	var unrendered = true;
+
+	// flag to easily keep track if swfs are being hidden
+	// (via hideSwfs and unhideSwfs)
+	var swfsHidden = false;
 	
 	var loadUI = function($element)
 	{
@@ -1932,6 +1936,10 @@ obo.view = function()
 	// use this when attempting to display content over swfs using gpu wmodes
 	var hideSWFs = function()
 	{
+		debug.log('hideSWFs');
+
+		swfsHidden = true;
+
 		$('object').css('visibility', 'hidden');
 		$('object').parent().addClass('stripe-bg');
 
@@ -1947,6 +1955,10 @@ obo.view = function()
 	
 	var unhideSWFs = function()
 	{
+		debug.log('unhideSWFs');
+
+		swfsHidden = false;
+
 		// unhide all content objects:
 		$('#content object').css('visibility', 'visible');
 		$('#content object').parent().removeClass('stripe-bg');
@@ -1956,6 +1968,17 @@ obo.view = function()
 
 		$('iframe').show();
 	};
+
+	// calls hideSWFs again if swfs are already hidden
+	// needed if (for example) embedding a media after hideSWFs
+	// has been called.
+	var rehideSWFs = function()
+	{
+		if(swfsHidden)
+		{
+			hideSWFs();
+		}
+	}
 	
 	// tosses up a error dialog. error can be a string message or an error object
 	// calls closeCallback if defined
@@ -1979,11 +2002,11 @@ obo.view = function()
 			title: 'ERROR',
 			contents: m
 		};
-		if(typeof callback !== 'undefined')
+		if(typeof closeCallback !== 'undefined')
 		{
 			opts.closeCallback = closeCallback;
 		}
-		obo.dialog.showOKDialog(opts);
+		obo.dialog.showDialog(opts);
 		
 		hideThrobber();
 	};
@@ -1991,7 +2014,7 @@ obo.view = function()
 	// notify the user when something went wrong, but we're not sure what
 	var displayGenericError = function()
 	{
-		obo.dialog.showOKDialog({
+		obo.dialog.showDialog({
 			title: 'Oops!',
 			contents: 'There was a problem, please try again.'
 		});
@@ -2008,6 +2031,7 @@ obo.view = function()
 		displayGenericError: displayGenericError,
 		updateInteractiveScore: updateInteractiveScore,
 		showThrobber: showThrobber,
-		hideThrobber: hideThrobber
+		hideThrobber: hideThrobber,
+		rehideSWFs: rehideSWFs
 	};
 }();
