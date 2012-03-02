@@ -444,7 +444,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	margin: 15px 0 0 0 !important;
 }
 
-.button.simplemodal-close
+.button.dialog-close-button
 {
 	margin: 15px 5px 15px 5px !important;
 }
@@ -2312,94 +2312,6 @@ a
 	background: url('/assets/images/viewer/external-href.png') center right no-repeat;
 }
 
-
-
-/* jquery ui dialog */
-/*
-.ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
-.ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; } 
-.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
-.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
-.ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
-.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
-.ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
-.ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
-.ui-draggable .ui-dialog-titlebar { cursor: move; }
-
-.ui-dialog
-{
-	padding: 0 !important;
-	border: 0 !important;
-	-moz-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-	-webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-	box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-}
-
-.ui-dialog .ui-dialog-titlebar
-{
-	text-transform: uppercase;
-	-moz-border-radius: 4px 4px 0 0;
-	-webkit-border-radius: 4px 4px 0 0;
-	border-radius: 4px 4px 0 0;
-	background: -moz-linear-gradient(#818181, #59595a);
-	background: -ms-linear-gradient(#818181, #59595a);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #818181), color-stop(100%, #59595a));
-	background: -webkit-linear-gradient(#818181, #59595a);
-	background: -o-linear-gradient(#818181, #59595a);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#818181', endColorstr='#59595a');
-	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#818181', endColorstr='#59595a')";
-	background: linear-gradient(#818181, #59595a);
-	border: 0;
-	border-bottom: 1px solid rgba(0, 0, 0, .6);
-}
-
-.ui-dialog .ui-dialog-title
-{
-	font-family: 'Lato' !important;
-	font-size: 13pt;
-	text-shadow: rgba(0, 0, 0, .2) 0px 1px 1px !important;
-}
-
-.ui-dialog .ui-dialog-content
-{
-	color: black;
-	font-size: 12pt;
-	font-family: 'Palatino Linotype', 'Book Antiqua', 'Palatino', serif;
-	padding: .8em 1em !important;
-}
-
-.ui-dialog .ui-dialog-buttonpane
-{
-	border: 0;
-}
-
-.ui-widget-overlay
-{
-	background: white !important;
-}
-
-
-
-
-
-
-
-
-
-.ui-widget
-{
-	font-family: 'Lato' !important;
-	font-size: 1em !important;
-}
-*/
-
-
-
-
-
 #content-blocker
 {
 	top: 0;
@@ -2482,9 +2394,11 @@ a
 	-webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
 	box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
 	width: 400px;
-	position: absolute;
-	top: 0;
-	left: 0;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -200px;
+	margin-top: -130px;
 	background: #eeeeee;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -2542,24 +2456,40 @@ a
 	opacity: 1;
 }
 
+.dialog-title-bar .dialog-close-button:focus
+{
+	outline: 5px auto white !important;
+}
+
 .dialog .dialog-buttons
 {
-	/*@TODO: This might need to be inline-block for ie*/
-	display: table;
-	width: 100%;
+	/*width: 100%;*/
 	/*height: 50px;*/
 	position: relative;
 	text-align: center;
 	bottom: 0;
+	margin: 0 auto;
 }
 
-#simplemodal-overlay {
-	opacity: .4;
+#obo-dialog-overlay {
+	top: 0;
+	left: 0;
+	z-index: 1001;
+	width: 100%;
+	height: 100%;
+	position: fixed;
 	background: black;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=40)";
+	opacity: .4;
 }
 
-#simplemodal-container {
-	
+#obo-dialog-container {
+	top: 0;
+	left: 0;
+	z-index: 1002;
+	width: 100%;
+	height: 100%;
+	position: fixed;
 }
 
 #qa-form
