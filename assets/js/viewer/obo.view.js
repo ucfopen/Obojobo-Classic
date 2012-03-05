@@ -327,6 +327,12 @@ obo.view = function()
 				}
 			});
 		}
+
+		// remove problematic footer for mobile browsers
+		if(obo.util.isMobile())
+		{
+			$('#footer').hide();
+		}
 		
 		// we prevent this from altering the history, which will break
 		// the back button

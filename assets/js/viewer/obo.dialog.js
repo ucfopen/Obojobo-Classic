@@ -153,8 +153,6 @@ obo.dialog = function()
 
 		return;
 	};
-
-	console.log(obo.dialog);
 	
 	return {
 		showDialog: showDialog,
