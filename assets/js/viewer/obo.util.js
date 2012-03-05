@@ -101,12 +101,9 @@ obo.util = function()
 		// @TODO: handle textformat with no style options
 		//Convert <textformat> into <div>
 		var i = 0;
-		//console.log('convert textformat into div');
-		//console.log('input start = ' + input);
 		while(matchFound)
 		{
 			matchFound = false;
-			//console.log('i >    =====' + i);
 			i = i + 1;
 			patternStrictTfToDiv.lastIndex = 0;
 			groups = patternStrictTfToDiv.exec(input);
@@ -116,8 +113,6 @@ obo.util = function()
 				groupString = groups[1];
 				var style = generateStyleFromFlashHTMLTag(groupString, tfReplaceRules);
 				//We only want to add this span if there are styles associated with it
-				//console.log('lastIndex = ' + patternStrictTfToDiv.lastIndex);
-				//console.log('input = "' + input.substr(0, patternStrictTfToDiv.lastIndex) + '".replace(pattern, stuff) + "' + input.substr(patternStrictTfToDiv.lastIndex) + '"');
 				if(style.length > 0)
 				{
 					input = input.substr(0, lastIndex).replace(patternStrictTfToDiv, '<div style="' + style + '">') + input.substr(lastIndex);
@@ -131,7 +126,6 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			//console.log('input now   = ' + input);
 		}
 //return 'test';
 		input = input.replace(patternStrictTFClose, "</div>");
@@ -139,20 +133,15 @@ obo.util = function()
 		//Convert <p><font> into <p>
 		var matchFound = true;
 		var j = 0;
-		//console.log('input start = ' + input)
 		while(matchFound)
 		{
-				//console.log('j >    =====' + j);
 				j = j + 1;
 			patternStrictPFont.lastIndex = 0;
 			groups = patternStrictPFont.exec(input);
 			lastIndex = patternStrictPFont.lastIndex;
 			if(groups && groups.length >= 3)
 			{
-				//console.log('input now   = ' + input);
 				groupString = groups[1] + ' ' + groups[2];
-				//console.log(patternStrictPFont);
-				//console.log('lastindex =' + patternStrictPFont.lastIndex);
 				
 				input = input.substr(0, lastIndex).replace(patternStrictPFont, '<p style="' + generateStyleFromFlashHTMLTag(groupString, pReplaceRules) + '">') + input.substr(lastIndex);
 				
@@ -161,9 +150,6 @@ obo.util = function()
 			{
 				matchFound = false;
 			}
-			//console.log('input now =');
-			//console.log(input);
-			//console.log(' ');
 			//matchFound = false; // @TODO
 			//if(j > 3) return;
 		}
@@ -541,6 +527,11 @@ obo.util = function()
 	{
 		return navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i);
 	};
+
+	isMobile = function()
+	{
+		return typeof window.orientation !== 'undefined';
+	}
 	
 	// simple wrapper to delay a function call by 1ms
 	doLater = function(func)
@@ -563,6 +554,7 @@ obo.util = function()
 		doLater: doLater,
 		createCombinedAttributionString: createCombinedAttributionString,
 		getBaseURL: getBaseURL,
-		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf
+		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf,
+		isMobile: isMobile
 	};
 }();
