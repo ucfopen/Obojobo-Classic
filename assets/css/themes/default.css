@@ -2476,7 +2476,7 @@ a
 	left: 0;
 	z-index: 1001;
 	width: 100%;
-	height: 100%;
+	height: 8000px; /* A very large height since 100% doesn't work well on mobile browsers */
 	position: fixed;
 	background: black;
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=40)";
