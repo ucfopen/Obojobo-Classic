@@ -7,7 +7,25 @@ html
 	background: url('/assets/images/viewer/themes/default/bg.png');
 }
 
-#login-page
+body
+{
+	max-width: none;
+}
+
+#footer
+{
+	width: 100%;
+	max-width: 100%;
+	border-left: none;
+	border-right: none;
+}
+
+#push
+{
+	height: 60px;
+}
+
+#login-box
 {
 	border-bottom: 1px solid gray;
 	background: -moz-linear-gradient(white, #e7e7e7);
