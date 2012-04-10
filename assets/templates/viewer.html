@@ -12,19 +12,47 @@
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 </head>
 <body>
-
+<div id="preview-mode-notification">
+	<div id="preview-mode-bar">
+		<div id="preview-label-container">
+			<p>Previewing</p>
+		</div>
+		<div id="enable-teach-view">
+			<label>X-Ray:</label>
+			<div id="teach-view-switch">
+				<span class="switch-on">ON</span>
+				<span class="switch-off">OFF</span>
+				<div id="teach-view-switch-dial"></div>
+			</div>
+		</div>
+	</div>
+	<div id="preview-mode-help-container">
+		<div id="preview-mode-help-subcontainer">
+			<div id="preview-mode-help">
+				<h1>About Preview Mode:</h1>
+				<p>In preview mode you can explore this learning object freely.  Your interactions and scores will not be recorded and there is no attempt limit.  Students do not have access to this mode.</p>
+				<h2>About X-Ray:</h2>
+				<p>X-Ray will reveal question answers, question alternates, and allow you to see all questions before they are randomized.</p>
+			</div>
+			<a href="#">More Info</a>
+		</div>
+	</div>
+</div>
 <div id="template-main">
-	<header id='header'>
-		<h1 id="lo-title"></h1>
-		<nav id="navigation">
-			<ul id="nav-list">
-				<li><a class="nav-item" id="nav-overview" href="#" role="button" title="Learning Object Overview">Overview</a></li><li><a class="nav-item" id="nav-content" href="#" role="button" title="Content Pages">Content</a></li><li><a class="nav-item" id="nav-practice" href="#" role="button" title="Practice Questions">Practice</a></li><li><a class="nav-item" id="nav-assessment" href="#" role="button" title="Assessment">Assessment</a></li>
-			</ul>
-			<a id="settings-button" href="#" role="button" title="Settings Menu">Settings</a>
-			<a id="log-out-button" href="#" role="button" title="Logout of Obojobo">Logout</a>
-		</nav>
-	</header>
-	<section id="content"></section><nav id="page-navigation-bottom" class="page-navigation"><ul><li><a href="#" role="button" class="prev-page-button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>
+	<div id="wrapper">
+		<header id='header'>
+			<h1 id="lo-title"></h1>
+			<nav id="navigation">
+				<ul id="nav-list">
+					<li><a class="nav-item" id="nav-overview" href="#" role="button" title="Learning Object Overview">Overview</a></li><li><a class="nav-item" id="nav-content" href="#" role="button" title="Content Pages">Content</a></li><li><a class="nav-item" id="nav-practice" href="#" role="button" title="Practice Questions">Practice</a></li><li><a class="nav-item" id="nav-assessment" href="#" role="button" title="Assessment">Assessment</a></li>
+				</ul>
+				<a id="settings-button" href="#" role="button" title="Settings Menu">Settings</a>
+				<a id="log-out-button" href="#" role="button" title="Logout of Obojobo">Logout</a>
+			</nav>
+		</header>
+		<section id="content"></section><nav id="page-navigation-bottom" class="page-navigation"><ul><li><a href="#" role="button" class="prev-page-button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>
+		<div class="push"></div>
+	</div>
 	<footer id="footer">
 		<div class="footer-container">
 			<div id='logo'>powered by Obojobo</div>
@@ -33,8 +61,6 @@
 			<p>Learning object created by: Ian Turgeon, Zach Berry, Francisca Yonekura, and Keegan Berry</p>-->
 		</div>
 	</footer>
-	<a href="#" id="go-left">Go left</a>
-	<a href="#" id="go-right">Go right</a>
 </div>
 
 <nav id="page-navigation-top" class="page-navigation">
@@ -269,7 +295,7 @@
 		<a href="https://www.google.com/chrome"><li class="google-chrome">Google Chrome</li></a>
 		<a href="http://www.mozilla.org/en-US/firefox/new/"><li class="firefox">Firefox</li></a>
 		<a href="http://www.opera.com/"><li class="opera">Opera</li></a>
-		<a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home"><li class="ie">IE 9</li></a>
+		<a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home"><li class="ie">Internet Explorer</li></a>
 		<a href="http://www.apple.com/safari/"><li class="safari">Safari</li></a>
 	</ul>
 	<p class="note">You can continue to Obojobo but important features may not function or display correctly: <a id="ignore-older-browser-warning" href="#">Proceed anyway</a></p>
