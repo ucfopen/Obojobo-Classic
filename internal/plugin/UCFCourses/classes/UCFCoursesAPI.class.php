@@ -974,6 +974,9 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		$termCodeLookup[1420] = array('start' => '1304640000', 'end' => '1313038799'); // summer 2011
 		$termCodeLookup[1430] = array('start' => '1313038800', 'end' => '1323910740'); // fall 2011 
 		$termCodeLookup[1440] = array('start' => '1323910741', 'end' => '1336089540'); // spring 2012
+		$termCodeLookup[1450] = array('start' => '1336089541', 'end' => '1344470340'); // summer 2012
+		$termCodeLookup[1460] = array('start' => '1344470341', 'end' => '1355533140'); // fall 2012
+		$termCodeLookup[1470] = array('start' => '1344470341', 'end' => '1362358740'); // spring 2013
 		
 		$term['start'] = $termCodeLookup[$term_code]['start'];
 		$term['end'] = $termCodeLookup[$term_code]['end'];
