@@ -30,6 +30,15 @@ obo.model = function()
 		view = viewModule;
 		opts = options;
 
+		// pull data from local storage
+		if(Modernizr.localstorage)
+		{
+			if(typeof localStorage.teachView !== 'undefined' && localStorage.teachView === 'true' || localStorage.teachView === 'false')
+			{
+				teachView = localStorage.teachView === 'true';
+			}
+		}
+
 		// start the verify timer
 		verifyTimeIntervalID = setInterval(onVerifyTime, VERIFY_TIME_SECONDS * 1000);
 
@@ -72,6 +81,9 @@ obo.model = function()
 	
 	// which mode ('preview'|'instance')
 	var mode;
+
+	// if in preview mode this flag determines if they should see all assessment questions and answer weights
+	var teachView = false;
 	
 	// the lo data object
 	var lo;
@@ -85,6 +97,9 @@ obo.model = function()
 		practice: [],
 		assessment: []
 	};
+
+	// a multi dimensional array storing questions and their alternates
+	var assessmentQuestionsForTeachView = [];
 	
 	// we need to track the practice and asssessment responses to redisplay them
 	// NOTE: These are indexed by page numbers so the first page (page 1) is at [1], not 0!
@@ -106,6 +121,14 @@ obo.model = function()
 		content: 'start',
 		practice: 'start',
 		assessment: 'start'
+	};
+
+	// store view information to a specific page (page is visited, page has feedback displayed, etc)
+	var viewState = {
+		overview: [],
+		content: [],
+		practice: [],
+		assessment: []
 	};
 
 	// keep track of which practice page we are attempting to view when the questions
@@ -135,7 +158,7 @@ obo.model = function()
 		{
 			obo.remote.makeCall('getSessionRoleValid', ['LibraryUser','ContentCreator'], onGetSessionValid);
 		}
-	}
+	};
 
 	var onGetSessionValid = function(result)
 	{
@@ -150,12 +173,12 @@ obo.model = function()
 		)) {
 			logout("You've been logged out. Click 'OK' to login again.");
 		}
-	}
+	};
 
 	var startIdleTimer = function()
 	{
 		$.idleTimer(IDLE_TIME_BEFORE_WARN_SECONDS * 1000);
-	}
+	};
 
 	var isValidSection = function(_section)
 	{
@@ -182,7 +205,7 @@ obo.model = function()
 		}
 		else
 		{
-			return (_section === 'assessment' && page === 'scores') || page === 'start' || page === 'end' || pageIsNumericWithinBounds(_section, page)
+			return (_section === 'assessment' && page === 'scores') || page === 'start' || page === 'end' || pageIsNumericWithinBounds(_section, page);
 		}
 	};
 	
@@ -470,23 +493,27 @@ obo.model = function()
 	var processAssessmentQuestions = function()
 	{	
 		questions.assessment = [];
-		var curQIndex = 0;
 
 		if(mode === 'preview')
 		{
-			$(lo.aGroup.kids).each(function(index, page)
+			buildTeachViewAssessmentQuiz();
+
+			if(teachView)
 			{
-				index++;
-				if(curQIndex != page.questionIndex || page.questionIndex === 0)
+				// copy our teach view questions to questions.assessment:
+				for(var i in assessmentQuestionsForTeachView)
 				{
-					curQIndex++;
-					questions.assessment.push([]);
+					questions.assessment[i] = assessmentQuestionsForTeachView[i];
 				}
-				questions.assessment[curQIndex - 1].push(page);
-			});
+			}
+			else
+			{
+				buildFakeAssessmentQuiz();
+			}
 		}
 		else
 		{
+			var curQIndex = 0;
 			$(lo.aGroup.kids).each(function(index, page)
 			{
 				questions.assessment[curQIndex] = [];
@@ -495,6 +522,59 @@ obo.model = function()
 			});
 		}
 	};
+
+	// creates a multi-dim array containing an array of question alts in an array of question
+	// indicies
+	var buildTeachViewAssessmentQuiz = function()
+	{
+		var curQIndex = 0;
+		assessmentQuestionsForTeachView = [];
+		$(lo.aGroup.kids).each(function(index, page)
+		{
+			index++;
+			if(curQIndex != page.questionIndex || page.questionIndex === 0)
+			{
+				curQIndex++;
+				assessmentQuestionsForTeachView.push([]);
+			}
+			assessmentQuestionsForTeachView[curQIndex - 1].push(page);
+		});
+	}
+
+	// if in preview mode without teach view we need to build an assessment quiz
+	// just like the server does when in instance mode.
+	// options: randomized and keep vs reselect
+	var buildFakeAssessmentQuiz = function()
+	{
+		var aGroup = obo.model.getLO().aGroup;
+		var allowAlts = aGroup.allowAlts === "1" || aGroup.allowAlts === 1 || aGroup.allowAlts === true;
+		var isRandom = aGroup.rand === "1" || aGroup.rand === 1 || aGroup.rand === true;
+		var altMethod = aGroup.altMethod; //'r' (reselect) or 'k' (keep)
+		var numQuestions;
+		var i;
+
+		if(allowAlts && (altMethod === 'r' || questions.assessment.length === 0))
+		{
+			questions.assessment = [];
+			for(i in assessmentQuestionsForTeachView)
+			{
+				numQuestions = assessmentQuestionsForTeachView[i].length;
+				questions.assessment[i] = [assessmentQuestionsForTeachView[i][Math.floor(Math.random() * numQuestions)]];
+			}
+		}
+		else if(questions.assessment.length === 0)
+		{
+			for(i in aGroup.kids)
+			{
+				questions.assessment[i] = [aGroup.kids[i]];
+			}
+		}
+
+		if(isRandom)
+		{
+			questions.assessment.sort(function() { return 0.5 - Math.random(); });
+		}
+	}
 	
 	// attempts to set the location variables to new values.
 	// will "downgrade" to the start page of sections
@@ -636,9 +716,6 @@ obo.model = function()
 				pages[section] = 1;
 			}
 		}
-		else
-		{
-		}
 
 		// update, if needed
 		if(section != currentSection || pages[section] != currentPage)
@@ -681,6 +758,12 @@ obo.model = function()
 
 		debug.log('setLocation result', section, pages[section]);
 
+		// mark this page as visited (if a standard page)
+		if(pageIsNumericWithinBounds())
+		{
+			setViewStatePropertyForPage('visited', true);
+		}
+
 		if(!isNaN(pendingPracticeQuestionsLoadedForPage))
 		{
 			startPractice();
@@ -690,6 +773,73 @@ obo.model = function()
 			// render
 			view.render();
 		}
+	}
+
+	var getViewStateForPage = function(_section, page)
+	{
+		if(typeof _section === 'undefined')
+		{
+			_section = section;
+		}
+		if(typeof page === 'undefined')
+		{
+			page = getPage();
+		}
+
+		if(typeof viewState[_section][page] === 'undefined')
+		{
+			return {};
+		}
+
+		return viewState[_section][page];
+	}
+
+	var getViewStatePropertyForPage = function(property, _section, page)
+	{
+		console.log('getViewStatePropertyForPage', property, _section, page);
+		var state = getViewStateForPage(_section, page);
+		console.log(state);
+		console.log(viewState);
+		if(typeof state === 'undefined' || typeof state[property] === 'undefined')
+		{
+			return undefined;
+		}
+
+		return state[property];
+	}
+
+	var setViewStatePropertyForPage = function(property, value, _section, page)
+	{
+		if(typeof _section === 'undefined')
+		{
+			_section = section;
+		}
+		if(typeof page === 'undefined')
+		{
+			page = getPage();
+		}
+
+		if(typeof viewState[_section][page] === 'undefined')
+		{
+			viewState[_section][page] = {};
+		}
+
+		viewState[_section][page][property] = value;
+	}
+
+	// returns the number of "true"s for property in viewState[section]
+	var getNumPagesWithViewStateProperty = function(_section, property)
+	{
+		var total = 0;
+		for(var i in viewState[_section])
+		{
+			if(typeof viewState[_section][i] !== 'undefined' && typeof viewState[_section][i][property] !== 'undefined' && viewState[_section][i][property] === true)
+			{
+				total++;
+			}
+		}
+
+		return total;
 	}
 	
 	var getPrevSection = function()
@@ -773,24 +923,28 @@ obo.model = function()
 				{
 					if(typeof result[i].savedAnswer !== 'undefined' && result[i].savedAnswer !== null)
 					{
+						var index = parseInt(i, 10) + 1;
 						switch(result[i].itemType.toLowerCase())
 						{
 							case 'mc':
 								if(typeof result[i].savedAnswer.answerID !== 'undefined' && result[i].savedAnswer.answerID !== null)
 								{
-									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.user_answer;
+									responses['assessment'][index] = result[i].savedAnswer.user_answer;
+									setViewStatePropertyForPage('answered', true, 'assessment', index);
 								}
 								break;
 							case 'qa':
 								if(typeof result[i].savedAnswer.user_answer !== 'undefined' && result[i].savedAnswer.user_answer !== null)
 								{
-									responses['assessment'][parseInt(i) + 1] = result[i].savedAnswer.user_answer;
+									responses['assessment'][index] = result[i].savedAnswer.user_answer;
+									setViewStatePropertyForPage('answered', true, 'assessment', index);
 								}
 								break;
 							case 'media':
 								if(typeof result[i].savedAnswer.user_answer !== 'undefined' && result[i].savedAnswer.user_answer !== null)
 								{
-									responses['assessment'][parseInt(i) + 1] = parseInt(result[i].savedAnswer.user_answer);
+									responses['assessment'][index] = parseInt(result[i].savedAnswer.user_answer, 10);
+									setViewStatePropertyForPage('answered', true, 'assessment', index);
 								}
 								break;
 						}
@@ -798,11 +952,16 @@ obo.model = function()
 					}
 				}
 			}
-			
+			else if(mode === 'preview' && !teachView)
+			{
+				// rebuild fake assessment quiz if not in teach view
+				buildFakeAssessmentQuiz();
+			}
+
 			// insert a local score record (to be completed later)
 			scores.push({
 				score: 0,
-				startTime: parseInt(new Date().getTime() / 1000),
+				startTime: parseInt(new Date().getTime() / 1000, 10),
 				endTime: 0
 			});
 		
@@ -830,8 +989,7 @@ obo.model = function()
 				
 					// @TODO - how does this work in preview mode?
 					// clear out responses
-					responses.assessment = [];
-					lastResponse = [];
+					clearAssessment();
 
 					// we are no longer resuming an attempt
 					if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.isInAttempt != 'undefined')
@@ -856,6 +1014,13 @@ obo.model = function()
 		//setPageOfCurrentSection('scores');
 		setLocation('assessment', 'scores');
 	}
+
+	var clearAssessment = function()
+	{
+		responses.assessment = [];
+		viewState.assessment = [];
+		lastResponse = [];
+	};
 	
 	/*
 	var practiceQuestionsLoaded = function()
@@ -1034,6 +1199,37 @@ obo.model = function()
 	{
 		return mode;
 	};
+
+	var isTeachView = function()
+	{
+		return mode === 'preview' && teachView;
+	};
+
+	var setTeachView = function(val)
+	{
+		if(mode === 'preview')
+		{
+			teachView = val;
+
+			processAssessmentQuestions();
+
+			if(inAssessmentQuiz)
+			{
+				clearAssessment();
+				setLocation('assessment', 1);
+			}
+
+			if(Modernizr.localstorage)
+			{
+				localStorage.teachView = teachView ? 'true' : 'false';
+			}
+
+			if((section === 'practice' || section === 'assessment') && pageIsNumericWithinBounds())
+			{
+				view.render();
+			}
+		}
+	}
 	
 	var getPage = function()
 	{
@@ -1129,7 +1325,7 @@ obo.model = function()
 				case 'content': return lo.pages[i - 1];
 				case 'practice': return questions.practice[i - 1][0];
 				case 'assessment':
-					if(mode === 'instance')
+					if(mode === 'instance' || (mode === 'preview' && !teachView))
 					{
 						return questions.assessment[i - 1][0];
 					}
@@ -1504,6 +1700,13 @@ obo.model = function()
 	{
 		setLocation(undefined, newPage);
 	};
+
+	// this function simply saves the response. it doesn't talk to the server.
+	var saveResponse = function(answerID_or_shortAnswerResponse_or_score)
+	{
+		var page = getPage();
+		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
+	}
 	
 	// use this to submit a MC, short answer or media question.
 	// for media, score = 0-100
@@ -1514,6 +1717,7 @@ obo.model = function()
 
 		if(mode === 'instance')
 		{
+			alert('trackSubmitQuestion:[' + answerID_or_shortAnswerResponse_or_score + ']');
 			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
 		}
 		
@@ -1527,8 +1731,16 @@ obo.model = function()
 			clearAssessmentAltResponses(pageIndex.index);
 		}
 
-		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
+		setViewStatePropertyForPage('answered', true);
+		saveResponse(answerID_or_shortAnswerResponse_or_score);
 	};
+
+	// use this to submit a question that is not considered 'saved' or 'submitted'
+	var submitUnsavedQuestion = function(answerID_or_shortAnswerResponse_or_score)
+	{
+		setViewStatePropertyForPage('answered', false);
+		saveResponse(answerID_or_shortAnswerResponse_or_score);
+	}
 
 	// for preview mode this removes all alt responses for a given question index 
 	var clearAssessmentAltResponses = function(questionIndex)
@@ -1628,22 +1840,26 @@ obo.model = function()
 			onSubmitAssessment(parseFloat(total) / parseFloat(questions.assessment.length));
 		}
 	};
-	
+	/*
 	var isPageAnswered = function(section, page)
 	{
-		return responses[section][parseInt(page)] != undefined;
+		return responses[section][page] != undefined;
 	};
 	
-	var getNumPagesAnswered = function(section)
+	// instead of looking at responses we look at pages
+	// marked as answered, since we could have 'unsaved' responses
+	var getNumPagesAnswered = function(_section)
 	{
+		/*
 		var total = 0;
 		for(var i in responses[section])
 		{
 			total++;
 		}
 		
-		return total;
-	};
+		return total;*//*
+		getNumPagesWithViewStateProperty(_section, 'answered');
+	};*/
 
 	// if logoutMessage is defined then the user will be shown a dialog first.
 	// otherwise they will be kicked to the login page.
@@ -1719,6 +1935,8 @@ obo.model = function()
 		getScoreMethod: getScoreMethod,
 		getFinalCalculatedScore: getFinalCalculatedScore,
 		getMode: getMode,
+		isTeachView: isTeachView,
+		setTeachView: setTeachView,
 		getPage: getPage,
 		getPrevPage: getPrevPage,
 		getNextPage: getNextPage,
@@ -1741,15 +1959,18 @@ obo.model = function()
 		gotoSection: gotoSection,
 		gotoPage: gotoPage,
 		submitQuestion: submitQuestion,
+		submitUnsavedQuestion: submitUnsavedQuestion,
 		getPreviousResponse: getPreviousResponse,
 		startAssessment: startAssessment,
 		startPractice: startPractice,
 		submitAssessment: submitAssessment,
-		isPageAnswered: isPageAnswered,
-		getNumPagesAnswered: getNumPagesAnswered,
 		currentQuestionIsAlternate: currentQuestionIsAlternate,
 		getInstanceCloseDate: getInstanceCloseDate,
 		getFlashRequirementsForSection: getFlashRequirementsForSection,
-		logout: logout
+		logout: logout,
+		getViewStateForPage: getViewStateForPage,
+		getViewStatePropertyForPage: getViewStatePropertyForPage,
+		setViewStatePropertyForPage: setViewStatePropertyForPage,
+		getNumPagesWithViewStateProperty: getNumPagesWithViewStateProperty
 	};
 }();

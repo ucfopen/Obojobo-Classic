@@ -1,6 +1,5 @@
 // requires :tabbable from jQuery-UI
 
-// remote handles ajax / server communication
 if(!window.obo)
 {
 	window.obo = {};
@@ -34,6 +33,7 @@ obo.dialog = function()
 		options.modal = typeof options.modal === 'undefined' ? true : options.modal;
 		options.escClose = typeof options.escClose === 'undefined' ? true : options.escClose;
 		options.buttons = typeof options.buttons === 'undefined' ? [{label: 'OK'}] : options.buttons;
+		options.center = typeof options.center === 'undefined' ? false : options.center;
 
 		// check to see if our modal blocker is already up
 		if($('#obo-dialog-overlay').length == 0 && options.modal)
@@ -67,6 +67,10 @@ obo.dialog = function()
 			$title.append($close);
 		}
 		var $p = $('<p>' + options.contents + '</p>');
+		if(options.center)
+		{
+			$p.css('text-align', 'center');
+		}
 		var $buttons = $('<div class="dialog-buttons"></div>');
 		var $curButton;
 		for(var i in options.buttons)
@@ -76,7 +80,10 @@ obo.dialog = function()
 			{
 				$curButton.attr('id', options.buttons[i].id);
 			}
-			$curButton.click(options.buttons[i].action);
+			if(typeof options.buttons[i].action === 'function')
+			{
+				$curButton.on('click', options.data, options.buttons[i].action);
+			}
 			$buttons.append($curButton);
 			$curButton.addClass('dialog-close-button');
 		}
@@ -100,7 +107,7 @@ obo.dialog = function()
 		// we set up our key listeners:
 		$('.dialog-close-button').click(function(event) {
 			event.preventDefault();
-			closeCallback();
+			closeCallback($dialog);
 		});
 
 		tabArray = $('.dialog').find(':tabbable');
@@ -111,7 +118,7 @@ obo.dialog = function()
 			if(options.escClose && code == 27) //ESC
 			{
 				//obo.dialog.closeDialogs();
-				closeCallback();
+				closeCallback($dialog);
 			}
 			else if(code == 9)
 			{
