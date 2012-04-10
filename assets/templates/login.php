@@ -11,6 +11,7 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 	<script type="text/javascript" src="/assets/js/jquery-1.7.js"></script>
 	<script type="text/javascript" src="/assets/js/modernizr.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.infieldlabel.js"></script>
+	<script type="text/javascript" src="/assets/js/date.format.js"></script>
 
 	<!-- DEV OBOJOBO CSS -->
 	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" media="screen">
@@ -31,7 +32,8 @@ else
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery-1.7.js,
 modernizr.js,
-jquery.infieldlabel.js"></script>
+jquery.infieldlabel.js,
+date.format.js"></script>
 
 <link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
 <link href='https://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
@@ -105,6 +107,17 @@ $('document').ready(function()
 function initLoginScreen()
 {
 	$("label").inFieldLabels();
+
+	<?php
+	if($startTime > 0 && $endTime > 0)
+	{
+		?>
+		var startTime = new Date(<?php echo $startTime * 1000; ?>);
+		var endTime = new Date(<?php echo $endTime * 1000; ?>);
+		$('#start-time').html('Begins: <em>' + startTime.format('mm/dd/yy') + '</em> at <em>' + startTime.format('h:MM TT') + '</em>');
+		$('#end-time').html('Closes: <em>' + endTime.format('mm/dd/yy') + '</em> at <em>' + endTime.format('h:MM TT') + '</em>');
+		<?php
+	}?>
 }
 </script>
 </head>
@@ -116,8 +129,8 @@ function initLoginScreen()
 
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
 					
-				<h3>Begins: <em><?php echo $startDate; ?></em> at <em><?php echo $startTime; ?></em></h3> 
-				<h3>Closes: <em><?php echo $endDate; ?></em> at <em><?php echo $endTime; ?></em></h3> 
+	<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3> 
+	<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3> 
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">

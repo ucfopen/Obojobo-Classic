@@ -52,11 +52,8 @@ else
       $title = $instData->name;
       $course = $instData->courseID;
       $instructor = $instData->userName;
-      date_default_timezone_set('America/New_York');
-      $startDate = date('m/j/y', $instData->startTime);
-      $startTime = date('g:i a', $instData->startTime);
-      $endDate = date('m/j/y', $instData->endTime);
-      $endTime = date('g:i a', $instData->endTime);
+      $startTime = $instData->startTime;
+      $endTime = $instData->endTime;
     }
     else
     {
@@ -73,10 +70,8 @@ else
       $title = $loMeta->title . ' ' . $loMeta->version . '.' . $loMeta->subVersion;
       $course = 'PREVIEW ONLY';
       $instructor = 'only visible to authors';
-      $startDate = 'Date Here';
-      $startTime = 'Time Here';
-      $endDate = 'Date Here';
-      $endTime = 'Time Here';    
+      $startTime = 0;
+      $endTime = 0;
     }
     else
     {
