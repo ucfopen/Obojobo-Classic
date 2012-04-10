@@ -52,10 +52,11 @@ else
       $title = $instData->name;
       $course = $instData->courseID;
       $instructor = $instData->userName;
+      date_default_timezone_set('America/New_York');
       $startDate = date('m/j/y', $instData->startTime);
-      $startTime = date('g:s a', $instData->startTime);
+      $startTime = date('g:i a', $instData->startTime);
       $endDate = date('m/j/y', $instData->endTime);
-      $endTime = date('g:s a', $instData->endTime);
+      $endTime = date('g:i a', $instData->endTime);
     }
     else
     {
