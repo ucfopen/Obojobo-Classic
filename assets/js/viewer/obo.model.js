@@ -332,6 +332,9 @@ obo.model = function()
 					killPage('You have already opened this learning object in another viewer window.  Only one viewer window per learning object is allowed open at a time.');
 					// @TODO: send client error
 					break;
+				case 2010: // instance closed
+					view.displayError("The assessment for this object closed on " + obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT.'));
+					break;
 				default:
 					view.displayError(response);
 					break;
@@ -1064,7 +1067,8 @@ obo.model = function()
 	var instanceIsClosed = function()
 	{
 		// must be an instance and between the start and end times
-		return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
+		//return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
+		return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getCorrectedTime();
 	};
 	
 	var currentQuestionIsAlternate = function()

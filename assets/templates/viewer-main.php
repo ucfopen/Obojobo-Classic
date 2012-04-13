@@ -121,9 +121,33 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
     }
   });
 
+
+  function correctTime()
+  {
+    // calculate client/server time difference
+    var now = new Date(); 
+    var clientUTCDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    var serverUTCDate = new Date('<?php $time = date_create('now', timezone_open('UTC')); echo $time->format("D, d M Y G:i:s"); ?>');
+    
+    var clientUTCTimestamp = clientUTCDate.getTime();
+    var serverUTCTimestamp = serverUTCDate.getTime();
+
+    Date.prototype.correctedMS = serverUTCTimestamp - clientUTCTimestamp;
+    Date.prototype.getCorrectedTime = function() {
+      return new Date(this.getTime() + this.correctedMS).getTime();
+    }
+
+    debug.log('server utc       ', serverUTCDate);
+    debug.log('client utc       ', clientUTCDate);
+    debug.log('client           ', now);
+    debug.log('client corrected ', new Date((new Date()).getCorrectedTime()));
+  }
+
   function init()
   {
     $('html').removeClass('older-browser-background');
+
+    correctTime();
 
     var params = {
         loID:'<?php echo(isset($_REQUEST["loID"]) ? $_REQUEST["loID"] : ''); ?>',
@@ -134,7 +158,7 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
     obo.model.load(params, function() {
       obo.view.init($('body'));
     });
-    
+
     document.onkeypress = function(event)
     {
       if(typeof event !== 'undefined' && typeof event.ctrlKey !== 'undefined' && event.ctrlKey && typeof event.keyCode !== 'undefined')
