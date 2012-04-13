@@ -902,6 +902,7 @@ obo.view = function()
 								$('.assessment-missed-section').hide();
 								$('#assessment-info').hide();
 								$('#assessment-info-closed').show();
+								$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
 							}
 							else if(numAttempts === 0)
 							{
@@ -1068,12 +1069,12 @@ obo.view = function()
 
 							// build score table
 							var endDate;
-							for(i in scores)
+							for(var i in scores)
 							{
 								endDate = new Date(scores[i].endTime * 1000);
 								$('#attempt-history').append(
-									'<tr><td>' + (parseInt(i) + 1) + '.</td>' + 
-									'<td>' + scores[i].score + '%</td>' + 
+									'<tr><td>' + (parseInt(i, 10) + 1) + '.</td>' +
+									'<td>' + scores[i].score + '%</td>' +
 									'<td>' + endDate.format('mm/dd/yy - h:MM:ss TT') + '</td></tr>'
 								);
 							}
