@@ -9,12 +9,7 @@ if(!window.obo)
 {
 	window.obo = {};
 }
-/*
-obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [1707, true]], function(event) {
-	debug.log('good job');
-	debug.log(event);
-});
-*/
+
 obo.model = function()
 {
 	var VERIFY_TIME_SECONDS = 30;
@@ -796,10 +791,7 @@ obo.model = function()
 
 	var getViewStatePropertyForPage = function(property, _section, page)
 	{
-		console.log('getViewStatePropertyForPage', property, _section, page);
 		var state = getViewStateForPage(_section, page);
-		console.log(state);
-		console.log(viewState);
 		if(typeof state === 'undefined' || typeof state[property] === 'undefined')
 		{
 			return undefined;
@@ -1717,7 +1709,6 @@ obo.model = function()
 
 		if(mode === 'instance')
 		{
-			alert('trackSubmitQuestion:[' + answerID_or_shortAnswerResponse_or_score + ']');
 			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
 		}
 		
@@ -1736,10 +1727,14 @@ obo.model = function()
 	};
 
 	// use this to submit a question that is not considered 'saved' or 'submitted'
+	// we want to not allow this if the same data is already saved.
 	var submitUnsavedQuestion = function(answerID_or_shortAnswerResponse_or_score)
 	{
-		setViewStatePropertyForPage('answered', false);
-		saveResponse(answerID_or_shortAnswerResponse_or_score);
+		if(getPreviousResponse() != answerID_or_shortAnswerResponse_or_score)
+		{
+			setViewStatePropertyForPage('answered', false);
+			saveResponse(answerID_or_shortAnswerResponse_or_score);
+		}
 	}
 
 	// for preview mode this removes all alt responses for a given question index 

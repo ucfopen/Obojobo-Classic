@@ -63,13 +63,7 @@
 
 					if(event.keyCode == 13) //enter
 					{
-						console.log('save via 13');
 						methods._save();
-					}
-					else if(event.keyCode == 27) //esc
-					{
-						console.log('you press esc?');
-						methods._revert();
 					}
 					else
 					{
@@ -84,7 +78,10 @@
 					methods._updateButton();
 				})
 				.blur(function(event) {
-					methods._update();
+					if(typeof lastSaved === 'undefined' || lastSaved !== methods.getText())
+					{
+						methods._update();
+					}
 				});
 			if(typeof elements.$button !== 'undefined')
 			{
@@ -93,7 +90,6 @@
 
 					if(!$(event.target).hasClass('disabled'))
 					{
-						console.log('save via click');
 						methods._save();
 					}
 				});
@@ -114,7 +110,6 @@
 			{
 				savedAnswer = false;
 			}
-			console.log('setText', s, savedAnswer);
 
 			var newText = $.trim(s.toLowerCase());
 			elements.$input.val(newText);
@@ -191,8 +186,6 @@
 
 		_save: function(force)
 		{
-			console.log('qa-form::save', force);
-
 			if(typeof force === 'undefined')
 			{
 				force = false;
@@ -212,7 +205,6 @@
 					lastSaved = s;
 				}
 
-				console.log('qa-form trigger save');
 				unsavedChanges = false;
 				elements.$container.trigger('save', [s, saved]);
 
@@ -222,11 +214,7 @@
 
 		_update: function()
 		{
-			var s = methods.getText();
-			if(s !== lastSaved)
-			{
-				elements.$container.trigger('update', s);
-			}
+			elements.$container.trigger('update', methods.getText());
 		},
 
 		_responseIsEmpty: function()
@@ -236,28 +224,20 @@
 
 		_revert: function()
 		{
-			console.log('revert ', lastSaved, ',', methods.getText());
-			console.log(typeof lastSaved);
-			console.log(methods.getText() !== lastSaved);
-			if(typeof lastSaved !== 'undefined' && methods.getText() !== lastSaved)
-			//if(typeof lastSaved !== 'undefined')
+			if(typeof lastSaved !== 'undefined')
 			{
-				console.log('revert 2');
+				methods._update();
 				methods.setText(lastSaved);
-				console.log('save via revert');
-				methods._save(true);
+				methods._update();
 			}
 		},
 
 		// enable or disable the 'check answer' button
 		_updateButton: function(buttonState)
 		{
-			console.log('updateButton', buttonState);
 			if(typeof elements.$button !== 'undefined')
 			{
 				var s = methods.getText();
-
-				console.log(buttonState, methods._isShowingFeedback(), methods._responseIsEmpty(), s === lastSaved, unsavedChanges);
 
 				var newButtonState;
 				if(typeof buttonState !== 'undefined')
@@ -266,7 +246,6 @@
 				}
 				else
 				{
-					//if(methods._isShowingFeedback() || !methods._responseIsEmpty() || s === lastSaved)
 					if(methods._responseIsEmpty() || !unsavedChanges)
 					{
 						newButtonState = 'disabled';
@@ -279,14 +258,12 @@
 
 				if(newButtonState == 'disabled')
 				{
-					console.log('disablin');
 					elements.$button
 						.addClass('disabled')
 						.html(s === '' ? UNSAVED_BUTTON_LABEL : SAVED_BUTTON_LABEL);
 				}
 				else
 				{
-					console.log('enablin');
 					elements.$button
 						.removeClass('disabled')
 						.html(UNSAVED_BUTTON_LABEL);
