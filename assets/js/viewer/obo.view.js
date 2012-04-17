@@ -1253,7 +1253,6 @@ obo.view = function()
 						$form.qaForm(qaFormSettings);
 						$form
 							.bind('save', function(event, answerText, saved) {
-								console.log('view save', answerText, saved);
 								markSubnavItem(obo.model.getSection(), obo.model.getPage(), 'answered');
 
 								if(saved === true)
@@ -1898,8 +1897,6 @@ obo.view = function()
 	//@remove
 	var setPageAsVisited = function(section, pageNumber)
 	{
-		console.log('setPageAsVisited', section, pageNumber);
-		console.log(viewState);
 		if(!isNaN(pageNumber))
 		{
 			var item = viewState[section][pageNumber - 1];
