@@ -8,10 +8,12 @@ if(!window.obo)
 obo.dialog = function()
 {
 	var HIDE_SWF_INTERVAL_SECONDS = 1;
+	var MAX_TICKS = 10;
 
 	var hideSwfIntervalID = undefined;
 	var tabPlace;
 	var tabArray = [];
+	var ticks;
 	
 	var closeDialogs = function()
 	{
@@ -27,6 +29,7 @@ obo.dialog = function()
 	{
 		obo.view.hideSWFs();
 		tabPlace = 0;
+		ticks = 0;
 		
 		// defaults:
 		options.activelyHideSWFs = typeof options.activelyHideSWFs === 'undefined' ? true : options.activelyHideSWFs;
@@ -150,7 +153,17 @@ obo.dialog = function()
 		// we start a timer to prevent swf content from popping up over our dialogs
 		if(typeof hideSwfIntervalID === 'undefined' && options.activelyHideSWFs)
 		{
-			hideSwfIntervalID = setInterval(obo.view.rehideSWFs, HIDE_SWF_INTERVAL_SECONDS * 1000);
+			hideSwfIntervalID = setInterval(function() {
+				ticks++;
+				if(ticks > MAX_TICKS)
+				{
+					clearInterval(hideSwfIntervalID);
+				}
+				else
+				{
+					obo.view.rehideSWFs();
+				}
+			}, HIDE_SWF_INTERVAL_SECONDS * 1000);
 		}
 		else if(typeof hideSwfIntervalID !== 'undefined' && !options.activelyHideSWFs)
 		{
