@@ -129,8 +129,8 @@ function initLoginScreen()
 
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
 					
-	<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3> 
-	<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3> 
+				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3> 
+				<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3> 
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">
