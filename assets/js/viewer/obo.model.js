@@ -1115,6 +1115,7 @@ obo.model = function()
 			(lo.instanceData.allowScoreImport === '1' || lo.instanceData.allowScoreImport === 1) &&
 			scores.length === 0 &&
 			typeof lo.equivalentAttempt !== 'undefined' &&
+			lo.equivalentAttempt !== null &&
 			typeof lo.equivalentAttempt.score !== 'undefined' &&
 			parseFloat(lo.equivalentAttempt.score) > 0)
 		{
