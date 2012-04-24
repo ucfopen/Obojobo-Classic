@@ -18,7 +18,7 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
   
   <!-- DEV JAVASCRIPT LIBRARIES -->
-  <script type="text/javascript" src="/assets/js/jquery-1.7.1.js"></script>
+  <script type="text/javascript" src="/assets/js/jquery.js"></script>
   <script type="text/javascript" src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
   <script type="text/javascript" src="/assets/js/modernizr.js"></script>
   <script type="text/javascript" src="/assets/js/date.format.js"></script>
