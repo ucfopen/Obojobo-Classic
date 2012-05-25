@@ -18,7 +18,7 @@
   }
 </style>
 <script type="text/javascript">
-  var SWF_URL = "Repository_2_0_5.swf";
+  var SWF_URL = "Repository_2_0_6.swf";
 
   // START PREVENT CLOSE
   window.onbeforeunload = confirmExit;
