@@ -540,6 +540,7 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 	
+	//@TODO: Change the name of this to 'createCopy' or 'createDuplicate'
 	public function createDerivative($loID)
 	{
 		if($this->getSessionValid())
