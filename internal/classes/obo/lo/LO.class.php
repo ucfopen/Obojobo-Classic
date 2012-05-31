@@ -13,6 +13,7 @@ class LO
 {
 	const DRAFT = 'newDraft';
 	const MASTER = 'master';
+	//@TODO: Change the name of this to 'copy'
 	const DERIVATIVE = 'derivative';
 	
 	public $loID;				//Number:  database id
@@ -363,9 +364,19 @@ class LO
 				 ***********************************************************/
 				
 				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
-				if($this->isValidMaster(true) !== true) return \rocketD\util\Error::getError(2); // Validate
+				//if($this->subVersion != 0 || $this->isValidMaster(true) !== true) return \rocketD\util\Error::getError(2); // Validate
 
-				$this->parentID = $this->loID; // link parent to previous root id (only case where a 1.0 object has a parent id)
+				// if we are making a derivative from a draft then we don't care about it's parent.
+				// otherwise a problem arises where you could delete a draft which is the parent of a
+				// derivative which will break the parent/child relationship.
+				if($this->subVersion == 0)
+				{
+					$this->parentID = $this->loID; // link parent to previous root id (only case where a 1.0 object has a parent id)
+				}
+				else
+				{
+					$this->parentID = 0;
+				}
 				$this->loID = 0;// force it to save a copy
 				$this->version = 0; // reset
 				$this->subVersion = 1; // reset
