@@ -66,7 +66,7 @@ td { font-size:12px; color:#000000; font-family:arial; } a { color:#FF0000;}
 <table align="center" border="0" cellspacing="0" cellpadding="0" style="background-color:#FF4748;margin-top:10px;">
 	<tr >
 		<td align="center" style="color:#FFF;font-size:17px;padding:10px;">
-			Your have {$attemptsRemaining} attempt{if $attemptsRemaining > 1}s{/if} left:
+			You have {$attemptsRemaining} attempt{if $attemptsRemaining > 1}s{/if} left:
 		</td>
 		<td style="">
 			<a href="{$loLink}"><img src="{$imgDir}score-confirm-start-now.png" width="206" height="54" alt="Start Now"></a>
