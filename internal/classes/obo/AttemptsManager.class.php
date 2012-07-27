@@ -548,6 +548,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 					return false;
 				}
 			}
+
+			\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
 			
 			return true;
 		}
@@ -593,6 +595,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		}
 		else
 		{
+			\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
 			return true;
 		}
 	}
