@@ -81,7 +81,7 @@ class CharsetHandler
 	 *
 	 * @param string $location One of "none", "iconv", "mbstring", "recode"
 	 */
-	function getMethod($val=NULL)
+	static function getMethod($val=NULL)
 	{
 		static $method = 0;
 		if($val != NULL)
@@ -95,11 +95,11 @@ class CharsetHandler
 		return $method;
 	}
 	
-	function setMethod($val=0){
+	static function setMethod($val=0){
 		return CharsetHandler::getMethod($val);
 	}
 
-	function getPhpCharset($val=NULL)
+	static function getPhpCharset($val=NULL)
 	{
 		static $phpCharset = 0;
 		if($val != NULL)
@@ -109,11 +109,11 @@ class CharsetHandler
 		return $phpCharset;
 	}
 	
-	function setPhpCharset($val=0){
+	static function setPhpCharset($val=0){
 		return CharsetHandler::getPhpCharset($val);
 	}
 	
-	function getSqlCharset($val=NULL)
+	static function getSqlCharset($val=NULL)
 	{
 		static $sqlCharset = 0;
 		if($val != NULL)
@@ -123,7 +123,7 @@ class CharsetHandler
 		return $sqlCharset;
 	}
 	
-	function setSqlCharset($val=0){
+	static function setSqlCharset($val=0){
 		return CharsetHandler::getSqlCharset($val);
 	}
 }
