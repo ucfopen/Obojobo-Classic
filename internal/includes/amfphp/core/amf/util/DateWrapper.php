@@ -62,7 +62,7 @@ class DateWrapper
 	/**
 	 * Get timezone
 	 */
-	function getTimezone($val=NULL)
+	static function getTimezone($val=NULL)
 	{
 		static $timezone = 0;
 		if($val != NULL)
@@ -75,7 +75,7 @@ class DateWrapper
 	/**
 	 * Set timezone
 	 */
-	function setTimezone($val=0){
+	static function setTimezone($val=0){
 		return DateWrapper::getTimezone($val);
 	}
 } 

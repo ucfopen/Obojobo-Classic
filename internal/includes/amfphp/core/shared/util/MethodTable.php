@@ -50,7 +50,7 @@ class MethodTable
 	 *        May also simply be __FILE__
 	 * @param $servicePath(String) The location of the classes (optional)
 	 */
-	function create($className, $servicePath = NULL, &$classComment){
+	static function create($className, $servicePath = NULL, &$classComment){
 		
 		$methodTable = array();
 		if(file_exists($className))
@@ -140,7 +140,7 @@ class MethodTable
 		return $methodTable;
 	}
 	
-	function getClassMethodsReflection($sourcePath, $className, & $classComment)
+	static function getClassMethodsReflection($sourcePath, $className, & $classComment)
 	{
 		//Include the class in question
 		$dir = dirname($sourcePath);
@@ -215,7 +215,7 @@ class MethodTable
 		return $methodTable;
 	}
 	
-	function getClassMethodsTokenizer($sourcePath, $className, & $classComment)
+	static function getClassMethodsTokenizer($sourcePath, $className, & $classComment)
 	{
 		$source = file_get_contents($sourcePath);
 		$tokens = token_get_all($source);
@@ -350,7 +350,7 @@ class MethodTable
 	/**
 	 * 
 	 */
-	function getMethodCommentArguments($comment)
+	static function getMethodCommentArguments($comment)
 	{
 		$pieces = explode('@param', $comment);
 		$args = array();
@@ -375,7 +375,7 @@ class MethodTable
 	 * @private
 	 * @param $comment(String) The method's comment.
 	 */
-	function getMethodDescription($comment){
+	static function getMethodDescription($comment){
 		$comment = MethodTable::cleanComment(strrstr($comment, "@"));
 		return trim($comment);
 	}
@@ -389,7 +389,7 @@ class MethodTable
 	 * @param $comment(String) The method's comment.
 	 * @param $attribute(String) The name of the attribute to get its value from.
 	 */
-	function getMethodCommentAttribute($comment, $attribute){
+	static function getMethodCommentAttribute($comment, $attribute){
 		$pieces = strstrafter($comment, '@' . $attribute);
 		if($pieces !== FALSE)
 		{
@@ -408,7 +408,7 @@ class MethodTable
 	 * @param $comment(String) The method's comment.
 	 * @param $attribute(String) The name of the attribute to get its value from.
 	 */
-	function getMethodCommentAttributeFirstLine($comment, $attribute){
+	static function getMethodCommentAttributeFirstLine($comment, $attribute){
 		$pieces = strstrafter($comment, '@' . $attribute);
 		if($pieces !== FALSE)
 		{
@@ -424,7 +424,7 @@ class MethodTable
 		return "";
 	}
 	
-	function getMethodCommentAttributeFirstWord($comment, $attribute){
+	static function getMethodCommentAttributeFirstWord($comment, $attribute){
 		$pieces = strstrafter($comment, '@' . $attribute);
 		if($pieces !== FALSE)
 		{
@@ -441,7 +441,7 @@ class MethodTable
 	 * @access private
 	 * @param $methodSignature (String)The method's signatureg;
 	 */
-	function getMethodArguments($methodSignature, $commentParams){
+	static function getMethodArguments($methodSignature, $commentParams){
 		if(strlen($methodSignature) < 2){
 			//no arguments, return an empty array
 			$result = array();
@@ -463,7 +463,7 @@ class MethodTable
 	 * @access private
 	 * @param $args(Array) The "dirty" array with arguments.
 	 */
-	function cleanArguments($args, $commentParams){
+	static function cleanArguments($args, $commentParams){
 		$result = array();
 		
 		foreach($args as $index => $arg){
@@ -497,7 +497,7 @@ class MethodTable
 	 * @private
 	 * @param $comment(String) The method's comment.
 	 */
-	function cleanComment($comment){
+	static function cleanComment($comment){
 		$comment = str_replace("/**", "", $comment);
 		$comment = str_replace("*/", "", $comment);
 		$comment = str_replace("*", "", $comment);
@@ -513,7 +513,7 @@ class MethodTable
 	/**
 	 *
 	 */
-	function showCode($methodTable){
+	static function showCode($methodTable){
 		
 
 		foreach($methodTable as $methodName=>$methodProps){

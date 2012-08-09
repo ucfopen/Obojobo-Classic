@@ -82,7 +82,7 @@ class MessageException {
 		}
 	} 
 	
-	function getFriendlyError ($err) {
+	static function getFriendlyError ($err) {
 		$errortype = array (1 => "Error",
 			2 => "Warning",
 			4 => "Parsing Error",
