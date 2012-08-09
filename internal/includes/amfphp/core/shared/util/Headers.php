@@ -13,7 +13,7 @@
 
 class Headers 
 {   
-	function setHeader($key=NULL, $val=NULL)
+	static function setHeader($key=NULL, $val=NULL)
 	{
 		static $headers = array();
 		if($val !== NULL)
@@ -23,7 +23,7 @@ class Headers
 		return $headers[$key];
 	}
 	
-	function getHeader($key)
+	static function getHeader($key)
 	{
 		return Headers::setHeader($key);
 	}

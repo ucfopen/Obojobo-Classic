@@ -37,7 +37,7 @@ class AMFSerializer extends AMFBaseSerializer {
 	 * @param object $stream The AMFOutputStream
 	 */
 	function AMFSerializer() {
-		AMFBaseSerializer::AMFBaseSerializer();
+		parent::AMFBaseSerializer();
 	} 
 
 	/**

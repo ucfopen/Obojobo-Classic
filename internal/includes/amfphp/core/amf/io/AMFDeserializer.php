@@ -106,7 +106,7 @@ class AMFDeserializer extends AMFBaseDeserializer {
 	 * @param object $is The referenced input stream
 	 */
 	function AMFDeserializer($rd) {
-		AMFBaseDeserializer::AMFBaseDeserializer($rd);
+		parent::AMFBaseDeserializer($rd);
 	} 
 
 	/**
