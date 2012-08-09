@@ -466,11 +466,13 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	 */
 	public function getAssessmentScores($instID, $userID)
 	{
-		if(($loID = \obo\lo\InstanceManager::getLOID($instID)) == false) // if instanceof Error
+		$instm = \obo\lo\InstanceManager::getInstance();
+		if(($loID = $instm->getLOID($instID)) == false) // if instanceof Error
 		{
 			return $loID; // error
 		}
-		if(($aGroup = \obo\lo\LOManager::getAssessmentID($loID)) == false) // if instanceof Error
+		$lom = \obo\lo\LOManager::getInstance();
+ 		if(($aGroup = $lom->getAssessmentID($loID)) == false) // if instanceof Error
 		{
 			return $aGroup; // error
 		}
