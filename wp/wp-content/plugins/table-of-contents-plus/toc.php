@@ -1039,7 +1039,7 @@ div#toc_container ul.toc_list a:visited {
 		}
 		
 		
-		private function build_hierarchy( &$matches )
+		private function build_hierarchy( $matches )
 		{
 			$current_depth = 100;	// headings can't be larger than h6 but 100 as a default to be sure
 			$html = '';
