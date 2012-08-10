@@ -17,6 +17,9 @@ div.tab_content ul li {
 div.tab_content ol li {
 	list-style: inherit;
 }
+div.tab_content pre {
+	margin-left: 2em;
+}
 ul#tabbed-nav {
 	margin-top: 1em;
 }
@@ -97,7 +100,8 @@ div.toc_theme_option {
 	padding-left: 15px;
 }
 input#width_custom,
-input#font_size {
+input#font_size,
+input#smooth_scroll_offset {
 	width: 50px;
 	text-align: center;
 }
