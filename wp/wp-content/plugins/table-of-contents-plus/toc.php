@@ -1208,7 +1208,7 @@ div#toc_container ul.toc_list a:visited {
 
 					// build a hierarchical toc?
 					// we could have tested for $items but that var can be quite large in some cases
-					if ( $this->options['show_heirarchy'] ) $items = $this->build_hierarchy( &$matches );
+					if ( $this->options['show_heirarchy'] ) $items = $this->build_hierarchy( $matches );
 				}
 			}
 			
@@ -1258,7 +1258,7 @@ div#toc_container ul.toc_list a:visited {
 
 			if ( $this->is_eligible($custom_toc_position) ) {
 			
-				$items = $this->extract_headings( &$find, &$replace, $content );
+				$items = $this->extract_headings( $find, $replace, $content );
 
 				if ( $items ) {
 					// do we display the toc within the content or has the user opted
@@ -1393,7 +1393,7 @@ if ( !class_exists( 'toc_widget' ) ) :
 				
 				extract( $args );
 				
-				$items = $tic->extract_headings( &$find, &$replace, $post->post_content );
+				$items = $tic->extract_headings( $find, $replace, $post->post_content );
 				$title = apply_filters('widget_title', $instance['title'] );
 				$hide_inline = $toc_options['show_toc_in_widget_only'];
 				
