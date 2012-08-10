@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	$('.tab_content, #toc_advanced_usage, #sitemap_advanced_usage, div.more_toc_options.disabled').hide();
+	$('.tab_content, #toc_advanced_usage, #sitemap_advanced_usage, div.more_toc_options.disabled, tr.disabled').hide();
 	$('ul#tabbed-nav li:first').addClass('active').show(); // show first tab
 	$('.tab_content:first').show(); // show first tab content
 
@@ -26,6 +26,10 @@ jQuery(document).ready(function($) {
 		$(this).siblings('div.more_toc_options').toggle('fast');
 	});
 	
+	$('input#smooth_scroll').click(function() {
+		$('#smooth_scroll_offset_tr').toggle('fast');
+	});
+	
 	$('input[name="theme"]').click(function() {
 		// check custom theme selection
 		if ( $(this).val() == 100 ) {
@@ -44,7 +48,7 @@ jQuery(document).ready(function($) {
 		else
 			$(this).siblings('div.more_toc_options').hide('fast');
 	});
-	$('input#width_custom, input#font_size').keyup(function() {
+	$('input#width_custom, input#font_size, input#smooth_scroll_offset').keyup(function() {
 		var value = $(this).val();
 		$(this).val( value.replace(/[^0-9\.]/, '') );
 	});

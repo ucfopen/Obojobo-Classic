@@ -1,39 +1,24 @@
 <?php
 /*
-Plugin Name: Page-list
+Plugin Name: [pagelist]
 Plugin URI: http://web-profile.com.ua/wordpress/plugins/page-list/
-Description: Show list of pages with [pagelist], [subpages], [siblings] and [pagelist_ext] shortcodes.
-Version: 2.2
+Description: [pagelist], [subpages], [siblings] and [pagelist_ext] shortcodes
+Version: 3.7
 Author: webvitaly
 Author Email: webvitaly(at)gmail.com
 Author URI: http://web-profile.com.ua/wordpress/
-
-Future features:
-- exclude_by_alias;
-- exclude_front_page;
-- exclude_post_page;
 */
 
-add_action('wp_print_styles', 'page_list_add_stylesheet');
-function page_list_add_stylesheet() {
-	wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '2.2', 'all' );
+add_action('wp_print_styles', 'pagelist_add_stylesheet');
+function pagelist_add_stylesheet() {
+	wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '3.7', 'all' );
 }
 
-if ( !function_exists('pagelist_norm_params') ) {
-	function pagelist_norm_params( $str ) {
-		global $post;
-		$new_str = $str;
-		$new_str = str_replace('this', $post->ID, $new_str); // exclude this page
-		$new_str = str_replace('current', $post->ID, $new_str); // exclude current page
-		$new_str = str_replace('curent', $post->ID, $new_str); // exclude curent page with mistake
-		$new_str = str_replace('parent', $post->post_parent, $new_str); // exclude parent page
-		return $new_str;
-	}
-}
+$pagelist_powered_line = "\n".'<!-- Page-list plugin v.3.7 (wordpress.org/extend/plugins/page-list/) -->'."\n";
 
 if ( !function_exists('pagelist_shortcode') ) {
 	function pagelist_shortcode( $atts ) {
-		global $post;
+		global $post, $pagelist_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -53,7 +38,7 @@ if ( !function_exists('pagelist_shortcode') ) {
 			'link_after' => '',
 			'class' => ''
 		), $atts ) );
-		
+
 		$page_list_args = array(
 			'depth'        => $depth,
 			'child_of'     => pagelist_norm_params($child_of),
@@ -76,9 +61,9 @@ if ( !function_exists('pagelist_shortcode') ) {
 			'walker' => ''
 		);
 		$list_pages = wp_list_pages( $page_list_args );
-		
+
 		if ($list_pages) {
-			$return = "\n".'<!-- powered by Page-list plugin ver.2.2 (wordpress.org/extend/plugins/page-list/) -->'."\n";
+			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
 			$return = '';
@@ -93,7 +78,7 @@ if ( !function_exists('pagelist_shortcode') ) {
 
 if ( !function_exists('subpages_shortcode') ) {
 	function subpages_shortcode( $atts ) {
-		global $post;
+		global $post, $pagelist_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -113,7 +98,7 @@ if ( !function_exists('subpages_shortcode') ) {
 			'link_after' => '',
 			'class' => ''
 		), $atts ) );
-		
+
 		$page_list_args = array(
 			'depth'        => $depth,
 			'child_of'     => $post->ID,
@@ -136,9 +121,9 @@ if ( !function_exists('subpages_shortcode') ) {
 			'walker' => ''
 		);
 		$list_pages = wp_list_pages( $page_list_args );
-		
+
 		if ($list_pages) {
-			$return = "\n".'<!-- powered by Page-list plugin ver.2.2 (wordpress.org/extend/plugins/page-list/) -->'."\n";
+			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list subpages-page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
 			$return = '';
@@ -153,7 +138,7 @@ if ( !function_exists('subpages_shortcode') ) {
 
 if ( !function_exists('siblings_shortcode') ) {
 	function siblings_shortcode( $atts ) {
-		global $post;
+		global $post, $pagelist_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -173,11 +158,11 @@ if ( !function_exists('siblings_shortcode') ) {
 			'link_after' => '',
 			'class' => ''
 		), $atts ) );
-		
+
 		if( $exclude == 'current' || $exclude == 'this' ){
 			$exclude = $post->ID;
 		}
-		
+
 		$page_list_args = array(
 			'depth'        => $depth,
 			'child_of'     => $post->post_parent,
@@ -200,9 +185,9 @@ if ( !function_exists('siblings_shortcode') ) {
 			'walker' => ''
 		);
 		$list_pages = wp_list_pages( $page_list_args );
-		
+
 		if ($list_pages) {
-			$return = "\n".'<!-- powered by Page-list plugin ver.2.2 (wordpress.org/extend/plugins/page-list/) -->'."\n";
+			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list siblings-page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
 			$return = '';
@@ -214,16 +199,18 @@ if ( !function_exists('siblings_shortcode') ) {
 
 if ( !function_exists('pagelist_ext_shortcode') ) {
 	function pagelist_ext_shortcode( $atts ) {
-		global $post;
+		global $post, $pagelist_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'show_image' => 1,
+			'show_first_image' => 0,
 			'show_title' => 1,
 			'show_content' => 1,
+			'more_tag' => 1,
 			'limit_content' => 250,
 			'image_width' => '50',
 			'image_height' => '50',
-			'child_of' => '0',
+			'child_of' => '',
 			'sort_order' => 'ASC',
 			'sort_column' => 'menu_order, post_title',
 			'hierarchical' => 1,
@@ -240,20 +227,23 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'post_status' => 'publish',
 			'class' => '',
 			'strip_tags' => 1,
+			'strip_shortcodes' => 1,
 			'show_child_count' => 0,
 			'child_count_template' => 'Subpages: %child_count%',
 			'show_meta_key' => '',
 			'meta_template' => '%meta%'
 		), $atts ) );
-		
-		if( $child_of == '0' ){
+
+		if( $child_of == '' ){ // show subpages if child_of is empty 
 			$child_of = $post->ID;
 		}
-		
+
 		$page_list_ext_args = array(
 			'show_image' => $show_image,
+			'show_first_image' => $show_first_image,
 			'show_title' => $show_title,
 			'show_content' => $show_content,
+			'more_tag' => $more_tag,
 			'limit_content' => $limit_content,
 			'image_width' => $image_width,
 			'image_height' => $image_height,
@@ -266,7 +256,7 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'meta_key'     => $meta_key,
 			'meta_value'   => $meta_value,
 			'authors' => $authors,
-			'parent' => $parent,
+			'parent' => pagelist_norm_params($parent),
 			'exclude_tree' => $exclude_tree,
 			'number' => '', // $number - own counter
 			'offset' => 0, // $offset - own offset
@@ -274,6 +264,7 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'post_status' => $post_status,
 			'class' => $class,
 			'strip_tags' => $strip_tags,
+			'strip_shortcodes' => $strip_shortcodes,
 			'show_child_count' => $show_child_count,
 			'child_count_template' => $child_count_template,
 			'show_meta_key' => $show_meta_key,
@@ -296,20 +287,58 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 					if( $show_image == 1 ){
 						if (function_exists('get_the_post_thumbnail')) {
 							if( get_the_post_thumbnail($page->ID) ){
-								$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.$page->post_title.'">';
+								$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
 								$list_pages_html .= get_the_post_thumbnail($page->ID, array($image_width,$image_height));
 								$list_pages_html .= '</a></div> ';
+							}else{
+								if( $show_first_image == 1 ){
+									$img_scr = page_list_get_first_image( $page->post_content );
+									if( !empty( $img_scr ) ){
+										$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
+										$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+										$list_pages_html .= '</a></div> ';
+									}
+								}
+							}
+						}else{
+							if( $show_first_image == 1 ){
+								$img_scr = page_list_get_first_image( $page->post_content );
+								if( !empty( $img_scr ) ){
+									$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
+									$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+									$list_pages_html .= '</a></div> ';
+								}
 							}
 						}
 					}
+
+
 					if( $show_title == 1 ){
-						$list_pages_html .= '<h3 class="page-list-ext-title"><a href="'.$link.'" title="'.$page->post_title.'">'.$page->post_title.'</a></h3>';
+						$list_pages_html .= '<h3 class="page-list-ext-title"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">'.$page->post_title.'</a></h3>';
 					}
 					if( $show_content == 1 ){
 						//$content = apply_filters('the_content', $page->post_content);
-						//$content = str_replace(']]>', ']]&gt;', $content);
-						$content = page_list_parse_content( $page->post_content, $limit_content, $strip_tags );
+						//$content = str_replace(']]>', ']]&gt;', $content); // both used in default the_content() function
+
+						if( !empty( $page->post_excerpt ) ){
+							$text_content = $page->post_excerpt;
+						}else{
+							$text_content = $page->post_content;
+						}
+
+						if ( post_password_required($page) ) {
+							$content = '<!-- password protected -->';
+						}else{
+							$content = page_list_parse_content( $text_content, $limit_content, $strip_tags, $strip_shortcodes, $more_tag );
+							$content = do_shortcode( $content );
+							
+							if( $show_title == 0 ){ // make content as a link if there is no title
+								$content = '<a href="'.$link.'">'.$content.'</a>';
+							}
+						}
+
 						$list_pages_html .= '<div class="page-list-ext-item-content">'.$content.'</div>';
+
 					}
 					if( $show_child_count == 1 ){
 						$count_subpages = count(get_pages("child_of=".$page->ID));
@@ -342,7 +371,7 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			}
 		}
 		if ($list_pages_html) {
-			$return = "\n".'<!-- powered by Page-list plugin ver.2.2 (wordpress.org/extend/plugins/page-list/) -->'."\n";
+			$return = $pagelist_powered_line;
 			$return .= '<div class="page-list page-list-ext '.$class.'">'."\n".$list_pages_html."\n".'</div>';
 		}else{
 			$return = '';
@@ -352,36 +381,86 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 	add_shortcode( 'pagelist_ext', 'pagelist_ext_shortcode' );
 }
 
+if ( !function_exists('pagelist_norm_params') ) {
+	function pagelist_norm_params( $str ) {
+		global $post;
+		$new_str = $str;
+		$new_str = str_replace('this', $post->ID, $new_str); // exclude this page
+		$new_str = str_replace('current', $post->ID, $new_str); // exclude current page
+		$new_str = str_replace('curent', $post->ID, $new_str); // exclude curent page with mistake
+		$new_str = str_replace('parent', $post->post_parent, $new_str); // exclude parent page
+		return $new_str;
+	}
+}
 
 if ( !function_exists('page_list_parse_content') ) {
-	function page_list_parse_content($content, $limit_content = 250, $strip_tags = 1) {
-		$output = '';
-		if ( preg_match('/<!--more(.*?)?-->/', $content, $matches) ) {
-			$content = explode($matches[0], $content, 2);
-			
-		} else {
-			if( $strip_tags ){
-				$content_stripped = strip_tags($content); // ,'<p>'
-			}else{
-				$content_stripped = $content;
+	function page_list_parse_content($content, $limit_content = 250, $strip_tags = 1, $strip_shortcodes = 1, $more_tag = 1) {
+
+		$more_tag_found = 0;
+		$content_before_more_tag_length = 0;
+
+		if( $more_tag ){ // "more_tag" have higher priority than "limit_content"
+			if ( preg_match('/<!--more(.*?)?-->/', $content, $matches) ) {
+				$more_tag_found = 1;
+				$more_tag = $matches[0];
+				$content_temp = explode($matches[0], $content);
+				$content_temp = $content_temp[0];
+				$content_before_more_tag_length = strlen($content_temp);
+				$content = substr_replace($content, '###more###', $content_before_more_tag_length, 0);
 			}
-			
-			if( strlen($content_stripped) > $limit_content ){
-				$pos = strpos($content_stripped, ' ', $limit_content);
+		}
+
+		// replace php and comments tags so they do not get stripped
+		//$content = preg_replace("@<\?@", "#?#", $content);
+		//$content = preg_replace("@<!--@", "#!--#", $content); // save html comments
+		// strip tags normally
+		//$content = strip_tags($content);
+		if( $strip_tags ){
+			$content = str_replace('</', ' </', $content); // <p>line1</p><p>line2</p> - adding space between lines
+			$content = strip_tags($content); // ,'<p>'
+		}
+		// return php and comments tags to their origial form
+		//$content = preg_replace("@#\?#@", "<?", $content);
+		//$content = preg_replace("@#!--#@", "<!--", $content);
+
+		if( $strip_shortcodes ){
+			$content = strip_shortcodes( $content );
+		}
+
+		if( $more_tag && $more_tag_found ){ // "more_tag" have higher priority than "limit_content"
+			$fake_more_pos = mb_strpos($content, '###more###', 0, 'UTF-8');
+			if( $fake_more_pos === false ) {
+				// substring not found in string and this is strange :)
+			} else {
+				$content = mb_substr($content, 0, $fake_more_pos, 'UTF-8');
+			}
+		}else{
+			if( strlen($content) > $limit_content ){ // limiting content
+				$pos = strpos($content, ' ', $limit_content); // find first space position
 				if ($pos !== false) {
 					$first_space_pos = $pos;
 				}else{
 					$first_space_pos = $limit_content;
 				}
-				$content_cut = mb_substr($content_stripped, 0, $first_space_pos,'UTF-8');
-				$content = $content_cut.'...';
-			}else{
-				$content = $content_stripped;
+				$content = mb_substr($content, 0, $first_space_pos, 'UTF-8') . '...';
 			}
-			$content = array($content);
 		}
-		$output .= $content[0];
-		$output = force_balance_tags($output);
+
+		$output = force_balance_tags($content);
 		return $output;
+	}
+}
+
+if ( !function_exists('page_list_get_first_image') ) {
+	function page_list_get_first_image( $content='' ) {
+		$first_img = '';
+		//ob_start();
+		//ob_end_clean();
+		$output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $content, $matches);
+		$first_img = $matches[1][0];
+		if(empty($first_img)){ // no image found
+			$first_img = '';
+		}
+		return $first_img;
 	}
 }

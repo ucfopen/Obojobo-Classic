@@ -1,0 +1,649 @@
+# Copyright (C) 2012 
+# This file is distributed under the same license as the  package.
+msgid ""
+msgstr ""
+"Project-Id-Version:  \n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/table-of-contents-plus\n"
+"POT-Creation-Date: 2012-08-01 13:02:20+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: toc.php:169
+msgid "Settings"
+msgstr ""
+
+#: toc.php:339 toc.php:340
+msgid "TOC"
+msgstr ""
+
+#: toc.php:474
+msgid "Options saved."
+msgstr ""
+
+#: toc.php:476
+msgid "Save failed."
+msgstr ""
+
+#: toc.php:488
+msgid "Main Options"
+msgstr ""
+
+#: toc.php:489
+msgid "Sitemap"
+msgstr ""
+
+#: toc.php:490
+msgid "Help"
+msgstr ""
+
+#: toc.php:498
+msgid "Position"
+msgstr ""
+
+#: toc.php:501
+msgid "Before first heading (default)"
+msgstr ""
+
+#: toc.php:502
+msgid "Top"
+msgstr ""
+
+#: toc.php:503
+msgid "Bottom"
+msgstr ""
+
+#: toc.php:508
+msgid "Show when"
+msgstr ""
+
+#: toc.php:518
+msgid "or more headings are present"
+msgstr ""
+
+#: toc.php:522
+msgid "Auto insert for the following content types"
+msgstr ""
+
+#: toc.php:535
+msgid "Heading text"
+msgstr ""
+
+#: toc.php:537
+msgid "Show title on top of the table of contents"
+msgstr ""
+
+#: toc.php:540
+msgid "Eg: Contents, Table of Contents, Page Contents"
+msgstr ""
+
+#: toc.php:542
+msgid "Allow the user to toggle the visibility of the table of contents"
+msgstr ""
+
+#: toc.php:547
+msgid "Show text"
+msgstr ""
+
+#: toc.php:549
+msgid "Eg: show"
+msgstr ""
+
+#: toc.php:552
+msgid "Hide text"
+msgstr ""
+
+#: toc.php:554
+msgid "Eg: hide"
+msgstr ""
+
+#: toc.php:563
+msgid "Show hierarchy"
+msgstr ""
+
+#: toc.php:567
+msgid "Number list items"
+msgstr ""
+
+#: toc.php:571
+msgid "Enable smooth scroll effect"
+msgstr ""
+
+#: toc.php:572
+msgid "Scroll rather than jump to the anchor link"
+msgstr ""
+
+#: toc.php:577
+msgid "Appearance"
+msgstr ""
+
+#: toc.php:581
+msgid "Width"
+msgstr ""
+
+#: toc.php:584
+msgid "Fixed width"
+msgstr ""
+
+#: toc.php:588
+msgid "(default)"
+msgstr ""
+
+#: toc.php:595
+msgid "Relative"
+msgstr ""
+
+#: toc.php:596
+msgid "Auto"
+msgstr ""
+
+#: toc.php:604
+msgid "Other"
+msgstr ""
+
+#: toc.php:605
+msgid "User defined"
+msgstr ""
+
+#: toc.php:609
+msgid "Please enter a number and"
+msgstr ""
+
+#: toc.php:609
+msgid "select its units, eg: 100px, 10em"
+msgstr ""
+
+#: toc.php:620
+msgid "Wrapping"
+msgstr ""
+
+#: toc.php:623
+msgid "None (default)"
+msgstr ""
+
+#: toc.php:624
+msgid "Left"
+msgstr ""
+
+#: toc.php:625
+msgid "Right"
+msgstr ""
+
+#: toc.php:630
+msgid "Font size"
+msgstr ""
+
+#: toc.php:641
+msgid "Presentation"
+msgstr ""
+
+#: toc.php:644
+msgid "Grey (default)"
+msgstr ""
+
+#: toc.php:649
+msgid "Light blue"
+msgstr ""
+
+#: toc.php:654
+msgid "White"
+msgstr ""
+
+#: toc.php:659
+msgid "Black"
+msgstr ""
+
+#: toc.php:664
+msgid "Transparent"
+msgstr ""
+
+#: toc.php:669
+msgid "Custom"
+msgstr ""
+
+#: toc.php:679
+msgid "Background"
+msgstr ""
+
+#: toc.php:683
+msgid "Border"
+msgstr ""
+
+#: toc.php:687 toc.php:1498
+msgid "Title"
+msgstr ""
+
+#: toc.php:691
+msgid "Links"
+msgstr ""
+
+#: toc.php:695
+msgid "Links (hover)"
+msgstr ""
+
+#: toc.php:710
+msgid "Leaving the value as"
+msgstr ""
+
+#: toc.php:710
+msgid "will inherit your theme's styles"
+msgstr ""
+
+#: toc.php:715
+msgid "Preserve theme bullets"
+msgstr ""
+
+#: toc.php:716
+msgid ""
+"If your theme includes background images for unordered list elements, enable "
+"this to support them"
+msgstr ""
+
+#: toc.php:721
+msgid "Advanced"
+msgstr ""
+
+#: toc.php:721 toc.php:816
+msgid "show"
+msgstr ""
+
+#: toc.php:723
+msgid "Power options"
+msgstr ""
+
+#: toc.php:727
+msgid "Include homepage"
+msgstr ""
+
+#: toc.php:728
+msgid "Show the table of contents for qualifying items on the homepage"
+msgstr ""
+
+#: toc.php:731
+msgid "Exclude CSS file"
+msgstr ""
+
+#: toc.php:732
+msgid ""
+"Prevent the loading of this plugin's CSS styles. When selected, the "
+"presentation options from above will also be ignored."
+msgstr ""
+
+#: toc.php:735
+msgid "Heading levels"
+msgstr ""
+
+#: toc.php:737
+msgid "Include (or exclude) the following heading levels"
+msgstr ""
+
+#: toc.php:743
+msgid "heading "
+msgstr ""
+
+#: toc.php:749
+msgid "Smooth scroll top offset"
+msgstr ""
+
+#: toc.php:752
+msgid ""
+"If you have a consistent menu across the top of your site, you can adjust "
+"the top offset to stop the headings from appearing underneath the top menu. "
+"A setting of 30 accommodates the WordPress admin bar. This setting appears "
+"after you have enabled smooth scrolling from above."
+msgstr ""
+
+#: toc.php:756
+msgid "Default anchor prefix"
+msgstr ""
+
+#: toc.php:759
+msgid ""
+"Anchor targets are restricted to alphanumeric characters as per HTML "
+"specification (see readme for more detail). The default anchor prefix will "
+"be used when no characters qualify. When left blank, a number will be used "
+"instead."
+msgstr ""
+
+#: toc.php:760
+msgid ""
+"This option normally applies to content written in character sets other than "
+"ASCII."
+msgstr ""
+
+#: toc.php:761
+msgid "Eg: i, toc_index, index, _"
+msgstr ""
+
+#: toc.php:767
+msgid "Usage"
+msgstr ""
+
+#: toc.php:768
+msgid ""
+"If you would like to fully customise the position of the table of contents, "
+"you can use the"
+msgstr ""
+
+#: toc.php:768
+msgid ""
+"shortcode by placing it at the desired position of your post, page or custom "
+"post type. This method allows you to generate the table of contents despite "
+"having auto insertion disabled for its content type. Please visit the help "
+"tab for further information about this shortcode."
+msgstr ""
+
+#: toc.php:776
+msgid "At its simplest, placing"
+msgstr ""
+
+#: toc.php:776
+msgid ""
+"into a page will automatically create a sitemap of all pages and categories. "
+"This also works in a text widget."
+msgstr ""
+
+#: toc.php:780
+msgid "Show page listing"
+msgstr ""
+
+#: toc.php:784
+msgid "Show category listing"
+msgstr ""
+
+#: toc.php:788
+msgid "Heading type"
+msgstr ""
+
+#: toc.php:789
+msgid "Use"
+msgstr ""
+
+#: toc.php:798
+msgid "to print out the titles"
+msgstr ""
+
+#: toc.php:802
+msgid "Pages label"
+msgstr ""
+
+#: toc.php:804
+msgid "Eg: Pages, Page List"
+msgstr ""
+
+#: toc.php:808
+msgid "Categories label"
+msgstr ""
+
+#: toc.php:810
+msgid "Eg: Categories, Category List"
+msgstr ""
+
+#: toc.php:816
+msgid "Advanced usage"
+msgstr ""
+
+#: toc.php:818
+msgid "lets you print out a listing of only pages. Similarly"
+msgstr ""
+
+#: toc.php:818
+msgid ""
+"can be used to print out a category listing. They both can accept a number "
+"of attributes so visit the help tab for more information."
+msgstr ""
+
+#: toc.php:819
+msgid "Examples"
+msgstr ""
+
+#: toc.php:821
+msgid "hides the heading from a category listing"
+msgstr ""
+
+#: toc.php:822
+msgid "Uses h6 to display"
+msgstr ""
+
+#: toc.php:822
+msgid "on a page listing excluding pages with IDs 1 and 15."
+msgstr ""
+
+#: toc.php:830
+msgid "Where's my table of contents?"
+msgstr ""
+
+#: toc.php:831
+msgid ""
+"If you're reading this, then chances are you have successfully installed and "
+"enabled the plugin and you're just wondering why the index isn't appearing "
+"right?  Try the following:"
+msgstr ""
+
+#: toc.php:833
+msgid ""
+"In most cases, the post, page or custom post type has less than the minimum "
+"number of headings. By default, this is set to four so make sure you have at "
+"least four headings within your content. If you want to change this value, "
+"you can find it under 'Main Options' &gt; 'Show when'."
+msgstr ""
+
+#: toc.php:834
+msgid ""
+"Is auto insertion enabled for your content type? By default, only pages are "
+"enabled."
+msgstr ""
+
+#: toc.php:835
+msgid "Have you got"
+msgstr ""
+
+#: toc.php:835
+msgid ""
+"somewhere within the content? This will disable the index for the current "
+"post, page or custom post type."
+msgstr ""
+
+#: toc.php:836
+msgid "If you are using the TOC+ widget, check if you have the"
+msgstr ""
+
+#: toc.php:836 toc.php:1504
+msgid "Show the table of contents only in the sidebar"
+msgstr ""
+
+#: toc.php:836
+msgid ""
+"enabled as this will limit its display to only the sidebar. You can check by "
+"going into Appearance &gt; Widgets."
+msgstr ""
+
+#: toc.php:839
+msgid "How do I stop the table of contents from appearing on a single page?"
+msgstr ""
+
+#: toc.php:840
+msgid "Place the following"
+msgstr ""
+
+#: toc.php:840
+msgid ""
+"anywhere on the page to suppress the table of contents. This is known as a "
+"shortcode and works for posts, pages and custom post types that make use of "
+"the_content()"
+msgstr ""
+
+#: toc.php:842
+msgid ""
+"I've set wrapping to left or right but the headings don't wrap around the "
+"table of contents"
+msgstr ""
+
+#: toc.php:843
+msgid ""
+"This normally occurs when there is a CSS clear directive in or around the "
+"heading specified by the theme author. This directive tells the user agent "
+"to reset the previous wrapping specifications."
+msgstr ""
+
+#: toc.php:844
+msgid ""
+"You can adjust your theme's CSS or try moving the table of contents position "
+"to the top of the page. If you didn't build your theme, I'd highly suggest "
+"you try the"
+msgstr ""
+
+#: toc.php:844
+msgid "if you wish to make CSS changes."
+msgstr ""
+
+#: toc.php:846
+msgid "Why are some headings not included in the table of contents?"
+msgstr ""
+
+#: toc.php:847
+msgid ""
+"First, make sure the title text that isn't appearing in the table of "
+"contents is actually marked up as a heading (eg heading 1 through to 6).  "
+"After verifying that it really is a heading, make sure that there are no "
+"linebreaks or enters from the start to the end of the heading HTML tags.  "
+"Eg, it should not be like the following:"
+msgstr ""
+
+#: toc.php:853
+msgid "Rather, it should be something like:"
+msgstr ""
+
+#: toc.php:858
+msgid "The sitemap uses a strange font disimilar to the rest of the site"
+msgstr ""
+
+#: toc.php:859
+msgid ""
+"No extra styles are created for the sitemap, instead it inherits any styles "
+"you used when adding the shortcode. If you copy and pasted, you probably "
+"also copied the 'code' tags surrounding it so remove them if this is the "
+"case."
+msgstr ""
+
+#: toc.php:860
+msgid ""
+"In most cases, try to have the shortcode on its own line with nothing before "
+"or after the square brackets."
+msgstr ""
+
+#: toc.php:862
+msgid "What were those shortcodes and attributes again?"
+msgstr ""
+
+#: toc.php:863
+msgid ""
+"When attributes are left out for the shortcodes below, they will fallback to "
+"the settings you defined under Settings &gt; TOC+."
+msgstr ""
+
+#: toc.php:867
+msgid "Shortcode"
+msgstr ""
+
+#: toc.php:868
+msgid "Description"
+msgstr ""
+
+#: toc.php:869
+msgid "Attributes"
+msgstr ""
+
+#: toc.php:875
+msgid ""
+"Lets you generate the table of contents at the preferred position. Also "
+"useful for sites that only require a TOC on a small handful of pages."
+msgstr ""
+
+#: toc.php:878
+msgid "text, title of the table of contents"
+msgstr ""
+
+#: toc.php:879
+msgid "true/false, shows or hides the title"
+msgstr ""
+
+#: toc.php:880
+msgid "text, either \"left\" or \"right\""
+msgstr ""
+
+#: toc.php:881
+msgid ""
+"numbers, this lets you select the heading levels you want included in the "
+"table of contents. Separate multiple levels with a comma. Example: include "
+"headings 3, 4 and 5 but exclude the others with"
+msgstr ""
+
+#: toc.php:887
+msgid ""
+"Allows you to disable the table of contents for the current post, page, or "
+"custom post type."
+msgstr ""
+
+#: toc.php:892
+msgid ""
+"Produces a listing of all pages and categories for your site. You can use "
+"this on any post, page or even in a text widget."
+msgstr ""
+
+#: toc.php:897
+msgid "Lets you print out a listing of only pages."
+msgstr ""
+
+#: toc.php:900
+msgid "number between 1 and 6, defines which html heading to use"
+msgstr ""
+
+#: toc.php:901
+msgid "text, title of the list"
+msgstr ""
+
+#: toc.php:902
+msgid "true/false, shows or hides the list heading"
+msgstr ""
+
+#: toc.php:903
+msgid "IDs of the pages or categories you wish to exclude"
+msgstr ""
+
+#: toc.php:909
+msgid "Similar to"
+msgstr ""
+
+#: toc.php:909
+msgid "but for categories."
+msgstr ""
+
+#: toc.php:915
+msgid "I have another question..."
+msgstr ""
+
+#: toc.php:916
+msgid "Visit the"
+msgstr ""
+
+#: toc.php:916
+msgid "plugin homepage"
+msgstr ""
+
+#: toc.php:916
+msgid ""
+"to ask your question - who knows, maybe your question has already been "
+"answered. I'd really like to hear your suggestions if you have any."
+msgstr ""
+
+#: toc.php:922
+msgid "Update Options"
+msgstr ""
+
+#: toc.php:1413
+msgid "Display the table of contents in the sidebar with this widget"
+msgstr ""
