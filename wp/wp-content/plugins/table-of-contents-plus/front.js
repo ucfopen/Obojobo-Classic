@@ -41,11 +41,17 @@ jQuery(document).ready(function($) {
 						target = '';
 				}
 				
+				// check offset setting
+				var offset = -30;
+				if (typeof tocplus != 'undefined')
+					if (typeof tocplus.smooth_scroll_offset != 'undefined')
+						offset = -1 * tocplus.smooth_scroll_offset;
+				
 				if ( target ) {
 					event.preventDefault();
 					$.smoothScroll({
 						scrollTarget: target,
-						offset: -30
+						offset: offset
 					});
 				}
 			}
