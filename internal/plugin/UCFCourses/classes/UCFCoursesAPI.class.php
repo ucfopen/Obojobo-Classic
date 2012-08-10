@@ -143,7 +143,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 			}
 			
 			$courseData->id = $r->{\cfg_plugin_UCFCourses::MAP_SECTION_ID};
-			$coursePlugin->plugin = 'UCFCourses';
+			$courseData->plugin = 'UCFCourses';
 		}
 		else
 		{
