@@ -188,7 +188,6 @@ class LO
 		trace('dbGetInstance');
 		if($this->dbGetFull($DBM, $loID))
 		{
-			trace($this->pGroup);
 			/*
 			if(is_object($this) && is_object($this->pGroup))
 			{

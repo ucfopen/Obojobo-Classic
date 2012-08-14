@@ -34,6 +34,7 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 // logged in, show the viewer
 if($loggedIn === true) 
 {
+  header('X-UA-Compatible: IE=edge');
   include("assets/templates/viewer-main.php");
 }
 

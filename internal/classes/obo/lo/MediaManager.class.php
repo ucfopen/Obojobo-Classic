@@ -179,7 +179,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 	    
 
 	    // TODO: THIS SHOULDNT BE HARD CODED- ANY PLUGIN SHOULD BE ABLE REGISTER FOR THIS EVENT
-	    if($media->itemType == 'kogneato')
+	    /*if($media->itemType == 'kogneato')
 	    {
 			$PM = \rocketD\plugin\PluginManager::getInstance();
 			$result = $PM->callAPI('Kogneato', 'getKogneatoWidgetInfo', $media->url, true);
@@ -199,7 +199,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			$media->meta['widget'] = $result['type'];
 			$media->meta['asVersion'] = 3;
 			$media->meta['container'] = 'flash';
-	    }
+	    }*/
 
 
 		$media->createTime = time();

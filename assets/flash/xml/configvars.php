@@ -63,6 +63,10 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 		<![CDATA[<?php echo \AppCfg::URL_STATUS; ?>]]>
 	</status_url>
 
+	<materia_lti_url>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.'assets/materia.php'; ?>]]>
+	</materia_lti_url>
+
 	<updates_url>
 		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_UPDATES; ?>]]>
 	</updates_url>
