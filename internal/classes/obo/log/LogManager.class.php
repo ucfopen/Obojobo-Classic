@@ -663,7 +663,29 @@ class LogManager extends \rocketD\db\DBEnabled
 	{
 		$this->track(new \obo\log\Trackable('SubmitMedia', 0, 0, $questionID, (int)$score, (int)$qGroupID));
 	}
-	
+
+	public function trackSubmitLTIAssessment($source, $instID, $visitID, $loID, $userID, $qGroupID, $questionID, $score)
+	{
+		$qstr = "
+		INSERT INTO `".\cfg_obo_Track::TABLE."`
+		(	`".\cfg_core_User::ID."`,
+			`".\cfg_obo_Track::TYPE."`,
+			`".\cfg_obo_Track::TIME."`,
+			".\cfg_obo_LO::ID.",
+			`".\cfg_obo_Instance::ID."`,
+			visitID,
+			valueA,
+			valueB,
+			valueC
+		) VALUES ('?', '?', '?', '?', '?', '?', '?', '?', '?')";
+		if(!($q = $this->DBM->querySafe($qstr, $userID, 'SubmitLTI', time(), $loID, $instID, $visitID, $qGroupID, $questionID, $score)))
+		{
+			$this->DBM->rollback();
+			return false;
+		}
+		return true;
+	}
+
 	public function trackPageChanged($pageID, $section)
 	{
 		$this->track(new \obo\log\Trackable('PageChanged', 0, 0, $pageID, $section));

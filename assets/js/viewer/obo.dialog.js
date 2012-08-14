@@ -76,7 +76,8 @@ obo.dialog = function()
 		}
 		var $buttons = $('<div class="dialog-buttons"></div>');
 		var $curButton;
-		for(var i in options.buttons)
+		var len = options.buttons.length;
+		for(var i = 0; i < len; i++)
 		{
 			$curButton = $('<a class="button" role="button" href="#">' + options.buttons[i].label + '</a>');
 			if(typeof options.buttons[i].id !== 'undefined')

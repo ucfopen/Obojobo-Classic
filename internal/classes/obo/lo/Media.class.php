@@ -33,7 +33,7 @@ class Media
 	    if(func_num_args() == 1)
         {
        		$mediaObj = func_get_arg(0);
-       		$this->mediaID = $mediaObj['mediaID'];
+       		$this->mediaID = empty($mediaObj['mediaID']) ? 0 : $mediaObj['mediaID'];
 //			$this->auth = $mediaObj[''];
 			$this->title = $mediaObj['title'];
 			$this->itemType = $mediaObj['itemType'];

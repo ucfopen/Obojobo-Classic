@@ -185,11 +185,11 @@ obo.model = function()
 	// maps to 2, so it's harmless to allow it.
 	var isValidPage = function(_section, page)
 	{
-		if(_section === undefined)
+		if(typeof _section === 'undefined')
 		{
 			_section = section;
 		}
-		if(page === undefined)
+		if(typeof page === 'undefined')
 		{
 			page = pages[_section];
 		}
@@ -396,16 +396,14 @@ obo.model = function()
 				processQuestions();
 				
 				// populate previous scores:
-				if(lo.tracking && lo.tracking.prevScores && lo.tracking.prevScores.length)
+				if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.prevScores !== 'undefined' && typeof lo.tracking.prevScores.length !== 'undefined')
 				{
-					for(var o in lo.tracking.prevScores)
-					{
-						scores = lo.tracking.prevScores.slice();
-					}
+					// we don't really need to clone this array
+					scores = lo.tracking.prevScores;
 				}
 				
 				// @TODO - is this a good idea?
-				// set the scores page as the default if there are scores 
+				// set the scores page as the default if there are scores
 				// and they are not in the middle of an assessment
 				if(scores.length > 0 && !isResumingPreviousAttempt())
 				{
@@ -489,7 +487,7 @@ obo.model = function()
 	};
 	
 	var processAssessmentQuestions = function()
-	{	
+	{
 		questions.assessment = [];
 
 		if(mode === 'preview')
@@ -499,7 +497,8 @@ obo.model = function()
 			if(teachView)
 			{
 				// copy our teach view questions to questions.assessment:
-				for(var i in assessmentQuestionsForTeachView)
+				var len = assessmentQuestionsForTeachView.length;
+				for(var i = 0; i < len; i++)
 				{
 					questions.assessment[i] = assessmentQuestionsForTeachView[i];
 				}
@@ -537,7 +536,7 @@ obo.model = function()
 			}
 			assessmentQuestionsForTeachView[curQIndex - 1].push(page);
 		});
-	}
+	};
 
 	// if in preview mode without teach view we need to build an assessment quiz
 	// just like the server does when in instance mode.
@@ -550,11 +549,13 @@ obo.model = function()
 		var altMethod = aGroup.altMethod; //'r' (reselect) or 'k' (keep)
 		var numQuestions;
 		var i;
+		var len;
 
 		if(allowAlts && (altMethod === 'r' || questions.assessment.length === 0))
 		{
 			questions.assessment = [];
-			for(i in assessmentQuestionsForTeachView)
+			len = assessmentQuestionsForTeachView.length;
+			for(i = 0; i < len; i++)
 			{
 				numQuestions = assessmentQuestionsForTeachView[i].length;
 				questions.assessment[i] = [assessmentQuestionsForTeachView[i][Math.floor(Math.random() * numQuestions)]];
@@ -562,7 +563,8 @@ obo.model = function()
 		}
 		else if(questions.assessment.length === 0)
 		{
-			for(i in aGroup.kids)
+			len = aGroup.kids.length;
+			for(i = 0; i < len; i++)
 			{
 				questions.assessment[i] = [aGroup.kids[i]];
 			}
@@ -572,7 +574,7 @@ obo.model = function()
 		{
 			questions.assessment.sort(function() { return 0.5 - Math.random(); });
 		}
-	}
+	};
 	
 	// attempts to set the location variables to new values.
 	// will "downgrade" to the start page of sections
@@ -771,7 +773,7 @@ obo.model = function()
 			// render
 			view.render();
 		}
-	}
+	};
 
 	var getViewStateForPage = function(_section, page)
 	{
@@ -790,7 +792,7 @@ obo.model = function()
 		}
 
 		return viewState[_section][page];
-	}
+	};
 
 	var getViewStatePropertyForPage = function(property, _section, page)
 	{
@@ -801,7 +803,7 @@ obo.model = function()
 		}
 
 		return state[property];
-	}
+	};
 
 	var setViewStatePropertyForPage = function(property, value, _section, page)
 	{
@@ -820,7 +822,7 @@ obo.model = function()
 		}
 
 		viewState[_section][page][property] = value;
-	}
+	};
 
 	// returns the number of "true"s for property in viewState[section]
 	var getNumPagesWithViewStateProperty = function(_section, property)
@@ -835,7 +837,7 @@ obo.model = function()
 		}
 
 		return total;
-	}
+	};
 	
 	var getPrevSection = function()
 	{
@@ -901,7 +903,7 @@ obo.model = function()
 		{
 			setLocation('practice', 1);
 		}
-	}
+	};
 	
 	var loadAssessment = function(result)
 	{
@@ -914,7 +916,8 @@ obo.model = function()
 				lo.aGroup.kids = result;
 				processAssessmentQuestions();
 				// tease out the saved answers from the response
-				for(var i in result)
+				var len = result.length;
+				for(var i = 0; i < len; i++)
 				{
 					if(typeof result[i].savedAnswer !== 'undefined' && result[i].savedAnswer !== null)
 					{
@@ -1008,7 +1011,7 @@ obo.model = function()
 		//setSection('assessment');
 		//setPageOfCurrentSection('scores');
 		setLocation('assessment', 'scores');
-	}
+	};
 
 	var clearAssessment = function()
 	{
@@ -1016,29 +1019,6 @@ obo.model = function()
 		viewState.assessment = [];
 		lastResponse = [];
 	};
-	
-	/*
-	var practiceQuestionsLoaded = function()
-	{
-		return mode === 'preview' || lo.hasOwnProperty('pgroup');
-	};
-	
-	var questions.assessmentLoaded = function()
-	{
-		return mode === 'preview' || lo.hasOwnProperty('agroup');
-	}*/
-	/*
-	// determine if the standard pages (1-n) for the current section are available
-	var sectionContentLoaded = function()
-	{
-		switch(section)
-		{
-			case 'overview': return true;
-			case 'content': return true;
-			case 'practice': return lo.hasOwnProperty('pgroup');
-			case 'assessment': return lo.hasOwnProperty('agroup');
-		}
-	}*/
 	
 	var isPreviousScoreImported = function()
 	{
@@ -1062,7 +1042,7 @@ obo.model = function()
 			d.setTime(d.getTime() + 1209600); // two weeks from now
 			return d;
 		}
-	}
+	};
 	
 	var instanceIsClosed = function()
 	{
@@ -1074,7 +1054,44 @@ obo.model = function()
 	var currentQuestionIsAlternate = function()
 	{
 		return section === 'assessment' && getAssessmentPageIndex(getPage()).altIndex > 0;
-	}
+	};
+
+	// this will ask the server what the question score is for a specific question,
+	// and save the score. an optional callback allows you to respond to this new information.
+	var updateQuestionScoreForCurrentAttempt = function(_section, _page, callback)
+	{
+		callback(false);
+		return;
+		if(typeof _section === 'undefined')
+		{
+			_section = section;
+		}
+		if(typeof _page === 'undefined')
+		{
+			_page = getPage();
+		}
+		var questionID = getPageID(_page, _section);
+		if(typeof questionID !== 'undefined')
+		{
+			obo.remote.makeCall('getAttemptQuestionScore', [lo.viewID, questionID], function(serverScore) {
+				if(typeof serverScore !== 'undefined' && !isNaN(serverScore))
+				{
+					setViewStatePropertyForPage('answered', true, _section, _page);
+					saveResponse(serverScore, _section, _page);
+
+					if(typeof callback !== 'undefined')
+					{
+						callback(serverScore);
+					}
+				}
+				else
+				{
+					// server doesn't have a score for some reason.
+					//@TODO: HANDLE THIS CASE!!!
+				}
+			});
+		}
+	};
 	
 	var getScores = function()
 	{
@@ -1167,22 +1184,25 @@ obo.model = function()
 	var getFinalCalculatedScore = function()
 	{
 		var s = 0;
+		var i;
+		var numScores = scores.length;
 		
 		switch(getScoreMethod())
 		{
 			case 'm': // mean
-				for(var i in scores)
+				for(i = 0; i < numScores; i++)
 				{
 					s += parseFloat(scores[i].score);
 				}
-				s = s / parseFloat(scores.length);
+				s = s / parseFloat(numScores);
 				break;
 			case 'r': // most recent
-				s = scores.length === 0 ? 0 : parseFloat(scores[scores.length - 1].score);
+				s = numScores === 0 ? 0 : parseFloat(scores[numScores - 1].score);
 				break;
 			case 'h': // highest
+				//<--- intentional fallthrough!
 			default:
-				for(var i in scores)
+				for(i = 0; i < numScores; i++)
 				{
 					s = Math.max(s, parseFloat(scores[i].score));
 				}
@@ -1226,7 +1246,7 @@ obo.model = function()
 				view.render();
 			}
 		}
-	}
+	};
 	
 	var getPage = function()
 	{
@@ -1234,7 +1254,7 @@ obo.model = function()
 		var p = pages[section];
 		if(!isNaN(p))
 		{
-			p = parseInt(p);
+			p = parseInt(p, 10);
 		}
 
 		return p;
@@ -1248,32 +1268,37 @@ obo.model = function()
 			containsFlashContent: highestVersion > 0,
 			installedMajorVersion: swfobject.getFlashPlayerVersion().major,
 			highestMajorVersion: highestVersion
-		}
-	}
+		};
+	};
 
 	// Useful to determine if the section is "completeable"
 	// depending on what flash version the user has installed.
 	// Returns -1 if no flash is found.
-	var getHighestFlashVersionInSection = function(section)
+	var getHighestFlashVersionInSection = function(_section)
 	{
 		var version = -1;
+		var i;
+		var len;
 
-		switch(section)
+		switch(_section)
 		{
 			case 'content':
-				for(var i in lo.pages)
+				len = lo.pages.length;
+				for(i = 0; i < len; i++)
 				{
 					version = Math.max(version, getHighestFlashVersionInPage(lo.pages[i]));
 				}
 				break;
 			case 'practice':
-				for(var i in lo.pGroup.kids)
+				len = lo.pGroup.kids;
+				for(i = 0; i < len; i++)
 				{
 					version = Math.max(version, getHighestFlashVersionInPage(lo.pGroup.kids[i]));
 				}
 				break;
 			case 'assessment':
-				for(var i in lo.aGroup.kids)
+				len = lo.aGroup.kids;
+				for(i = 0; i < len; i++)
 				{
 					version = Math.max(version, getHighestFlashVersionInPage(lo.aGroup.kids[i]));
 				}
@@ -1287,7 +1312,8 @@ obo.model = function()
 	var getHighestFlashVersionInPage = function(page)
 	{
 		var version = -1;
-		for(var i in page.items)
+		var len = page.items.length;
+		for(var i = 0; i < len; i++)
 		{
 			var pi = page.items[i];
 			if(	typeof pi.media !== 'undefined' &&
@@ -1302,7 +1328,7 @@ obo.model = function()
 		}
 
 		return version;
-	}
+	};
 	
 	// @TODO: use this more!
 	// if page is not defined we use the current page
@@ -1345,14 +1371,31 @@ obo.model = function()
 			case 'practice': return questions.practice;
 			case 'assessment': return questions.assessment;
 		}
-	}
+	};
+
+	// returns the index of an item for the current page
+	var getIndexOfItem = function(item)
+	{
+		var items = getPageObject().items;
+		var len = items.length;
+		for(var i = 0; i < len; i++)
+		{
+			if(items[i] === item)
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	};
 	
 	// returns a media object on the current page by its ID
 	var getMediaObjectByID = function(mediaID)
 	{
 		var pageObject = getPageObject();
 		var curPageItem;
-		for(var i in pageObject.items)
+		var len = pageObject.items;
+		for(var i = 0; i < len; i++)
 		{
 			curPageItem = pageObject.items[i];
 			if(curPageItem.component.toLowerCase() === 'mediaview')
@@ -1395,14 +1438,35 @@ obo.model = function()
 	
 	// return how many standard pages (not overview nor end) are in a section
 	// abstracts between instance summary data and lo data
-	var getNumPagesOfSection = function(_section)
+	// note that for assessment this will return how many questions a student
+	// should see, not the total number of questions (all alternates).
+	var getNumPagesOfSection = function(_section, includeAlternates)
 	{
 		switch(_section)
 		{
 			case 'overview': return 0;
-			case 'content': return mode === 'preview' ? lo.pages.length : parseInt(lo.summary.contentSize);
-			case 'practice': return mode === 'preview' ? questions.practice.length : parseInt(lo.summary.practiceSize);
-			case 'assessment': return mode === 'preview' ? questions.assessment.length : parseInt(lo.summary.assessmentSize);
+			case 'content': return mode === 'preview' ? lo.pages.length : parseInt(lo.summary.contentSize, 10);
+			case 'practice': return mode === 'preview' ? questions.practice.length : parseInt(lo.summary.practiceSize, 10);
+			case 'assessment':
+				if(mode === 'preview')
+				{
+					if(typeof includeAlternates === 'undefined')
+					{
+						includeAlternates = false;
+					}
+					if(includeAlternates)
+					{
+						return lo.aGroup.kids.length;
+					}
+					else
+					{
+						return questions.assessment.length;
+					}
+				}
+				else
+				{
+					return parseInt(lo.summary.assessmentSize, 10);
+				}
 		}
 	};
 	
@@ -1411,25 +1475,15 @@ obo.model = function()
 		return getNumPagesOfSection(section);
 	};
 	
-	// @TODO - practice should follow the same model
-	// we need a special function to return our assessment since we store it differently
-	/*
-	var getquestions.assessment = function()
-	{
-		return questions.assessment;
-	};*/
-	
-	// @TODO is this used?
-	/*
-	var getCurrentquestions.assessment = function()
-	{
-		return questions.assessment[getAssessmentPageIndex(getPageOfCurrentSection()).index];
-	};*/
-	
 	// @TODO: use this more!
-	var getQGroup = function()
+	var getQGroup = function(_section)
 	{
-		switch(section)
+		if(typeof _section === 'undefined')
+		{
+			_section = getSection();
+		}
+
+		switch(_section)
 		{
 			case 'practice': return lo.pGroup;
 			case 'assessment': return lo.aGroup;
@@ -1458,9 +1512,6 @@ obo.model = function()
 	{
 		if(params['instID'].length > 0)
 		{
-			//obo.view.displayError('Only preview mode is enabled currently.');
-			//return;
-
 			// instance
 			loadInstance(params['instID'], callback, opts);
 		}
@@ -1498,26 +1549,6 @@ obo.model = function()
 		
 		$.extend(options, opts);
 		
-		// lets set up the db and see if the lo we're looking for is already stored
-		if(options.useOpenDatabase)
-		{
-			var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024 * 1024);
-			db.transaction(function (tx)
-			{
-				tx.executeSql('CREATE TABLE IF NOT EXISTS los (id unique, loJSON)');
-
-				tx.executeSql('SELECT * FROM los WHERE id = ?', [loID], function (tx, results)
-				{
-					var len = results.rows.length, i;
-					if(results.rows.length)
-					{
-						// @TODO: WTF
-						///////onGetLO(results.rows.item(0).loJSON);
-						return;
-					}
-				});
-			});
-		}
 		// Check local storage for the LO
 		if(options.useLocalStorage)
 		{
@@ -1699,36 +1730,57 @@ obo.model = function()
 	};
 
 	// this function simply saves the response. it doesn't talk to the server.
-	var saveResponse = function(answerID_or_shortAnswerResponse_or_score)
+	var saveResponse = function(answerID_or_shortAnswerResponse_or_score, _section, _page)
 	{
-		var page = getPage();
-		responses[section][page] = answerID_or_shortAnswerResponse_or_score;
+		if(typeof _section === 'undefined')
+		{
+			_section = getSection();
+		}
+		if(typeof _page === 'undefined')
+		{
+			_page = getPage();
+		}
+
+		responses[_section][_page] = answerID_or_shortAnswerResponse_or_score;
 	}
 	
 	// use this to submit a MC, short answer or media question.
 	// for media, score = 0-100
-	var submitQuestion = function(answerID_or_shortAnswerResponse_or_score, isMedia)
+	var submitQuestion = function(answerID_or_shortAnswerResponse_or_score, isMedia, _section, page)
 	{
-		var page = getPage();
-		var qGroup = getQGroup();
+		if(typeof _section === 'undefined')
+		{
+			_section = getSection();
+		}
+		if(typeof page === 'undefined')
+		{
+			page = getPage();
+		}
+
+		var qGroup = getQGroup(_section);
 
 		if(mode === 'instance')
 		{
-			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [lo.viewID, qGroup.qGroupID, getPageID(), answerID_or_shortAnswerResponse_or_score], processResponse);
+			obo.remote.makeCall(isMedia === true ? 'trackSubmitMedia' : 'trackSubmitQuestion', [
+				lo.viewID,
+				qGroup.qGroupID,
+				getPageID(page, _section),
+				answerID_or_shortAnswerResponse_or_score
+			], processResponse);
 		}
 		
 		// store this response
 		// (for question alternates in preview mode we just store one response -
 		//	the last response, therefore we need to remove other alternates for
 		// the same question)
-		if(mode === 'preview' && section === 'assessment')
+		if(mode === 'preview' && _section === 'assessment')
 		{
 			var pageIndex = getAssessmentPageIndex(page);
 			clearAssessmentAltResponses(pageIndex.index);
 		}
 
-		setViewStatePropertyForPage('answered', true);
-		saveResponse(answerID_or_shortAnswerResponse_or_score);
+		setViewStatePropertyForPage('answered', true, _section, page);
+		saveResponse(answerID_or_shortAnswerResponse_or_score, _section, page);
 	};
 
 	// use this to submit a question that is not considered 'saved' or 'submitted'
@@ -1760,9 +1812,18 @@ obo.model = function()
 	// return the previous response, if it exists, for the current question
 	// return 'undefined' if it doesn't exist
 	// note that for media questions the previous response is really the score
-	var getPreviousResponse = function()
+	var getPreviousResponse = function(_section, _page)
 	{
-		return responses[section][getPage()];
+		if(typeof _section === 'undefined')
+		{
+			_section = getSection();
+		}
+		if(typeof _page === 'undefined')
+		{
+			_page = getPage();
+		}
+
+		return responses[_section][_page];
 	};
 
 	var startPractice = function()
@@ -1802,36 +1863,42 @@ obo.model = function()
 			var curResponse;
 			var assessmentIndex;
 			// @TODO: This is O(n^2)
-			for(var i in responses['assessment'])
+			var len;
+			var i;
+			var j;
+
+			for(i in responses.assessment)
 			{
 				//lastResponseAltIndex = lastResponse[i];
 				
 				//curQuestion = lo.aGroup.kids[i - 1]; //i - 1 since responses uses page numbers as it's index
-				curResponse = responses['assessment'][i];
+				curResponse = responses.assessment[i];
 				assessmentIndex = getAssessmentPageIndex(i);
 				curQuestion = questions.assessment[assessmentIndex.index][assessmentIndex.altIndex];
 				switch(curQuestion.itemType.toLowerCase())
 				{
 					case 'mc':
-						for(var j in curQuestion.answers)
+						len = curQuestion.answers.length;
+						for(j = 0; j < len; j++)
 						{
 							if(curQuestion.answers[j].answerID === curResponse)
 							{
-								total += parseInt(curQuestion.answers[j].weight);
+								total += parseInt(curQuestion.answers[j].weight, 10);
 							}
 						}
 						break;
 					case 'qa':
-						for(var j in curQuestion.answers)
+						len = curQuestion.answers.length;
+						for(j = 0; j < len; j++)
 						{
-							if(curQuestion.answers[j].answer === curResponse)
+							if(curQuestion.answers[j].answer.toLowerCase() === curResponse)
 							{
 								total += 100;
 							}
 						}
 						break;
 					case 'media':
-						total += parseInt(curResponse);
+						total += parseInt(curResponse, 10);
 						break;
 				}
 				
@@ -1840,26 +1907,6 @@ obo.model = function()
 			onSubmitAssessment(parseFloat(total) / parseFloat(questions.assessment.length));
 		}
 	};
-	/*
-	var isPageAnswered = function(section, page)
-	{
-		return responses[section][page] != undefined;
-	};
-	
-	// instead of looking at responses we look at pages
-	// marked as answered, since we could have 'unsaved' responses
-	var getNumPagesAnswered = function(_section)
-	{
-		/*
-		var total = 0;
-		for(var i in responses[section])
-		{
-			total++;
-		}
-		
-		return total;*//*
-		getNumPagesWithViewStateProperty(_section, 'answered');
-	};*/
 
 	// if logoutMessage is defined then the user will be shown a dialog first.
 	// otherwise they will be kicked to the login page.
@@ -1871,13 +1918,13 @@ obo.model = function()
 		{
 			_logoutMessage = '';
 		}
-		logoutMessage = _logoutMessage
+		logoutMessage = _logoutMessage;
 
 		obo.view.showThrobber();
 		obo.remote.makeCall('doLogout', null, function(result) {
 			obo.view.hideThrobber();
 
-			if(logoutMessage.length == 0)
+			if(logoutMessage.length === 0)
 			{
 				redirectToLoginPage();
 			}
@@ -1971,6 +2018,9 @@ obo.model = function()
 		getViewStateForPage: getViewStateForPage,
 		getViewStatePropertyForPage: getViewStatePropertyForPage,
 		setViewStatePropertyForPage: setViewStatePropertyForPage,
-		getNumPagesWithViewStateProperty: getNumPagesWithViewStateProperty
+		getNumPagesWithViewStateProperty: getNumPagesWithViewStateProperty,
+		updateQuestionScoreForCurrentAttempt: updateQuestionScoreForCurrentAttempt,
+		getPageID: getPageID,
+		getIndexOfItem: getIndexOfItem
 	};
 }();

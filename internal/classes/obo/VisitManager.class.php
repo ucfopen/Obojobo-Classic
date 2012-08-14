@@ -58,7 +58,6 @@ class VisitManager extends \rocketD\db\DBEnabled
 					$GLOBALS['CURRENT_INSTANCE_DATA'] = $_SESSION['OPEN_INSTANCE_DATA'][$key];
 				}
 			}
-			
 		}
 		
 		$trackingMan = \obo\log\LogManager::getInstance();

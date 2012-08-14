@@ -31,31 +31,9 @@ obo.view = function()
 	// in this case we don't want to modify to the history stack,
 	// but move through it instead.
 	var preventUpdateHistoryOnNextRender = false;
-
-	// we need to keep track of the last url pushed to history.
-	// this is a workaround until all browsers support checking history.state
-	// this allows us to not push the same url twice
-	//var lastHistoryState = '';
-	
-	// some view-based state info - need to keep track of which pages have already been visited
-	// and which ones are displaying feedback
-	/*
-	var visited = {
-		content: [],
-		practice: [],
-		assessment: []
-	};
-*/
 	
 	// number in ms that defines how long simple animations should take place
 	var defaultAnimationDuration = 200;
-	
-	// we want to keep track of which questions have been answered
-	/*
-	var answered = {
-		practice: [],
-		assessment: []
-	};*/
 	
 	// flag used to specify the first time render() is called.
 	// the view is 'unrendered' until the first render() completes.
@@ -64,6 +42,75 @@ obo.view = function()
 	// flag to easily keep track if swfs are being hidden
 	// (via hideSwfs and unhideSwfs)
 	var swfsHidden = false;
+
+	// listen for postMessage events from media items
+	var onPostMessage = function(event) {
+		var data = $.parseJSON(event.data);
+
+		// materia:
+		if(typeof data.type !== 'undefined' && data.type === 'materiaScoreRecorded')
+		{
+			// loop through the window.frames object hunting for our iframe
+			var $materiaIFrames = $('.materia-container');
+			var $materiaIFrame;
+			var len = $materiaIFrames.length;
+			var $targetIFrame;
+
+			for(var i = 0; i < len; i++)
+			{
+				$materiaIFrame = $($materiaIFrames[i]);
+
+				if(event.source === window.frames[$materiaIFrame.attr('name')])
+				{
+					$targetIFrame = $materiaIFrame;
+					break;
+				}
+			}
+			if(typeof $targetIFrame !== 'undefined')
+			{
+				var $parent = $targetIFrame.parent();
+				var targetSection = $parent.attr('data-section');
+				var targetPage = $parent.attr('data-page');
+
+				// we only show scores for interactive questions
+				var p = obo.model.getPageObject(targetPage, targetSection);
+				if(typeof p.itemType !== 'undefined' && p.itemType.toLowerCase() === 'media')
+				{
+					if(obo.model.getMode() === 'preview')
+					{
+						updateInteractiveScore(data.score, targetPage, targetSection);
+					}
+					else
+					{
+						showThrobber();
+						obo.model.updateQuestionScoreForCurrentAttempt(targetSection, targetPage, function(score) {
+							// if we don't get back the response we expect we err on the side of the student
+							// and give them the score
+							if(score === false && !isNaN(data.score))
+							{
+								updateInteractiveScore(data.score, targetPage, targetSection);
+							}
+							else
+							{
+								markSubnavItem(targetSection, targetPage, 'answered');
+								updateInteractiveScoreDisplay(score);
+							}
+
+							hideThrobber();
+						});
+					}
+				}
+			}
+		}
+	};
+	if(typeof window.addEventListener !== 'undefined')
+	{
+		window.addEventListener('message', onPostMessage, false);
+	}
+	else if(typeof window.attachEvent !== 'undefined')
+	{
+		window.attachEvent('onmessage', onPostMessage);
+	}
 	
 	var loadUI = function($element)
 	{
@@ -103,16 +150,7 @@ obo.view = function()
 				obo.model.isResumingPreviousAttempt() ? obo.model.gotoSectionAndPage('assessment', 'start') : obo.model.gotoStartPageOfNextSection();
 			}
 		}).on('mouseenter', '.subnav-list.assessment li:has(ul)', function(event) {
-			$ul = $(this).find('ul');
-			$('object').each(function(i, e) {
-				// hide swfs if alts menu would overlap
-				// 40 is a fudge value to account for padding
-				if($ul.offset().top + $ul.height() + 40 >= $(e).offset().top)
-				{
-					hideSWFs();
-					return false; //break
-				}
-			});
+			hideSWFs();
 		}).on('mouseleave', '.subnav-list.assessment li:has(ul)', function(event) {
 			unhideSWFs();
 		}).on('click', '.begin-section-button', function(event) {
@@ -415,9 +453,10 @@ obo.view = function()
 			var rawTokens = hashURL.split('/');
 			// need to remove empty strings
 			var tokens = [];
-			for(var i in rawTokens)
+			var len = rawTokens.length;
+			for(var i = 0; i < len; i++)
 			{
-				if(rawTokens[i] != '')
+				if(rawTokens[i] !== '')
 				{
 					tokens.push(rawTokens[i]);
 				}
@@ -563,7 +602,8 @@ obo.view = function()
 		var $li;
 		var $a;
 		var origTitle;
-		for(var i in sections)
+		var len = sections.length;
+		for(var i = 0; i < len; i++)
 		{
 			$li = $('#nav-' + sections[i]).parent();
 			$li.addClass('lockedout');
@@ -582,12 +622,12 @@ obo.view = function()
 			attribute: 'data-lockout-message',
 			edgeOffset: -20
 		});*/
-	}
+	};
 	
 	var lockoutNonAssessment = function()
 	{
 		lockoutSections(['overview', 'content', 'practice']);
-	}
+	};
 	
 	var unlockNonAssessment = function()
 	{
@@ -598,7 +638,7 @@ obo.view = function()
 			$li.removeClass('lockedout');
 			$($li.children()[0]).removeAttr('data-lockout-message');
 		});
-	}
+	};
 	
 	// @TODO
 	/*
@@ -637,20 +677,22 @@ obo.view = function()
 		var missedPages = $('.subnav-list > li:not(.visited)');
 		missedPages.clone().appendTo('.missed-pages-list');
 		$('.missed-pages-list a').click(onNavPageLinkClick);
-	}
+	};
 	
 	// this creates our 'you missed a page or two' subnav list for anything not 'answered'
 	var createUnansweredPageList = function()
 	{
+		var unanswered;
+
 		// we added in 'finish', remove it when cloning
 		if(obo.model.getSection() === 'assessment')
 		{
-			// ul.subnav-list 
+			// ul.subnav-list
 			//		li[.answered] <--
 			//			ul.subnav-list-alts
 			//				li[.answered] <--
 			//var unanswered = $('.subnav-list.assessment li:not(.answered)');//.not(':last-child');
-			var unanswered = $('.subnav-list.assessment > li:not(:last-child)').filter(function(index) {
+			unanswered = $('.subnav-list.assessment > li:not(:last-child)').filter(function(index) {
 				var $this = $(this);
 				if($this.hasClass('answered'))
 				{
@@ -661,11 +703,11 @@ obo.view = function()
 		}
 		else
 		{
-			var unanswered = $('.subnav-list > li:not(.answered)');
+			unanswered = $('.subnav-list > li:not(.answered)');
 		}
 		unanswered.clone().appendTo('.missed-pages-list');
 		$('.missed-pages-list a').click(onNavPageLinkClick);
-	}
+	};
 	
 	var buildPage = function(section, index)
 	{
@@ -679,7 +721,7 @@ obo.view = function()
 			case 'practice': buildQuestionPage(section, index); break;
 			case 'assessment': buildQuestionPage(section, index); break;
 		}
-	}
+	};
 	
 	// creates a content page (index = 'start', 'end' or a standard page 1-n)
 	var buildContentPage = function(index)
@@ -723,7 +765,7 @@ obo.view = function()
 		{
 			showAndUpdateNextPrevNav();
 			
-			var page = obo.model.getLO().pages[index - 1]
+			var page = obo.model.getLO().pages[index - 1];
 			
 			var $pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
 			//$pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
@@ -778,10 +820,9 @@ obo.view = function()
 						createPageItemMediaView(item, $target);
 						break;
 					case 'TextArea':
-						$target.append(formatPageItemTextArea(item, parseInt(page.layoutID) === 8));
+						$target.append(formatPageItemTextArea(item, parseInt(page.layoutID, 10) === 8));
 						break;
 				}
-
 			});
 
 			$('.text-item li').each(function(index, item)
@@ -833,7 +874,6 @@ obo.view = function()
 						$('#content').load('/assets/templates/viewer.html #assessment-overview', function() {
 							var flashRequirements = obo.model.getFlashRequirementsForSection('assessment');
 							var canViewFlash = !flashRequirements.containsFlashContent || flashRequirements.installedMajorVersion >= flashRequirements.highestMajorVersion;
-
 							var numAssessment = obo.model.getNumPagesOfSection('assessment');
 							var numAttempts = obo.model.getNumAttemptsRemaining();
 							$('#start-assessment-button').attr('href', baseURL + '#/assessment/1');
@@ -956,7 +996,7 @@ obo.view = function()
 								$('#do-import-previous-score-button').click(function(event) {
 									event.preventDefault();
 
-									var score = obo.model.getImportableScore(); 
+									var score = obo.model.getImportableScore();
 									obo.dialog.showDialog({
 										title: 'Confirm Score Importing: ' + score + '%',
 										contents: '<strong>WARNING:</strong> Importing will forfeit all of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
@@ -1069,7 +1109,8 @@ obo.view = function()
 
 							// build score table
 							var endDate;
-							for(var i in scores)
+							var len = scores.length;
+							for(var i = 0; i < len; i++)
 							{
 								endDate = new Date(scores[i].endTime * 1000);
 								$('#attempt-history').append(
@@ -1245,7 +1286,8 @@ obo.view = function()
 						if(obo.model.isTeachView())
 						{
 							var answers = [];
-							for(var i in question.answers)
+							var len = question.answers.length;
+							for(var i = 0; i < len; i++)
 							{
 								answers.push(question.answers[i].answer);
 							}
@@ -1311,7 +1353,12 @@ obo.view = function()
 					fillInQAAnswer(prevResponse);
 					break;
 				case 'media':
-					updateInteractiveScoreDisplay(prevResponse);
+					// we don't want to update the score display if we are in real assessment,
+					// since that will only flash 'question score updated'.
+					if(obo.model.getSection() === 'practice' || obo.model.isTeachView())
+					{
+						updateInteractiveScoreDisplay(prevResponse);
+					}
 					break;
 			}
 		}
@@ -1443,7 +1490,8 @@ obo.view = function()
 
 		var p = obo.model.getPageObject();
 		var weight = 0;
-		for(var i in p.answers)
+		var len = p.answers.length;
+		for(var i = 0; i < len; i++)
 		{
 			if(response === p.answers[i].answer.toLowerCase())
 			{
@@ -1467,17 +1515,33 @@ obo.view = function()
 			$('#qa-form').qaForm('showAnswers');
 		}
 		return;
-	}
+	};
 	
-	var updateInteractiveScore = function(score)
+	var updateInteractiveScore = function(score, _page, _section)
 	{
-		markSubnavItem(obo.model.getSection(), obo.model.getPage(), 'answered');
-		
-		var oldScore = obo.model.getPreviousResponse();
-		obo.model.submitQuestion(score, true);
-		
-		updateInteractiveScoreDisplay(score, oldScore);
-	}
+		if(typeof _section === 'undefined')
+		{
+			_section = obo.model.getSection();
+		}
+		if(typeof _page === 'undefined')
+		{
+			_page = obo.model.getPage();
+		}
+
+		// we only show these updates if this is actually an interactive question
+		var p = obo.model.getPageObject(_page, _section);
+		if(typeof p.itemType !== 'undefined' && p.itemType.toLowerCase() === 'media')
+		{
+			markSubnavItem(_section, _page, 'answered');
+			var oldScore = obo.model.getPreviousResponse(_section, _page);
+			obo.model.submitQuestion(score, true, _section, _page);
+
+			if(_section === obo.model.getSection() && _page.toString() === obo.model.getPage().toString())
+			{
+				updateInteractiveScoreDisplay(score, oldScore);
+			}
+		}
+	};
 	
 	var updateInteractiveScoreDisplay = function(score, oldScore)
 	{
@@ -1524,11 +1588,6 @@ obo.view = function()
 				{
 					// pulse the answer-preview
 					$('.answer-preview').html(html);
-					/*
-					$('.answer-preview').animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#d6d6d6'}, 200).animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#d6d6d6'}, 200);
-					$('.answer-preview p').animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#efe1a8'}, 200).animate({backgroundColor: '#a2b6c4'}, 200).animate({backgroundColor: '#efe1a8'}, 200);*/
-					//$('.answer-preview').animate({fontSize: 21}, 200).animate({fontSize: 20}, 200);
-					//$('.answer-preview p').animate({backgroundColor: 'white'}, 200).animate({backgroundColor: '#efe1a8'}, 200).animate({backgroundColor: 'white'}, 200).delay(1000).animate({backgroundColor: '#efe1a8'}, 2000);
 					var origColor = $('.answer-preview p').css('color');
 					$('.answer-preview p')
 						.animate({color: '#b3e99d'}, defaultAnimationDuration)
@@ -1548,7 +1607,7 @@ obo.view = function()
 			$('.answer-preview').addClass('teach-view-item');
 		}
 		
-	}
+	};
 	
 	var buildMCAnswers = function(questionID, answers)
 	{
@@ -1600,7 +1659,7 @@ obo.view = function()
 	//var formatPageItemMediaView = function(pageItem)
 	{
 		//var mediaHTML = displayMedia(pageItem.media[0]);
-		if($media = obo.media.createMedia(pageItem.media[0], $target, pageItem.options))
+		if($media = obo.media.createMedia(pageItem, $target))
 		{
 			if(pageItem.options)
 			{
@@ -1753,72 +1812,63 @@ obo.view = function()
 		}
 	};
 	
-	var makeAssessmentPageNav = function() 
+	var makeAssessmentPageNav = function()
 	{
-		// @TODO - does this work with question alts?
-		// rebuild page nav if it doesn't exist or it has the wrong number of items
-		var numItems = $('.subnav-list.assessment li').length;
-		if($('.subnav-list.assessment').length === 0 || (obo.model.getNumPagesOfSection('assessment') != numItems))
-		{
-			//var qListHTML = $('<ul class="subnav-list assessment"></ul>');
-			//$('#nav-assessment').parent().append(qListHTML)
-			var qListHTML = makePageNav('assessment', $('#nav-assessment').parent());
-			
-			var lo = obo.model.getLO();
-			$(obo.model.getPageObjects()).each(function(qIndex, pageGroup)
-			{
-				qIndex++;
-				var $li = $('<li></li>');
-				if(obo.model.getViewStatePropertyForPage('visited', 'assessment', qIndex))
-				{
-					$li.addClass('visited');
-				}
-				//if(obo.model.isPageAnswered('assessment', qIndex))
-				if(obo.model.getViewStatePropertyForPage('answered', 'assessment', qIndex))
-				{
-					$li.addClass('answered');
-				}
-				$li.append($('<a class="subnav-item nav-AQ-'+qIndex+'" href="'+ baseURL +'#/assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a>'));
-				qListHTML.append($li);
-				$li.children('a').click(onNavPageLinkClick);
-				// add nav for preview mode to show alts
-				if(obo.model.getMode() === 'preview' && pageGroup.length > 1 )
-				{
-					var altListHTML = $('<ul class="subnav-list-alts"></ul>');
-					$li.append(altListHTML)
-					$(pageGroup).each(function(altIndex, page)
-					{
-						// skip the first - its shown right above this
-						if(altIndex === 0)
-						{
-							return true;
-						}
-
-						var altVersion = String.fromCharCode(altIndex + 97);
-						var altLink = $('<li><a class="subnav-item-alt nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'#/assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
-
-						if(obo.model.getViewStatePropertyForPage('visited', 'assessment', qIndex + altVersion))
-						{
-							altLink.addClass('visited');
-						}
-						if(obo.model.getViewStatePropertyForPage('answered', 'assessment', qIndex + altVersion))
-						//if(obo.model.isPageAnswered('assessment', qIndex + altVersion))
-						{
-							altLink.addClass('answered');
-						}
-
-						altListHTML.append(altLink);
-						altLink.children('a').click(onNavPageLinkClick);
-					});
-				}
-			});
-			
-			// append finish button:
-			$finishButton = $('<li><a id="finish-section-button" title="Finish this section" class="subnav-item" href="' + baseURL + '#/assessment/end/">Finish</a></li>');
-			$finishButton.click(onFinishSectionButtonClick);
-			qListHTML.append($finishButton);
-		}
+		var qListHTML = makePageNav('assessment', $('#nav-assessment').parent());
 		
+		var lo = obo.model.getLO();
+		$(obo.model.getPageObjects()).each(function(qIndex, pageGroup)
+		{
+			qIndex++;
+			var $li = $('<li></li>');
+			if(obo.model.getViewStatePropertyForPage('visited', 'assessment', qIndex))
+			{
+				$li.addClass('visited');
+			}
+			//if(obo.model.isPageAnswered('assessment', qIndex))
+			if(obo.model.getViewStatePropertyForPage('answered', 'assessment', qIndex))
+			{
+				$li.addClass('answered');
+			}
+			$li.append($('<a class="subnav-item nav-AQ-'+qIndex+'" href="'+ baseURL +'#/assessment/' + qIndex + '" title="Assessment Question '+qIndex+'">' + qIndex +'</a>'));
+			qListHTML.append($li);
+			$li.children('a').click(onNavPageLinkClick);
+			// add nav for preview mode to show alts
+			if(obo.model.getMode() === 'preview' && pageGroup.length > 1 )
+			{
+				var altListHTML = $('<ul class="subnav-list-alts"></ul>');
+				$li.append(altListHTML);
+				$(pageGroup).each(function(altIndex, page)
+				{
+					// skip the first - its shown right above this
+					if(altIndex === 0)
+					{
+						return true;
+					}
+
+					var altVersion = String.fromCharCode(altIndex + 97);
+					var altLink = $('<li><a class="subnav-item-alt nav-AQ-'+qIndex+altVersion+'" href="'+ baseURL +'#/assessment/' + qIndex + altVersion+'" title="Assessment Question '+qIndex+' Alternate '+ altVersion+'">'+ altVersion +'</a></li>');
+
+					if(obo.model.getViewStatePropertyForPage('visited', 'assessment', qIndex + altVersion))
+					{
+						altLink.addClass('visited');
+					}
+					if(obo.model.getViewStatePropertyForPage('answered', 'assessment', qIndex + altVersion))
+					//if(obo.model.isPageAnswered('assessment', qIndex + altVersion))
+					{
+						altLink.addClass('answered');
+					}
+
+					altListHTML.append(altLink);
+					altLink.children('a').click(onNavPageLinkClick);
+				});
+			}
+		});
+		
+		// append finish button:
+		$finishButton = $('<li class="finish-button-container"><a id="finish-section-button" title="Finish this section" class="subnav-item" href="' + baseURL + '#/assessment/end/">Finish</a></li>');
+		$finishButton.click(onFinishSectionButtonClick);
+		qListHTML.append($finishButton);
 	};
 	
 	var onFinishSectionButtonClick = function(event)
@@ -1893,109 +1943,7 @@ obo.view = function()
 	var resetSubnav = function(cssClass)
 	{
 		$('.subnav-list li').removeClass(cssClass);
-	}
-	/*
-	//@remove
-	var setPageAsVisited = function(section, pageNumber)
-	{
-		if(!isNaN(pageNumber))
-		{
-			var item = viewState[section][pageNumber - 1];
-
-			if(typeof item === 'undefined')
-			{
-				viewState[section][pageNumber - 1] = {visited: true};
-			}
-			else
-			{
-				if(typeof item.visited === 'undefined')
-				{
-					item = {visited: true};
-				}
-				else
-				{
-					item.visited = true;
-				}
-			}
-		}
-		
-		markSubnavItem(section, pageNumber, 'visited');
 	};
-	
-	//@remove
-	// flag a question page as having been answered (view only)
-	var setPageAsAnswered = function(section, pageNumber)
-	{
-		if(!isNaN(pageNumber))
-		{
-		//	answered[section][pageNumber - 1] = true;
-			viewState[section][pageNumber - 1].answered = true; //@TODO: This is not currently used
-			markSubnavItem(section, pageNumber, 'answered');
-		}
-	}
-	
-	//@remove
-	var setPageAsSelected = function(section, pageNumber)
-	{
-		markSubnavItem(section, pageNumber, 'selected');
-	};
-
-	//@remove
-	var setIsPageShowingFeedback = function(section, pageNumber, showingFeedback)
-	{
-		//@TODO
-		//.feedback = true;
-		if(!isNaN(pageNumber))
-		{
-			var item = viewState[section][pageNumber - 1];
-
-			if(typeof item === 'undefined')
-			{
-				viewState[section][pageNumber - 1] = {feedback: showingFeedback};
-			}
-			else
-			{
-				if(typeof item.visited === 'undefined')
-				{
-					item = {feedback: showingFeedback};
-				}
-				else
-				{
-					item.feedback = showingFeedback;
-				}
-			}
-		}
-	}
-
-	//@remove
-	var isPageShowingFeedback = function(section, pageNumber)
-	{
-		var item = viewState[section][pageNumber - 1];
-		return typeof item !== 'undefined' && typeof item.feedback !== 'undefined' && item.feedback === true;
-	}
-	
-	//@remove
-	var isPageVisited = function(section, pageNumber)
-	{
-		var item = viewState[section][pageNumber - 1];
-		return typeof item !== 'undefined' && typeof item.visited !== 'undefined' && item.visited === true;
-	};
-	
-	//@remove (transfer to model)
-	var getNumPagesVisited = function(section)
-	{
-		//return visited[section].join('').split('true').length - 1;
-		var total = 0;
-		for(var o in viewState[section])
-		{
-			if(o.visited === true)
-			{
-				total++;
-			}
-		}
-
-		return total;
-	};*/
 	
 	var getScoreMethodString = function()
 	{
@@ -2005,7 +1953,7 @@ obo.view = function()
 			case 'h': return 'Highest';
 			case 'r': return 'Most recent';
 		}
-	}
+	};
 	
 	// @PUBLIC:
 	var init = function($element)
@@ -2024,6 +1972,7 @@ obo.view = function()
 		// @HACK we turn both parent and object visible for Safari
 		$('#swf-holder object').css('visibility', 'hidden');
 		$('#swf-holder .media-item').css('visibility', 'hidden');
+		$('#swf-holder iframe').hide();
 		// we also remove any flash alt text placeholders in the swf-holder
 		// in case the user doesn't have flash installed
 		$('#swf-holder .swf-placeholder').remove();
@@ -2176,13 +2125,14 @@ obo.view = function()
 		$('object').parent().addClass('stripe-bg');
 
 		$('iframe').hide();
+		$('iframe').parent().addClass('stripe-bg');
 	};
 	
 	// returns the currently overlayed swf (if there is one)
 	// in the practice or assessment sections
-	var getOverlayedSWF = function()
+	var getOverlayedMedia = function()
 	{
-		return $('#swf-holder .media-for-page-' + obo.model.getSection() + obo.model.getPage() + ' object');
+		return $('#swf-holder .media-for-page-' + obo.model.getSection() + obo.model.getPage());
 	}
 	
 	var unhideSWFs = function()
@@ -2194,11 +2144,17 @@ obo.view = function()
 		// unhide all content objects:
 		$('#content object').css('visibility', 'visible');
 		$('#content object').parent().removeClass('stripe-bg');
+		$('#content iframe').show();
+		$('#content iframe').parent().removeClass('stripe-bg');
 		
 		// unhide overlay swfs for the current page
-		getOverlayedSWF().css('visibility', 'visible').parent().removeClass('stripe-bg');
-
-		$('iframe').show();
+		var $overlayedMedia = getOverlayedMedia();
+		if($overlayedMedia.length > 0)
+		{
+			$overlayedMedia.children('object').css('visibility', 'visible');
+			$overlayedMedia.children('iframe').show();
+			$overlayedMedia.parent().removeClass('stripe-bg');
+		}
 	};
 
 	// calls hideSWFs again if swfs are already hidden
