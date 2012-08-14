@@ -237,10 +237,11 @@ obo.util = function()
 		var style = '';
 		var reg;
 		var match;
-		for(var a in rules)
+		var len = rules.length;
+		for(var a = 0; a < len; a++)
 		{
 			reg = new RegExp(rules[a][0] + '\s*=\s*(?:\'|")(.+?)(?:\'|")', 'gi');
-			match = reg.exec(attribs)
+			match = reg.exec(attribs);
 			if(match != null && match.length >= 2)
 			{
 				// special case: convert px to % for font size
@@ -315,7 +316,7 @@ obo.util = function()
 	cleanFlashHTML = function(input, strict)
 	{
 		// first, handle a special case where IE8 can't handle &apos;
-		if($('#ie-8-stylesheet'))
+		if(isIE8())
 		{
 			input = input.replace(patternIE8ConvertApos, "'");
 		}
@@ -432,7 +433,8 @@ obo.util = function()
 	{
 		var a = [];
 		var item;
-		for(var i in items)
+		var len = items.length;
+		for(var i = 0; i < len; i++)
 		{
 			item = items[i];
 			if(typeof item.media === 'object' && item.media.length && item.media.length > 0 && item.media[0].attribution === 1)
@@ -449,9 +451,9 @@ obo.util = function()
 		else if(a.length > 1)
 		{
 			r = 'Photos used under Creative Commons from ';
-			var len = a.length;
+			len = a.length;
 			var join = ', ';
-			for(var i = 0; i < len; i++)
+			for(i = 0; i < len; i++)
 			{
 				if(i == len - 2)
 				{
@@ -467,7 +469,7 @@ obo.util = function()
 		}
 
 		return cleanAttributionCopyrightHTML(r);
-	}
+	};
 	
 	// Modfies creative commons attributions to be standard
 	cleanAttributionCopyrightHTML = function(input)
@@ -512,7 +514,8 @@ obo.util = function()
 	// given a answer array it will return the answer object matching answerID
 	getAnswerByID = function(answers, answerID)
 	{
-		for(var i in answers)
+		var len = answers.length;
+		for(var i = 0; i < len; i++)
 		{
 			if(answers[i].answerID === answerID)
 			{
@@ -531,7 +534,12 @@ obo.util = function()
 	isMobile = function()
 	{
 		return typeof window.orientation !== 'undefined';
-	}
+	};
+
+	isIE8 = function()
+	{
+		return $('#ie-8-stylesheet').length > 0;
+	};
 	
 	// simple wrapper to delay a function call by 1ms
 	doLater = function(func)
@@ -555,6 +563,7 @@ obo.util = function()
 		createCombinedAttributionString: createCombinedAttributionString,
 		getBaseURL: getBaseURL,
 		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf,
-		isMobile: isMobile
+		isMobile: isMobile,
+		isIE8: isIE8
 	};
 }();

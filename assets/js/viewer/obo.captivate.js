@@ -33,6 +33,11 @@ obo.captivate = function()
 		}
 		
 		var scoreData = scoreDatas[event.id];
+
+		var $swf = $('#' + event.id);
+		var $parent = $swf.parent();
+		var targetSection = $parent.attr('data-section');
+		var targetPage = $parent.attr('data-page');
 		
 		// we listen for two versions of captivate - 2 (AS2) and 5 (AS3):
 		switch(event.version)
@@ -41,7 +46,7 @@ obo.captivate = function()
 				switch(event.type)
 				{
 					case 'score':
-						obo.view.updateInteractiveScore(Math.round(event.data.percent * 100));
+						obo.view.updateInteractiveScore(Math.round(event.data.percent * 100), targetPage, targetSection);
 						break;
 				}
 				break;
@@ -67,14 +72,15 @@ obo.captivate = function()
 						
 						// if all questions answered, send info to obojobo
 						var total = 0;
-						for(var i in scoreData.responses)
+						var len = scoreData.responses.length;
+						for(var i = 0; i < len; i++)
 						{
 							total += scoreData.responses[i];
 						}
 						
 						var percent = Math.round((total / event.data.cpQuizInfoTotalQuestionsPerProject) * 100);
 						
-						obo.view.updateInteractiveScore(percent);
+						obo.view.updateInteractiveScore(percent, targetPage, targetSection);
 						break;
 				}
 				break;

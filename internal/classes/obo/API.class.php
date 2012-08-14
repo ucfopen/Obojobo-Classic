@@ -1244,28 +1244,22 @@ class API extends \rocketD\db\DBEnabled
 				
 		}
 		return false;
-		
-
 	}
 	
 	/** @author Zachary Berry **/
 	public function getQuestionResponses($instid, $questionid)
 	{
-		if(\obo\util\Validator::isPosInt($instid) && \obo\util\Validator::isPosInt($questionid))
-		{
-			
-			if($this->getSessionValid())
-			{
-				$scoreman = \obo\ScoreManager::getInstance();
-				$result = $scoreman->getQuestionResponses($instid, $questionid);
-			}
-			else
-			{
-				$result = \rocketD\util\Error::getError(1);
-			}
-			return $result;
-		}
-		return \rocketD\util\Error::getError(2);
+		if(\obo\util\Validator::isPosInt($instid) && \obo\util\Validator::isPosInt($questionid)) return \rocketD\util\Error::getError(2);
+		if($this->getSessionValid() !== true ) return \rocketD\util\Error::getError(1);
+		
+		$um = \rocketD\auth\AuthManager::getInstance();
+		$me = $um->getSessionID();
+
+		$im = \obo\lo\InstanceManager::getInstance();
+		if(!$im->userCanEditInstance($me, $instid)) return \rocketD\util\Error::getError(1);
+
+		$sm = \obo\ScoreManager::getInstance();
+		return $sm->getQuestionResponses($instid, $questionid);	
 	}
 
 
@@ -1793,6 +1787,120 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 
+	/**
+	 * Build a set of arguments needed to create an LTI Post request for an outcomes module
+	 * 
+	 * 3 Modes are possible with this
+	 * Play Mode:  getLTIParams($widgetId, $pageId, $loID, $visitKey), requires login and active visitKey
+	 * Preview Mode:  getLTIParams($widgetId, $pageId, $loID) - you dont have a visitKey, requires lib user
+	 * Creator Mode: if you know your itemID - getLTIParams($widgetId) or if you dont - getLTIParams(), requires lib user
+	 * 
+	 * @param string Optional - Id of the object you want from the tool (in Materia this is a widgetID)
+	 * @param string Optional - Id of the current page that item is shown on
+	 * @param string Optional - LOid of the lo that the item is sown in
+	 * @param string Optional - Visit key of the current visit
+	 * @return array ['url'] is the outcomes url to send the request to, ['params'] are the params to post to that url
+	 */
+	public function getLTIParams($mode, $itemID=null, $loID=null, $pageOrQuestionID=null, $pageItemIndex=null, $visitKey=null)
+	{
+		// must be logged in
+		if($this->getSessionValid() !== true) return \rocketD\util\Error::getError(1);
+
+		// ============================= CHOOSE PARAMS BASED ON MODE ============================
+		switch($mode)
+		{
+			
+			case 'select': // select a widget in creator mode
+				if(!empty($loID) || !empty($pageOrQuestionID) || !empty($pageItemIndex) || !empty($visitKey) ) return \rocketD\util\Error::getError(2); // nothing but the itemID
+				$roleMan = \obo\perms\RoleManager::getInstance();
+				if(!$roleMan->isLibraryUser()) return \rocketD\util\Error::getError(1);
+
+				$instID     = '';
+				$visitID    = '';
+				$attemptID  = '';
+				$role       = 'Instructor';
+				$passback   = false;
+				break;
+
+			case 'preview': // show a widget in lo previews
+				if(empty($itemID) || empty($loID) || empty($pageOrQuestionID) || !\obo\util\Validator::isPosInt($pageItemIndex, true) || !empty($visitKey)) return \rocketD\util\Error::getError(2); // no visit key
+				$roleMan = \obo\perms\RoleManager::getInstance();
+				if(!$roleMan->isLibraryUser()) return \rocketD\util\Error::getError(1);
+
+				$instID     = '';
+				$visitID    = '';
+				$attemptID  = '';
+				$role       = 'Learner';
+				$passback   = false;
+				break;
+
+			case 'content': // show a widget in content in instance mode
+				if(empty($itemID) || empty($loID) || empty($pageOrQuestionID) || !\obo\util\Validator::isPosInt($pageItemIndex, true) || empty($visitKey) ) return \rocketD\util\Error::getError(2); // everything
+				$vm = \obo\VisitManager::getInstance();
+				if(!$vm->registerCurrentViewKey($visitKey)) return \rocketD\util\Error::getError(5);
+
+				$instID     = $vm->getCurrentViewKeyInstID();
+				$visitID    = $vm->getCurrentVisitID();
+				$attemptID  = '';
+				$role       = 'Learner';
+				$passback   = false;
+				break;
+
+			case 'question': // show a widget in practice/assessment in instance mode
+				if(empty($itemID) || empty($loID) || empty($pageOrQuestionID) || !\obo\util\Validator::isPosInt($pageItemIndex, true) || empty($visitKey) ) return \rocketD\util\Error::getError(2); // everything
+				$vm = \obo\VisitManager::getInstance();
+				if(!$vm->registerCurrentViewKey($visitKey)) return \rocketD\util\Error::getError(5);
+
+				$am = \obo\AttemptsManager::getInstance();
+
+				$instID    = $vm->getCurrentViewKeyInstID();
+				$visitID   = $vm->getCurrentVisitID();
+				$attemptID = $am->getCurrentAttemptID();
+				$role      = 'Learner';
+				$passback  = true;
+
+				if(!\obo\util\Validator::isPosInt($attemptID)) return \rocketD\util\Error::getError(2);
+				break;
+
+			default:
+				return \rocketD\util\Error::getError(2);
+				break;
+
+		}
+
+		$params = array(
+			"resource_link_id"           => $loID .'-'. $instID .'-'. $pageItemIndex .'-'. $pageOrQuestionID, // unique placement in obojobo
+			"context_id"                 => $instID,
+			"lis_result_sourcedid"       => $loID .'-'. $instID .'-'. $pageItemIndex .'-'. $pageOrQuestionID .'-'. $attemptID .'-'. $visitID,
+			"custom_widget_instance_id"  => $itemID,
+			"roles"                      => $role,
+		);
+
+		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'Oauth.class.php');
+
+		$params =  \LTI\Oauth::buildPostArgs(\AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
+
+		return array('url' => \AppCfg::MATERIA_LTI_URL, 'params' => $params);
+	}
+
+	public function getAttemptQuestionScore($visitKey, $questionID)
+	{
+		// must be logged in
+		if($this->getSessionValid() !== true) return \rocketD\util\Error::getError(1);
+
+		// must be nice input
+		if(!\obo\util\Validator::isPosInt($questionID) || empty($visitKey)) return \rocketD\util\Error::getError(2);
+
+		// visit key must be valid
+		$vm = \obo\VisitManager::getInstance();
+		if(!$vm->registerCurrentViewKey($visitKey)) return \rocketD\util\Error::getError(5);
+
+		$am = \obo\AttemptsManager::getInstance();
+		$attemptID = $am->getCurrentAttemptID();
+
+		$sm = \obo\ScoreManager::getInstance();
+		return $sm->getQuestionScoreForAttempt($attemptID, $questionID);
+	}
 
 }
 ?>

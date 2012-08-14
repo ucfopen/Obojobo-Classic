@@ -1092,6 +1092,11 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	
 }
 
+.page-layout-8 iframe
+{
+	border: none;
+}
+
 
 /* ----------- Media Left / Media Right (quiz only layout) ----------- */
 .page-layout-9
@@ -1450,6 +1455,7 @@ background: linear-gradient(#d4d4d4, #7e7e7e);*/
 	color: white;
 	text-shadow: rgba(0,0,0,.5) 1px 1px 1px;
 	padding: 2px 0 2px 0;
+	z-index: 2;
 }
 
 .question-type-Media .answer-preview.teach-view-item

@@ -30,7 +30,8 @@ obo.remote = function()
 		}
 		else
 		{
-			var callURL = "/api/json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json';
+			//var callURL = "/api/json.php/loRepository."+method+"/"+args.join("/")+'/?contentType=application/json';
+			var callURL = "/api/json.php/loRepository."+method+"/"+args.join("/");
 		}
 		
 

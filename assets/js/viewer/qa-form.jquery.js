@@ -48,9 +48,10 @@
 			{
 				elements.$answers = $('<span class="answer-feedback answers"></span>');
 				var list = '';
-				for(i in answers)
+				var len = answers.length;
+				for(var i = 0; i < len; i++)
 				{
-					list += '<li>' + answers[i] + '</li>';
+					list += '<li>' + answers[i].toLowerCase() + '</li>';
 				}
 				elements.$answers.append('<h4>Answers</h4> <ul>' + list + '</ul>');
 				elements.$container.append(elements.$answers);

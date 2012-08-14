@@ -29,6 +29,124 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		return self::$instance;
 	}
 	
+	public function submitLTIQuestion($sourceid, $tool, $score)
+	{
+		if(empty($sourceid) || empty($score)) return array(false, "Invalid sourceid");
+
+		// get the paramaters out of the sourceid
+		// AS DEFINED BY lis_result_sourcedid => $loID .'-'. $instID .'-'. $pageItemIndex .'-'. $pageOrQuestionID .'-'. $attemptID .'-'. $visitID,
+		list($loID, $instID, $pageItemIndex, $questionID, $attemptID, $visitID) = explode('-', $sourceid);
+
+		// grading not possible
+		if(empty($loID) || empty($instID) || !\obo\util\Validator::isPosInt($pageItemIndex, true) || empty($questionID) ||  empty($attemptID) || empty($visitID)) return array(false, "Invalid sourceid");
+
+		$am       = \obo\AttemptsManager::getInstance();
+		$details  = $am->getAttemptDetails($attemptID);
+		$a        = $details['attempt'];
+		$qGroupID = $a->qGroupID;
+
+		// ================== VALIDATE PASSED PARAMS AGAINST ATTEMPT ============================
+		if( $a->instID != $instID ) return array(false, "Attempt param mismatch");
+
+		// make sure the visit id from attempt details is associated with the visit id from the lti request
+		if($a->visitID != $visitID)
+		{
+			// Note: sometimes the current visitID wont match the visitID from the attempt table, when resuming attempts, that table is not updated
+			// Solution: check out the logs table for a StartAttempt for this lo with a matching attemptID
+			$query = "
+				SELECT ".\cfg_obo_Visit::ID."
+				 FROM  ".\cfg_obo_Track::TABLE."
+				WHERE  ".\cfg_core_User::ID."     = '?'
+				 AND   ".\cfg_obo_Track::TYPE."  = 'ResumeAttempt'
+				 AND   ".\cfg_obo_Instance::ID." = '?'
+				 AND   ".\cfg_obo_Visit::ID."    = '?'
+				 AND   ".\cfg_obo_Track::TO."    = '?'";
+
+			$q = $this->DBM->querySafe($query, $a->userID, $instID, $visitID, $attemptID);
+			if($this->DBM->fetch_num($q) != 1) return array(false, "Attempt param mismatch");
+		}
+
+		// does this question belong to this attempt?
+		if(strlen($a->qOrder) > 1 && strpos($a->qOrder, (string) $questionID) === false ) return array(false, "Question is not in assessment");
+		else
+		{
+			$qgm = \obo\lo\QuestionGroupManager::getInstance();
+			$qGroup = $qgm->getGroup($a->qGroupID, true);
+
+			$found = false;
+			foreach($qGroup->kids AS $question)
+			{
+				if($question->questionID == $questionID)
+				{
+					$found = true;
+					break;
+				}
+			}
+			if(!$found) return array(false, "Question is not in assessment");
+		}
+		// make sure this is a media question
+		$qm = \obo\lo\QuestionManager::getInstance();
+		$q  = $qm->getQuestion($questionID);
+
+		if( !($q instanceof \obo\lo\Question) || $q->itemType != \cfg_obo_Question::QTYPE_MEDIA || $q->items[0]->media[0]->itemType != 'kogneato') return array(false, "Question is not valid LTI type");
+
+		// ================================ SAVE THE SCORE ============================
+		
+		$score = round($score*100);
+		// Store the answer in the score table, getting the attempt data from the associated attempt table
+		// Update if this question is already answered for this attempt - we only keep the score that matters
+		$qstr = "
+		INSERT
+		INTO ".\cfg_obo_Score::TABLE." 
+		(
+			".\cfg_obo_Visit::ID.",
+			".\cfg_obo_LO::ID.",
+			".\cfg_obo_Instance::ID.",
+			".\cfg_obo_Score::TIME.",
+			".\cfg_obo_Attempt::ID.",
+			".\cfg_core_User::ID.",
+			".\cfg_obo_QGroup::ID.",
+			".\cfg_obo_Score::ITEM_ID.",
+			".\cfg_obo_Score::TYPE.",
+			".\cfg_obo_Answer::ID.",
+			".\cfg_obo_Score::ANSWER.",
+			".\cfg_obo_Score::SCORE."
+		)
+		SELECT
+			".\cfg_obo_Visit::ID.",
+			".\cfg_obo_LO::ID.",
+			".\cfg_obo_Instance::ID.",
+			'?' AS ".\cfg_obo_Score::TIME.",
+			".\cfg_obo_Attempt::ID.",
+			".\cfg_core_User::ID.",
+			".\cfg_obo_QGroup::ID.",
+			'?' AS ".\cfg_obo_Score::ITEM_ID.",
+			'?' AS ".\cfg_obo_Score::TYPE.",
+			'?' AS ".\cfg_obo_Answer::ID.",
+			'?' AS ".\cfg_obo_Score::ANSWER.",
+			'?' AS ".\cfg_obo_Score::SCORE."
+		FROM ".\cfg_obo_Attempt::TABLE."
+		WHERE ".\cfg_obo_Attempt::ID." = '?'
+		
+		ON DUPLICATE KEY
+		UPDATE
+			".\cfg_obo_Score::TIME." = '?',
+			".\cfg_obo_Answer::ID." = '?',
+			".\cfg_obo_Score::ANSWER."='?',
+			".\cfg_obo_Score::SCORE." = '?'";
+
+		if( !($q = $this->DBM->querySafe($qstr, time(), $questionID, 'm', 0, $score, $score, $attemptID, time(), 0, $score, $score)) )
+		{
+			trace(mysql_error(), true);
+			return array(false, "Could not save score");
+		}
+
+		$tm = \obo\log\LogManager::getInstance();
+		$tm->trackSubmitLTIAssessment($source, $instID, $visitID, $a->{\cfg_obo_LO::ID}, $a->{\cfg_core_User::ID}, $qGroupID, $questionID, $score);
+
+		return  array(true, "Score for item $sourceid saved as $score");;
+	}
+
 	/**
 	 * Submits a question to be graded MEDIA uses submit media
 	 * @param $qgroup (number) QuestionGroup ID
@@ -71,21 +189,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			trace('questionID invalid', true);
 			return false; // error: invalid questionID
 		}
-
-		// // Make Sure the question is part of this qGroup
-		// $qstr = "SELECT * FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' AND ".\cfg_obo_QGroup::MAP_CHILD."='?' LIMIT 1";
-		// if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $questionID)))
-		// {
-		//     $this->DBM->rollback();
-		// 	return false; // query error
-		// }
-		// 
-		// if($this->DBM->fetch_num($q) == 0)
-		// {
-		// 	trace('question id not a child of this qgroup', true);
-		// 	return false; // question isnt part of this qgroup
-		// }
-		
 		
 		// ---- Make sure the question is in the current attempt ----
 		$AM = \obo\AttemptsManager::getInstance();
@@ -931,6 +1034,16 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		$qgroup->getFromDB($this->DBM, $qGroupID, true);
 		return $qgroup->calculateQuizSize();
 
+	}
+
+	public function getQuestionScoreForAttempt($attemptID, $questionID)
+	{
+		if(empty($attemptID) || empty($questionID)) return false;
+
+		$query = "SELECT * FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID." = '?' AND ".\cfg_obo_Score::ITEM_ID." = '?'";
+		if( !($q = $this->DBM->querySafe($query, $attemptID, $questionID)) ) return false;
+		if( $r = $this->DBM->fetch_obj($q) ) return $r->{\cfg_obo_Score::SCORE};
+		return false;
 	}
 }
 ?>

@@ -16,13 +16,6 @@ obo.media = function()
 	var YOUTUBE_WIDTH_FOR_QUIZ = 500;
 	var YOUTUBE_HEIGHT_FOR_QUIZ = 304;
 	
-	// @private
-	
-	//var youTubeAPIReady = false;
-	
-	// we store a reference to the YT player instances and media objects
-	//var ytPlayers = {};
-	
 	// counter used to create uniqueIDs for media.
 	// this always increases, so each media will be uniquely identified.
 	var mediaCount = 0;
@@ -36,7 +29,7 @@ obo.media = function()
 	{
 		if(params != null)
 		{
-			return params
+			return params;
 		}
 		else
 		{
@@ -51,84 +44,76 @@ obo.media = function()
 				// we want high performance gpu, but in preview mode the popups for the subnavs (question alts)
 				// can be blocked by the swf (gpu/direct swfs are the front most layer)
 				wmode: obo.model.getMode() === 'preview' ? 'opaque' : 'direct'*/
-			}
-		};
-	}
-	
-	// update the duration
-	/*
-	var reportDurationForYoutubeVideo = function(mediaID, duration)
-	{
-		// @TODO - In the future we should simply store the mediaID instead of grabbing it again
-		var mediaObject = obo.model.getMediaObjectByID(mediaID);
-		mediaObject.duration = duration;
-		
-		// @TODO - This doesn't work because it doesn't JSON encode the mediaObject.
-		// we need to create a more specific call - perhaps updateMediaProperty
-		obo.remote.makeCall('editMedia', [mediaObject, obo.model.getMode() === 'instance' ? obo.model.getLO().viewID : -1]);
-	};*/
-	
-	// @TODO need to deal with the player variable
-	/*
-	var buildYouTubeVideo = function($placeholder)
-	{
-		var youtubeID = $placeholder.attr('data-youtube-id');
-		debug.log('buildYouTubeVideo=', youtubeID);
-		var player = new YT.Player($placeholder.attr('id'), {
-			width: $placeholder.width(),
-			height: $placeholder.height(),
-			videoId: youtubeID
-			
-			//events: { // @TODO: make onStateChange work for multiple videos (send callback?)
-			//	'onStateChange': onYouTubeStateChange
-			//}
-		});
-		//ytPlayers[$placeholder.attr('data-media-id')] = player;
-		
-		// remove it's placeholder status:
-		$placeholder.removeClass('youtube-placeholder').addClass('youtube-container');
-		
-		return player;
-	};
-	*/
-	var kogneatoize = function()
-	{
-		debug.log('kogneatoize');
-		if(AUTOLOAD_FLASH)
-		{
-			$('.kogneato-placeholder').each(function(index, placeholder)
-			{
-				var $placeholder = $(placeholder);
-				$placeholder.removeClass('kogneato-placeholder').addClass('kogneato-container');
-				var giid = $placeholder.attr('data-giid');
-				obo.remote.makeCall('doPluginCall', ['Kogneato', 'getKogneatoEngineLink',  [giid]], function(event) {
-					debug.log('kogneatoize 2');
-					debug.log(event);
-					$('.kogneato-container').each(function(index, container)
-					{
-						var $container = $(container);
-						var w = $container.width();
-						var h = $container.height();
-						debug.log(w, h);
-						var url = '/assets/flash/kogneato-widget.swf?id=' + container.id + '&callback=obo.kogneato.onKogneatoEvent&kogneatoURL=' + event.url;
-						swfobject.embedSWF(url, container.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
-					});
-				});
-			});
+			};
 		}
+	};
+
+	var materiaize = function()
+	{
+		debug.log('materiaize');
+		$('.materia-placeholder').each(function(index, placeholder)
+		{
+			var $placeholder = $(placeholder);
+			$placeholder.removeClass('materia-placeholder').addClass('materia-container');
+			var giid = $placeholder.attr('data-giid');
+//public function getLTIParams($mode, $itemID=null, $loID=null, $pageOrQuestionID=null, $pageItemIndex=null, $visitKey=null)
+			//preview, content, question
+			//content=not interactive question
+			//preview=interactive questions not in inst mode
+
+			var p = obo.model.getPageObject();
+			var itemIndex = $placeholder.parents('figure').attr('data-item-index');
+
+			var params = ['mode', giid, obo.model.getLO().loID, obo.model.getPageID(), itemIndex];
+			if(obo.model.getMode() === 'preview')
+			{
+				params[0] = 'preview';
+			}
+			else
+			{
+				params.push(obo.model.getLO().viewID);
+				
+				if(typeof p.itemType !== 'undefined' && p.itemType.toLowerCase() === 'media')
+				{
+					params[0] = 'question';
+				}
+				else
+				{
+					params[0] = 'content';
+				}
+			}
+			obo.remote.makeCall('getLTIParams', params, function(result) {
+				//result could be {errorID: X, message: Y}
+				if(result.params !== 'undefined')
+				{
+					var $form = $('<form action="' + _materiaLtiUrl + '" method="POST" target="' + $placeholder.attr('id') + '"></form>');
+					
+					var $input;
+					for(var param in result.params)
+					{
+						$input = $('<input name="' + param + '" id="' + param + '" value="' + result.params[param] + '" hidden="true">');
+						$form.append($input);
+					}
+					
+					$('body').append($form);
+					$form.submit();
+					$form.remove();
+				}
+			});
+		});
+
+		positionOverlayMedia();
 	};
 	
 	var swfize = function()
 	{
-		//return;
 		if(AUTOLOAD_FLASH)
 		{
 			$('.swf-placeholder').each(function(index, placeholder)
 			{
 				var $placeholder = $(placeholder);
 				$placeholder.removeClass('swf-placeholder').addClass('swf-container');
-				var mediaID = $placeholder.attr('data-media-id'); //placeholder.id.split('media-')[1];	
-				//$placeholder.parent('.media-item').css('height', $placeholder.css('height')).css('width', $placeholder.css('width'));
+				var mediaID = $placeholder.attr('data-media-id');
 				var url = '/media/';
 				var asVersion = $placeholder.attr('data-as-version');
 				if(asVersion && asVersion.length > 0)
@@ -137,45 +122,18 @@ obo.media = function()
 					{
 						case '2':
 							url = '/assets/flash/captivateSpyCP2.swf?id=' + placeholder.id + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
-							// @TODO hack captivate switch
-							//$('#swf-holder').append('<a id="swap-cap" onclick="switchCaptivateSpy(event)" data-cur-version="2" data-element-id="' + placeholder.id + '" data-width="' + $placeholder.width() + '" data-height="' + $placeholder.height() + '" data-media-id="' + mediaID + '" style="position:relative; top:-25px;" href="#">Loaded as AS2 - Click to reload as AS3</a>');
 							break;
 						case '3':
 							url = '/assets/flash/captivateSpyCP5.swf?id=' + placeholder.id + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
-							// @TODO
-							//$('#swf-holder').append('<a id="swap-cap" onclick="switchCaptivateSpy(event)" data-cur-version="3" data-element-id="' + placeholder.id + '" data-width="' + $placeholder.width() + '" data-height="' + $placeholder.height() + '" data-media-id="' + mediaID + '" style="position:relative; top:-25px;" href="#">Loaded as AS3 - Click to reload as AS2</a>');
 							break;
 					}
 				}
-				//alert('placeholder:'+ $placeholder.width()+','+ $placeholder.height());
 				var w = $placeholder.width();
 				var h = $placeholder.height();
-				//swfobject.embedSWF(url + mediaID, placeholder.id, '100%', '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
 				swfobject.embedSWF(url + mediaID, placeholder.id, w > 0 ? w : '100%', h > 0 ? h : '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
 			});
 		}
-		
-		//obo.view.updateInteractiveScore(0);
 	};
-	/*
-	var capize = function()
-	{
-		////mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
-		debug.log('capize');
-		if(AUTOLOAD_FLASH)
-		{
-			$('.cap-placeholder').each(function(index, placeholder)
-			{
-				debug.log(placeholder);
-				debug.log(placeholder.id);
-				var $placeholder = $(placeholder);
-				$placeholder.removeClass('swf-placeholder').addClass('swf-container');
-				var mediaID = $placeholder.attr('data-media-id'); //placeholder.id.split('media-')[1];	
-				$placeholder.parent('.page-item').css('height', $placeholder.css('height')).css('width', $placeholder.css('width'));
-				swfobject.embedSWF( "/captivate/" + mediaID, placeholder.id, '100%', '100%', "10",  "/assets/flash/expressInstall.swf", {}, getParams());
-			});
-		}
-	};*/
 	
 	// converts any youtube placeholder elements with an instance of the youtube player.
 	var youtubeize = function()
@@ -186,8 +144,6 @@ obo.media = function()
 			{
 				var $placeholder = $(placeholder);
 				$placeholder.removeClass('youtube-placeholder').addClass('youtube-container');
-				//var mediaID = placeholder.id.split('media-')[1];
-				//var mediaID = $placeholder.attr('data-media-id');
 				var youtubeURL = $placeholder.attr('data-youtube-id');
 				var params = getParams();
 				params.allowScriptAccess = "always";
@@ -229,15 +185,6 @@ obo.media = function()
 		}
 	}
 	
-	// @public
-	
-	// to be called when a page changes which clears out video info
-	/*
-	var clear = function()
-	{
-		ytPlayers = {};
-		youTubeVideoCount = 0;
-	};*/
 	var getMediaItemByMediaID = function(mediaID)
 	{
 		var result = $('.media-item[data-media-id="' + mediaID + '"]');
@@ -253,13 +200,6 @@ obo.media = function()
 
 	var reloadSWF = function($objectElement)
 	{
-		/*
-		(function($objectElement) {
-			$objectElement.hide();
-			setTimeout(function() {
-				$objectElement.show();
-			}, 1);
-		})($objectElement);*/
 		var url = obo.util.getURLFromEmbeddedSwf($objectElement);
 		if(typeof url !== 'undefined')
 		{
@@ -279,23 +219,29 @@ obo.media = function()
 	
 	// creates either a YouTube or non-YouTube video, appends to $target
 	// pageItemOptions is for custom layout page items only
-	var createMedia = function(mediaObject, $target, pageItemOptions)
+	var createMedia = function(pageObject, $target)
 	{
-		if(mediaObject)
+		var mediaObject = pageObject.media[0];
+		var pageItemOptions = pageObject.options;
+
+		if(typeof mediaObject !== 'undefined')
 		{
 			var section = obo.model.getSection();
 			var page = obo.model.getPage();
 		
 			var $mediaElement = $('<figure class="media-item"></figure>');
-			//obo.util.doLater(function() { alert($mediaElement.css('list-style-type')); });
 		
-			debug.log('create media', mediaObject.width, mediaObject.height);
-			//debug.log('createMedia', mediaObject, $target);
-			//mediaObject.itemType = 'cap5';
+			debug.log('create media', mediaObject);
 		
 			// some useful attributes - we also include page and section for flash overlay hack purposes
-			$mediaElement.attr('data-media-width', mediaObject.width).attr('data-media-height', mediaObject.height).attr('data-media-id', mediaObject.mediaID);
-			$mediaElement.addClass('media-for-page-' + section + page);
+			$mediaElement
+				.attr('data-media-width', mediaObject.width)
+				.attr('data-media-height', mediaObject.height)
+				.attr('data-media-id', mediaObject.mediaID)
+				.addClass('media-for-page-' + section + page)
+				.attr('data-section', section)
+				.attr('data-page', page)
+				.attr('data-item-index', obo.model.getIndexOfItem(pageObject));
 		
 			switch(mediaObject.itemType.toLowerCase())
 			{
@@ -358,19 +304,7 @@ obo.media = function()
 					{
 						$target.append($mediaElement);
 					}
-					/*
-					var maxWidth = parseInt($mediaElement.css('max-width').replace('px', ''));
-					if(isNaN(maxWidth))
-					{
-						maxWidth = 9999999;
-					}
-					alert('now=',maxWidth);
-					var mediaWidth = Math.min(maxWidth, mediaObject.width);
-					var scaleFactor = mediaWidth / mediaObject.width;
-					var mediaHeight = Math.ceil(mediaObject.height * scaleFactor);
-					debug.log('mediaObject', mediaObject, 'maxWidth', maxWidth, 'mediaWidth', mediaWidth, 'mediaHeight', mediaHeight);
-					*/
-					//$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder" style="height:' + mediaHeight + 'px;width:' + mediaWidth + 'px;"></div>');
+
 					$swf = $('<div id="swf-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="swf-placeholder"></div>');
 					if(isCaptivate)
 					{
@@ -391,61 +325,14 @@ obo.media = function()
 					{
 						$standin.width(mediaObject.width).height(mediaObject.height);
 					
-						//setTimeout(function() {
-							var o = $('.media-item-standin').offset();
-							//alert('O='+ o.left + ',' + o.top);
-							$('.media-item').offset({left: o.left});
-							$('#swf-holder').offset({top: o.top});
-						//}, 1);
+						var o = $('.media-item-standin').offset();
+						$('.media-item').offset({left: o.left});
+						$('#swf-holder').offset({top: o.top});
 					}
 					else
 					{
 						$mediaElement.width(mediaObject.width).height(mediaObject.height);
 					}
-				
-				
-					/*
-					//$('.media-item').click(function(event) {
-					setTimeout(function () {
-						debug.log('click');
-						var $media = $target;
-						$media.css('max-width', '');
-						$('body').append($media);
-						$media.css('position', 'absolute');
-						$media.css('left', 0);
-						$media.css('top', 0);
-						$media.css('width', mediaObject.width + 'px');
-						$media.css('height', mediaObject.height + 'px');
-					}, 2000);
-					//});*/
-				
-					// popout:
-				
-					// @TODO: Testing
-					/*
-					$('#preview-mode-notification').click(function() {
-						var objects = document.getElementsByTagName('object');
-						alert(objects);
-						document.body.appendChild(objects[0]);
-						/*
-						$('.question').addClass('modal');
-						$('.media-item').attr('data-page-width', $('.media-item').width());
-						$('.media-item').attr('data-page-height', $('.media-item').height());
-						$('.media-item').css('max-width', '9999px');
-						$('.media-item').width($('.media-item').attr('data-media-width')).height($('.media-item').attr('data-media-height'));
-						$('.question').click(function() {
-							$('.question').removeClass('modal');
-							$('.media-item').css('max-width', '850px');
-							$('.media-item').width($('.media-item').attr('data-page-width'));
-							$('.media-item').height($('.media-item').attr('data-page-height'));
-						});*/
-						/*
-						$('.media-item').css('position', 'fixed');
-						$('.media-item').css('left', 0);
-						$('.media-item').css('top', 0);
-						$('.media-item').css('z-index', '9999');
-						//$.modal($('.media-item'));*/
-					//});
 
 					$('.reload-media-button').remove();
 					if(isCaptivate)
@@ -465,12 +352,7 @@ obo.media = function()
 					}
 					
 				
-					break;/*
-				case 'cap':
-					$target.append('<div id="cap-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="cap-placeholder" style="height:' + mediaObject.height + 'px;width:' + mediaObject.width + 'px;">SWF ' + mediaObject.title + '</div>');
-					$target.children('#cap-' + mediaCount).load('/assets/templates/viewer.html #swf-alt-text', capize);
-					//mediaObject.source = './captivateSpy.swf?commChannel=' + 'bridgeData.channel' + '&captivateURL=' + escape('../getAsset.php?id=' + _mediaObject.id);
-					break;*/
+					break;
 				case 'kogneato':
 					// some sanity values in case we're getting bad sizes back.
 					if(mediaObject.width < 100 || mediaObject.height < 100)
@@ -478,12 +360,70 @@ obo.media = function()
 						mediaObject.width = 800;
 						mediaObject.height = 600;
 					}
+
+					// standin represents our media stand-in - where the swf would be placed normally.
+					// we define standin if needed to act as a positioning guide for captivates.
+					var $standin = null;
+
+					var isInteractive = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
+					if(isInteractive)
+					{
+						//$('#swap-cap').show();
+					
+						createSwfHolder(section);
+					
+						// define standin, since we need to overlay captivates
+						$standin = $('<div class="media-item-standin"></div>');
+					
+						// if this kogneato already is being overlayed then don't overlay it again!
+						if($('.media-for-page-' + section + page).length > 0)
+						{
+							$mediaElement = $($('.media-for-page-' + section + page)[0]);
+							// @HACK we turn both parent and object visible for Safari
+							$mediaElement.css('visibility', 'visible');
+							$mediaElement.find('iframe').show();
+						}
+						else
+						{
+							$('#swf-holder-' + section).append($mediaElement);
+						}
+					
+						$target.append($standin);
+					
+					}
+					else
+					{
+						$target.append($mediaElement);
+					}
+
+					// frameborder=0 will remove iframe borders for IE8. it's not valid html though, so we only use it if we have to.
+					var $materia = $('<iframe ' + (obo.util.isIE8() ? 'frameborder="0"' : '') + 'id="materia-' + mediaCount + '" name="materia-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" data-giid="' + mediaObject.url + '" class="materia-placeholder"></iframe>');
+					if($mediaElement.find('iframe').length === 0)
+					{
+						$mediaElement.append($materia);
+					}
+
+					if($standin != null)
+					{
+						$standin.width(mediaObject.width).height(mediaObject.height);
+						
+						positionOverlayMedia();
+					}
+					else
+					{
+						$mediaElement.width(mediaObject.width).height(mediaObject.height);
+					}
+
+					break;
 					/*
-					mediaObject.width = 640;
-					mediaObject.height = 480;
-					mediaObject.width = 1000;
-					mediaObject.height = 1000;
-*/
+				case 'kogneato-old': //@TODO delete me
+					// some sanity values in case we're getting bad sizes back.
+					if(mediaObject.width < 100 || mediaObject.height < 100)
+					{
+						mediaObject.width = 800;
+						mediaObject.height = 600;
+					}
+
 					// standin represents our media stand-in - where the swf would be placed normally.
 					// we define standin if needed to act as a positioning guide for captivates.
 					var $standin = null;
@@ -540,7 +480,7 @@ obo.media = function()
 					{
 						$mediaElement.width(mediaObject.width).height(mediaObject.height);
 					}
-					break;
+					break;*/
 				case 'youtube':
 					var $youtube = $('<div id="youtube-' + mediaCount + '" data-youtube-id="' + mediaObject.url + '" data-media-id="' + mediaObject.mediaID + '" class="youtube-placeholder"></div>');
 				
@@ -556,35 +496,17 @@ obo.media = function()
 						// otherwise use default youtube dimensions
 						if(obo.model.getSection() === 'content')
 						{
-							//$youtube.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
-							//$mediaElement.width(YOUTUBE_WIDTH_FOR_CONTENT_PAGE).height(YOUTUBE_HEIGHT_FOR_CONTENT_PAGE);
 							mediaObject.width = YOUTUBE_WIDTH_FOR_CONTENT_PAGE;
 							mediaObject.height = YOUTUBE_HEIGHT_FOR_CONTENT_PAGE;
 						}
 						else
 						{
-							//$youtube.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
-							//$mediaElement.width(YOUTUBE_WIDTH_FOR_QUIZ).height(YOUTUBE_HEIGHT_FOR_QUIZ);
 							mediaObject.width = YOUTUBE_WIDTH_FOR_QUIZ;
 							mediaObject.height = YOUTUBE_HEIGHT_FOR_QUIZ;
 						}
 					}
 					$target.append($mediaElement);
 					$mediaElement.append($youtube);
-				
-					//@TODO - This is iFrame embed code which doesn't play nice with IE8
-					/*
-					if(!youTubeAPIReady)
-					{
-						obo.loader.loadScript('http://www.youtube.com/player_api');
-					}
-					else
-					{
-						setTimeout(function() {
-							youtubeize();
-						}, 1);
-					}*/
-					//youtubeize();
 				
 					break;
 				case 'flv':
@@ -600,11 +522,7 @@ obo.media = function()
 				default:
 					return false;
 			}
-		
-			// @TODO
-			//alert(parseInt($mediaElement.css('max-width').replace('px', '')));
-			//alert($mediaElement.css('max-height'));
-		
+
 			// calculate dimensions, based on the media object and max-widths/max-heights.
 			// this results in us being able to create the media-item container at the
 			// correct dimensions so we don't have flashy expanding divs.
@@ -677,6 +595,11 @@ obo.media = function()
 					$img = undefined;
 				}
 
+				if(typeof $materia !== 'undefined')
+				{
+					$materia.width(mediaObject.width).height(mediaObject.height);
+				}
+
 				// attribution
 				if(typeof mediaObject.attribution !== 'undefined' && mediaObject.attribution !== null && (mediaObject.attribution === true || mediaObject.attribution.toString() === '1'))
 				{
@@ -696,10 +619,10 @@ obo.media = function()
 				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
 				$swf = undefined;
 			}
-			if(typeof $kogneato !== 'undefined')
+			if(typeof $materia !== 'undefined')
 			{
-				$kogneato.load('/assets/templates/viewer.html #swf-alt-text', kogneatoize);
-				$kogneato = undefined;
+				$materia.load('/assets/templates/viewer.html #swf-alt-text', materiaize);
+				$materia = undefined;
 			}
 
 			debug.log('dimensions', $mediaElement.width(), $mediaElement.height());
@@ -719,32 +642,6 @@ obo.media = function()
 			$('#swf-holder').offset({top: o.top});
 		}
 	};
-	
-	// (you don't need to call this directly)
-	/*
-	var onYouTubeStateChange = function(event)
-	{
-		// update the duration in the DB
-		debug.log('onYouTubeStateChange');
-		var mediaID = $(event.target.a.parentElement).attr('data-media-id');
-		//debug.log('youtubeID', youtubeID, players);
-		var duration;
-		if(ytPlayers[mediaID] && ytPlayers[mediaID].getDuration)
-		{
-			debug.log(ytPlayers[mediaID]);
-			duration = ytPlayers[mediaID].getDuration();
-			if(duration > 0)
-			{
-				debug.log(ytPlayers[mediaID].getDuration());
-				reportDurationForYoutubeVideo(mediaID, duration);
-			}
-		}
-	};*/
-	/*
-	var setYouTubeAPIReady = function(val)
-	{
-		youTubeAPIReady = val;
-	};*/
 
 	// add our swf holder mechanism if it doesn't exist already:
 	var createSwfHolder = function(section)
@@ -758,20 +655,10 @@ obo.media = function()
 		
 			$('#swf-holder').append($('<div id="swf-holder-' + section + '"></div>'));
 		}
-	}
+	};
 	
 	return {
-		//setYouTubeAPIReady: setYouTubeAPIReady,
 		createMedia: createMedia,
 		positionOverlayMedia: positionOverlayMedia
-		//youtubeize: youtubeize
 	};
 }();
-/*
-// @TODO does this need to be in the global namespace?
-// required callback by the youtube iframe API.
-function onYouTubePlayerAPIReady(event)
-{
-	obo.media.setYouTubeAPIReady(true);
-	obo.media.youtubeize();
-}*/

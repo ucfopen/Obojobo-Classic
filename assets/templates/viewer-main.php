@@ -35,7 +35,6 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.model.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
-  <script type="text/javascript" src="/assets/js/viewer/obo.kogneato.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
 
@@ -55,7 +54,7 @@ else
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 <script type="text/javascript" src="/min/b=assets/js&f=
-jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.kogneato.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
+jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
 
 
@@ -101,6 +100,9 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
   
   // disable logs by defualt
   debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
+
+  // global variables from the config
+  _materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
   
   $(function() {
     if(typeof oldBrowser !== 'undefined' && oldBrowser === true)
