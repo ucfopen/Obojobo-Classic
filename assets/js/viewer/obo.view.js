@@ -265,7 +265,7 @@ obo.view = function()
 								{
 									$('#swf-holder-assessment').remove();
 								}
-								obo.captivate.clearCaptivateData();
+								obo.captivate.clearCaptivateData('assessment');
 								toggleTeachViewSwitch();
 							},
 							buttons: [
@@ -551,7 +551,8 @@ obo.view = function()
 		{
 			$('#swf-holder-practice').remove();
 		}
-		obo.captivate.clearCaptivateData();
+		obo.captivate.clearCaptivateData('practice');
+		obo.captivate.clearCaptivateData('assessment');
 		
 		obo.model.startAssessment();
 	}
@@ -569,7 +570,7 @@ obo.view = function()
 		// @TODO: What happens if the server takes a dump?  Should I not clear out assessment?
 		//viewState.assessment = []; // clear out assessment answers so new attempts are empty
 		obo.model.submitAssessment();
-		obo.captivate.clearCaptivateData();
+		obo.captivate.clearCaptivateData('assessment');
 	};
 	
 	var showSubnav = function()

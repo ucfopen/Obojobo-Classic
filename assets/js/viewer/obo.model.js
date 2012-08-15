@@ -949,12 +949,21 @@ obo.model = function()
 						
 					}
 				}
+
+				// By deleting the practice questions we ensure that returning to the practice
+				// section will start a new attempt and re-grab the questions.
+				// If we don't do this then LTI integrations won't have the correct AttemptID!
+				delete lo.pGroup.kids;
 			}
 			else if(mode === 'preview' && !teachView)
 			{
 				// rebuild fake assessment quiz if not in teach view
 				buildFakeAssessmentQuiz();
 			}
+
+			// clear out the practice section (since we'll be starting a new attempt)
+			clearPractice();
+			pages['practice'] = 'start';
 
 			// insert a local score record (to be completed later)
 			scores.push({
@@ -1011,6 +1020,12 @@ obo.model = function()
 		//setSection('assessment');
 		//setPageOfCurrentSection('scores');
 		setLocation('assessment', 'scores');
+	};
+
+	var clearPractice = function()
+	{
+		responses.practice = [];
+		viewState.practice = [];
 	};
 
 	var clearAssessment = function()

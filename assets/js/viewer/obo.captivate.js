@@ -12,13 +12,20 @@ obo.captivate = function()
 	//var captivateID = -1;
 	// we store the captivate score data for captivate 5 swfs since we are responsible for
 	// calculating the grade
-	var scoreDatas = {};
+	var scoreDatas = {practice:{}, assessment:{}};
 	
 	// public method which ExternalInterface calls whenever it gets a captivate event.
 	// look in the CaptivateSpy fla files for the ExternalInterface code
 	var onCaptivateSpyEvent = function(event)
 	{
 		debug.log('onCaptivateSpyEvent',event, event.type, event.id,scoreDatas);
+
+		var $swf = $('#' + event.id);
+		var $parent = $swf.parent();
+		var targetSection = $parent.attr('data-section');
+		var targetPage = $parent.attr('data-page');
+
+		var targetScoreDatas = scoreDatas[targetSection];
 		
 		/*
 		// if this event is for a different id then reset our data
@@ -27,17 +34,14 @@ obo.captivate = function()
 			captivateID = event.id;
 			scoreData = {responses:[], numQuestionsAnswered:0};
 		}*/
-		if(scoreDatas[event.id] == undefined)
+		if(targetScoreDatas[event.id] == undefined)
 		{
-			scoreDatas[event.id] = {responses:[], numQuestionsAnswered:0};
+			targetScoreDatas[event.id] = {responses:[], numQuestionsAnswered:0};
 		}
 		
-		var scoreData = scoreDatas[event.id];
+		var scoreData = targetScoreDatas[event.id];
 
-		var $swf = $('#' + event.id);
-		var $parent = $swf.parent();
-		var targetSection = $parent.attr('data-section');
-		var targetPage = $parent.attr('data-page');
+		
 		
 		// we listen for two versions of captivate - 2 (AS2) and 5 (AS3):
 		switch(event.version)
@@ -88,14 +92,27 @@ obo.captivate = function()
 	};
 	
 	// removes all scoring information.
-	var clearCaptivateData = function()
+	var clearCaptivateData = function(_section)
 	{
-		scoreDatas = {};
+		scoreDatas[_section] = {};
+	};
+
+	var clearCaptivateDataForID = function(id)
+	{
+		if(typeof scoreDatas['practice'][id] !== 'undefined')
+		{
+			delete scoreDatas['practice'][id];
+		}
+		else if(typeof scoreDatas['assessment'][id] !== 'undefined')
+		{
+			delete scoreDatas['assessment'][id];
+		}
 	};
 	
 	// @public:
 	return {
 		onCaptivateSpyEvent: onCaptivateSpyEvent,
-		clearCaptivateData: clearCaptivateData
-	}
+		clearCaptivateData: clearCaptivateData,
+		clearCaptivateDataForID: clearCaptivateDataForID
+	};
 }();
