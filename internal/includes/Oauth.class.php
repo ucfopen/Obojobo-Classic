@@ -59,12 +59,12 @@ class Oauth
 			"lis_person_contact_email_primary"       => $me->email,
 
 			"launch_presentation_document_target"    => 'iframe',
-			"launch_presentation_return_url"         => 'http://obo/lti/return',
+			"launch_presentation_return_url"         => \AppCfg::URL_WEB . 'lti/return',
 		);
 
 		$params = array_merge($params, $oauthParams);
 
-		if($enablePassback) $params['lis_outcome_service_url'] = 'http://obo/lti/grade-passback.php';
+		if($enablePassback) $params['lis_outcome_service_url'] = \AppCfg::URL_WEB . 'lti/grade-passback.php';
 
 		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'oauth.php');
 

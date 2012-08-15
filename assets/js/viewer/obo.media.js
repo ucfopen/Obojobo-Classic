@@ -211,7 +211,6 @@ obo.media = function()
 			var $new = $('<div></div>');
 			$new.attr('id', id);
 			$parent.prepend($new);
-
 			//@TODO - This simply requires flash 10, but we know what it should require
 			swfobject.embedSWF(url, id, width, height, "10",  "/assets/flash/expressInstall.swf", {}, getParams(), {});
 		}
@@ -337,15 +336,19 @@ obo.media = function()
 					$('.reload-media-button').remove();
 					if(isCaptivate)
 					{
-						var $reloadMediaButton = $('<a class="reload-media-button" role="button" data-media-id="' + mediaObject.mediaID + '" href="#">Reload media</a>');
+						var $reloadMediaButton = $('<a class="reload-media-button" role="button" href="#">Reload media</a>');
 						$reloadMediaButton.click(function(event) {
 							event.preventDefault();
-							var $link = $(event.target);
-							var mediaID = $link.attr('data-media-id');
-							var $e = getMediaItemByMediaID(mediaID);
-							if(typeof $e !== 'undefined')
+
+							var $figure = $('.media-for-page-' + obo.model.getSection() + obo.model.getPage());
+							if($figure.length > 0)
 							{
-								reloadSWF($e.find('object'));
+								var $object = $figure.find('object');
+								if($object.length > 0)
+								{
+									obo.captivate.clearCaptivateDataForID($object.attr('id'));
+									reloadSWF($object);
+								}
 							}
 						});
 						$mediaElement.append($reloadMediaButton);
