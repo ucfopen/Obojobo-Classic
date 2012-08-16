@@ -2127,7 +2127,7 @@ obo.view = function()
 			var mode = obo.model.getMode();
 			var id = mode == 'instance' ? obo.model.getLO().instanceData.instID : obo.model.getLO().loID;
 			debug.log('Google Url: /' + mode + '/' + id + getHashURL());
-			_gaq.push(['_trackPageview', '/' + mode + '/' + id + '/' + getHashURL()]);
+			_gaq.push(['_trackPageview', '/' + mode + '/' + id + getHashURL()]);
 		}
 		
 	};
