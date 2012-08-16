@@ -1959,6 +1959,13 @@ obo.view = function()
 	// @PUBLIC:
 	var init = function($element)
 	{
+		// update google analytics
+		if(typeof _gaq !== 'undefined')
+		{
+			debug.log('Google Mode: ' + obo.model.getMode());
+			_gaq.push(['_setCustomVar', 2, 'mode', obo.model.getMode(), 2]);
+		}
+
 		loadUI($element);
 	};
 	
@@ -2113,6 +2120,16 @@ obo.view = function()
 		window.scrollTo(0, 0);
 
 		debug.timeEnd('render');
+
+		if(typeof _gaq !== 'undefined')
+		{
+			
+			var mode = obo.model.getMode();
+			var id = mode == 'instance' ? obo.model.getLO().instanceData.instID : obo.model.getLO().loID;
+			debug.log('Google Url: /' + mode + '/' + id + getHashURL());
+			_gaq.push(['_trackPageview', '/' + mode + '/' + id + '/' + getHashURL()]);
+		}
+		
 	};
 	
 	// use this when attempting to display content over swfs using gpu wmodes

@@ -720,6 +720,12 @@ obo.model = function()
 		// update, if needed
 		if(section != currentSection || pages[section] != currentPage)
 		{
+			// update google analytics
+			if(typeof _gaq !== 'undefined' && section != currentSection)
+			{
+				debug.log('Google Section: ' + getSection());
+				_gaq.push(['_setCustomVar', 1, 'section', getSection(), 2]);
+			}
 			// send tracking logs
 			if(mode === 'instance')
 			{
