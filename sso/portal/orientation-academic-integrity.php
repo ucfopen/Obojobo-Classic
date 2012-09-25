@@ -131,7 +131,7 @@ try
 	// Display html
 	?>
 	<html>
-		<head><head>
+		<head></head>
 		<body bgcolor="#F8F8F8">
 		<?php
 		// we found at least one instances
