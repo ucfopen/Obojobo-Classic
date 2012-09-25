@@ -6,6 +6,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 ?>
 <config>
 	<remoting_gateway><?php echo \AppCfg::URL_WEB.\AppCfg::AMF_GATEWAY; ?></remoting_gateway>
+	<json_gateway><?php echo \AppCfg::URL_WEB.\AppCfg::JSON_GATEWAY; ?></json_gateway>
 
 	<debug><?php echo \AppCfg::DEBUG_MODE; ?></debug>
 	
