@@ -1210,6 +1210,30 @@ class API extends \rocketD\db\DBEnabled
 		return \rocketD\util\Error::getError(2);
 	}
 	
+	/**
+	 * Gets a listing of each question response (qscores data) for an instance.
+	 * @param $instid (number) instance id
+	 * @param $offset (number) the first record to return
+	 * @param $amount (number) the number of records to return
+	 * @return (Array<Object>) an array of qscore record objects for this instance.
+	 */
+	public function getResponsesForInstance($instid, $offset, $amount)
+	{
+		if(\obo\util\Validator::isPosInt($instid) && \obo\util\Validator::isInt($offset) && \obo\util\Validator::isPosInt($amount))
+		{
+			if($this->getSessionValid())
+			{
+				$scoreman = \obo\ScoreManager::getInstance();
+				$result = $scoreman->getResponsesForAllUsers($instid, $offset, $amount);
+			}
+			else
+			{
+				$result = \rocketD\util\Error::getError(1);
+			}
+			return $result;
+		}
+		return \rocketD\util\Error::getError(2);
+	}
 	
 	public function getVisitTrackingData($userID, $instid)
 	{
@@ -1244,22 +1268,6 @@ class API extends \rocketD\db\DBEnabled
 				
 		}
 		return false;
-	}
-	
-	/** @author Zachary Berry **/
-	public function getQuestionResponses($instid, $questionid)
-	{
-		if(\obo\util\Validator::isPosInt($instid) && \obo\util\Validator::isPosInt($questionid)) return \rocketD\util\Error::getError(2);
-		if($this->getSessionValid() !== true ) return \rocketD\util\Error::getError(1);
-		
-		$um = \rocketD\auth\AuthManager::getInstance();
-		$me = $um->getSessionID();
-
-		$im = \obo\lo\InstanceManager::getInstance();
-		if(!$im->userCanEditInstance($me, $instid)) return \rocketD\util\Error::getError(1);
-
-		$sm = \obo\ScoreManager::getInstance();
-		return $sm->getQuestionResponses($instid, $questionid);	
 	}
 
 
@@ -1677,6 +1685,11 @@ class API extends \rocketD\db\DBEnabled
 	/* @author: Zachary Berry */
 	public function trackClientError($client, $message, $data)
 	{
+		trace('trackClientError');
+		trace($client);
+		trace($message);
+		trace($data);
+
 		if($this->getSessionValid())
 		{
 			if(\obo\util\Validator::isClientType($client) && \obo\util\Validator::isString($message) && \obo\util\Validator::isString($data))
