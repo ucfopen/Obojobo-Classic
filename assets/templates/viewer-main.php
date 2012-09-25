@@ -37,8 +37,19 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
   <script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
   <script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
-
   <?php
+  if(defined('\AppCfg::GOOGLE_ANALYTICS_ID'))
+  {
+    echo "<script type='text/javascript'>
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '".\AppCfg::GOOGLE_ANALYTICS_ID."']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();</script>";
+  }
 }
 // =========================== PRODUCTION ENVIRONMENT =============================
 else
@@ -56,9 +67,19 @@ else
 <script type="text/javascript" src="/min/b=assets/js&f=
 jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
-
-
   <?php
+  if(defined('\AppCfg::GOOGLE_ANALYTICS_ID'))
+  {
+    echo "<script type='text/javascript'>
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '".\AppCfg::GOOGLE_ANALYTICS_ID."']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();</script>";
+  }
 }
 ?>
 
