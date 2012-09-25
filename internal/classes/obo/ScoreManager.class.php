@@ -414,7 +414,8 @@ class ScoreManager extends \rocketD\db\DBEnabled
 						".\cfg_core_User::ID." ASC,
 						".\cfg_obo_Attempt::ID." ASC";
 
-		if(!($q = $this->DBM->querySafe($qstr, $instID)))
+
+		if(!($q = $this->DBM->querySafeTrace($qstr, $instID)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
@@ -556,8 +557,58 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		
 		return $result;
 	}
-	
-	
+
+	public function getResponsesForAllUsers($instID, $offset, $amount)
+	{
+		if(!is_numeric($instID) || $instID < 1 || !is_numeric($offset) || !is_numeric($amount))
+		{
+			return false; // error: invalid input
+		}
+
+		$instm = \obo\lo\InstanceManager::getInstance();
+		if(($loID = $instm->getLOID($instID)) == false) // if instanceof Error
+		{
+			return $loID; // error
+		}
+		$lom = \obo\lo\LOManager::getInstance();
+ 		if(($aGroupID = $lom->getAssessmentID($loID)) == false) // if instanceof Error
+		{
+			return $aGroupID; // error
+		}
+
+		//********************  GET RESPONSES FOR ALL USERS - REQUIRES INSTANCE PERMISSIONS  ****************************//
+
+		//If they do not have permissions to write to this instance, reject the request
+		$IM = \obo\lo\InstanceManager::getInstance();
+		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
+		{
+			return \rocketD\util\Error::getError(4);
+		}
+
+		// grab every assessment attempt for each user (including unsubmitted ones!)
+		$qstr = "SELECT
+					".\cfg_obo_Score::TIME.", ".\cfg_core_User::ID.", ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE."
+					FROM ".\cfg_obo_Score::TABLE."
+					WHERE ".\cfg_obo_Instance::ID." = '?'
+					AND ".\cfg_obo_QGroup::ID." = '?'
+					LIMIT ?, ?";
+
+		if(!($q = $this->DBM->querySafeTrace($qstr, $instID, $aGroupID, $offset, $amount)))
+		{
+			trace(mysql_error(), true);
+			$this->DBM->rollback();
+			return false;
+		}
+
+		$result = array();
+		while($r = $this->DBM->fetch_obj($q))
+		{
+			$result[] = $r;
+		}
+
+		return $result;
+	}
+
 	/**
 	 * Get Assessment Scores
 	 * WARNING - DO NOT EXPOSE DIRECTLY TO API - NO PERMISSIONS CHECKING HERE
@@ -630,77 +681,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	public function getQuestionStatistics($questionID, $includeAllAttempts)
 	{
 		
-	}
-	
-	/**
-	 * @author Zachary Berry
-	 * 
-	 * @param $instid (number) instance ID
-	 * @param $questionID (number) question ID
-	 * 
-	 * @return (Array) an array of data.  (refer to table below)
-	 *
-	 * Score array values:
-	 * 'userName' = Name of the user who submitted the question.
-	 * 'attemptID' = ID of the attempt
-	 * 'score' = The score tied to their response
-	 * 'attempt_score' = The score of the attempt
-	 * 'answer_id' = The ID of the answer
-	 */
-	
-	//@TODO: Note - Function disabled for 1.1 release.
-	public function getQuestionResponses($instID = 0, $questionID = 0)
-	{
-
-		$qstr =    "SELECT V.".\cfg_core_User::ID.", A.".\cfg_obo_Attempt::ID." as attemptID, S.".\cfg_obo_Score::SCORE.", A.".\cfg_obo_Attempt::SCORE." as attempt_score, S.".\cfg_obo_Score::ANSWER." as answer_id
-					FROM ".\cfg_obo_Score::TABLE." AS S, ".\cfg_obo_Attempt::TABLE." AS A, ".\cfg_obo_Visit::TABLE." AS V, ".\cfg_core_User::TABLE." AS U
-					WHERE A.".\cfg_obo_Attempt::ID." = S.".\cfg_obo_Attempt::ID."
-					AND V.".\cfg_obo_Visit::ID." = A.".\cfg_obo_Visit::ID."
-					AND U.".\cfg_core_User::ID." = V.".\cfg_core_User::ID."
-					AND V.".\cfg_obo_Instance::ID." = '?'
-					AND S.".\cfg_obo_Score::ITEM_ID." = '?'
-					ORDER BY V.".\cfg_core_User::ID;
-		
-		if( !($q = $this->DBM->querySafe($qstr, $instID, $questionID)) )
-		{
-			trace(mysql_error(), true);
-			$this->DBM->rollback();
-			return false;
-		}
-		
-		//We want to sort the result array by users.
-		//Each user will then have an array of scores based on the number of attempts they took.
-		$returnArr = array();
-		$userMan = \rocketD\auth\AuthManager::getInstance();
-		$userIndex = -1;
-		$lastUser = 0;
-		//$returnArr[0] = array();
-		
-		while( $r = $this->DBM->fetch_obj($q) )
-		{
-			if($lastUser == 0 || $lastUser != $r->{\cfg_core_User::ID})
-			{
-				$userIndex++;
-				$returnArr[$userIndex] = array(
-					'user' => array(
-						'userID' => $r->{\cfg_core_User::ID},
-						'userName' => $userMan->getNameObject($r->{\cfg_core_User::ID}),
-					),
-					'responses' => array()
-				);
-			}
-			
-			array_push($returnArr[$userIndex]['responses'], array(
-			'attemptID' => (int)$r->attemptID,
-			'score' => (int)$r->{\cfg_obo_Score::SCORE},
-			'attemptScore' => (int)$r->attempt_score,
-			'answerID' => (int)$r->answer_id
-			));
-			
-			$lastUser = $r->{\cfg_core_User::ID};
-		}
-		
-		return $returnArr;
 	}
 
 	/**
