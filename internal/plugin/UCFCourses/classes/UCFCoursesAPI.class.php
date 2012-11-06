@@ -976,7 +976,31 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 		$termCodeLookup[1440] = array('start' => '1323910741', 'end' => '1336089540'); // spring 2012
 		$termCodeLookup[1450] = array('start' => '1336089541', 'end' => '1344470340'); // summer 2012
 		$termCodeLookup[1460] = array('start' => '1344470341', 'end' => '1355533140'); // fall 2012
-		$termCodeLookup[1470] = array('start' => '1344470341', 'end' => '1362358740'); // spring 2013
+		$termCodeLookup[1470] = array('start' => '1355533141', 'end' => '1367668740'); // spring 2013
+
+		$termCodeLookup[1480] = array('start' => '1367539201', 'end' => '1375833600'); // summer 2013
+		$termCodeLookup[1490] = array('start' => '1375833601', 'end' => '1388448000'); // fall 2013
+		$termCodeLookup[1500] = array('start' => '1388448001', 'end' => '1399075200'); // spring 2014
+
+		$termCodeLookup[1510] = array('start' => '1399075201', 'end' => '1407369600'); // summer 2014
+		$termCodeLookup[1520] = array('start' => '1407369601', 'end' => '1419984000'); // fall 2014
+		$termCodeLookup[1530] = array('start' => '1419984001', 'end' => '1430611200'); // spring 2015
+
+		$termCodeLookup[1540] = array('start' => '1430611201', 'end' => '1438905600'); // summer 2015
+		$termCodeLookup[1550] = array('start' => '1438905601', 'end' => '1451520000'); // fall 2015
+		$termCodeLookup[1560] = array('start' => '1451520001', 'end' => '1462233600'); // spring 2016
+
+		$termCodeLookup[1570] = array('start' => '1462233601', 'end' => '1470528000'); // summer 2016
+		$termCodeLookup[1580] = array('start' => '1470528001', 'end' => '1483142400'); // fall 2016
+		$termCodeLookup[1590] = array('start' => '1483142401', 'end' => '1493769600'); // spring 2017
+
+		$termCodeLookup[1600] = array('start' => '1493769601', 'end' => '1502064000'); // summer 2017
+		$termCodeLookup[1610] = array('start' => '1502064001', 'end' => '1514678400'); // fall 2017
+		$termCodeLookup[1620] = array('start' => '1514678401', 'end' => '1525305600'); // spring 2018
+
+		$termCodeLookup[1630] = array('start' => '1525305601', 'end' => '1533600000'); // summer 2018
+		$termCodeLookup[1640] = array('start' => '1533600001', 'end' => '1546214400'); // fall 2018
+		$termCodeLookup[1650] = array('start' => '1546214401', 'end' => '1556841600'); // spring 2019
 		
 		$term['start'] = $termCodeLookup[$term_code]['start'];
 		$term['end'] = $termCodeLookup[$term_code]['end'];
