@@ -1,8 +1,6 @@
 <?php
 function formatDisplayForInstance($user, $instID, $minScore, $targetURL, $hash)
 {
-	// quick thing to get around issues with security built into some of the score functions
-	$_SESSION['userID'] = $user->userID;
 	
 	$im = \obo\lo\InstanceManager::getInstance();
 	$instData = $im->getInstanceData($instID);
@@ -10,46 +8,9 @@ function formatDisplayForInstance($user, $instID, $minScore, $targetURL, $hash)
 	// if we found the instance 
 	if($instData instanceof \obo\lo\InstanceData)
 	{
-		$scoreman = \obo\ScoreManager::getInstance();
-		$myScores = $scoreman->getScoresForUser($instData->instID, $user->userID);
-	
-		// var_dump($scores);
-		$score = (int)$scoreman->calculateUserOverallScoreForInstance($instData, $myScores);
 		
-		// if they have not yet submitted a score for this instance, find equivalent attempts
-		if(count($myScores) == 0 && $score < 1 )
-		{
-			$am = \obo\AttemptsManager::getInstance();
-			if($eqAttempt = $am->getEquivalentAttempt($user->userID, $instID))
-			{
-
-				if($eqAttempt->{\cfg_obo_Attempt::SCORE} > $score) $score = (int)$eqAttempt->{\cfg_obo_Attempt::SCORE};
-			}
-		}
-	
-		$output = '<li>';
-
-		// No Score
-		if($score === NULL)
-		{
-			$output .= '<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="'.$targetURL.'?instID='.$instID.$hash.'" target="_blank" proxied="false">'.$instData->name.'</a></p>';
-			$output .= '<p style="margin-top: 0; font-size: 8pt; color: #990000;">Not yet complete</p>';
-		}
-		// Completed & Score is above min
-		else if( (int)$score >= (int)$minScore)
-		{
-			$output .= '<p style="font-size: 12pt; margin-bottom: 0;"><a style="color: #000; text-decoration:none;"  href="'.$targetURL.'?instID='.$instID.$hash.'" target="_blank" proxied="false">'.$instData->name.'</a></p>';
-			$output .= '<p style="margin-top: 0; font-size: 8pt;"><span style="color: green">Completed</span> with a score of '.$score.'% </p>';
-		}
-		// Completed BUT score is below min
-		else
-		{
-			$output .= '<p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="'.$targetURL.'?instID='.$instID.$hash.'" target="_blank" proxied="false">'.$instData->name.'</a></p>';
-			$output .= '<p style="margin-top: 0; font-size: 8pt;"><span style="color: #990000">Not yet complete.</span> Your score of <strong style="color: #990000">'.$score.'%</strong> is below the minimum of '.$minScore.'%.</p>';
-		}
-		$output .= '</li>';
-
-		return $output;
+		return '<li><p style="font-size: 12pt; margin-bottom: 0;"><a style="font-weight:bold;" href="'.$targetURL.'?instID='.$instID.$hash.'" target="_blank" 
+proxied="false">'.$instData->name.'</a></p></li>';
 	}
 	else
 	{
