@@ -2,6 +2,10 @@
 require_once (dirname( __FILE__ )."/../internal/app.php");
 switch($_GET['function'])
 {
+	// Older scores method (designed for Webcourses)
+	// Kept here if we want to provide a 'full data set' export
+	// See #131 (https://github.com/ucfcdl/Obojobo/issues/131)
+	/*
 	case 'scores':
 		if ($_GET['instID'] > 0 && strlen($_GET['filename']) > 0)
 		{
@@ -26,6 +30,40 @@ switch($_GET['function'])
 				{
 					$score = getCountedScore($user['attempts'], $_GET['method']);
 					if($score != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score['score'].','.date('m/d/Y G:i:s',$score['date'])."\r\n";
+				}
+				
+				exit();
+			}
+		}
+		break;
+	 */
+	case 'scores':
+		if ($_GET['instID'] > 0 && strlen($_GET['filename']) > 0)
+		{
+			$api = \obo\API::getInstance();
+			$scores = $api->getScoresForInstance($_GET['instID']);
+			$inst_data = $api->getInstanceData($_GET['instID']);
+			$column_name = 'Obojobo: '.$inst_data->name;
+			if (is_array($scores))
+			{
+				$UM = \rocketD\auth\AuthManager::getInstance();
+				session_write_close();
+				header("Pragma: public");
+				header("Expires: 0"); // set expiration time
+				header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+				header("Content-Type: application/force-download");
+				header("Content-Type: application/octet-stream");
+				header("Content-Type: application/download");
+				header("Content-Disposition: attachment; filename=\"{$_GET['filename']}.csv\"");
+				echo "Student,ID,SIS User ID,SIS Login ID,Section,{$column_name},Date Updated\r\n";
+				
+				usort($scores, "compareFunction");
+				
+				foreach ($scores as $user)
+				{
+					$score = getCountedScore($user['attempts'], $_GET['method']);
+					$fullName = $user['user']['last'].', '.$user['user']['first'];
+					if($score != -1) echo '"'.$fullName.'","","","'.$UM->getUserName($user['userID']).'","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
 				}
 				
 				exit();
