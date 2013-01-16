@@ -36,7 +36,7 @@ class cfg_plugin_AuthModUCF
 	
 	const COL_EXTERNAL_SYNC_NAME  = 'AuthMod_PeopleSoft_LastNIDUpdate';
 	const MAX_USERNAME_LENGTH = '255';
-	const MIN_USERNAME_LENGTH = '3';
+	const MIN_USERNAME_LENGTH = '2';
 	
 	const WS_INVALID_PW = 'Invalid Password'; // NID exists, but Password is incorrect
 	const WS_SUCCESS = 'Success'; // NID and Password correct
