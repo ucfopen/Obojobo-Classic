@@ -16,6 +16,8 @@ class cfg_obo_Instance
 	const SCORE_METHOD_RECENT = 'r';
 	const SCORE_IMPORT = 'allowScoreImport';
 	const DELETED = 'deleted';
+	const EXTERNAL_LINK = 'externalLink';
+	const ORIGINAL_ID = 'originalID';
 
 
 }

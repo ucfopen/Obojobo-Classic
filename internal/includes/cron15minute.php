@@ -19,7 +19,7 @@ foreach($authMods AS $curAuthMod)
 	if(method_exists($curAuthMod, 'updateNIDChanges'))
 	{
 		$result = $curAuthMod->updateNIDChanges();
-		\rocketD\util\Log::profile('cron', "'updateNIDChanges','".time()."','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'\n");
+		\rocketD\util\Log::profile('cron', "'updateNIDChanges','".time()."','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'");
 	}
 }
 
@@ -27,7 +27,7 @@ foreach($authMods AS $curAuthMod)
 $t = microtime(1);
 $VM = \obo\VisitManager::getInstance();
 $count = $VM->calculateVisitTimes();
-\rocketD\util\Log::profile('cron', "'calculateVisitLogs','".time()."','".round((microtime(true) - $t),5)."','{$count}','{$count}'\n");
+\rocketD\util\Log::profile('cron', "'calculateVisitLogs','".time()."','".round((microtime(true) - $t),5)."','{$count}','{$count}'");
 
 
 ?>

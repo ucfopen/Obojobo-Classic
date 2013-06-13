@@ -329,7 +329,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $lo;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'loID:'.$loID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'loID:'.$loID);
 		}
 
 		return false;
@@ -364,7 +364,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $lo;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'loMeta:'.$loID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'loMeta:'.$loID);
 		}
 		return false;
 	}
@@ -493,7 +493,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'qGroupID:'.$qGroupID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'qGroupID:'.$qGroupID);
 		}
 
 		return false;
@@ -531,7 +531,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'pagesForLOID:'.$loID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'pagesForLOID:'.$loID);
 		}		
 
 		return false;
@@ -553,7 +553,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'equivalentAttempts:'.$userID . ' ' .$loID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'equivalentAttempts:'.$userID . ' ' .$loID);
 		}		
 	}
 	public function clearEquivalentAttempt($userID, $loID)
@@ -572,7 +572,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'PermsForItem:'.$itemType . ','. $itemID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'PermsForItem:'.$itemType . ','. $itemID);
 		}
 	}
 	
@@ -617,7 +617,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'getPermsForGroup:'.$groupID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'getPermsForGroup:'.$groupID);
 		}
 	}
 	
@@ -638,7 +638,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'permsForUserToItem:'.$userID.','.$itemType.','.$itemID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'permsForUserToItem:'.$userID.','.$itemType.','.$itemID);
 		}		
 	}
 	public function  clearPermsForUserToItem($userID, $itemType, $itemID)
@@ -665,7 +665,7 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			\rocketD\util\Log::profile('memcache_missed', 'courseStudents:'.$courseID."\n");
+			\rocketD\util\Log::profile('memcache_missed', 'courseStudents:'.$courseID);
 		}
 	}
 	

@@ -17,7 +17,8 @@ if(!empty($_POST) && !empty($_POST['selectedWidget']))
 		'descText' => '',
 		'copyright' => 'Content from Materia.',
 		'thumb' => 0,
-		'url' => $selectedWidget->GIID,
+		// Bahamut uses id, Ifrit uses GIID
+		'url' => (!empty($selectedWidget->id) ? $selectedWidget->id : $selectedWidget->GIID),
 		'size' => 0,
 		'length' => 0,
 		'width' => $selectedWidget->width,

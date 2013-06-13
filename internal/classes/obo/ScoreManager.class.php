@@ -31,7 +31,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	
 	public function submitLTIQuestion($sourceid, $tool, $score)
 	{
-		if(empty($sourceid) || empty($score)) return array(false, "Invalid sourceid");
+		if(empty($sourceid) || (empty($score) && $score != 0)) return array(false, "Invalid sourceid");
 
 		// get the paramaters out of the sourceid
 		// AS DEFINED BY lis_result_sourcedid => $loID .'-'. $instID .'-'. $pageItemIndex .'-'. $pageOrQuestionID .'-'. $attemptID .'-'. $visitID,
@@ -415,7 +415,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 						".\cfg_obo_Attempt::ID." ASC";
 
 
-		if(!($q = $this->DBM->querySafeTrace($qstr, $instID)))
+		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
@@ -593,7 +593,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					AND ".\cfg_obo_QGroup::ID." = '?'
 					LIMIT ?, ?";
 
-		if(!($q = $this->DBM->querySafeTrace($qstr, $instID, $aGroupID, $offset, $amount)))
+		if(!($q = $this->DBM->querySafe($qstr, $instID, $aGroupID, $offset, $amount)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();

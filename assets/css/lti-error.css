@@ -1,0 +1,75 @@
+html {
+	background: white;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
+	margin: 0;
+	font-family: "Source Sans Pro", sans-serif;
+}
+
+a {
+	color: #4e6c84;
+}
+
+header {
+	background: #f7dbd9;
+	padding: 15px 60px;
+}
+
+	header h1 {
+		margin: 0 0 -10px 0;
+	}
+
+		header h1 .logo-text {
+			background: url('/assets/images/lti/logo-gray.png') no-repeat;
+			height: 17px;
+			width: 92px;
+			text-indent: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			display: inline-block;
+			padding-top: 10px;
+		}
+
+	header h2 {
+		font-weight: bold;
+		color: #c60f00;
+		background: url('/assets/images/lti/error-x.png') no-repeat 0 center;
+		margin: 0;
+		padding-left: 30px;
+	}
+
+section {
+	padding: 15px 60px;
+}
+
+	section p {
+		font-size: 14pt;
+	}
+
+	section h3 {
+		width: 100%;
+		font-weight: bold;
+		border-bottom: 1px solid #cccccc;
+		margin: 60px 0 -6px 0;
+		padding-bottom: 6px;
+	}
+
+	section dl {
+
+	}
+
+		section dl dt {
+			float: left;
+			margin-right: 1em;
+			width: 154px;
+			text-align: right;
+		}
+
+		section dl dd {
+			display: block;
+			margin-bottom: 0.3em;
+		}

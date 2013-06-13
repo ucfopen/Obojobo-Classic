@@ -392,6 +392,11 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		if($userID===0 || !\obo\util\Validator::isPosInt($userID) )
 		{
+			if(!isset($_SESSION['userID']))
+			{
+				return false;
+			}
+
 			$userID = $_SESSION['userID'];
 		}
 		

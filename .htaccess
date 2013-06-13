@@ -1,3 +1,8 @@
+<IfModule mod_headers.c>
+# P3P header to make IE happy so session will carry over even if Obojobo is embedded
+Header set P3P 'CP="Obojobo does not have a P3P policy. View our privacy policy at http://www.ucf.edu/policy/"'
+</IfModule>
+
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
@@ -19,6 +24,9 @@ RewriteRule ^repository/?$ repository.php [L,QSA]
 
 # OBOJOBO  Media
 RewriteRule ^media/([0-9]+)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
+
+# OBOJOBO Error
+RewriteRule ^error/([0-9A-Za-z\-]+)/?$ assets/templates/error.php?msgType=$1 [L,QSA]
 
 # BEGIN WordPress
 RewriteRule ^index\.php$ - [L]

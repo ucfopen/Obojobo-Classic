@@ -103,7 +103,7 @@ function executionAction (&$amfbody)
 			$t = microtime(1);
 			$mem1 = memory_get_usage(true);
 			$results = Executive::doMethodCall($amfbody, $construct, $method, $args); // do the magic
-			\rocketD\util\Log::profile('amfphp_Methods', "'{$_SESSION['userID']}','$method','".round((microtime(1) - $t),5)."','".time().",'$mem1','".memory_get_usage(true)."','".memory_get_peak_usage(true)."'\n");
+			\rocketD\util\Log::profile('amfphp_Methods', "'{$_SESSION['userID']}','$method','".round((microtime(1) - $t),5)."','".time().",'$mem1','".memory_get_usage(true)."','".memory_get_peak_usage(true)."'");
 		}
 		else
 		{

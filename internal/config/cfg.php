@@ -148,7 +148,9 @@ class AppCfgDefault
 
 	// Define Idle Time Logout in seconds
 	const AUTH_TIMEOUT = 1800; // 30 minute timeout
+	//const AUTH_TIMEOUT = 1; // 30 minute timeout
 	const AUTH_TIMEOUT_REMOTING = 240; // 4 minute timeout
+	//const AUTH_TIMEOUT_REMOTING = 1; // 4 minute timeout
 
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
@@ -165,6 +167,6 @@ class AppCfgDefault
 	const UCF_AUTH_BYPASS_PASSWORDS = false;
 	
 	// If true, scores will not be pushed to webcourses [true, false]
-	const UCFCOURSES_DISABLE_SCORE_PUSH = false;	
+	const UCFCOURSES_DISABLE_SCORE_PUSH = false;
 }
 ?>
