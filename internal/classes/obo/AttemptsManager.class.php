@@ -90,7 +90,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		if($isAssessment)
 		{
 			// make sure its not past closing time
-			if($instanceData->endTime <= time() || $instanceData->startTime >= time())
+			if(!$instanceData->externalLink && ($instanceData->endTime <= time() || $instanceData->startTime >= time()))
 			{
 				return \rocketD\util\Error::getError(2010); // error: assessment closed
 			}
@@ -668,21 +668,46 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$IM = \obo\lo\InstanceManager::getInstance();
 		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 		
-		
 		$scoreman = \obo\ScoreManager::getInstance();
 		$scores = $scoreman->getScoresForUser($instData->instID, $_SESSION['userID']);
 		
 		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
 		
 		// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
+		/*
 		if($submittableScore !== false)
 		{
 			if($scores['syncedScore'] != $submittableScore || !$scores['synced'])
 			{
+				//@TODO -get rid of this??
 				// TODO: NEED TO USE SYSTEM EVENTS
 				// Send the score to webcourses
-				$PM = \rocketD\plugin\PluginManager::getInstance();
-				$result = $PM->callAPI('UCFCourses', 'sendScore', array($instData->instID, $_SESSION['userID'], $submittableScore), true);
+				//$PM = \rocketD\plugin\PluginManager::getInstance();
+				//$result = $PM->callAPI('UCFCourses', 'sendScore', array($instData->instID, $_SESSION['userID'], $submittableScore), true);
+			}
+		}*/
+
+		if($instData->externalLink)
+		{
+			// Send the score via LTI
+			//@TODO: Check to make sure session variables are set
+			$ltiApi = \Lti\API::getInstance();
+			$assessmentData = $ltiApi->getAssessmentSessionData($instData->instID);
+			if(!$assessmentData)
+			{
+				\rocketD\util\Log::profile('lti',"'cant-find-assessment-session-data', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$instData->instID', '$submittableScore', '".time()."'");
+				\Lti\Views::logError();
+			}
+			else
+			{
+				$secret     = \AppCfg::LTI_CANVAS_SECRET;
+				$success    = $ltiApi->sendScore($submittableScore, $instData->instID, $assessmentData['sourceId'], $assessmentData['outcomeUrl'], $secret);
+
+				if(!$success)
+				{
+					\rocketD\util\Log::profile('lti',"'send-score-failed', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$instData->instID', '$submittableScore'");
+					\Lti\Views::logError();
+				}
 			}
 		}
 		
@@ -1002,6 +1027,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			// store unfiltered in cache
 			\rocketD\util\Cache::getInstance()->setEquivalentAttempt($userID, $loID, $attempt);
 		}
+
 		return $attempt;
 	}
 	

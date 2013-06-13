@@ -173,7 +173,7 @@ class Analytics extends \rocketD\db\DBEnabled
 				case 110:
 					break;
 			}
-			\rocketD\util\Log::profile('analytics', "'$stat','$preview',".time().",'{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'\n");
+			\rocketD\util\Log::profile('analytics', "'$stat','$preview',".time().",'{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'");
 			return $results;
 		}
 		return false;

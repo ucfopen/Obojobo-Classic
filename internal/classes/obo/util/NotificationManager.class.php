@@ -27,15 +27,12 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	
 	public function sendScoreFailureNotice($instructor, $student, $instData)
 	{
-		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
-		
 		// get student info
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$studentName = $AM->getName($student);
 		trace('ya');
 		// load up template
-		$smarty = new \Smarty();
-		$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
+		$smarty = \rocketD\util\Template::getInstance();
 		$smarty->assign('studentName', $studentName);
 		$smarty->assign('courseName', $instData->courseID);
 		$smarty->assign('repositoryURL', \AppCfg::URL_WEB . \AppCfg::URL_REPOSITORY);
@@ -65,17 +62,13 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
 	{
-		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
-		
 		// get student info
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$student = $AM->fetchUserByID($studentID);
 		$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
 		
 		// load up email template
-		$smarty = new \Smarty();
-
-		$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
+		$smarty = \rocketD\util\Template::getInstance();
 		
 		$smarty->assign('multiPartBoundry', $boundry);
 		$smarty->assign('loLink',\AppCfg::URL_WEB . \AppCfg::URL_VIEWER . $instData->instID);
@@ -110,7 +103,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 
 		
 		$sent = $this->mail($student->email, $subject, $body, $headers);
-		\rocketD\util\Log::profile('email', "'$studentID','$student->email','$score','" . ($sent ? '1' : '0' ). "'\n");
+		\rocketD\util\Log::profile('email', "'$studentID','$student->email','$score','" . ($sent ? '1' : '0' ). "'");
 
 		return $sent;
 	}

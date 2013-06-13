@@ -39,10 +39,8 @@ class Error
 	
 	protected function logError()
 	{
-		
 		if(\AppCfg::DEBUG_LOG_ERRORS)
 		{
-			trace('Error logged: ' . $this->errorID . ' - ' . $this->message);
 			switch($this->errorID){
 				case 1: // fall through
 				case 1006: // fall through

@@ -1,7 +1,6 @@
 <?php
 
 	$API = \obo\API::getInstance();
-	include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'smarty/Smarty.class.php');
 	
 	// get student info
 	$AM = \rocketD\auth\AuthManager::getInstance();
@@ -9,9 +8,7 @@
 	$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
 	
 	// load up email template
-	$smarty = new \Smarty();
-
-	$smarty->compile_dir = \AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'compiled/';
+	$smarty = \rocketD\util\Template::getInstance();
 	
 	$smarty->assign('multiPartBoundry', $boundry);
 	$smarty->assign('loLink',\AppCfg::URL_WEB . \AppCfg::URL_VIEWER . 555);
@@ -45,6 +42,6 @@
 	$subject = $smarty->fetch('eval:Results for {$loTitle} {$loCourse|ternary:"($loCourse)":"no course"}');
 	
 	$sent = $this->mail($student->email, $subject, $body, $headers);
-	\rocketD\util\Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ). "'\n");
+	\rocketD\util\Log::profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ));
 
 ?>

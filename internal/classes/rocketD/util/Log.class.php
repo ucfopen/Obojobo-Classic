@@ -106,6 +106,8 @@ class Log
 		// 	self::dumpProfile($key, $append);
 		// }
 		
+		$append = $append."\n";
+
 		self::dumpProfile($key, $append);
 	}
 	

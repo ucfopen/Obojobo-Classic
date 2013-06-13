@@ -299,7 +299,7 @@ obo.model = function()
 		else
 		{
 			return {
-				index: parseInt(match[1]) - 1,
+				index: parseInt(match[1], 10) - 1,
 				altIndex: (match[2] === '' || match[2].length > 1) ? 0 : match[2].charCodeAt(0) - 97
 			}
 		}
@@ -334,6 +334,11 @@ obo.model = function()
 					break;
 				case 2010: // instance closed
 					view.displayError("The assessment for this object closed on " + obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT.'));
+					break;
+				case 4006:
+					//var externalSystemName = getExternalSystemName();
+					//killPage("You cannot access this instance directly since it is being used in an external system. Please log into the external system instead.");
+					window.location = obo.util.getWebURL() + 'error/no-access';
 					break;
 				default:
 					view.displayError(response);
@@ -388,7 +393,7 @@ obo.model = function()
 		{
 			if(checkForValidLO(result, 'instance').length > 0)
 			{
-				view.displayError('This is not a valid LO!');
+				killPage('This Learning Object is not valid. Ensure that the URL is correct and try again.');
 			}
 			else
 			{
@@ -423,7 +428,7 @@ obo.model = function()
 		
 		try
 		{
-			if(parseInt(lo.loID) < 1)
+			if(parseInt(lo.loID, 10) < 1)
 			{
 				errors.push(100); // if the id is not a number above 0
 			}
@@ -431,7 +436,7 @@ obo.model = function()
 			{
 				errors.push(102); // there are no content pages
 			}
-			if(parseInt(lo.pGroup.qGroupID) < 1)
+			if(parseInt(lo.pGroup.qGroupID, 10) < 1)
 			{
 				errors.push(104); // the practice group id isnt above 0
 			}
@@ -440,6 +445,10 @@ obo.model = function()
 				if(Number(lo.aGroup.qGroupID) < 1)
 				{
 					errors.push(108); // assessment group id isnt above 0
+				}
+				if(parseInt(lo.instanceData.startTime, 10) === 0 && parseInt(lo.instanceData.endTime, 10) === 0 && lo.instanceData.externalLink.length === 0)
+				{
+					errors.push(111); // invalid start/end times
 				}
 			}
 			else if(type === 'lo')
@@ -998,7 +1007,7 @@ obo.model = function()
 					// update our 'local' score record
 					var s = scores[scores.length - 1];
 					s.score = Math.round(result);
-					s.endTime = parseInt(new Date().getTime() / 1000);
+					s.endTime = parseInt(new Date().getTime() / 1000, 10);
 				
 					// @TODO - how does this work in preview mode?
 					// clear out responses
@@ -1043,7 +1052,7 @@ obo.model = function()
 	
 	var isPreviousScoreImported = function()
 	{
-		return mode === 'instance' && (attemptImportedThisVisit || (lo.tracking != null && lo.tracking.prevScores != null && lo.tracking.prevScores.length != null && lo.tracking.prevScores.length > 0 && lo.tracking.prevScores[0].linkedAttemptID != null && parseInt(lo.tracking.prevScores[0].linkedAttemptID) > 0));
+		return mode === 'instance' && (attemptImportedThisVisit || (lo.tracking != null && lo.tracking.prevScores != null && lo.tracking.prevScores.length != null && lo.tracking.prevScores.length > 0 && lo.tracking.prevScores[0].linkedAttemptID != null && parseInt(lo.tracking.prevScores[0].linkedAttemptID, 10) > 0));
 	};
 	
 	var isInAssessmentQuiz = function()
@@ -1055,7 +1064,7 @@ obo.model = function()
 	{
 		if(mode === 'instance')
 		{
-			return new Date(parseInt(lo.instanceData.endTime) * 1000);
+			return new Date(parseInt(lo.instanceData.endTime, 10) * 1000);
 		}
 		else
 		{
@@ -1064,12 +1073,26 @@ obo.model = function()
 			return d;
 		}
 	};
+
+	// false if this is an externally linked instance, meaning it doesn't have
+	// open/close dates defined (these are defined on the host system)
+	var instanceHasNoAccessDates = function()
+	{
+		return mode === 'instance' && typeof lo.instanceData !== 'undefined' && typeof lo.instanceData.externalLink !== 'undefined' && lo.instanceData.externalLink && String(lo.instanceData.externalLink).length > 0;
+	};
+
+	// get the name of the external system that this instance is hosted in.
+	// Returns undefined if no external system data is found
+	/*var getExternalSystemName = function()
+	{
+		return instanceHasNoAccessDates() ? lo.instanceData.externalLink : undefined;
+	};*/
 	
 	var instanceIsClosed = function()
 	{
 		// must be an instance and between the start and end times
 		//return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
-		return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getCorrectedTime();
+		return mode === 'instance' && !instanceHasNoAccessDates() && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getCorrectedTime();
 	};
 	
 	var currentQuestionIsAlternate = function()
@@ -1081,8 +1104,8 @@ obo.model = function()
 	// and save the score. an optional callback allows you to respond to this new information.
 	var updateQuestionScoreForCurrentAttempt = function(_section, _page, callback)
 	{
-		callback(false);
-		return;
+		//callback(false);
+		//return;
 		if(typeof _section === 'undefined')
 		{
 			_section = section;
@@ -1173,7 +1196,7 @@ obo.model = function()
 					attemptImportedThisVisit = true;
 					
 					// add the previous score into our scores array
-					var t = parseInt(new Date().getTime() / 1000);
+					var t = parseInt(new Date().getTime() / 1000, 10);
 					scores.push({
 						score: lo.equivalentAttempt.score,
 						startTime: t,
@@ -1344,7 +1367,7 @@ obo.model = function()
 				(pi.media[0].itemType.toLowerCase() === 'swf' || pi.media[0].itemType.toLowerCase() === 'kogneato')
 			) {
 				//@TODO - Assume kogneato is flash version 10
-				version = Math.max(version, pi.media[0].itemType.toLowerCase() === 'swf' ? parseInt(pi.media[0].version) : 10);
+				version = Math.max(version, pi.media[0].itemType.toLowerCase() === 'swf' ? parseInt(pi.media[0].version, 10) : 10);
 			}
 		}
 
@@ -1635,7 +1658,7 @@ obo.model = function()
 			}
 			else
 			{
-				newPage = parseInt(page) - 1;
+				newPage = parseInt(page, 10) - 1;
 			}
 		}
 		
@@ -1687,7 +1710,7 @@ obo.model = function()
 			if(assessIndex.altIndex === questions.assessment[assessIndex.index].length - 1)
 			{
 				newPage = assessIndex.index + 2;
-				if(parseInt(newPage) > getNumPagesOfCurrentSection())
+				if(parseInt(newPage, 10) > getNumPagesOfCurrentSection())
 				{
 					newPage = 'end';
 				}
@@ -1703,7 +1726,7 @@ obo.model = function()
 		}
 		else
 		{
-			newPage = parseInt(page) + 1;
+			newPage = parseInt(page, 10) + 1;
 		}
 
 		if(typeof newSection === 'undefined')
@@ -1820,12 +1843,12 @@ obo.model = function()
 	{
 		if(mode === 'preview')
 		{
-			delete responses['assessment'][parseInt(questionIndex) + 1];
+			delete responses['assessment'][parseInt(questionIndex, 10) + 1];
 
 			var numAlts = questions.assessment[questionIndex].length;
 			for(var i = 1; i < numAlts; i++)
 			{
-				delete responses['assessment'][String(parseInt(questionIndex) + 1) + String.fromCharCode(i + 97)];
+				delete responses['assessment'][String(parseInt(questionIndex, 10) + 1) + String.fromCharCode(i + 97)];
 			}
 		}
 	}
@@ -1983,7 +2006,8 @@ obo.model = function()
 			closeButton: false,
 			escClose: false,
 			modal: false,
-			activelyHideSWFs: false
+			activelyHideSWFs: false,
+			buttons: []
 		});
 	}
 
@@ -1996,6 +2020,7 @@ obo.model = function()
 		init: init,
 		isInAssessmentQuiz: isInAssessmentQuiz,
 		instanceIsClosed: instanceIsClosed,
+		instanceHasNoAccessDates: instanceHasNoAccessDates,
 		getScores: getScores,
 		getNumAttemptsRemaining: getNumAttemptsRemaining,
 		getImportableScore: getImportableScore,

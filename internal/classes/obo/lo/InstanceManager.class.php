@@ -31,6 +31,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	
 	/**
 	 * Creates a new instance of a learning object (this is what the lo viewer will call)
+	 *
+	 *
 	 * @param $instArr (Array) Array of information about the new instance (needs name, lo_id, courseID, startTime, and endTime)
 	 * @return (number) new instance id
 	 */
@@ -51,62 +53,23 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 		}
 		
-		if(!\obo\util\Validator::isString($name))
+		$valid = $this->validateInstanceValues($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+		if($valid !== true)
 		{
-			return \rocketD\util\Error::getError(2);
+			return $valid;
 		}
-
-		if(!\obo\util\Validator::isPosInt($loID))
+		$valid = $this->validateLO($loID);
+		if($valid !== true)
 		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($startTime))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isPosInt($endTime))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if($startTime > $endTime || $endTime < time())
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isPosInt($attemptCount))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isScoreMethod($scoreMethod))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isBoolean($allowScoreImport))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		$lo = new \obo\lo\LO();
-		if( ! $lo->dbGetFull($this->DBM, $loID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		if($lo->subVersion > 0)
-		{
-			return \rocketD\util\Error::getError(2);
+			return $valid;
 		}
 		
 		$userID = $_SESSION['userID'];
-	    
+
 		//check if user is a Super User
 		if(!$roleMan->isSuperUser())
-		{	
-		    //if the user is not a Super User
+		{
+			//if the user is not a Super User
 			//check if the user has permissions to do this
 			$permMan = \obo\perms\PermissionsManager::getInstance();
 			if(!$permMan->getMergedPerm($loID, \cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::PUBLISH, $userID))
@@ -115,34 +78,12 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 		}
 
-		$qstr = "INSERT INTO `".\cfg_obo_Instance::TABLE."`
-				SET 
-					`".\cfg_obo_Instance::TITLE."`='?',
-					`".\cfg_obo_LO::ID."`='?',
-					`".\cfg_core_User::ID."`='?',
-					`".\cfg_obo_Instance::TIME."`='?',
-					`".\cfg_obo_Instance::COURSE."`='?',
-					`".\cfg_obo_Instance::START_TIME."`='?',
-					`".\cfg_obo_Instance::END_TIME."`='?',
-					`".\cfg_obo_Instance::ATTEMPT_COUNT."`='?',
-					`".\cfg_obo_Instance::SCORE_METHOD."`='?',
-					`".\cfg_obo_Instance::SCORE_IMPORT."`='?'";
-		
-		//Default scoreMethod (highest)
-		if(empty($scoreMethod)) $scoreMethod = 'h';
-		
-		//Send query to DB, checking for errors
-		//TODO: future course code: if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID)))
-		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport)))
+		$instID = $this->insertNewInstance($userID, $name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+		if(!$instID)
 		{
-			$this->DBM->rollback();
-			trace(mysql_error(), true);
 			return false;
 		}
-		$instID = $this->DBM->insertID;
-		
-		
-		
+
 		//Give the current user permissions to view and edit the instance
 		// TODO: move permission sql statments to permMan
 		$qstr = "INSERT 
@@ -166,7 +107,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		if(!($this->DBM->querySafe($qstr, $userID, $instID)))
 		{
 			$this->DBM->rollback();
-			erro_log("ERROR: newInstance query 2  ".mysql_error());
+			//erro_log("ERROR: newInstance query 2  ".mysql_error());
 			return false;
 		}
 		
@@ -181,7 +122,62 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				
 		return $instID;
 	}
-	
+
+	public function duplicateInstance_SystemOnly($instID = 0, $overriddenProps = false)
+	{
+		if( ! \obo\util\Validator::isPosInt($instID) )
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		$source = new \obo\lo\InstanceData();
+		$source->dbGet($this->DBM, $instID);
+
+		// If our instID is zero then the instance doesn't exist!
+		if($source->instID == 0)
+		{
+			return false;
+		}
+
+		// Override any properties with overriddenProps
+		$source = get_object_vars($source);
+		if(is_array($overriddenProps))
+		{
+			$source = array_merge($source, $overriddenProps);
+		}
+
+		if( ! $this->validateInstanceValues(
+			$source['name'],
+			$source['loID'],
+			$source['courseID'],
+			$source['startTime'],
+			$source['endTime'],
+			$source['attemptCount'],
+			$source['scoreMethod'],
+			(bool)$source['allowScoreImport']
+		))
+		{
+			return false;
+		}
+		if( ! $this->validateLO($source['loID']) )
+		{
+			return false;
+		}
+
+		return $this->insertNewInstance(
+			0,
+			$source['name'],
+			$source['loID'],
+			$source['courseID'],
+			$source['startTime'],
+			$source['endTime'],
+			$source['attemptCount'],
+			$source['scoreMethod'],
+			(bool)$source['allowScoreImport'],
+			$instID
+		);
+	}
+
 	/**
 	 * Retrieves an instance from the database  ONLY USE WHEN VIEWING A LO FROM THE VIEWER INCLUDING TRACKING
 	 * @param $instID (number) ID of instance to retrieve
@@ -203,6 +199,16 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 		if($r = $this->DBM->fetch_obj($q))
 		{
+			// Verify that this is not direct access to an externally linked instance
+			if(!empty($r->{\cfg_obo_Instance::EXTERNAL_LINK}))
+			{
+				$ltiApi = \Lti\API::getInstance();
+				if(!$ltiApi->getAssessmentSessionData($instID))
+				{
+					return \rocketD\util\Error::getError(4006);
+				}
+			}
+
 			$curtime = time();
 			//Verify that the instance is currently active
 			if($r->{\cfg_obo_Instance::START_TIME} <= $curtime)
@@ -218,7 +224,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 				// getinstance, only get content if its past the assessment end time
 				$trackMan = \obo\log\LogManager::getInstance();
-				if($curtime >= $r->{\cfg_obo_Instance::END_TIME})
+				if(empty($r->{\cfg_obo_Instance::EXTERNAL_LINK}) && $curtime >= $r->{\cfg_obo_Instance::END_TIME})
 				{
 					$lo = $lom->getLO($r->{\cfg_obo_LO::ID}, 'content', false);
                     $lo->tracking =  $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
@@ -361,8 +367,9 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		// Get all the instances from the database
 		while($r = $this->DBM->fetch_obj($q))
 		{
-			$ownerName = $authMan->getName($r->{\cfg_core_User::ID});
-			$iData = new \obo\lo\InstanceData($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $ownerName, $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT});
+			$userID = $r->{\cfg_core_User::ID};
+			$ownerName = $userID > 0 ? $authMan->getName($userID) : '';
+			$iData = new \obo\lo\InstanceData($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $ownerName, $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT}, 0, array(), $r->{\cfg_obo_Instance::EXTERNAL_LINK});
 			$iData->dbGetCourseData();
 			\rocketD\util\Cache::getInstance()->setInstanceData($iData);
 			// get perms
@@ -380,6 +387,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return $return[0];
 		}
+
 		return $return;
 	}
 
@@ -392,7 +400,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	public function getAllInstances()
 	{		
 		$PMan = \obo\perms\PermManager::getInstance();
-		$itemPerms = $PMan->getAllItemsForUser($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, true);
+		$itemPerms = $PMan->getAllItemsForUser($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, true, true);
 
 		// TODO: limit what is returned based on what perm they have
 		$myInstances = array_keys($itemPerms);
@@ -407,58 +415,23 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	 */
 	public function updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport)
 	{
-		if(!\obo\util\Validator::isString($name))
+		$valid = $this->validateInstanceValues($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+		if($valid !== true)
 		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($instID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($startTime))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isPosInt($endTime))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if($startTime > $endTime)
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isPosInt($attemptCount))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isScoreMethod($scoreMethod))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-		
-		if(!\obo\util\Validator::isBoolean($allowScoreImport))
-		{
-			return \rocketD\util\Error::getError(2);
+			return $valid;
 		}
 
 		$qstr = "UPDATE ".\cfg_obo_Instance::TABLE."
-			SET 
-				`".\cfg_obo_Instance::TITLE."` = '?', 
-				`".\cfg_obo_Instance::COURSE."` = '?', 
-				`".\cfg_obo_Instance::START_TIME."` = '?', 
-				`".\cfg_obo_Instance::END_TIME."` = '?', 
-				`".\cfg_obo_Instance::ATTEMPT_COUNT."` = '?', 
+			SET
+				`".\cfg_obo_Instance::TITLE."` = '?',
+				`".\cfg_obo_Instance::COURSE."` = '?',
+				`".\cfg_obo_Instance::START_TIME."` = '?',
+				`".\cfg_obo_Instance::END_TIME."` = '?',
+				`".\cfg_obo_Instance::ATTEMPT_COUNT."` = '?',
 				`".\cfg_obo_Instance::SCORE_METHOD."` = '?',
 				`".\cfg_obo_Instance::SCORE_IMPORT."` = '?'
-			WHERE 
+			WHERE
 				`".\cfg_obo_Instance::ID."` = '?'";
-				
 		
 		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 		//Send query to DB, checking for errors
@@ -472,7 +445,51 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		
 		return true;
 	}
-	
+
+	/**
+	 * Updates and instance to be used in an external system.
+	 * Setting externalLinkName to '' will remove the link (and destroy the start/end times).
+	 * @param (int) instID
+	 * @param (string) externalLinkName
+	 * @return true if updated
+	 */
+	public function updateInstanceExternalLink($instID, $externalLinkName)
+	{
+		if(!is_string($externalLinkName)) return \rocketD\util\Error::getError(2);
+
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
+
+		if(strlen($externalLinkName) === 0)
+		{
+			// remove external link:
+			$qstr = "UPDATE ".\cfg_obo_Instance::TABLE."
+				SET
+					`".\cfg_obo_Instance::EXTERNAL_LINK."` = '?'
+				WHERE
+					`".\cfg_obo_Instance::ID."` = '?'";
+		}
+		else
+		{
+			// add/change external link
+			$qstr = "UPDATE ".\cfg_obo_Instance::TABLE."
+				SET
+					`".\cfg_obo_Instance::START_TIME."` = '0',
+					`".\cfg_obo_Instance::END_TIME."` = '0',
+					`".\cfg_obo_Instance::EXTERNAL_LINK."` = '?'
+				WHERE
+					`".\cfg_obo_Instance::ID."` = '?'";
+		}
+
+		if( !($q = $this->DBM->querySafe($qstr, $externalLinkName, $instID)) )
+		{
+			$this->DBM->rollback();
+			trace(mysql_error(), true);
+			return false;
+		}
+
+		return true;
+	}
+
 	public function userCanEditInstance($userID, $instID)
 	{
 		$roleMan = \obo\perms\RoleManager::getInstance();
@@ -589,6 +606,82 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		}
 		// return empty array if non found
 		return count($result) > 0 ? $this->getInstanceData($result) : $result;
+	}
+
+	protected function validateInstanceValues($name, $instOrLoID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true)
+	{
+		if(!\obo\util\Validator::isString($name))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPosInt($instOrLoID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPosInt($attemptCount))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+		
+		if(!\obo\util\Validator::isScoreMethod($scoreMethod))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+		
+		if(!\obo\util\Validator::isBoolean($allowScoreImport))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		return true;
+	}
+
+	protected function validateLO($loID)
+	{
+		$lo = new \obo\lo\LO();
+		if( ! $lo->dbGetFull($this->DBM, $loID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+		if($lo->subVersion > 0)
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		return true;
+	}
+
+	protected function insertNewInstance($userID, $name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $originalID = 0)
+	{
+		$qstr = "INSERT INTO `".\cfg_obo_Instance::TABLE."`
+				SET 
+					`".\cfg_obo_Instance::TITLE."`='?',
+					`".\cfg_obo_LO::ID."`='?',
+					`".\cfg_core_User::ID."`='?',
+					`".\cfg_obo_Instance::TIME."`='?',
+					`".\cfg_obo_Instance::COURSE."`='?',
+					`".\cfg_obo_Instance::START_TIME."`='?',
+					`".\cfg_obo_Instance::END_TIME."`='?',
+					`".\cfg_obo_Instance::ATTEMPT_COUNT."`='?',
+					`".\cfg_obo_Instance::SCORE_METHOD."`='?',
+					`".\cfg_obo_Instance::SCORE_IMPORT."`='?',
+					`".\cfg_obo_Instance::ORIGINAL_ID."`='?'";
+		
+		//Default scoreMethod (highest)
+		if(empty($scoreMethod)) $scoreMethod = 'h';
+		
+		//Send query to DB, checking for errors
+		//TODO: future course code: if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID)))
+		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, (int)$originalID)))
+		{
+			$this->DBM->rollback();
+			trace(mysql_error(), true);
+			return false;
+		}
+		
+		return $this->DBM->insertID;
 	}
 }
 ?>

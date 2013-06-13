@@ -185,7 +185,6 @@ class LO
 	
 	public function dbGetInstance($DBM, $loID)
 	{
-		trace('dbGetInstance');
 		if($this->dbGetFull($DBM, $loID))
 		{
 			/*

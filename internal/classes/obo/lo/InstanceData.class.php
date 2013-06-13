@@ -25,8 +25,10 @@ class InstanceData
 	public $allowScoreImport;
 	public $perms;
 	public $courseData;
+	public $externalLink;
+	public $originalID;
 	
-	function __construct($instID=0, $loID=0, $userID=0, $userName='', $name='', $course='', $createTime=0, $startTime=0, $endTime=0, $attemptCount=0, $scoreMethod=0, $allowScoreImport=0, $courseData=0, $perms=array())
+	function __construct($instID=0, $loID=0, $userID=0, $userName='', $name='', $course='', $createTime=0, $startTime=0, $endTime=0, $attemptCount=0, $scoreMethod=0, $allowScoreImport=0, $courseData=0, $perms=array(), $externalLink='', $originalID=0)
 	{
 		$this->instID = $instID;
 		$this->loID = $loID;
@@ -42,6 +44,8 @@ class InstanceData
 		$this->allowScoreImport = $allowScoreImport;
 		$this->perms = $perms;
 		$this->courseData = $courseData;
+		$this->externalLink = $externalLink;
+		$this->originalID = $originalID;
 	}
 	
 	public function dbGetCourseData()
@@ -66,7 +70,7 @@ class InstanceData
 				$ownerName = $authMan->getName($r->{\cfg_core_User::ID});
 				
 				// construct
-				$this->__construct($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $owner , $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT});
+				$this->__construct($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $owner , $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT}, $r->{\cfg_obo_Instance::ORIGINAL_ID});
 				
 				// get course data
 				// TODO: use system events to do this
