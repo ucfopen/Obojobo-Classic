@@ -797,7 +797,7 @@ class plg_UCFCourses_UCFCoursesAPI extends \rocketD\plugin\PluginAPI
 	protected function logScoreSet($instID, $currentUserID, $studentUserID, $sectionID, $columnID, $columnName, $score, $success)
 	{
 		$time = time();
-		\rocketD\util\Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'\n");
+		\rocketD\util\Log::profile('webcourses_score_log', "'$instID','$time','$currentUserID','$studentUserID','$sectionID','$columnID','$columnName','$score','$success'");
 		// insert new row, or update with current time, score, and incriment attempts
 		// NOTE that attempts are only incrimented if the row exists AND the score is the same.  If the score changes, we reset the attempts
 		$sql = "

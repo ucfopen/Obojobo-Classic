@@ -481,7 +481,6 @@ class API extends \rocketD\db\DBEnabled
 	
     public function getLibraryLOs()
     {
-		
 		if($this->getSessionValid())
 		{
 			$loMan = \obo\lo\LOManager::getInstance();
@@ -580,7 +579,6 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function removeLO($loID)
     {
-		trace('removeLO');
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -683,14 +681,17 @@ class API extends \rocketD\db\DBEnabled
 	{
 		if($this->getSessionValid())
 		{
-			
 			$instman = \obo\lo\InstanceManager::getInstance();
+			//$result = \obo\util\Error::getError(4006);
+			//@TODO
 			$result = $instman->createInstanceVisit($instID);
+
 		}
 		else
 		{
 			$result = \rocketD\util\Error::getError(1);
 		}
+
 		return $result;
 	}
 
@@ -728,13 +729,17 @@ class API extends \rocketD\db\DBEnabled
 	 * @param $instArr (Array) Array of information about the instance
 	 * @param (Array) The instance Array
 	 */
-	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport)
+	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $removeExternalLink = false)
 	{
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
 			$instman = \obo\lo\InstanceManager::getInstance();
 			$result = $instman->updateInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
+
+			// ONLY DELETE External link if start and end times are set properly
+			if ($startTime > 0 && $endTime > $startTime && $removeExternalLink === true) $instman->updateInstanceExternalLink($instID, '');
+			
 			$this->DBM->commit();
 		}
 		else
@@ -759,7 +764,6 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
 
 	/**
 	 * Gets list of all Media that are globally viewable or user has rights to view it
@@ -1396,7 +1400,6 @@ class API extends \rocketD\db\DBEnabled
 	{
 		if($this->getSessionValid())
 		{
-			trace('uploadMedia', true);
 			$this->DBM->startTransaction();
 			$mediaMan = \obo\lo\MediaManager::getInstance();
 			$result = $mediaMan->handleFileDataUpload($fileData, $filename, $title, $description, $copyright, $length);
@@ -1881,6 +1884,11 @@ class API extends \rocketD\db\DBEnabled
 
 		}
 
+		if($passback)
+		{
+			$passback = \AppCfg::URL_WEB . 'lti/grade-passback.php';
+		}
+
 		$params = array(
 			"resource_link_id"           => $loID .'-'. $instID .'-'. $pageItemIndex .'-'. $pageOrQuestionID, // unique placement in obojobo
 			"context_id"                 => $instID,
@@ -1889,9 +1897,7 @@ class API extends \rocketD\db\DBEnabled
 			"roles"                      => $role,
 		);
 
-		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'Oauth.class.php');
-
-		$params =  \LTI\Oauth::buildPostArgs(\AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
+		$params =  \Lti\Oauth::buildPostArgs($this->getUser(), \AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
 
 		return array('url' => \AppCfg::MATERIA_LTI_URL, 'params' => $params);
 	}

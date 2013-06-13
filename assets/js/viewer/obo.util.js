@@ -551,7 +551,12 @@ obo.util = function()
 	{
 		return location.href.substr(0, location.href.indexOf('#') === -1 ? location.href.length : location.href.indexOf('#'));
 	};
-	
+
+	getWebURL = function()
+	{
+		return _webUrl;
+	};
+
 	return {
 		getRGBA: getRGBA,
 		cleanFlashHTML: cleanFlashHTML,
@@ -564,6 +569,7 @@ obo.util = function()
 		getBaseURL: getBaseURL,
 		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf,
 		isMobile: isMobile,
-		isIE8: isIE8
+		isIE8: isIE8,
+		getWebURL: getWebURL
 	};
 }();

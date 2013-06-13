@@ -80,7 +80,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		return $groupIDs;
 	}
 		
-	public function getAllItemsForUser($userID, $itemType, $includeGroupRights=true)
+	public function getAllItemsForUser($userID, $itemType, $includeGroupRights=true, $includeSessionRights=false)
 	{
 		/** Validate Input **/
 		
@@ -117,7 +117,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		// get explicitly set perms
 		$query = "SELECT ".\cfg_core_Perm::PERM.", ".\cfg_core_Perm::ITEM." FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." > 0 AND ".\cfg_core_User::ID." = '?' ";
 		$q = $this->DBM->querySafe($query, $itemType, $userID);
@@ -130,6 +130,26 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			}
 			$allItems[$itemID][] = $r->{\cfg_core_Perm::PERM};
 		}
+
+		if($includeSessionRights)
+		{
+			$sessionPerms = $this->getSessionPermsForUser($userID, $itemType);
+			if($sessionPerms)
+			{
+				foreach($sessionPerms as $sessionPermInstID => $sessionPermValues)
+				{
+					if(!isset($allItems[$sessionPermInstID]))
+					{
+						$allItems[$sessionPermInstID] = $sessionPermValues;
+					}
+					else
+					{
+						$allItems[$sessionPermInstID] = $this->_mergePermValues($allItems[$sessionPermInstID], $sessionPermValues);
+					}
+				}
+			}
+		}
+
 		return $allItems;
 	}
 	
@@ -207,6 +227,13 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		
 		\rocketD\util\Cache::getInstance()->setPermsFOrUserToItem($userID, $itemType, $itemID, $perms);
 		
+		// merge in any session perms:
+		$sessionPerms = $this->getSessionPermsForUserToItem($userID, $itemType, $itemID);
+		if($sessionPerms)
+		{
+			$perms = $this->_mergePermValues($perms, $sessionPerms);
+		}
+
 		return $perms;
 		
 	}
@@ -231,7 +258,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			
 			return \rocketD\util\Error::getError(2);
 		}
-		trace($addPerms);
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($addPerms) == false)
 		{
@@ -431,7 +458,6 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		if(!is_array($perms) && !empty($perms))
 		{
 			$perms = array($perms);
-			trace($perms);
 		}
 		// search for invalid input, die if invalid
 		if(count($perms) > 0)
@@ -468,7 +494,102 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			return true;
 		}
 	}
-	
+
+	public function setSessionPermsForUserToItem($userID, $itemType, $itemID, $permValues)
+	{
+		if(!\obo\util\Validator::isPosInt($userID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPermItemType($itemType))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPosInt($itemID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!is_array($permValues))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		$sessionKey = 'perm:'.$userID.':'.$itemType;
+		if(!isset($_SESSION[$sessionKey]))
+		{
+			$perms = array();
+		}
+		else
+		{
+			$perms = unserialize($_SESSION[$sessionKey]);
+		}
+
+		if(!in_array($itemID, $perms))
+		{
+			$perms[$itemID] = array();
+		}
+
+		$perms[$itemID] = $this->_mergePermValues($perms[$itemID], $permValues);
+
+		$_SESSION[$sessionKey] = serialize($perms);
+	}
+
+	public function getSessionPermsForUser($userID, $itemType)
+	{
+		if(!\obo\util\Validator::isPosInt($userID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPermItemType($itemType))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		$sessionKey = 'perm:'.$userID.':'.$itemType;
+		if(!isset($_SESSION[$sessionKey]))
+		{
+			return false;
+		}
+
+		return unserialize($_SESSION[$sessionKey]);
+	}
+
+	public function getSessionPermsForUserToItem($userID, $itemType, $itemID)
+	{
+		if(!\obo\util\Validator::isPosInt($userID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPermItemType($itemType))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		if(!\obo\util\Validator::isPosInt($itemID))
+		{
+			return \rocketD\util\Error::getError(2);
+		}
+
+		$perms = $this->getSessionPermsForUser($userID, $itemType);
+
+		if(!$perms || !isset($perms[$itemID]))
+		{
+			return false;
+		}
+
+		return $perms[$itemID];
+	}
+
+	protected function _mergePermValues($a, $b)
+	{
+		return array_values(array_unique(array_merge($a, $b)));
+	}
+
 	public function getPermsForUserToItemCombined($userID, $itemType, $itemID){}
 	
 	public function clearPermsForItem($itemType, $itemID)

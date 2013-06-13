@@ -2,7 +2,6 @@
 require_once("internal/app.php");
 $API = \obo\API::getInstance();
 
-
 // ================ LOGIN OR CHECK EXISTING LOGIN ===========================
 if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
 {
@@ -44,12 +43,32 @@ else
 
   // ================ PREPARE VARS FOR THE TEMPLATE ================
 
-
   // Instance requested - student mode
   if(isset($_REQUEST['instID']))
   {
     if($instData = $API->getInstanceData($_REQUEST['instID']))
     {
+      // Reject access if this is attempted direct access to an LTI instance:
+      if(!empty($instData->externalLink))
+      {
+        $ltiApi = \Lti\API::getInstance();
+        if(!$ltiApi->getAssessmentSessionData($_REQUEST['instID']))
+        {
+          // No session data for LTI - Either they got logged out or they accessed the instance directly.
+          $consumerName = isset($_GET['consumer']) ? $_GET['consumer'] : '';
+          if($consumerName == '')
+          {
+            header('Location: ' . \AppCfg::URL_WEB . 'error/no-access');
+            exit();
+          }
+          else
+          {
+            header('Location: ' . \AppCfg::URL_WEB . 'error/lti');
+            exit();
+          }
+        }
+      }
+
       $title = $instData->name;
       $course = $instData->courseID;
       $instructor = $instData->userName;

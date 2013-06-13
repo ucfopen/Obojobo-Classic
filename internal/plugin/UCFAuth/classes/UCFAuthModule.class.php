@@ -188,45 +188,29 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
 		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
-		// required stuff not sent, CHECK IF A SINGLE SIGN ON METHOD IS BEING USED
+
+		// handle a portal-based SSO authentication request:
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
 		{
-
 			// *********** Sammy's SSO Hash for system to system single sign on ****************//
 			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 			{
-				$time = microtime(true);
-				$sso = new plg_UCFAuth_SsoHash(\AppCfg::SSO_SECRET);
-				$sso_req = $sso->getSsoInParametersFromRequest();
-				trace($sso_req);
-				try
-				{
-					if($sso->validateSSOHash($sso_req))
-					{
-						trace('sso validated', true);
-						$validSSO = true;
-						$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
-					}
-				}
-				//catch exception
-				catch(Exception $e)
-				{
-					trace($e, true);
-				}
-				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'\n");
+				verifyPortalHash($requestVars, $validSSO, $weakExternalSync);
 			}
 			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
 			else if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
 			{
-				$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
-				$validSSO = true;
-				$weakExternalSync = true; // allow the user to not exist in external db
-				// logged in, clear the session variables
-				unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
-				
-				\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'\n");
+				verifyPortalSession($requestVars, $validSSO, $weakExternalSync);
 			}
-			
+		}
+		// handle an LTI SSO authentication request
+		else if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
+		{
+			if(!empty($requestVars['createIfMissing']) && $requestVars['createIfMissing'] === true)
+			{
+				$weakExternalSync = true;
+			}
+			$validSSO = true;
 		}
 
 		// filter the username to be all lowercase
@@ -261,9 +245,43 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		else
 		{
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','".round((microtime(true) - $time),5)."','".time().",'0'\n");
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','".round((microtime(true) - $time),5)."','".time().",'0'");
 		}
 		return false;
+	}
+
+	protected function verifyPortalHash(&$requestVars, &$validSSO, &$weakExternalSync)
+	{
+		$time = microtime(true);
+		$sso = new plg_UCFAuth_SsoHash(\AppCfg::SSO_SECRET);
+		$sso_req = $sso->getSsoInParametersFromRequest();
+		trace($sso_req);
+		try
+		{
+			if($sso->validateSSOHash($sso_req))
+			{
+				trace('sso validated', true);
+				$validSSO = true;
+				$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
+			}
+		}
+		//catch exception
+		catch(Exception $e)
+		{
+			trace($e, true);
+		}
+		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'");
+	}
+
+	protected function verifyPortalSession(&$requestVars)
+	{
+		$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
+		$validSSO = true;
+		$weakExternalSync = true; // allow the user to not exist in external db
+		// logged in, clear the session variables
+		unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
+		
+		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'");
 	}
 
 	public function verifyPassword($userName, $password)
@@ -294,7 +312,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			{
 				ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 				$success = @ldap_bind($ds, "cn=".$userName.",ou=people,dc=net,dc=ucf,dc=edu", $password); // true if LDAP verifies
-				\rocketD\util\Log::profile('login', "'$userName','func_LDAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'".($success?'1':'0')."'\n");
+				\rocketD\util\Log::profile('login', "'$userName','func_LDAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'".($success?'1':'0')."'");
 			}
 		}
 		catch(Exception $e)
@@ -314,7 +332,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				$soapClient = new SoapClient(\AppCfg::UCF_WSDL);
 				$time = microtime(true); // time the soap call
 				$soapRes = $soapClient->AuthenticateNid(array('sNid' => $userName,'sPassword' => $password,'sAppID' => \AppCfg::UCF_APP_ID));
-				\rocketD\util\Log::profile('login', "'$userName','func_WSSOAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'{$soapRes->AuthenticateNidResult}'\n");
+				\rocketD\util\Log::profile('login', "'$userName','func_WSSOAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'{$soapRes->AuthenticateNidResult}'");
 
 				// if the responce is valid but is not an error
 				if(isset($soapRes->AuthenticateNidResult))
@@ -406,7 +424,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('Username is empty', true);
 			return 'Username is empty';
 		}
-		if(preg_match("/^[[:alnum:]]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
+		//if(preg_match("/^[[:alnum:]]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
+		if(preg_match("/^[[:alnum:]_]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
 		{
 			trace('User name can only contain alpha numeric characters. ' . $userName, true);
 			return 'User name can only contain alpha numeric characters.';
@@ -430,7 +449,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 	
-	public function syncExternalUser($userName, $allowWeakSync=false)
+	public function syncExternalUser($userName, $allowWeakSync=false, $createIfMissing = false)
 	{
 		if($this->validateUsername($userName) !== true) return false;
 
@@ -484,7 +503,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			
 			return $user;
 		}
-		
 		
 		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
 		if($allowWeakSync === true)
@@ -613,7 +631,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($user instanceof \rocketD\auth\User)
 		{
 			// override hasnt been engaged, let external db dictate the role
-			if($user->overrideRole != '1')
+			if(!isset($user->overrideRole) || $user->overrideRole != '1')
 			{
 				$RM  = \rocketD\perms\RoleManager::getInstance();
 				if($isLibraryUser)

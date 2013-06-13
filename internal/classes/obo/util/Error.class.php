@@ -78,6 +78,7 @@ class Error extends \rocketD\util\Error
 			case 4003: return "Instance is not currently active.";
 			case 4004: return "Not enough permissions.";
 			case 4005: return "Not able to set Visit Key";
+			case 4006: return "Cannot directly access externally linked instance.";
 			
 			/* PermissionsManager Errors*/
 			case 5003: return "Cannot remove permissions for sole owner.";
@@ -102,8 +103,14 @@ class Error extends \rocketD\util\Error
 			case 7011: return "User is not a student of the specified course.";
 			case 7012: return "Course could not be found.";
 			case 7013: return "General course plugin error.";
-			
-			    
+
+			/* LTI Errors */
+			case 8001: return "Unable to set or update LTI association.";
+			case 8002: return "Unable to remove LTI association.";
+			case 8003: return "Unable to duplicate instance for LTI integration.";
+			case 8004: return "Unable to set LTI association for duplicated instance.";
+			case 8005: return "Unable to retrieve LTI association - instance not found.";
+
 			default: return "General Error.";
 		}
 	}

@@ -43,6 +43,11 @@ obo.view = function()
 	// (via hideSwfs and unhideSwfs)
 	var swfsHidden = false;
 
+	// we need to hold on to this timeout id so we can clear the timeout.
+	// this prevents an issue where two quick showThrobber calls might
+	// prematurely timeout the throbber
+	var hideThrobberTimeoutId = -1;
+
 	// listen for postMessage events from media items
 	var onPostMessage = function(event) {
 		var data = $.parseJSON(event.data);
@@ -507,26 +512,38 @@ obo.view = function()
 		return '/' + p.section + (typeof p.page === 'undefined' ? '' : '/' + p.page);
 	}
 	
-	var showThrobber = function()
+	var showThrobber = function(timeoutThrobber, fadeInThrobber)
 	{
+		// prevent an issue with two quick showThrobber calls - the first call
+		// can timeout the second
+		clearTimeout(hideThrobberTimeoutId);
+
+		if(typeof fadeInThrobber === 'undefined')
+		{
+			fadeInThrobber = true;
+		}
+
 		$('body').append($('<div id="content-blocker"></div>'));
 		$('#content').animate({
 			opacity: .5
 		},
 		{
-			duration: 1000
+			duration: fadeInThrobber ? 1000 : 1
 		});
 		$('#content-blocker').animate({
 			opacity: 1
 		},
 		{
-			duration: 1000
+			duration: fadeInThrobber ? 1000 : 1
 		});
-		
-		// we want to automatically give up if we never get a response after 10 seconds
-		// (Just so we don't kill the website with an overlay)
-		setTimeout(hideThrobber, 10000);
-	}
+
+		if(typeof timeoutThrobber === 'undefined' || timeoutThrobber === true)
+		{
+			// we want to automatically give up if we never get a response after 10 seconds
+			// (Just so we don't kill the website with an overlay)
+			hideThrobberTimeoutId = setTimeout(hideThrobber, 10000);
+		}
+	};
 	
 	var hideThrobber = function()
 	{
@@ -566,9 +583,10 @@ obo.view = function()
 		}
 		
 		unlockNonAssessment();
-		showThrobber();
+		showThrobber(false, false);
 		// @TODO: What happens if the server takes a dump?  Should I not clear out assessment?
 		//viewState.assessment = []; // clear out assessment answers so new attempts are empty
+
 		obo.model.submitAssessment();
 		obo.captivate.clearCaptivateData('assessment');
 	};
@@ -1156,6 +1174,13 @@ obo.view = function()
 						}
 
 						$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
+
+						// special case: we should hide the close notice if there are no access dates
+						if(obo.model.instanceHasNoAccessDates())
+						{
+							$('#assessment-close-notice').hide();
+						}
+
 						/*
 						var $ul = $('#scores-list');
 						var scores = obo.model.getScores();
