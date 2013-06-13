@@ -1,22 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . "/../internal/app.php");
 
-//@DEBUG
-//trace('ASSIGNMENT!!!');
-//trace($_GET);
-//trace($_POST);
-
-
-// HACK
-$_POST['lis_person_sourcedid'] = 'zstudent';
-$_POST['lis_person_contact_email_primary'] = 'zachberry@gmail.com';
-
 $ltiApi = \Lti\API::getInstance();
 $ltiData = new \Lti\Data($_POST);
 
-
 \rocketD\util\Log::profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
-
 
 // make sure required instID parameter is present
 if(!isset($_GET['instID']) || !is_numeric($_GET['instID']))
