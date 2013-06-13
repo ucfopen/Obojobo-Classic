@@ -1,13 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/../internal/app.php');
 
-//trace('PICKER!');
-//trace($_POST);
-
-//@HACK
-$_POST['lis_person_sourcedid'] = 'zberry';
-$_POST['lis_person_contact_email_primary'] = 'zachberry@gmail.com';
-
 // Route the requests according to arguments sent
 if (isset($_POST['selectedLoId']))
 {
