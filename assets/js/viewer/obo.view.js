@@ -83,7 +83,10 @@ obo.view = function()
 				{
 					if(obo.model.getMode() === 'preview')
 					{
-						updateInteractiveScore(data.score, targetPage, targetSection);
+						if(typeof data.score !== 'undefined')
+						{
+							updateInteractiveScore(parseInt(data.score), targetPage, targetSection);
+						}
 					}
 					else
 					{
@@ -91,9 +94,12 @@ obo.view = function()
 						obo.model.updateQuestionScoreForCurrentAttempt(targetSection, targetPage, function(score) {
 							// if we don't get back the response we expect we err on the side of the student
 							// and give them the score
-							if(score === false && !isNaN(data.score))
+							if(score === false)
 							{
-								updateInteractiveScore(data.score, targetPage, targetSection);
+								if(typeof data.score !== 'undefined')
+								{
+									updateInteractiveScore(parseInt(data.score, 10), targetPage, targetSection);
+								}
 							}
 							else
 							{
