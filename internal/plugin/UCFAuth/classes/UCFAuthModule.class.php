@@ -196,12 +196,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
 		}
 		// handle an LTI SSO authentication request
-		else if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
+		else if(!empty($requestVars['userName']) && isset($_SESSION['isValidLtiLogin']) && $_SESSION['isValidLtiLogin'] === true)
 		{
-			if(!empty($requestVars['createIfMissing']) && $requestVars['createIfMissing'] === true)
-			{
-				$weakExternalSync = true;
-			}
+			unset($_SESSION['isValidLtiLogin']);
+			$weakExternalSync = \AppCfg::LTI_CREATE_USER_IF_MISSING;
 			$validSSO = true;
 		}
 

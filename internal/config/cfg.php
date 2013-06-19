@@ -157,7 +157,7 @@ class AppCfgDefault
 		
 	//--------------------   PLUGINS   -----------------------//
 	// add in camma seperated class names of authentication plugins to us
-	const AUTH_PLUGINS = '\rocketD\auth\ModInternal,plg_UCFAuth_UCFAuthModule';
+	const AUTH_PLUGINS = '\rocketD\auth\ModTestUser,\rocketD\auth\ModInternal,plg_UCFAuth_UCFAuthModule';
 	
 	// add in camma seperated names of plugins from the internal/plugins/ directory
 	const CORE_PLUGINS = '';
