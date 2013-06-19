@@ -45,3 +45,6 @@ internal/templates/compiled/
 internal/DELETEME/tests/*
 
 /*.json
+
+# ignore smarty template complied directory
+internal/templates/compiled/*
