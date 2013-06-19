@@ -165,8 +165,5 @@ class AppCfgDefault
 	//-----------------   PLUGIN SETTINGS   -----------------//
 	// Never set true in production, [true, false]
 	const UCF_AUTH_BYPASS_PASSWORDS = false;
-	
-	// If true, scores will not be pushed to webcourses [true, false]
-	const UCFCOURSES_DISABLE_SCORE_PUSH = false;
 }
 ?>

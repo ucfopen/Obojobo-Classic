@@ -370,8 +370,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$userID = $r->{\cfg_core_User::ID};
 			$ownerName = $userID > 0 ? $authMan->getName($userID) : '';
 			$iData = new \obo\lo\InstanceData($r->{\cfg_obo_Instance::ID}, $r->{\cfg_obo_LO::ID}, $r->{\cfg_core_User::ID}, $ownerName, $r->{\cfg_obo_Instance::TITLE}, $r->{\cfg_obo_Instance::COURSE}, $r->{\cfg_obo_Instance::TIME}, $r->{\cfg_obo_Instance::START_TIME}, $r->{\cfg_obo_Instance::END_TIME}, $r->{\cfg_obo_Instance::ATTEMPT_COUNT}, $r->{\cfg_obo_Instance::SCORE_METHOD}, $r->{\cfg_obo_Instance::SCORE_IMPORT}, 0, array(), $r->{\cfg_obo_Instance::EXTERNAL_LINK});
-			$iData->dbGetCourseData();
-			\rocketD\util\Cache::getInstance()->setInstanceData($iData);
+			//$iData->dbGetCourseData();
+			//\rocketD\util\Cache::getInstance()->setInstanceData($iData);
 			// get perms
 			
 			// Fix if the user is SU, just get merged perms

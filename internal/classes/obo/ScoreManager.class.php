@@ -427,12 +427,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		$lastUID = -1;
 		$attempts;
 
-		// TODO: SYSTEM EVENTS
-
-		// get their sync status
-		$PM = \rocketD\plugin\PluginManager::getInstance();
-		$wcScoresLog = $PM->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
-
 		$userMan = \rocketD\auth\AuthManager::getInstance();
 		while($r = $this->DBM->fetch_obj($q))
 		{
@@ -446,8 +440,8 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					'additional' => $r->additional_attempts,
 					'attempts' => array(),
 					// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
-					'synced' => (!($wcScoresLog instanceof \rocketD\util\Error) && isset($wcScoresLog[$r->{\cfg_core_User::ID}] ) ? $wcScoresLog[$r->{\cfg_core_User::ID}]->{\cfg_plugin_UCFCourses::SUCCESS} : false) ,
-					'syncedScore' => (!($wcScoresLog instanceof \rocketD\util\Error) && isset($wcScoresLog[$r->{\cfg_core_User::ID}]) ? $wcScoresLog[$r->{\cfg_core_User::ID}]->{\cfg_plugin_UCFCourses::SCORE} : 0)
+					'synced' => false ,
+					'syncedScore' => 0
 				);
 				$lastUID = $r->{\cfg_core_User::ID};
 			}
@@ -526,12 +520,6 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 
-		// TODO: SYSTEM EVENTS
-
-		// get their sync status
-		$pm = \rocketD\plugin\PluginManager::getInstance();
-		$wcScoresLog = $pm->callAPI('UCFCourses', 'getScoreLogsForInstance', array($instID), true);
-
 		$userMan = \rocketD\auth\AuthManager::getInstance();
 
 		while($r = $this->DBM->fetch_obj($q))
@@ -545,8 +533,8 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					'additional' => $r->additional_attempts,
 					'attempts' => array(),
 					// TODO: when this uses SYSTEM EVENTS, we will probably need to be more geralized
-					'synced' => (isset($wcScoresLog[$userID]) ? $wcScoresLog[$userID]->{\cfg_plugin_UCFCourses::SUCCESS} : false) ,
-					'syncedScore' => (isset($wcScoresLog[$userID]) ? $wcScoresLog[$userID]->{\cfg_plugin_UCFCourses::SCORE} : 0)
+					'synced' => false,
+					'syncedScore' => 0
 				);
 			}
 			// add attempts

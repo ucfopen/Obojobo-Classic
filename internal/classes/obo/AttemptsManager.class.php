@@ -672,20 +672,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$scores = $scoreman->getScoresForUser($instData->instID, $_SESSION['userID']);
 		
 		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
-		
-		// if the score is different or it hasn't been synced yet, send one (this handles score 0 as well)
-		/*
-		if($submittableScore !== false)
-		{
-			if($scores['syncedScore'] != $submittableScore || !$scores['synced'])
-			{
-				//@TODO -get rid of this??
-				// TODO: NEED TO USE SYSTEM EVENTS
-				// Send the score to webcourses
-				//$PM = \rocketD\plugin\PluginManager::getInstance();
-				//$result = $PM->callAPI('UCFCourses', 'sendScore', array($instData->instID, $_SESSION['userID'], $submittableScore), true);
-			}
-		}*/
 
 		if($instData->externalLink)
 		{

@@ -52,9 +52,9 @@ class InstanceData
 	{
 		// get courseData
 		// TODO: this should use the system events system
-		$PM = \rocketD\plugin\PluginManager::getInstance();
+		//$PM = \rocketD\plugin\PluginManager::getInstance();
 		// Link item to course
-		$this->courseData = $PM->callAPI('UCFCourses', 'getInstanceCourseData', array($this->instID), true);
+		$this->courseData = (object) array('type' => 'none');
 	}
 	
 	public function dbGet($DBM, $instID)
