@@ -1897,7 +1897,7 @@ class API extends \rocketD\db\DBEnabled
 			"roles"                      => $role,
 		);
 
-		$params =  \Lti\Oauth::buildPostArgs($this->getUser(), \AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
+		$params =  \Lti\OAuth::buildPostArgs($this->getUser(), \AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
 
 		return array('url' => \AppCfg::MATERIA_LTI_URL, 'params' => $params);
 	}
