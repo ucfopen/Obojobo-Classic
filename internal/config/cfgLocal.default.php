@@ -52,10 +52,6 @@ class AppCfg extends AppCfgDefault
 	const UCF_APP_ID = ''; // the app id needed to connect to the web service
 		
 	const LDAP = ''; // The LDAP URL for accessing UCF Authentication
-	
-	const SSO_SECRET = ""; // SSO Secret key used for the single sign on script
-	
-	const KOGNEATO_JSON_URL = 'https://kogneato.ucf.edu/gs-amfphp/json.php/GSPlayer.';
 
 }
 ?>
