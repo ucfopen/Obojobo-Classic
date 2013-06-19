@@ -1,5 +1,5 @@
 <?
-namespace Lti;
+namespace lti;
 
 class Data
 {

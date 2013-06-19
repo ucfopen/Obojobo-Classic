@@ -1,5 +1,5 @@
 <?php
-namespace Lti;
+namespace lti;
 
 class OAuth
 {
@@ -23,12 +23,12 @@ class OAuth
 		$timestampChecker = function($provider)
 		{
 			//@TODO - Check to see if nonce is already used
-			return $provider->timestamp >= time() - \Lti\OAuth::$timeout ? OAUTH_OK : OAUTH_TOKEN_EXPIRED;
+			return $provider->timestamp >= time() - \lti\OAuth::$timeout ? OAUTH_OK : OAUTH_TOKEN_EXPIRED;
 		};
 
 		$consumerHandler = function($provider)
 		{
-			$provider->consumer_secret = \Lti\OAuth::$secret;
+			$provider->consumer_secret = \lti\OAuth::$secret;
 
 			return OAUTH_OK;
 		};

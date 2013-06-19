@@ -1,30 +1,30 @@
 <?php
 require_once(dirname(__FILE__) . "/../internal/app.php");
 
-$ltiApi = \Lti\API::getInstance();
-$ltiData = new \Lti\Data($_POST);
+$ltiApi = \lti\API::getInstance();
+$ltiData = new \lti\Data($_POST);
 
 \rocketD\util\Log::profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 
 // make sure required instID parameter is present
 if(!isset($_GET['instID']) || !is_numeric($_GET['instID']))
 {
-	\Lti\Views::renderUnknownAssignmentError($ltiData, $ltiData->isInstructor());
+	\lti\Views::renderUnknownAssignmentError($ltiData, $ltiData->isInstructor());
 }
 $originalInstID = $_GET['instID'];
 
 // show error if any values are invalid
-\Lti\Views::validateLtiAndRenderAnyErrors($ltiData);
+\lti\Views::validateLtiAndRenderAnyErrors($ltiData);
 
 // create lti association and duplicate the instance if required
 $instID = $ltiApi->createLtiAssociationIfNeeded($originalInstID, $ltiData);
 if($instID instanceof \obo\util\Error)
 {
-	\Lti\Views::renderUnexpectedError($ltiData, $instID->message);
+	\lti\Views::renderUnexpectedError($ltiData, $instID->message);
 }
 else if(!$instID || !is_numeric($instID))
 {
-	\Lti\Views::renderUnexpectedError($ltiData, 'Unexpected return value when potentially creating new LTI association.');
+	\lti\Views::renderUnexpectedError($ltiData, 'Unexpected return value when potentially creating new LTI association.');
 }
 
 // Depending on role we want to either show preview mode or the actual instance:
@@ -34,7 +34,7 @@ if($ltiData->isInstructor())
 	$instanceData = $API->getInstanceData($instID);
 	if(!$instanceData || !isset($instanceData->instID))
 	{
-		\Lti\Views::renderUnknownAssignmentError($ltiData, true);
+		\lti\Views::renderUnknownAssignmentError($ltiData, true);
 	}
 
 	$loID = $instanceData->loID;

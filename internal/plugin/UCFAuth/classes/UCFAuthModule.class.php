@@ -192,15 +192,13 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// handle a portal-based SSO authentication request:
 		if(empty($requestVars['userName']) && empty($requestVars['password']))
 		{
-			// *********** Sammy's SSO Hash for system to system single sign on ****************//
-			if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
-			{
-				verifyPortalHash($requestVars, $validSSO, $weakExternalSync);
-			}
 			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
-			else if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
+			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
+
+			if(!$validSSO)
 			{
-				verifyPortalSession($requestVars, $validSSO, $weakExternalSync);
+				// *********** Sammy's SSO Hash for system to system single sign on ****************//
+				$this->verifySSOHash($requestVars, $validSSO, $weakExternalSync);
 			}
 		}
 		// handle an LTI SSO authentication request
@@ -250,38 +248,48 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return false;
 	}
 
-	protected function verifyPortalHash(&$requestVars, &$validSSO, &$weakExternalSync)
+	protected function verifySSOHash(&$requestVars, &$validSSO, &$weakExternalSync)
 	{
-		$time = microtime(true);
-		$sso = new plg_UCFAuth_SsoHash(\AppCfg::SSO_SECRET);
-		$sso_req = $sso->getSsoInParametersFromRequest();
-		trace($sso_req);
-		try
+		// *********** Sammy's SSO Hash for system to system single sign on ****************//
+		if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
 		{
-			if($sso->validateSSOHash($sso_req))
+			$time = microtime(true);
+			$sso = new plg_UCFAuth_SsoHash(\AppCfg::SSO_SECRET);
+			$sso_req = $sso->getSsoInParametersFromRequest();
+			trace($sso_req);
+			try
 			{
-				trace('sso validated', true);
-				$validSSO = true;
-				$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
+				if($sso->validateSSOHash($sso_req))
+				{
+					trace('sso validated', true);
+					$validSSO = true;
+					$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
+				}
 			}
+			//catch exception
+			catch(Exception $e)
+			{
+				trace($e, true);
+			}
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'");
+
+			return true;
 		}
-		//catch exception
-		catch(Exception $e)
-		{
-			trace($e, true);
-		}
-		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'");
+
+		return false;
 	}
 
-	protected function verifyPortalSession(&$requestVars)
+	protected function checkForValidPortalSession(&$requestVars, &$validSSO, &$weakExternalSync)
 	{
-		$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
-		$validSSO = true;
-		$weakExternalSync = true; // allow the user to not exist in external db
-		// logged in, clear the session variables
-		unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
-		
-		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'");
+		if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
+		{
+			$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
+			// logged in, clear the session variables
+			unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
+			$validSSO = true;
+			$weakExternalSync = true; // allow the user to not exist in external db
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'");
+		}
 	}
 
 	public function verifyPassword($userName, $password)
