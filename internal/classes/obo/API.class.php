@@ -105,63 +105,6 @@ class API extends \rocketD\db\DBEnabled
 		$PM = \rocketD\plugin\PluginManager::getInstance();
 		return $PM->callAPI($plugin, $method, $args, false); // call the plugin method, but restrict it to whitelisted functions
 	}
-
-	public function getCourses()
-	{
-		if($this->getSessionValid())
-		{
-			// TODO: NEED TO USE SYSTEM EVENTS
-			$PM = \rocketD\plugin\PluginManager::getInstance();
-			$result = $PM->callAPI('UCFCourses', 'getCourses', array(), true);
-		}
-		else
-		{
-			$result = \rocketD\util\Error::getError(1);
-		}
-		return $result;
-	}
-	
-	public function setCourseForInstance($instID, $courseID, $sendScores = false, $gradeBookColumnName = false)
-	{
-		$result = false;
-		if($this->getSessionValid())
-		{
-			// TODO: NEED TO USE SYSTEM EVENTS
-			$user = $this->getUser();
-			
-			$PM = \rocketD\plugin\PluginManager::getInstance();
-			
-			// Link item to course
-			$result = $PM->callAPI('UCFCourses', 'setInstanceCourseLink', array($instID, $courseID), true);
-			
-			if($sendScores == true && strlen($gradeBookColumnName) > 0)
-			{
-				// create the gradebook column
-				$result = $PM->callAPI('UCFCourses', 'createColumn', array($instID, $courseID, $gradeBookColumnName), true);
-
-				// it worked, return true
-				if($result['columnID'] > 0 )
-				{
-					$result = true;
-				}
-				// errors returned, return the first one
-				elseif(count($result['errors']) > 0)
-				{
-					$result = $result['errors'][0];
-				}
-				// no idea what happend, but it didnt work, report a general error
-				else
-				{
-					$result = \rocketD\util\Error::getError(0);
-				}
-			}
-		}
-		else
-		{
-			$result = \rocketD\util\Error::getError(1);
-		}
-		return $result;	
-	}
 	
 	/**
 	 * Logs out the current active user

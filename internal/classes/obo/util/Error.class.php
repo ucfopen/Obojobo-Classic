@@ -87,22 +87,6 @@ class Error extends \rocketD\util\Error
 			case 6003: return "Can't delete LO, there is an existing instance.";
 			case 6004: return "There are no drafts to create a master from.";
 			case 6005: return "Master version already exists.";
-			
-			/* UCFCourses Plugin Errors */
-			case 7000: return "Course does not exist.";
-			case 7001: return "User does not exist.";
-			case 7002: return "User is not an instructor of requested course.";
-			case 7003: return "Could not connect to Webcourses.";
-			case 7004: return "Could not fetch columns.";
-			case 7005: return "Grade book column already exists.";
-			case 7006: return "Grade book column does not exist.";
-			case 7007: return "Unable to create grade book column.";
-			case 7008: return "Specified score is an incorrect format.";
-			case 7009: return "Unable to get student list.";
-			case 7010: return "Unable to get member description.";
-			case 7011: return "User is not a student of the specified course.";
-			case 7012: return "Course could not be found.";
-			case 7013: return "General course plugin error.";
 
 			/* LTI Errors */
 			case 8001: return "Unable to set or update LTI association.";
