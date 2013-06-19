@@ -28,7 +28,7 @@ function createTestCase($customParams, $endpoint, $user = false, $passbackUrl = 
 		$api = \obo\API::getInstance();
 		$user = $api->getUser();
 	}
-	$params = \Lti\OAuth::buildPostArgs($user, $endpoint, $params, $key, $secret, $passbackUrl);
+	$params = \lti\OAuth::buildPostArgs($user, $endpoint, $params, $key, $secret, $passbackUrl);
 	trace('****************built params');
 	trace($params);
 

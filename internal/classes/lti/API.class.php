@@ -1,5 +1,5 @@
 <?
-namespace Lti;
+namespace lti;
 
 class API extends \rocketD\db\DBEnabled
 {
@@ -313,7 +313,7 @@ class API extends \rocketD\db\DBEnabled
 		$smarty->assign('sourceId', $sourceID);
 		$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
 
-		$result = \Lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
+		$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
 
 		\rocketD\util\Log::profile('lti', "'outcome-".($result['success'] ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '{$result['error']}', '".time()."'");
 

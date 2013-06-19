@@ -26,12 +26,12 @@ if(empty($_POST) && function_exists('apache_request_headers'))
 $valid = false;
 $description = "Invalid Oauth Signature";
 
-$ltiData = new \Lti\Data($_POST);
+$ltiData = new \lti\Data($_POST);
 
 $outMsgId = 0;
 
 // validate the oauth signature
-if(\Lti\OAuth::validateLtiMessage($ltiData, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT) === true)
+if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT) === true)
 {
 	// process the incoming data
 	$body       = @file_get_contents('php://input');
