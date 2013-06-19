@@ -46,7 +46,7 @@ body
 	min-height: 100%;
 	height: auto !important;
 	height: 100%;
-	margin: 0 auto -37px;
+	margin: 0 auto -38px;
 }
 
 /* prevent FF from giving swfs a dotted border: */
@@ -1619,6 +1619,7 @@ body
 	
 	
 	background: linear-gradient(top, #d9d8d8 0%,#e5e5e5 29%,#cfcfd0 100%);
+	box-sizing: border-box;
 }
 
 .push
