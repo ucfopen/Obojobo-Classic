@@ -51,7 +51,7 @@ else
       // Reject access if this is attempted direct access to an LTI instance:
       if(!empty($instData->externalLink))
       {
-        $ltiApi = \Lti\API::getInstance();
+        $ltiApi = \lti\API::getInstance();
         if(!$ltiApi->getAssessmentSessionData($_REQUEST['instID']))
         {
           // No session data for LTI - Either they got logged out or they accessed the instance directly.

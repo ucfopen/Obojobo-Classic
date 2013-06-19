@@ -24,11 +24,11 @@ foreach($oauthData as $oauthKey => $oauthValue)
 	$_POST[$oauthKey] = $oauthValue;
 }
 
-$ltiData = new \Lti\Data($_POST);
+$ltiData = new \lti\Data($_POST);
 
 $valid = false;
 // validate the oauth signature
-if(\Lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT) === true)
+if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT) === true)
 {
 	// process the incoming data
 	$body     = @file_get_contents('php://input');

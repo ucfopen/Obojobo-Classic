@@ -13,28 +13,28 @@ else
 
 function beginPickerSession()
 {
-	$ltiApi  = \Lti\API::getInstance();
-	$ltiData = new \Lti\Data($_POST);
+	$ltiApi  = \lti\API::getInstance();
+	$ltiData = new \lti\Data($_POST);
 
-	\Lti\Views::validateLtiAndRenderAnyErrors($ltiData);
+	\lti\Views::validateLtiAndRenderAnyErrors($ltiData);
 
 	if (!$ltiData->isInstructor())
 	{
-		\Lti\Views::renderIncorrectRoleError($ltiData);
+		\lti\Views::renderIncorrectRoleError($ltiData);
 	}
 
 	$ltiInstanceToken = $ltiApi->storeLtiData($ltiData);
 	if (!$ltiInstanceToken)
 	{
-		\Lti\Views::renderUnexpectedError($ltiData, "Couldn't store LTI token in session");
+		\lti\Views::renderUnexpectedError($ltiData, "Couldn't store LTI token in session");
 	}
 
-	\Lti\Views::renderPicker($ltiInstanceToken, $ltiData->returnUrl);
+	\lti\Views::renderPicker($ltiInstanceToken, $ltiData->returnUrl);
 }
 
 function clearAssociatedInstance()
 {
-	$ltiApi           = \Lti\API::getInstance();
+	$ltiApi           = \lti\API::getInstance();
 	$selectedInstId   = $_POST['selectedInstId'];
 	$ltiInstanceToken = $_POST['ltiInstanceToken'];
 	$ltiData          = $ltiApi->restoreLtiData($ltiInstanceToken);
@@ -68,7 +68,7 @@ function createNewExternallyLinkedInstance()
 	$scoreMethod      = $_POST['scoreMethod'];
 	$allowScoreImport = $_POST['allowScoreImport'] === 'true';
 
-	$ltiApi           = \Lti\API::getInstance();
+	$ltiApi           = \lti\API::getInstance();
 	$ltiData          = $ltiApi->restoreLtiData($ltiInstanceToken);
 
 	$courseName       = $ltiData->contextTitle;

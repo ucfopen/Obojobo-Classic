@@ -1,13 +1,13 @@
 <?
-namespace Lti;
+namespace lti;
 
 class Views
 {
 	static public function validateLtiAndRenderAnyErrors($ltiData)
 	{
-		$ltiApi = \Lti\API::getInstance();
+		$ltiApi = \lti\API::getInstance();
 
-		$valid = \Lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT);
+		$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT);
 		if($valid instanceof \OAuthException)
 		{
 			if($valid->getCode() === OAUTH_TOKEN_EXPIRED)
