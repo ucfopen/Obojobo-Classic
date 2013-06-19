@@ -119,21 +119,31 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * @param $sessid (string) PHP session ID
 	 * @return (bool) True if they are the same, False if not
 	 */	 	
-	public function cmpSessID($userID, $sessid){
-		//TODO: check to see if the session has past the expiration time
-		$qstr = "SELECT ".\cfg_core_User::SID." FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1";
-		$this->defaultDBM();
-		if( !($q = $this->DBM->querySafe($qstr, $userID)) )
+	protected function cmpSessID($userID, $sessid){
+		// dont compare sessions for the test user since many people can be him at the same time
+		if(isset($_SESSION['isTestUser']) && $_SESSION['isTestUser'] === true)
 		{
-			$this->DBM->rollback();
-			return false;
+			$qstr = "SELECT * FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_core_User::AUTH_MODULE." = 'rocketD\auth\ModTestUser LIMIT 1";
+			if( !($q = $this->DBM->querySafe($qstr, $userID)) )
+			{
+				$this->DBM->rollback();
+				return false;
+			}
+			return $this->DBM->fetch_num($q) > 0;
 		}
-		
-		//Compare the two session IDs
-		if( $r = $this->DBM->fetch_obj($q) )
+		// if not the test user, make sure my session id matches in the database -  prevents me from being logged in in 2 places
+		else
 		{
-			if($r->{\cfg_core_User::SID} == $sessid && $r->{\cfg_core_User::SID} != '') return true;
+			if ($sessid == '') return false;
+			$qstr = "SELECT * FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_core_User::SID." = '?' LIMIT 1";
+			if( !($q = $this->DBM->querySafe($qstr, $userID, $sessid)) )
+			{
+				$this->DBM->rollback();
+				return false;
+			}
+			return $this->DBM->fetch_num($q) > 0;
 		}
+
 		return false;
 	}
 
@@ -452,8 +462,13 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return false;
 
 	}
-	
-	
+
+	// NEVER LET A USER DO THIS DIRECTLY
+	public function loginAsTestStudent()
+	{
+		return self::authenticate(array('isTestUser' => true));
+	}
+
 	/**
 	 * Handle checking all the authentication modules in order of priority
 	 *
@@ -462,7 +477,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 **/
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	// TODO: make protected
-	public function authenticate($requestVars, $authID=0 )
+	protected function authenticate($requestVars, $authID=0 )
 	{
 		// get array of authmodules in order, first to last
 		$authModList = $this->getAllAuthModules();
