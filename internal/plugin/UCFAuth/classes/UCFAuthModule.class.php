@@ -194,12 +194,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
 			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
-
-			if(!$validSSO)
-			{
-				// *********** Sammy's SSO Hash for system to system single sign on ****************//
-				$this->verifySSOHash($requestVars, $validSSO, $weakExternalSync);
-			}
 		}
 		// handle an LTI SSO authentication request
 		else if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
@@ -245,37 +239,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','".round((microtime(true) - $time),5)."','".time().",'0'");
 		}
-		return false;
-	}
-
-	protected function verifySSOHash(&$requestVars, &$validSSO, &$weakExternalSync)
-	{
-		// *********** Sammy's SSO Hash for system to system single sign on ****************//
-		if(isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_USERID]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_TIMESTAMP]) && isset($_REQUEST[plg_UCFAuth_SsoHash::SSO_HASH]))
-		{
-			$time = microtime(true);
-			$sso = new plg_UCFAuth_SsoHash(\AppCfg::SSO_SECRET);
-			$sso_req = $sso->getSsoInParametersFromRequest();
-			trace($sso_req);
-			try
-			{
-				if($sso->validateSSOHash($sso_req))
-				{
-					trace('sso validated', true);
-					$validSSO = true;
-					$requestVars['userName'] = $sso_req[plg_UCFAuth_SsoHash::SSO_USERID];
-				}
-			}
-			//catch exception
-			catch(Exception $e)
-			{
-				trace($e, true);
-			}
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_SSOAuthentication','".round((microtime(true) - $time),5)."','".time().",'".($validSSO?'1':'0')."'");
-
-			return true;
-		}
-
 		return false;
 	}
 
