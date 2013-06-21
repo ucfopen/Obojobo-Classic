@@ -299,7 +299,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**** LO Functions ****/
 	/**
 	 * Get the entire LO
@@ -310,29 +310,35 @@ class API extends \rocketD\db\DBEnabled
 	public function getLO($loID, $newest=false)
 	{
 		// TODO: move validation
-	    if(!\obo\util\Validator::isPosInt($loID))
+		if(!\obo\util\Validator::isPosInt($loID))
 		{
 			return \rocketD\util\Error::getError(2);
-		}   
-		
+		}
+
 		if($this->getSessionValid())
 		{
-			$this->DBM->startTransaction();
-			$loman = \obo\lo\LOManager::getInstance();
-			// if newest is true, get the newest draft that is related to the passed id
-			$loObj = ($newest === true ? $loman->getLatestDraftByLOID($loID) /*newest*/ : $loman->getLO($loID, 'full') /*exact match*/);
-			$this->DBM->commit();
+			$hasRole = $this->getSessionRoleValid(array(\cfg_obo_Role::CONTENT_CREATOR, \cfg_obo_Role::LIBRARY_USER));
+			if(in_array(\cfg_obo_Role::LIBRARY_USER, $hasRole['hasRoles']) || in_array(\cfg_obo_Role::CONTENT_CREATOR, $hasRole['hasRoles']))
+			{
+				$this->DBM->startTransaction();
+				$loman = \obo\lo\LOManager::getInstance();
+				// if newest is true, get the newest draft that is related to the passed id
+				$loObj = ($newest === true ? $loman->getLatestDraftByLOID($loID) /*newest*/ : $loman->getLO($loID, 'full') /*exact match*/);
+				$this->DBM->commit();
+			}
+			else
+			{
+				$loObj = \obo\util\Error::getError(4);
+			}
 		}
 		else
 		{
 			$loObj = \rocketD\util\Error::getError(1);
 		}
-		
+
 		return $loObj;
 	}
-	
-	
-	
+
 	/**
 	 * Gets a list of all drafts for a given root id
 	 * @param $rootid (number) root learning object id
