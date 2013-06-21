@@ -43,7 +43,7 @@ class InstanceData
 		$this->scoreMethod = $scoreMethod;
 		$this->allowScoreImport = $allowScoreImport;
 		$this->perms = $perms;
-		$this->courseData = $courseData;
+		$this->courseData = (object) array('type' => 'none');
 		$this->externalLink = $externalLink;
 		$this->originalID = $originalID;
 	}
