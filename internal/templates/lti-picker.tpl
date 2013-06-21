@@ -153,10 +153,12 @@
 			<span class="logo-text">Obojobo&reg;</span>
 			<div class="blue-flourish"></div>
 		</header>
-		<span class="note">Scores for this learning object will be sent to Canvas</span>
-		<span class="close-notice">You can now close this window.</span>
-		<h1 class="selected-instance-title"></h1>
-		<a href="#" class="preview-link" target="_blank">Preview at Obojobo...</a>
+		<div class="grey-box">
+			<h1>Obojobo Instance Connected:</h1>
+			<h2 class="selected-instance-title"></h2>
+			<span class="note">Scores for this Obojobo assignment will sync with your Canvas gradebook</span>
+		</div>
+		<a href="#" class="preview-link" target="_blank">Preview this instance in a new window...</a>
 	</section>
 	<section id="loading"></section>
 	<section id="dead"></section>

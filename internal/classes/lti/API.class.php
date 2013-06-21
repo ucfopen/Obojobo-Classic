@@ -19,31 +19,22 @@ class API extends \rocketD\db\DBEnabled
 
 	public function updateAndAuthenticateUser($ltiData)
 	{
-		$setRoleNeeded = false;
-		$AM = \rocketD\auth\AuthManager::getInstance();
+		$createIfMissing = \AppCfg::LTI_CREATE_USER_IF_MISSING;
 
-		// If this is the test user we want to make sure they are created
-		// if they don't exist
+		// If this is the test user we don't want to create a new
+		// user, skip authentication
 		if($ltiData->isTestUser())
 		{
-			$success = $AM->loginAsTestStudent();
-			$ltiData->username = $ltiData->remote_id = rocketD\auth\ModTestStudent::USERNAME;
-			$ltiData->email = "testuser@{$ltiData->consumer}.com";
-			$setRoleNeeded = true;
+			return true;
 		}
-		else
-		{
-			$setRoleNeeded = \AppCfg::LTI_CREATE_USER_IF_MISSING;
-			$API = \obo\API::getInstance();
-			$API->verifySession(); // Called to make sure the session is started
-			$_SESSION['isValidLtiLogin'] = true; // set a session variable for the authentication module to find
-			$loggedIn = $API->doLogin($ltiData->username, '');
-			$success = $loggedIn === true;
-		}
+
+		$AM = \rocketD\auth\AuthManager::getInstance();
+
+		$success = $AM->authenticate(array('userName' => $ltiData->username, 'validLti' => true, 'createIfMissing' => $createIfMissing));
 
 		// We need to potentially elevate this users roles if we are creating them on the fly
 		// and the external system claims them to be an instructor:
-		if($success && $setRoleNeeded && $ltiData->isInstructor())
+		if($success && $createIfMissing && $ltiData->isInstructor())
 		{
 			$user = $AM->fetchUserByUserName($ltiData->username);
 
