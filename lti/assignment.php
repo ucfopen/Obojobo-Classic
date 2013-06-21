@@ -1,6 +1,18 @@
 <?php
 require_once(dirname(__FILE__) . "/../internal/app.php");
 
+function getInstanceDataOrRenderError($instID)
+{
+	$API = \obo\API::getInstance();
+	$instanceData = $API->getInstanceData($instID);
+	if(!$instanceData || !isset($instanceData->instID))
+	{
+		\lti\Views::renderUnknownAssignmentError($ltiData, true);
+	}
+
+	return $instanceData;
+}
+
 $ltiApi = \lti\API::getInstance();
 $ltiData = new \lti\Data($_POST);
 
@@ -28,15 +40,17 @@ else if(!$instID || !is_numeric($instID))
 }
 
 // Depending on role we want to either show preview mode or the actual instance:
-if($ltiData->isInstructor())
+if($ltiData->isTestUser())
 {
-	$API = \obo\API::getInstance();
-	$instanceData = $API->getInstanceData($instID);
-	if(!$instanceData || !isset($instanceData->instID))
-	{
-		\lti\Views::renderUnknownAssignmentError($ltiData, true);
-	}
+	$instanceData = getInstanceDataOrRenderError($instID);
 
+	$ltiApi->initAssessmentSession($instID, $ltiData);
+
+	\lti\Views::renderTestUserConfirmPage($instanceData);
+}
+else if($ltiData->isInstructor())
+{
+	$instanceData = getInstanceDataOrRenderError($instID);
 	$loID = $instanceData->loID;
 
 	// We want to store in some additional permissions info in

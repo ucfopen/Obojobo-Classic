@@ -108,6 +108,17 @@ class Views
 		echo $response;
 	}
 
+	static public function renderTestUserConfirmPage($instanceData)
+	{
+		// render page:
+		$smarty = \rocketD\util\Template::getInstance();
+		$smarty->assign('instanceTitle', $instanceData->name);
+		$smarty->assign('instanceCourseName', $instanceData->courseID);
+		$smarty->assign('previewLink', \AppCfg::URL_WEB.'preview/'.$instanceData->loID);
+		$response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-test-confirmation.tpl');
+		echo $response;
+	}
+
 	static protected function createErrorTemplate($ltiData)
 	{
 		$smarty = \rocketD\util\Template::getInstance();
