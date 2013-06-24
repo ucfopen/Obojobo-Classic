@@ -43,7 +43,7 @@
 				Community<br />Library
 			</div>
 			<p>
-				Choose an object built by groups like <strong>Information Literacy, SARC</strong> and <strong>Experiental Learning</strong>.
+				Choose an object built by groups like <strong>Information Literacy, SARC</strong> and <strong>Experiential Learning</strong>.
 			</p>
 		</div>
 		<a role="button" class="wizard-button-container personal-library-button-container">
