@@ -29,7 +29,6 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 }
 
 // ================ DISPLAY OUTPUT =================================
-
 // logged in, show the viewer
 if($loggedIn === true) 
 {
@@ -55,17 +54,8 @@ else
         if(!$ltiApi->getAssessmentSessionData($_REQUEST['instID']))
         {
           // No session data for LTI - Either they got logged out or they accessed the instance directly.
-          $consumerName = isset($_GET['consumer']) ? $_GET['consumer'] : '';
-          if($consumerName == '')
-          {
-            header('Location: ' . \AppCfg::URL_WEB . 'error/no-access');
-            exit();
-          }
-          else
-          {
-            header('Location: ' . \AppCfg::URL_WEB . 'error/lti');
-            exit();
-          }
+          header('Location: ' . \AppCfg::URL_WEB . 'error/no-access');
+          exit();
         }
       }
 
