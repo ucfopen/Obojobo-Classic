@@ -3267,6 +3267,68 @@ a
 	margin: 0 auto 15px auto;
 }
 
+.embedded
+{
+	background: #9c9c9c;
+}
+
+#embedded-dialog
+{
+	background: white;
+	border: gray;
+	box-shadow: 0 3px 3px rgba(0, 0, 0, .25);
+	width: 80%;
+	max-width: 500px;
+	margin: 40px auto 0 auto;
+	padding: 60px 60px 20px 60px;
+	box-sizing: border-box;
+	font-family: 'Lato', Arial;
+	text-align: center;
+}
+
+#embedded-dialog .logo
+{
+	display: block;
+	text-align: left;
+	background: url('/assets/images/viewer/logo.png') -50px 0 no-repeat;
+	text-indent:-9000px;
+}
+
+#embedded-dialog h1
+{
+	border-bottom: 1px solid gray;
+	padding-bottom: .5em;
+	margin: 0 0 6px 0;
+	text-align: left;
+	color: #86273d;
+	font-size: 20pt;
+}
+
+#embedded-dialog ul
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+#embedded-dialog ul li
+{
+	display: inline-block;
+	float: right;
+	font-weight: bold;
+	color: gray;
+	font-size: 10pt;
+}
+#embedded-dialog ul li:first-child
+{
+	float:left;
+}
+
+#embedded-dialog .button
+{
+	margin-top: 3em;
+}
+
 .reload-media-button
 {
 	font-family: 'Lato', Arial;

@@ -46,7 +46,7 @@ date.format.js"></script>
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
 <script type="text/javascript">
-  oldBrowser = true;
+  __oldBrowser = true;
 </script>
 <![endif]-->
 <!--[if lte IE 8]>
@@ -57,7 +57,7 @@ date.format.js"></script>
 <![endif]-->
 <!-- END IE CONDITIONALS -->
 
-<style type="text/css">.oldBrowser { background: #eeeeee; }</style>
+<style type="text/css">.__oldBrowser { background: #eeeeee; }</style>
 
 <script type="text/javascript">
 // Guess if they have an old browser
@@ -75,13 +75,13 @@ if(typeof navigator.userAgent !== 'undefined')
 
 	if(oldFirefox.test(ua) || oldOpera.test(ua) || oldSafari.test(ua))
 	{
-		oldBrowser = true;
+		__oldBrowser = true;
 	}
 }
 
 $('document').ready(function()
 {
-	if(typeof oldBrowser !== 'undefined' && oldBrowser === true)
+	if(typeof __oldBrowser !== 'undefined' && __oldBrowser === true)
 	{
 		$('body *').hide();
 		$('html').addClass('older-browser-background');

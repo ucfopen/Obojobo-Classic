@@ -777,6 +777,17 @@ obo.model = function()
 		if(pageIsNumericWithinBounds())
 		{
 			setViewStatePropertyForPage('visited', true);
+
+			// If this is an interactive practice question go ahead and mark it as answered
+			// so if the media is buggy it won't trigger any notices to the user.
+			if(section === 'practice')
+			{
+				var p = getPageObject();
+				if(typeof p.itemType !== 'undefined' && p.itemType.toLowerCase() === 'media')
+				{
+					setViewStatePropertyForPage('answered', true);
+				}
+			}
 		}
 
 		if(!isNaN(pendingPracticeQuestionsLoadedForPage))
@@ -1994,14 +2005,14 @@ obo.model = function()
 
 	// doesn't log the user out, but wipes out the content
 	// and displays a message as to why the page was killed
-	var killPage = function(message)
+	var killPage = function(message, title)
 	{
 		clearInterval(verifyTimeIntervalID);
 		$('body').empty();
 		$('html').addClass('older-browser-background');
 		//view.displayError(message);
 		obo.dialog.showDialog({
-			title: 'Error',
+			title: typeof title !== 'undefined' ? title : 'Error',
 			contents: message,
 			closeButton: false,
 			escClose: false,
@@ -2014,7 +2025,7 @@ obo.model = function()
 	var redirectToLoginPage = function()
 	{
 		location.href = obo.util.getBaseURL();
-	}
+	};
 	
 	return {
 		init: init,
@@ -2067,6 +2078,7 @@ obo.model = function()
 		getNumPagesWithViewStateProperty: getNumPagesWithViewStateProperty,
 		updateQuestionScoreForCurrentAttempt: updateQuestionScoreForCurrentAttempt,
 		getPageID: getPageID,
-		getIndexOfItem: getIndexOfItem
+		getIndexOfItem: getIndexOfItem,
+		killPage: killPage
 	};
 }();
