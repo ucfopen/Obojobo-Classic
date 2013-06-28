@@ -75,8 +75,7 @@ else
 	$ltiApi->initAssessmentSession($instID, $ltiData);
 
 	// show the instance:
-	// Passing in consumer here so that the viewer page can better determine that this url came from obo embedded in an external system
-	$viewURL = \AppCfg::URL_WEB . 'view/' . $instID . '?consumer='.$ltiData->consumer;
+	$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
 	\rocketD\util\Log::profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
 	header('Location: ' . $viewURL);
 }
