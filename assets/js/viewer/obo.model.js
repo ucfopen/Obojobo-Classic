@@ -777,17 +777,6 @@ obo.model = function()
 		if(pageIsNumericWithinBounds())
 		{
 			setViewStatePropertyForPage('visited', true);
-
-			// If this is an interactive practice question go ahead and mark it as answered
-			// so if the media is buggy it won't trigger any notices to the user.
-			if(section === 'practice')
-			{
-				var p = getPageObject();
-				if(typeof p.itemType !== 'undefined' && p.itemType.toLowerCase() === 'media')
-				{
-					setViewStatePropertyForPage('answered', true);
-				}
-			}
 		}
 
 		if(!isNaN(pendingPracticeQuestionsLoadedForPage))

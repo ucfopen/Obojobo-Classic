@@ -1359,6 +1359,14 @@ obo.view = function()
 							});
 						break;
 					case 'Media':
+						// If this is an interactive practice question go ahead and mark it as answered
+						// so if the media is buggy it won't trigger any notices to the user.
+						var section = obo.model.getSection();
+						if(section === 'practice')
+						{
+							obo.model.setViewStatePropertyForPage('answered', true);
+							markSubnavItem(section, obo.model.getPage(), 'answered');
+						}
 						break;
 				}
 				
