@@ -112,10 +112,6 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 			__oldBrowser = true;
 		}
 	}
-
-	// If we do this comparision before any other iframes are created on this page
-	// it should be accurate.
-	var __isInIFrame = window.frames.length !== window.parent.frames.length;
 	
 	// Polyfills:
 	Modernizr.load({
@@ -183,7 +179,7 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 
 		obo.model.init(obo.view, {});
 		obo.model.load(params, function() {
-			if(typeof __isInIFrame !== 'undefined' && __isInIFrame === true)
+			if(obo.util.isInIFrame())
 			{
 				$('html').addClass('embedded');
 				$('body').load('/assets/templates/viewer.html #embedded-dialog', function() {

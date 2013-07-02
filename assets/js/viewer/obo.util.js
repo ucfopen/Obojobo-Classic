@@ -540,7 +540,12 @@ obo.util = function()
 	{
 		return $('#ie-8-stylesheet').length > 0;
 	};
-	
+
+	isInIFrame = function()
+	{
+		return top.location != self.location;
+	};
+
 	// simple wrapper to delay a function call by 1ms
 	doLater = function(func)
 	{
@@ -570,6 +575,7 @@ obo.util = function()
 		getURLFromEmbeddedSwf: getURLFromEmbeddedSwf,
 		isMobile: isMobile,
 		isIE8: isIE8,
-		getWebURL: getWebURL
+		getWebURL: getWebURL,
+		isInIFrame: isInIFrame
 	};
 }();
