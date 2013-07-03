@@ -3270,6 +3270,7 @@ a
 .embedded
 {
 	background: #9c9c9c;
+	height: auto;
 }
 
 #embedded-dialog
