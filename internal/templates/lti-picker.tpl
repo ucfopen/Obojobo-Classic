@@ -7,11 +7,10 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Title</title>
-	<!-- <link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" media="screen" /> -->
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti.css">
 
 	  <!-- GOOGLE FONTS -->
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
 	<script src="/assets/js/jquery.js"></script>
 	<script src="/assets/js/lti/jquery-ui-1.10.2.custom.js"></script>
