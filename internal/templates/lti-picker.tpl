@@ -13,7 +13,7 @@
 	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
 	<script src="/assets/js/jquery.js"></script>
-	<script src="/assets/js/lti/jquery-ui-1.10.2.custom.js"></script>
+	<script src="/assets/js/lti/jquery-ui-1.10.3.custom.js"></script>
 	<script src="/assets/js/ba-debug.js"></script>
 	<script src="/assets/js/viewer/obo.util.js"></script>
 	<script src="/assets/js/viewer/obo.remote.js"></script>
@@ -110,6 +110,10 @@
 		</div>
 	</section>
 	<section id="create-instance">
+		<header>
+			<span class="logo-text">Obojobo&reg;</span>
+			<div class="blue-flourish"></div>
+		</header>
 		<form>
 			<h1>Create Instance</h1>
 			<div class="error-notice">
@@ -146,6 +150,17 @@
 				</li>
 			</ul>
 		</form>
+	</section>
+	<section id="progress">
+		<header>
+			<span class="logo-text">Obojobo&reg;</span>
+			<div class="blue-flourish"></div>
+		</header>
+		<h1></h1>
+		<div class="progress-container">
+			<span>Creating your instance...</span>
+			<div class="progressbar"></div>
+		</div>
 	</section>
 	<section id="success">
 		<header>
