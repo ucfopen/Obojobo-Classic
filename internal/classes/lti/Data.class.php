@@ -51,7 +51,7 @@ class Data
 
 	public function hasValidUserData()
 	{
-		return $this->isTestUser() || (!empty($this->remoteId) && !empty($this->username) && !empty($this->email) && !empty($this->consumer));
+		return $this->isTestUser() || (!empty($this->remoteId) && !empty($this->username) && !empty($this->consumer));
 	}
 
 	public function isTestUser()
