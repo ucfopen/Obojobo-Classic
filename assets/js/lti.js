@@ -7,6 +7,7 @@ obo.lti = function()
 {
 	"use strict";
 
+	var PROGESS_FAKE_DELAY_MS = 1000;
 	var SEARCH_DELAY_MS = 250;
 	var CHANGE_SECTION_FADE_DELAY_MS = 250;
 	var MAX_ITEMS = 20;
@@ -29,9 +30,10 @@ obo.lti = function()
 	var $createInstanceForm = $('#create-instance');
 	var $search = $('#search');
 
+	var ltiUrl = null;
 
-
-
+	// disable logs by defualt
+	debug.setLevel(0);
 
 	// searching:
 	function search()
@@ -238,6 +240,7 @@ obo.lti = function()
 			{
 				$('#submit').addClass('loading');
 				$('form input').attr('disabled', 'disabled');
+
 				submitForm();
 			}
 		});
@@ -288,6 +291,14 @@ obo.lti = function()
 
 		var selectedLoId = $('.obo-item.selected').attr('data-lo-id');
 
+		$('#progress h1').html(inputs.instName);
+		$('.progressbar').progressbar();
+		gotoSection('progress');
+
+		setTimeout(function() {
+			startProgressBar();
+		}, 500);
+
 		$.post('/lti/picker.php', {
 			selectedLoId: selectedLoId,
 			instanceName: inputs.instName,
@@ -298,6 +309,63 @@ obo.lti = function()
 		}, responseHandler);
 	}
 
+	function getRandInt(min, max)
+	{
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function startProgressBar()
+	{
+		// create a random number of progress bar stops
+		var availStops = [1,2,3,4,5,6,7,8,9];
+		var stops = { tick:0 };
+		for(var i = 0, len = getRandInt(3, 5); i < len; i++)
+		{
+			stops[availStops.splice(getRandInt(0, availStops.length), 1)] = true;
+		}
+
+		var intervalId = setInterval(function() {
+			stops.tick++;
+			if(typeof stops[stops.tick] !== 'undefined')
+			{
+				$('.progressbar').progressbar('value', stops.tick * 10);
+			}
+			if(stops.tick >= 10)
+			{
+				clearInterval(intervalId);
+
+				// Either end the progress bar or continue to wait if no response
+				// has been returned
+				if(ltiUrl !== null)
+				{
+					finishProgressBar();
+				}
+				else
+				{
+					ltiUrl = 'pending';
+				}
+			}
+		}, 200);
+
+		$(document).on('keyup', function(event) {
+			if(event.keyCode === 16) // shift
+			{
+				$('.progress-container').find('span').html('Reticulating splines...');
+				$(document).off('keyup');
+			}
+		})
+	}
+
+	function finishProgressBar()
+	{
+		$('.progress-container').addClass('success');
+		$('.progress-container').find('span').html('Success!');
+		$('.progressbar').progressbar('value', 100);
+		setTimeout(function() {
+			window.location = ltiUrl;
+		}, 1000);
+	}
+
 	function responseHandler(response)
 	{
 		response = $.parseJSON(response);
@@ -306,14 +374,19 @@ obo.lti = function()
 		{
 			window.__previousResponse = response;
 			$('.selected-instance-title').html(window.__previousResponse.body.name);
-			gotoSection('success');
+			//gotoSection('success');
 
 			//@TODO: Don't get this here
 			var instID = response.body.instID;
 			if(typeof __returnUrl !== 'undefined' && __returnUrl !== null && __returnUrl !== '')
 			{
 				var widgetURL = __webUrl + 'lti/assignment.php?instID=' + instID;
-				window.location = __returnUrl + '?embed_type=basic_lti&url=' + encodeURI(widgetURL);
+				var pending = ltiUrl === 'pending';
+				ltiUrl = __returnUrl + '?embed_type=basic_lti&url=' + encodeURI(widgetURL);
+				if(pending)
+				{
+					finishProgressBar();
+				}
 			}
 		}
 		else
