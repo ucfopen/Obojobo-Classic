@@ -24,6 +24,35 @@ a {
 	color: #4e6c84;
 }
 
+header {
+	height: 66px;
+	width: 100%;
+	background: #f2f2f2;
+	text-align: center;
+}
+
+header .blue-flourish {
+	height: 4px;
+	background: #4e6c84;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+}
+
+header .logo-text {
+	background: url('/assets/images/lti/logo2.png') no-repeat 0 100%;
+	height: 26px;
+	width: 92px;
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	display: inline-block;
+	position: absolute;
+	left: 20px;
+	top: 20px;
+}
+
 .button {
 	text-decoration: none;
 	display: inline-block;
@@ -441,6 +470,35 @@ footer .button {
 	text-align: center;
 }
 
+/*#create-instance header {
+	height: 66px;
+	width: 100%;
+	background: #f2f2f2;
+	text-align: center;
+}
+
+#create-instance header .blue-flourish {
+	height: 4px;
+	background: #4e6c84;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+}
+
+#create-instance header .logo-text {
+	background: url('/assets/images/lti/logo2.png') no-repeat 0 100%;
+	height: 26px;
+	width: 92px;
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	display: inline-block;
+	position: absolute;
+	left: 20px;
+	top: 20px;
+}*/
+
 #create-instance h1 {
 	text-align: left;
 	font-family: 'Source Sans Pro', Arial, sans-serif;
@@ -627,6 +685,7 @@ footer .button {
 	display: inline-block;
 	vertical-align: top;
 	margin-right: 3px;
+	position: static;
 }
 #wizard header .heading-container h1 .remaining-tagline {
 	display: inline-block;
@@ -768,7 +827,7 @@ footer .button {
 	left: 0;
 	right: 0;
 }
-
+/*
 #success header {
 	height: 65px;
 	width: 100%;
@@ -798,7 +857,7 @@ footer .button {
 	position: absolute;
 	left: 20px;
 	top: 20px;
-}
+}*/
 
 
 #loading {
@@ -821,6 +880,38 @@ footer .button {
 	bottom: 0;
 	z-index: 1000;
 	display: none;
+}
+
+#progress {
+	display: none;
+}
+
+#progress h1 {
+	font-weight: 200;
+	font-size: 24pt;
+	text-align: center;
+	margin-top: 1.5em;
+}
+
+#progress .progress-container {
+	width: 580px;
+	margin: 0 auto;
+	padding: 4em 1em 5em 1em;
+	box-sizing: border-box;
+	border: 1px solid #c5c5c5;
+	background: #f7f7f7;
+}
+
+#progress .progress-container > span {
+	text-align: center;
+	display: block;
+	margin-bottom: 1em;
+	font-size: 14pt;
+	line-height: 0;
+}
+#progress .progress-container.success > span {
+	font-weight: bold;
+	color: #37c89c;
 }
 
 
@@ -969,4 +1060,23 @@ footer .button {
 	width: 20px;
 	height: 20px;
 	cursor: pointer;
+}
+
+.ui-progressbar {
+	background: url('/assets/images/lti/progressbar-bg.gif');
+	/*background: #b2aeb7;*/
+	height: 20px;
+	border-radius: 11px;
+	width: 470px;
+	margin: 0 auto;
+}
+
+.ui-progressbar-value {
+	background: #553c75;
+	height: 100%;
+	border-radius: 11px;
+	transition: width 0.2s ease, background 0.2s ease;
+}
+.progress-container.success .ui-progressbar-value {
+	background: #37c89c;
 }
