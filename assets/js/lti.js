@@ -338,7 +338,7 @@ obo.lti = function()
 				// has been returned
 				if(ltiUrl !== null)
 				{
-					finishProgressBar();
+					finishProgressBarAndSetLocation();
 				}
 				else
 				{
@@ -356,7 +356,7 @@ obo.lti = function()
 		})
 	}
 
-	function finishProgressBar()
+	function finishProgressBarAndSetLocation()
 	{
 		$('.progress-container').addClass('success');
 		$('.progress-container').find('span').html('Success!');
@@ -381,11 +381,11 @@ obo.lti = function()
 			if(typeof __returnUrl !== 'undefined' && __returnUrl !== null && __returnUrl !== '')
 			{
 				var widgetURL = __webUrl + 'lti/assignment.php?instID=' + instID;
-				var pending = ltiUrl === 'pending';
+				var pendingCreateInstanceSuccessResponse = ltiUrl === 'pending';
 				ltiUrl = __returnUrl + '?embed_type=basic_lti&url=' + encodeURI(widgetURL);
-				if(pending)
+				if(pendingCreateInstanceSuccessResponse)
 				{
-					finishProgressBar();
+					finishProgressBarAndSetLocation();
 				}
 			}
 		}
