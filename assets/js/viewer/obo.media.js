@@ -91,7 +91,7 @@ obo.media = function()
 					var $input;
 					for(var param in result.params)
 					{
-						$input = $('<input name="' + param + '" id="' + param + '" value="' + result.params[param] + '" hidden="true">');
+						$input = $('<input name="' + param + '" value="' + result.params[param] + '" type="hidden">');
 						$form.append($input);
 					}
 					
