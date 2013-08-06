@@ -1124,7 +1124,7 @@ obo.view = function()
 				{
 					$('#content').load('/assets/templates/viewer.html #score-results', function() {
 						$('#return-to-overview-button').attr('href', baseURL + '#/assessment/start');
-						var recentScore = scores[scores.length - 1].score;
+						var recentScoreObject = scores[scores.length - 1];
 						var recordedScore = obo.model.getFinalCalculatedScore();
 						var attemptsRemaining = obo.model.getNumAttemptsRemaining();
 
@@ -1147,7 +1147,7 @@ obo.view = function()
 						}
 
 						$('#attempt-score-result h2').html('Attempt ' + scores.length + ' Score:');
-						$('#attempt-score').html(recentScore + '%');
+						$('#attempt-score').html(recentScoreObject.score + '%');
 						$('.recorded-score').html(recordedScore + '%');
 						$('.attempts-remaining').html(attemptsRemaining + ' Attempt' + (attemptsRemaining === 1 ? '' : 's'));
 						var note = '';
@@ -1185,6 +1185,22 @@ obo.view = function()
 						if(obo.model.instanceHasNoAccessDates())
 						{
 							$('#assessment-close-notice').hide();
+						}
+
+						if(typeof recentScoreObject.badgeInfo !== 'undefined' && typeof recentScoreObject.badgeInfo === 'object')
+						{
+							$('#badge-info').show();
+							if(recentScoreObject.badgeInfo.awarded)
+							{
+								$('#badges').show();
+								createCredHubIFrameFromParams(recentScoreObject.badgeInfo.params);
+							}
+							else
+							{
+								var minScore = parseFloat(recentScoreObject.badgeInfo.minScore);
+								$('.badge-not-awarded').show();
+								$('.badge-min-score').html(minScore == 100 ? '100%' : minScore + '% or higher');
+							}
 						}
 
 						/*
@@ -1369,12 +1385,25 @@ obo.view = function()
 						}
 						break;
 				}
-				
+
 				//$('#content').append(page);
 				break;
 		}
 	};
-	
+
+	var createCredHubIFrameFromParams = function(params)
+	{
+		$form = $('<form style="display:none;" method="POST" target="badges" action="' + _credhubUrl + '"></form>');
+		for(var paramName in params)
+		{
+			$form.append('<input type="hidden" name="' + paramName + '" value="' + params[paramName] + '">');
+		}
+		$form.append('<input type="submit" value="submit-form">');
+		$('body').append($form);
+		$form.submit();
+		$form.remove();
+	};
+
 	// selects a previous mc answer or fills in a short answer for when the user navigates
 	// back to a previously answered question.
 	var selectPreviousAnswer = function()
@@ -2067,7 +2096,7 @@ obo.view = function()
 				{
 					$('.prev-page-button').addClass('disabled');
 				}
-				
+
 				break;
 		}
 		
