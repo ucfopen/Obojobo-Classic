@@ -599,7 +599,7 @@ class LO
 		}
 		return true;
 	}
-	
+
 	private function dbStore($DBM)
 	{
 		/**
