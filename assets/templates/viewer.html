@@ -274,17 +274,26 @@
 		</p>
 		<div id="assessment-close-notice">The assessment will close on <span class="assessment-close-date"></span>.</div>
 		<a class="button" id="return-to-overview-button" href="#" role="button" title="Return to the Assessment Overview page" >Return to the Assessment Overview page</a>
+		<div id="badge-info">
+			<h3>Badges Earned:</h3>
+			<iframe name="badges" id="badges"></iframe>
+			<p class="badge-not-awarded">
+				This learning object awards badges - Score a <span class="badge-min-score"></span> to get a badge!
+			</p>
+		</div>
 	</div>
 	<div id="all-attempts">
 		<h3>All Attempt Scores:</h3>
-		<div>(<span class="attempts-remaining">1 Attempt</span> Available)</div>
-		<table id="attempt-history">
-			<tbody>
-				<tr>
-					<th>#</th><th>Score</th><th>Time</th>
-				</tr>
-			</tbody>
-		</table>
+		<div class="attempts-remaining-container">(<span class="attempts-remaining">1 Attempt</span> Available)</div>
+		<div id="attempt-history-container">
+			<table id="attempt-history">
+				<tbody>
+					<tr>
+						<th>#</th><th>Score</th><th>Time</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </div>
 
