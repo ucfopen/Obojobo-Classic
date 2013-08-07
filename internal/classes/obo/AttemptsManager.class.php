@@ -739,23 +739,11 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		// clear equivalent cache
 		\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
 
-		$badgeMinScore = 0;
-		$badgeInfo = false;
-		$awarded = false;
 		$BM = \obo\lo\BadgeManager::getInstance();
-		$badgeParams = $BM->getSignedCredHubParams($instData->loID, $instData->instID, $badgeMinScore, $awarded);
-		if($badgeParams)
-		{
-			$badgeInfo = array(
-				'minScore' => $badgeMinScore,
-				'awarded'  => $awarded,
-				'params'   => $awarded ? $badgeParams : false,
-			);
-		}
 
 		return array(
 			'score'     => $score,
-			'badgeInfo' => $badgeInfo,
+			'badgeInfo' => $BM->getBadgeInfo($instData->loID, $instData->instID),
 		);
 	}
 

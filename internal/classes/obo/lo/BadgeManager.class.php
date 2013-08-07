@@ -25,12 +25,36 @@ class BadgeManager extends \rocketD\db\DBEnabled
 		return self::$instance;
 	}
 
+	public function getBadgeInfo($loID, $instID)
+	{
+		$badge = $this->getBadgeForLO($loID);
+		if(!$badge)
+		{
+			return false;
+		}
+
+		// Determine the maximum attempt score
+		$SM = \obo\ScoreManager::getInstance();
+		$scores = $SM->getScoresForUser($instID, $_SESSION['userID']);
+		$scoreValues = $SM->calculateUserOverallScoreForInstance($scores);
+		$maxScore = $scoreValues['max'];
+
+		$awarded = $maxScore >= $badge->{\cfg_obo_Badge::MIN_SCORE};
+		$badgeInfo = array(
+			'minScore' => $badge->{\cfg_obo_Badge::MIN_SCORE},
+			'awarded' =>  $awarded,
+			'params' => $awarded ? $this->getSignedCredHubParams($badge) : false,
+		);
+
+		return $badgeInfo;
+	}
+
 	/**
 	 * Returns badge information for a given LO
 	 * @param  int $loID
 	 * @return object Object containing badge information (badge id, minimum required score) or false if no badge exists
 	 */
-	public function getBadgeForLO($loID)
+	private function getBadgeForLO($loID)
 	{
 		$qstr = "
 					SELECT *
@@ -71,32 +95,21 @@ class BadgeManager extends \rocketD\db\DBEnabled
 	 * @param  bool  $awarded          True if badge should be awarded, false otherwise
 	 * @return array Array of key/value pairs to make a Credhub request (or false if no badge)
 	 */
-	public function getSignedCredHubParams($loID, $instID, &$minRequiredScore, &$awarded)
+	private function getSignedCredHubParams($badge)
 	{
-		// Determine the maximum attempt score
-		$scoreman = \obo\ScoreManager::getInstance();
-		$scores = $scoreman->getScoresForUser($instID, $_SESSION['userID']);
-		$scoreValues = $scoreman->calculateUserOverallScoreForInstance($scores);
-		$maxScore = $scoreValues['max'];
-
-		// Get the badge info
-		$badge = $this->getBadgeForLO($loID);
-		if($badge)
+		if(!$badge)
 		{
-			$minRequiredScore = $badge->minScore;
-			$awarded = $maxScore >= $minRequiredScore;
-
-			$UM = \rocketD\auth\AuthManager::getInstance();
-			$userInfo = $UM->fetchUserByID($_SESSION['userID']);
-			$params = array(
-				'email' => $userInfo->email,
-				'badgeId' => $badge->badgeId,
-			);
-
-			return $this->signOAuthPostArgs($params);
+			return false;
 		}
 
-		return false;
+		$UM = \rocketD\auth\AuthManager::getInstance();
+		$userInfo = $UM->fetchUserByID($_SESSION['userID']);
+		$params = array(
+			'email' => $userInfo->email,
+			'badge_id' => $badge->{\cfg_obo_Badge::BADGE_ID},
+		);
+
+		return $this->signOAuthPostArgs($params);
 	}
 
 	/**
