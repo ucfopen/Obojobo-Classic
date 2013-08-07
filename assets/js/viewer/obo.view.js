@@ -1187,17 +1187,18 @@ obo.view = function()
 							$('#assessment-close-notice').hide();
 						}
 
-						if(typeof recentScoreObject.badgeInfo !== 'undefined' && typeof recentScoreObject.badgeInfo === 'object')
+						var badgeInfo = obo.model.getBadgeInfo();
+						if(badgeInfo)
 						{
 							$('#badge-info').show();
-							if(recentScoreObject.badgeInfo.awarded)
+							if(badgeInfo.awarded)
 							{
 								$('#badges').show();
-								createCredHubIFrameFromParams(recentScoreObject.badgeInfo.params);
+								createCredHubIFrameFromParams(badgeInfo.params);
 							}
 							else
 							{
-								var minScore = parseFloat(recentScoreObject.badgeInfo.minScore);
+								var minScore = parseFloat(badgeInfo.minScore);
 								$('.badge-not-awarded').show();
 								$('.badge-min-score').html(minScore == 100 ? '100%' : minScore + '% or higher');
 							}

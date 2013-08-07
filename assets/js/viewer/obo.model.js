@@ -86,6 +86,8 @@ obo.model = function()
 	//var scores = [{score:55, startTime:0, endTime:443848530},{score:96, startTime:0, endTime:0},{score:88, startTime:0, endTime:0}];
 	var scores = [];
 
+	var badgeInfo = false;
+
 	// we store practice and assessment questions in a special array.
 	// useful for preview mode (we group qalts so we can display those easier)
 	var questions = {
@@ -386,7 +388,7 @@ obo.model = function()
 			}
 		}
 	};
-	
+
 	var onLoadInstance = function(result)
 	{
 		if(processResponse(result) === true)
@@ -399,14 +401,22 @@ obo.model = function()
 			{
 				lo = result;
 				processQuestions();
-				
-				// populate previous scores:
-				if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.prevScores !== 'undefined' && typeof lo.tracking.prevScores.length !== 'undefined')
+
+				if(typeof lo.tracking !== 'undefined')
 				{
-					// we don't really need to clone this array
-					scores = lo.tracking.prevScores;
+					// populate previous scores:
+					if(typeof lo.tracking.prevScores !== 'undefined' && typeof lo.tracking.prevScores.length !== 'undefined')
+					{
+						// we don't really need to clone this array
+						scores = lo.tracking.prevScores;
+					}
+
+					if(typeof lo.badgeInfo !== 'undefined' && typeof lo.badgeInfo === 'object')
+					{
+						badgeInfo = lo.badgeInfo;
+					}
 				}
-				
+
 				// @TODO - is this a good idea?
 				// set the scores page as the default if there are scores
 				// and they are not in the middle of an assessment
@@ -414,18 +424,18 @@ obo.model = function()
 				{
 					pages.assessment = 'scores';
 				}
-				
+
 				loadCallback();
 			}
 		}
 	};
-	
+
 	// checks lo for validity and returns an errors array (empty for no errors).
 	// type = ('lo'|'instance')
 	var checkForValidLO = function(lo, type)
 	{
 		var errors = [];
-		
+
 		try
 		{
 			if(parseInt(lo.loID, 10) < 1)
@@ -1010,7 +1020,7 @@ obo.model = function()
 					s.endTime = parseInt(new Date().getTime() / 1000, 10);
 					if(typeof result.badgeInfo !== 'undefined')
 					{
-						s.badgeInfo = result.badgeInfo;
+						badgeInfo = result.badgeInfo;
 					}
 
 					// @TODO - how does this work in preview mode?
@@ -2022,7 +2032,12 @@ obo.model = function()
 	{
 		location.href = obo.util.getBaseURL();
 	};
-	
+
+	var getBadgeInfo = function()
+	{
+		return badgeInfo;
+	}
+
 	return {
 		init: init,
 		isInAssessmentQuiz: isInAssessmentQuiz,
@@ -2075,6 +2090,7 @@ obo.model = function()
 		updateQuestionScoreForCurrentAttempt: updateQuestionScoreForCurrentAttempt,
 		getPageID: getPageID,
 		getIndexOfItem: getIndexOfItem,
-		killPage: killPage
+		killPage: killPage,
+		getBadgeInfo: getBadgeInfo
 	};
 }();
