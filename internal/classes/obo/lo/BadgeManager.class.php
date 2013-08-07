@@ -1,8 +1,7 @@
 <?php
 /**
- * This class handles all logic for Learning Objects
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
+ * This class handles logic for retrieving Credhub badge info
+ * @author Zachary Berry <jbates@mail.ucf.edu>
  */
 
 namespace obo\lo;
