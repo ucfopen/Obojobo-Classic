@@ -25,6 +25,18 @@ class BadgeManager extends \rocketD\db\DBEnabled
 		return self::$instance;
 	}
 
+	/**
+	 * Determines if, based on your attempt history, you should be awarded a badge
+	 * (given one exists for a given LO). Badges are awarded based on your highest
+	 * attempt score.
+	 *
+	 * Returns false if this LO doesn't have a badge, otherwise, returns an object of
+	 * useful information needed to implement Credhub badges.
+	 *
+	 * @param int $loID
+	 * @param int $instID
+	 * @return object Object (See code) or false if no badge exists for this lo
+	 */
 	public function getBadgeInfo($loID, $instID)
 	{
 		$badge = $this->getBadgeForLO($loID);
@@ -79,20 +91,9 @@ class BadgeManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Determines if, based on your attempt history, you should be awarded a badge
-	 * (given one exists for a given LO). Badges are awarded based on your highest
-	 * attempt score.
+	 * Returns an array of key/value pairs for creating a signed Credhub request.
 	 *
-	 * Returns false if this LO doesn't have a badge, otherwise, returns an array of
-	 * key/value pairs for creating a signed Credhub request.
-	 *
-	 * For convience, additionally sets the values of minRequiredScore and awarded
-	 * so you don't have to request the badge information a second time.
-	 *
-	 * @param  int   $loID
-	 * @param  int   $instID
-	 * @param  int   $minRequiredScore Will contain the minimum required score to obtain the badge
-	 * @param  bool  $awarded          True if badge should be awarded, false otherwise
+	 * @param  object $badge A badge as returned from getBadgeFromLO()
 	 * @return array Array of key/value pairs to make a Credhub request (or false if no badge)
 	 */
 	private function getSignedCredHubParams($badge)
