@@ -86,6 +86,8 @@ obo.model = function()
 	//var scores = [{score:55, startTime:0, endTime:443848530},{score:96, startTime:0, endTime:0},{score:88, startTime:0, endTime:0}];
 	var scores = [];
 
+	var badgeInfo = false;
+
 	// we store practice and assessment questions in a special array.
 	// useful for preview mode (we group qalts so we can display those easier)
 	var questions = {
@@ -386,7 +388,7 @@ obo.model = function()
 			}
 		}
 	};
-	
+
 	var onLoadInstance = function(result)
 	{
 		if(processResponse(result) === true)
@@ -399,14 +401,22 @@ obo.model = function()
 			{
 				lo = result;
 				processQuestions();
-				
-				// populate previous scores:
-				if(typeof lo.tracking !== 'undefined' && typeof lo.tracking.prevScores !== 'undefined' && typeof lo.tracking.prevScores.length !== 'undefined')
+
+				if(typeof lo.tracking !== 'undefined')
 				{
-					// we don't really need to clone this array
-					scores = lo.tracking.prevScores;
+					// populate previous scores:
+					if(typeof lo.tracking.prevScores !== 'undefined' && typeof lo.tracking.prevScores.length !== 'undefined')
+					{
+						// we don't really need to clone this array
+						scores = lo.tracking.prevScores;
+					}
+
+					if(typeof lo.badgeInfo !== 'undefined' && typeof lo.badgeInfo === 'object')
+					{
+						badgeInfo = lo.badgeInfo;
+					}
 				}
-				
+
 				// @TODO - is this a good idea?
 				// set the scores page as the default if there are scores
 				// and they are not in the middle of an assessment
@@ -414,18 +424,18 @@ obo.model = function()
 				{
 					pages.assessment = 'scores';
 				}
-				
+
 				loadCallback();
 			}
 		}
 	};
-	
+
 	// checks lo for validity and returns an errors array (empty for no errors).
 	// type = ('lo'|'instance')
 	var checkForValidLO = function(lo, type)
 	{
 		var errors = [];
-		
+
 		try
 		{
 			if(parseInt(lo.loID, 10) < 1)
@@ -1002,13 +1012,17 @@ obo.model = function()
 			// @TODO: Recover from errors
 			if(processResponse(result))
 			{
-				if(!isNaN(result))
+				if(typeof result.score !== 'undefined' && !isNaN(result.score))
 				{
 					// update our 'local' score record
 					var s = scores[scores.length - 1];
-					s.score = Math.round(result);
+					s.score = Math.round(result.score);
 					s.endTime = parseInt(new Date().getTime() / 1000, 10);
-				
+					if(typeof result.badgeInfo !== 'undefined')
+					{
+						badgeInfo = result.badgeInfo;
+					}
+
 					// @TODO - how does this work in preview mode?
 					// clear out responses
 					clearAssessment();
@@ -1087,14 +1101,14 @@ obo.model = function()
 	{
 		return instanceHasNoAccessDates() ? lo.instanceData.externalLink : undefined;
 	};*/
-	
+
 	var instanceIsClosed = function()
 	{
 		// must be an instance and between the start and end times
 		//return mode === 'instance' && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getTime();
 		return mode === 'instance' && !instanceHasNoAccessDates() && (new Date(lo.instanceData.endTime * 1000)).getTime() <= (new Date()).getCorrectedTime();
 	};
-	
+
 	var currentQuestionIsAlternate = function()
 	{
 		return section === 'assessment' && getAssessmentPageIndex(getPage()).altIndex > 0;
@@ -1238,7 +1252,7 @@ obo.model = function()
 				{
 					s += parseFloat(scores[i].score);
 				}
-				s = s / parseFloat(numScores);
+				s = numScores === 0 ? 0 : s / parseFloat(numScores);
 				break;
 			case 'r': // most recent
 				s = numScores === 0 ? 0 : parseFloat(scores[numScores - 1].score);
@@ -1948,7 +1962,10 @@ obo.model = function()
 				
 			}
 			//onSubmitAssessment(parseFloat(total) / parseFloat(lo.aGroup.kids.length));
-			onSubmitAssessment(parseFloat(total) / parseFloat(questions.assessment.length));
+			onSubmitAssessment({
+				score: parseFloat(total) / parseFloat(questions.assessment.length),
+				badgeInfo: false
+			});
 		}
 	};
 
@@ -2015,7 +2032,12 @@ obo.model = function()
 	{
 		location.href = obo.util.getBaseURL();
 	};
-	
+
+	var getBadgeInfo = function()
+	{
+		return badgeInfo;
+	}
+
 	return {
 		init: init,
 		isInAssessmentQuiz: isInAssessmentQuiz,
@@ -2068,6 +2090,7 @@ obo.model = function()
 		updateQuestionScoreForCurrentAttempt: updateQuestionScoreForCurrentAttempt,
 		getPageID: getPageID,
 		getIndexOfItem: getIndexOfItem,
-		killPage: killPage
+		killPage: killPage,
+		getBadgeInfo: getBadgeInfo
 	};
 }();

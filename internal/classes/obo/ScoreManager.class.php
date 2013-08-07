@@ -857,86 +857,42 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		return $state;
 	}
 
-	
-	public function calculateUserOverallScoreForInstance($instData, $scores)
+	public function calculateUserOverallScoreForInstance($scores)
 	{
-		if( !($instData instanceof \obo\lo\InstanceData) )
+		if( !is_array($scores) || !is_array($scores['attempts']) || count($scores['attempts']) == 0 ) return 0;
+
+		$values = array(
+			'min' => INF, // for convience, need to reset to 0 if no submitted scores exist
+			'max' => 0,
+			'average' => 0,
+			'latest' => 0,
+			'count' => 0
+		);
+
+		// get all submitted scores
+		$submittedScores = array();
+		foreach($scores['attempts'] as $attempt)
 		{
-			return false;
+			if($attempt['submitted']) $submittedScores[] = $attempt['score'];
 		}
-		if( !is_array($scores) || !is_array($scores['attempts']) || count($scores['attempts']) == 0 )
+
+		// caluclate stats
+		if($cnt = count($submittedScores))
 		{
-			return 0;
+			$values['min']     = min($submittedScores);
+			$values['max']     = max($submittedScores);
+			$values['latest']  = $submittedScores[$cnt - 1];
+			$values['average'] = round(array_sum($submittedScores) / $cnt);
+			$values['count']   = $cnt;
 		}
-		
-		// just return the first one
-		if(count($scores['attempts']) == 1)
+		else
 		{
-			if($scores['attempts'][0]['submitted'])
-			{
-				return $scores['attempts'][0]['score']; // submitted score
-			}
-			else
-			{
-				return 0; // not a submitted score
-			}
+			$values['min'] = 0; // no scores, so reset min to 0
 		}
-		
-		switch($instData->scoreMethod)
-		{
-			case 'r':
-				// return the latest submitted score
-				$score = 0;
-				foreach($scores['attempts'] AS $attempt)
-				{
-					if($attempt['submitted']) $score = $attempt['score'];
-				}
-				return $score;
-				break;
-				
-			case 'm':
-				// return the average submitted score
-				$score = 0;
-				$submitCount = 0;
-				foreach($scores['attempts'] AS $attempt)
-				{
-					if($attempt['submitted'])
-					{
-						$submitCount++;
-						$score += $attempt['score'];
-					}
-				}
-				if($submitCount == 0)
-				{
-					return 0;
-				}
-				else
-				{
-					return round($score / $submitCount );
-				}
-				break;
-				
-			case 'h':
-				$score = 0;
-				foreach($scores['attempts'] AS $attempt)
-				{
-					if($attempt['submitted'] && $attempt['score'] > $score)
-					{
-						$score = $attempt['score'];
-					}
-				}
-				return $score;
-				break;
-			default:
-				trace('error - score method not supported', true);
-				trace($instData);
-				break;
-		}
-		
-		return 0;
+
+		return $values;
 	}
-	
-	
+
 	/********************************************************************/
 	
 	/**

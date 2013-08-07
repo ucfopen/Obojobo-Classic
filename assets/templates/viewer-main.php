@@ -125,6 +125,7 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 	// global variables from the config
 	_materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
 	_webUrl = '<?php echo \AppCfg::URL_WEB; ?>';
+	_credhubUrl = '<?php echo \AppCfg::CREDHUB_URL; ?>';
 
 	$(function() {
 		if(typeof __oldBrowser !== 'undefined' && __oldBrowser === true)
