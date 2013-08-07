@@ -859,10 +859,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 	public function calculateUserOverallScoreForInstance($scores)
 	{
-		if( !is_array($scores) || !is_array($scores['attempts']) || count($scores['attempts']) == 0 )
-		{
-			return 0;
-		}
+		if( !is_array($scores) || !is_array($scores['attempts']) || count($scores['attempts']) == 0 ) return 0;
 
 		$values = array(
 			'min' => INF, // for convience, need to reset to 0 if no submitted scores exist
@@ -872,35 +869,30 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			'count' => 0
 		);
 
-		$curScore;
+		// get all submitted scores
+		$submittedScores = array();
 		foreach($scores['attempts'] as $attempt)
 		{
-			// we only want to look at submitted scores
-			if($attempt['submitted'])
-			{
-				$curScore = $attempt['score'];
-
-				$values['latest'] = $curScore;
-				$values['min'] = min($values['min'], $curScore);
-				$values['max'] = max($values['max'], $curScore);
-				$values['average'] = $values['average'] + $curScore; // will calc avg at the end
-				$values['count']++;
-			}
+			if($attempt['submitted']) $submittedScores[] = $attempt['score'];
 		}
 
-		if($values['count'] == 0)
+		// caluclate stats
+		if($cnt = count($submittedScores))
 		{
-			$values['min'] = 0;
+			$values['min']     = min($submittedScores);
+			$values['max']     = max($submittedScores);
+			$values['latest']  = $submittedScores[$cnt - 1];
+			$values['average'] = round(array_sum($submittedScores) / $cnt);
+			$values['count']   = $cnt;
 		}
 		else
 		{
-			$values['average'] = round($values['average'] / ($values['count'] * 100) * 100);
+			$values['min'] = 0; // no scores, so reset min to 0
 		}
 
 		return $values;
 	}
-	
-	
+
 	/********************************************************************/
 	
 	/**
