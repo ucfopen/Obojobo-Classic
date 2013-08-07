@@ -245,7 +245,11 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				$lo->instanceData->attemptCount = $attemptMan->getTotalAttempts($instID);
 				unset($lo->pGroup->kids);
 				//unset($lo->aGroup->kids);
-				
+
+				// Add in badge information
+				$BM = \obo\lo\BadgeManager::getInstance();
+				$lo->badgeInfo = $BM->getBadgeInfo($r->{\cfg_obo_LO::ID}, $instID);
+
 				return $lo;
 
 			}
