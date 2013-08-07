@@ -40,14 +40,14 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		// search for unfinished attempts
 		$qstr = "SELECT	A.".\cfg_obo_Attempt::ID."
 				FROM ".\cfg_obo_Visit::TABLE." AS V
-    			LEFT JOIN ".\cfg_obo_Attempt::TABLE." AS A ON A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID."
-    			WHERE A.".\cfg_obo_QGroup::ID."='?' AND A.".\cfg_obo_Attempt::END_TIME."='0'
+				LEFT JOIN ".\cfg_obo_Attempt::TABLE." AS A ON A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID."
+				WHERE A.".\cfg_obo_QGroup::ID."='?' AND A.".\cfg_obo_Attempt::END_TIME."='0'
 				AND V.".\cfg_obo_Instance::ID." = '?'
-    			AND V.".\cfg_core_User::ID." = '?'	ORDER BY V.".\cfg_obo_Visit::TIME." DESC";
+				AND V.".\cfg_core_User::ID." = '?'	ORDER BY V.".\cfg_obo_Visit::TIME." DESC";
 			
 		if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'])))
 		{
-        	trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			return false;
 		}
 
@@ -298,7 +298,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$qstr = "UPDATE ".\cfg_obo_Attempt::TABLE." SET ".\cfg_obo_Attempt::ORDER." = '?' WHERE ".\cfg_obo_Attempt::ID." = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, implode(',', $kidIDs), $attemptID)))
 		{
-		    $this->DBM->rollback();
+			$this->DBM->rollback();
 			return false;
 		}
 		$this->DBM->commit();
@@ -376,8 +376,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $attemptID)))
 		{
-    	    $this->DBM->rollback();
-           	trace(mysql_error(), true);
+			$this->DBM->rollback();
+			trace(mysql_error(), true);
 			return false;
 		}
 		$r = $this->DBM->fetch_obj($q);
@@ -528,8 +528,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				if(!($q = $this->DBM->querySafe($qstr, $userID, $instID, $count)))
 				{
 					$this->DBM->rollback();
-		        	trace(mysql_error(), true);
-		        	//die();
+					trace(mysql_error(), true);
+					//die();
 					return false;
 				}
 			}
@@ -582,8 +582,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $instID)))
 		{
 			$this->DBM->rollback();
-        	trace(mysql_error(), true);
-        	//die();
+			trace(mysql_error(), true);
+			//die();
 			return false;
 		}
 		
@@ -671,7 +671,19 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$scoreman = \obo\ScoreManager::getInstance();
 		$scores = $scoreman->getScoresForUser($instData->instID, $_SESSION['userID']);
 		
-		$submittableScore = $scoreman->calculateUserOverallScoreForInstance($instData, $scores);
+		$submittableScores = $scoreman->calculateUserOverallScoreForInstance($scores);
+		switch($instData->scoreMethod)
+		{
+			case 'r': // recent (latest)
+				$submittableScore = $submittableScores['latest'];
+				break;
+			case 'm': // mean (average)
+				$submittableScore = $submittableScores['average'];
+				break;
+			case 'h': // highest (max)
+				$submittableScore = $submittableScores['max'];
+				break;
+		}
 
 		if($instData->externalLink)
 		{
@@ -726,10 +738,15 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		\rocketD\util\Cache::getInstance()->clearScoresForUser($instData->instID, $_SESSION['userID']);
 		// clear equivalent cache
 		\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
-		
-		return $score;
+
+		$BM = \obo\lo\BadgeManager::getInstance();
+
+		return array(
+			'score'     => $score,
+			'badgeInfo' => $BM->getBadgeInfo($instData->loID, $instData->instID),
+		);
 	}
-	
+
 	private function createAttempt($loID=0, $qGroupID = 0, $equivalentAttempt=false)
 	{
 		if(!\obo\util\Validator::isPosInt($qGroupID))
@@ -764,8 +781,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $loID, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'], $equivalentAttempt->attemptID)))
 		{
-		    $this->DBM->rollback();
-        	trace(mysql_error(), true);
+			$this->DBM->rollback();
+			trace(mysql_error(), true);
 			return false;
 		}
 		
@@ -785,8 +802,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 	}
 	
 	// TODO: FIX RETURN FOR DB ABSTRACTION
-    public function getAttemptDetails($attemptID = 0, $includeScores = true )
-    {
+	public function getAttemptDetails($attemptID = 0, $includeScores = true )
+	{
 		if(!\obo\util\Validator::isPosInt($attemptID))
 		{
 			return \rocketD\util\Error::getError(2);
@@ -795,7 +812,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT * FROM " . \cfg_obo_Attempt::TABLE . " WHERE ".\cfg_obo_Attempt::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
 		{
-		    trace(mysql_error(), true);
+			trace(mysql_error(), true);
 			return false;
 		}
 		$r = $this->DBM->fetch_obj($q);
@@ -820,7 +837,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		$result['scores'] = $details;
 		return $result;
-    }
+	}
 
 
 
