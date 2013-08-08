@@ -109,23 +109,20 @@ class BadgeManager extends \rocketD\db\DBEnabled
 			'badge_id' => $badge->{\cfg_obo_Badge::BADGE_ID},
 		);
 
-		return $this->signOAuthPostArgs($params);
+		return $this->sign_oauth_post_args(\AppCfg::CREDHUB_URL, $params, \AppCfg::CREDHUB_KEY, \AppCfg::CREDHUB_SECRET);
 	}
 
 	/**
-	 * Returns an array of arguments needed to sign and send an OAuth request via a form POST
-	 * NOTE: Requires oauth pecl library
-	 * @param  string $endpoint url that the request is going to be sent to
-	 * @param  array  $params   array of paramaters to send to the endpoint (excluding any oauth params)
-	 * @param  [type] $key      OAuth Consumer Key to send
-	 * @param  [type] $secret   OAuth Secret key used to sign the request
-	 * @return array            array of key/value pairs to send via Post to the endpoint
-	 */
-	private function signOAuthPostArgs($params)
+	* Returns an array of arguments needed to sign and send an OAuth request via a form POST
+	* NOTE: Requires oauth pecl library
+	* @param  string $endpoint url that the request is going to be sent to
+	* @param  array  $params   array of paramaters to send to the endpoint (excluding any oauth params)
+	* @param  [type] $key      OAuth Consumer Key to send
+	* @param  [type] $secret   OAuth Secret key used to sign the request
+	* @return array            array of key/value pairs to send via Post to the endpoint
+	*/
+	protected function sign_oauth_post_args($endpoint, array $params, $key, $secret)
 	{
-		$key = \AppCfg::CREDHUB_KEY;
-		$secret = \AppCfg::CREDHUB_SECRET;
-
 		// generate the timestamp and nonce
 		$time = time();
 		$nonce = uniqid();
