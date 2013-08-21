@@ -667,6 +667,13 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		// check to see if we need to update the score externally
 		$IM = \obo\lo\InstanceManager::getInstance();
 		$instData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+
+		// Must clear all score related cache for this user to take this score into account
+		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instData->instID);
+		// clear score 
+		\rocketD\util\Cache::getInstance()->clearScoresForUser($instData->instID, $_SESSION['userID']);
+		// clear equivalent cache
+		\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
 		
 		$scoreman = \obo\ScoreManager::getInstance();
 		$scores = $scoreman->getScoresForUser($instData->instID, $_SESSION['userID']);
@@ -732,12 +739,6 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			$NM = \obo\util\NotificationManager::getInstance();
 			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
 		}
-		// clear cached scores for this instance
-		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instData->instID);
-		// clear score 
-		\rocketD\util\Cache::getInstance()->clearScoresForUser($instData->instID, $_SESSION['userID']);
-		// clear equivalent cache
-		\rocketD\util\Cache::getInstance()->clearEquivalentAttempt($_SESSION['userID'], $instData->loID);
 
 		$BM = \obo\lo\BadgeManager::getInstance();
 
