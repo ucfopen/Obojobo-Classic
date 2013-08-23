@@ -1205,10 +1205,10 @@ obo.model = function()
 		obo.remote.makeCall('doImportEquivalentAttempt', [lo.viewID], function(result) {
 			if(processResponse(result))
 			{
-				if(result === true)
+				if(typeof result.success !== 'undefined' && result.success === true)
 				{
 					attemptImportedThisVisit = true;
-					
+
 					// add the previous score into our scores array
 					var t = parseInt(new Date().getTime() / 1000, 10);
 					scores.push({
@@ -1216,7 +1216,12 @@ obo.model = function()
 						startTime: t,
 						endTime: t
 					});
-				
+
+					if(typeof result.badgeInfo !== 'undefined')
+					{
+						badgeInfo = result.badgeInfo;
+					}
+
 					// send them to the scores page
 					//setSection('assessment');
 					//setPageOfCurrentSection('scores');
