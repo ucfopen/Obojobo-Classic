@@ -245,6 +245,9 @@ obo.media = function()
 			switch(mediaObject.itemType.toLowerCase())
 			{
 				case 'embed':
+					// ugly hack to convert engage "http://" or "https://" to "//"
+					mediaObject.descText = mediaObject.descText.replace(/https?:\/\/engage/, '//engage');
+
 					var $embed = $(mediaObject.descText);
 					$mediaElement.append($embed);
 					$target.append($mediaElement);
