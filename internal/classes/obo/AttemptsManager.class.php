@@ -961,7 +961,13 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		
 		$TM = \obo\log\LogManager::getInstance();
 		$TM->trackImportScore(/* $curAttempt, $equivalent->attemptID*/);
-		return true;
+
+		$BM = \obo\lo\BadgeManager::getInstance();
+
+		return array(
+			'success'   => true,
+			'badgeInfo' => $BM->getBadgeInfo($instData->loID, $instData->instID),
+		);
 	}
 	
 	/**
