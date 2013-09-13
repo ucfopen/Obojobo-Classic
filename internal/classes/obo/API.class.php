@@ -1785,6 +1785,7 @@ class API extends \rocketD\db\DBEnabled
 				$attemptID  = '';
 				$role       = 'Instructor';
 				$passback   = false;
+				$url        = \AppCfg::MATERIA_LTI_PICKER_URL;
 				break;
 
 			case 'preview': // show a widget in lo previews
@@ -1797,6 +1798,7 @@ class API extends \rocketD\db\DBEnabled
 				$attemptID  = '';
 				$role       = 'Learner';
 				$passback   = false;
+				$url        = \AppCfg::MATERIA_LTI_URL;
 				break;
 
 			case 'content': // show a widget in content in instance mode
@@ -1809,6 +1811,7 @@ class API extends \rocketD\db\DBEnabled
 				$attemptID  = '';
 				$role       = 'Learner';
 				$passback   = false;
+				$url        = \AppCfg::MATERIA_LTI_URL;
 				break;
 
 			case 'question': // show a widget in practice/assessment in instance mode
@@ -1823,6 +1826,7 @@ class API extends \rocketD\db\DBEnabled
 				$attemptID = $am->getCurrentAttemptID();
 				$role      = 'Learner';
 				$passback  = true;
+				$url       = \AppCfg::MATERIA_LTI_URL;
 
 				if(!\obo\util\Validator::isPosInt($attemptID)) return \rocketD\util\Error::getError(2);
 				break;
@@ -1846,9 +1850,9 @@ class API extends \rocketD\db\DBEnabled
 			"roles"                      => $role,
 		);
 
-		$params =  \lti\OAuth::buildPostArgs($this->getUser(), \AppCfg::MATERIA_LTI_URL, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
+		$params =  \lti\OAuth::buildPostArgs($this->getUser(), $url, $params, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, $passback);
 
-		return array('url' => \AppCfg::MATERIA_LTI_URL, 'params' => $params);
+		return array('url' => $url, 'params' => $params);
 	}
 
 	public function getAttemptQuestionScore($visitKey, $questionID)
