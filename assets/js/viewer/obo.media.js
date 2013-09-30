@@ -147,7 +147,7 @@ obo.media = function()
 				var youtubeURL = $placeholder.attr('data-youtube-id');
 				var params = getParams();
 				params.allowScriptAccess = "always";
-				swfobject.embedSWF('http://www.youtube.com/v/' + youtubeURL + '', placeholder.id, $placeholder.width() + 'px', $placeholder.height() + 'px', "10",  "/assets/flash/expressInstall.swf", null, params);
+				swfobject.embedSWF('//www.youtube.com/v/' + youtubeURL + '', placeholder.id, $placeholder.width() + 'px', $placeholder.height() + 'px', "10",  "/assets/flash/expressInstall.swf", null, params);
 			});
 		}
 	};
