@@ -1,5 +1,5 @@
 <?php
-function formatDisplayForInstance($user, $instID, $minScore, $targetURL, $hash)
+function formatDisplayForInstance($instID, $targetURL, $hash)
 {
 	
 	$im = \obo\lo\InstanceManager::getInstance();
@@ -32,7 +32,6 @@ try
 	$timestamp = $_REQUEST['epoch'];
 	$hash = $_REQUEST['hash'];
 	$scores = array();
-	$minScore = 80;
 	$isDevEnvironment = false;
 
 	// figure out if this is being accessed via the test or dev portals
@@ -85,7 +84,7 @@ try
 	$validCount = 0;
 	foreach($los AS $instID)
 	{
-		$output[] = $tmpOutput = formatDisplayForInstance($user, $instID, $minScore, $targetURL, $hashAppend);
+		$output[] = $tmpOutput = formatDisplayForInstance($instID, $targetURL, $hashAppend);
 		if($tmpOutput != false) $validCount++;
 	}
 		
@@ -101,8 +100,8 @@ try
 			?>
 
 			<h2>Are you an incoming student?</h2>
-                        <p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in Summer 2013</strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
-                        <p>You need to score <strong><?php echo $minScore; ?>% or higher on all required modules before August 30, 2013</strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
+				<p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in <?= \AppCfg::UCF_PORTAL_ADMITTED ?></strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
+				<p>You need to score <strong><?= \AppCfg::UCF_PORTAL_MIN_SCORE ?>% or higher on all required modules before <?= \AppCfg::UCF_PORTAL_DUE ?></strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
 
 			<h3>New Undergraduate Students</h3>
 				<ul>
