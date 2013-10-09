@@ -1410,7 +1410,6 @@ obo.view = function()
 
 	var createCredHubIFrameFromParams = function(params)
 	{
-		_credhubUrl = "/getbadge.php"; //@TODO
 		$form = $('<form style="display:none;" method="POST" target="badges" action="' + _credhubUrl + '"></form>');
 		for(var paramName in params)
 		{
