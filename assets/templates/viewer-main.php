@@ -126,6 +126,7 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 	_materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
 	_webUrl = '<?php echo \AppCfg::URL_WEB; ?>';
 	_credhubUrl = '<?php echo \AppCfg::CREDHUB_URL; ?>';
+	_credhubTimeout = parseInt('<?php echo \AppCfg::CREDHUB_TIMEOUT; ?>', 10);
 
 	$(function() {
 		if(typeof __oldBrowser !== 'undefined' && __oldBrowser === true)
