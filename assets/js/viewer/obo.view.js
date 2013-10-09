@@ -20,8 +20,6 @@ if(!window.obo)
 
 obo.view = function()
 {
-	// @PRIVATE:
-	
 	// @TODO: Make sure this is defined when we set it
 	// for convience keep a reference to the URL sans fake # URL
 	var baseURL = obo.util.getBaseURL();
@@ -47,6 +45,11 @@ obo.view = function()
 	// this prevents an issue where two quick showThrobber calls might
 	// prematurely timeout the throbber
 	var hideThrobberTimeoutId = -1;
+
+	// Keep track of when we last asked CredHub for badge info.
+	// Default to infinity - checks to see if the cred hub request
+	// is expired will always pass.
+	var lastCredHubRequestTime = Number.POSITIVE_INFINITY;
 
 	// listen for postMessage events from media items
 	var onPostMessage = function(event) {
@@ -587,6 +590,9 @@ obo.view = function()
 		{
 			$('#swf-holder-assessment').remove();
 		}
+
+		// clear out cred hub request time
+		lastCredHubRequestTime = Number.POSITIVE_INFINITY;
 		
 		unlockNonAssessment();
 		showThrobber(false, false);
@@ -1191,10 +1197,20 @@ obo.view = function()
 						if(badgeInfo)
 						{
 							$('#badge-info').show();
+
 							if(badgeInfo.awarded)
 							{
-								$('#badges').show();
-								createCredHubIFrameFromParams(badgeInfo.params);
+								var now = (new Date()).getTime();
+								if(now - lastCredHubRequestTime <= _credhubTimeout)
+								{
+									$('#badges').show();
+									createCredHubIFrameFromParams(badgeInfo.params);
+									lastCredHubRequestTime = now;
+								}
+								else
+								{
+									$('.badges-expired').show();
+								}
 							}
 							else
 							{
