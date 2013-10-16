@@ -398,7 +398,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			$this->set($this->ns.'\obo\perms\RoleManager:getUsersInRole:'.$roleID, $usersIndexes, false, 0) or trace('failure writing memcache', true);
+			$this->set($this->ns.'\obo\perms\RoleManager:getUsersInRole:'.$roleID, $usersIndexes, false, 900) or trace('failure writing memcache', true);
 		}
 	}
 	
