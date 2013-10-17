@@ -6,7 +6,7 @@ class Data
 	const ROLE_CONTENT_DEVELOPER = 'ContentDeveloper';
 	const ROLE_ADMINISTRATOR     = 'Administrator';
 	const ROLE_INSTRUCTOR        = 'Instructor';
-	const ROLE_TA                = 'TeachingAssistant';
+	const ROLE_TA                = 'urn:lti:role:ims/lis/TeachingAssistant';
 	const ROLE_LEARNER           = 'Learner';
 	const ROLE_STUDENT           = 'Student';
 
