@@ -6,6 +6,7 @@ class Data
 	const ROLE_CONTENT_DEVELOPER = 'ContentDeveloper';
 	const ROLE_ADMINISTRATOR     = 'Administrator';
 	const ROLE_INSTRUCTOR        = 'Instructor';
+	const ROLE_TA                = 'TeachingAssistant';
 	const ROLE_LEARNER           = 'Learner';
 	const ROLE_STUDENT           = 'Student';
 
@@ -78,12 +79,12 @@ class Data
 	}
 
 	public function isInstructor(){
-		return $this->hasRole(array(self::ROLE_ADMINISTRATOR, self::ROLE_INSTRUCTOR, self::ROLE_CONTENT_DEVELOPER));
+		return $this->hasRole(array(self::ROLE_ADMINISTRATOR, self::ROLE_INSTRUCTOR, self::ROLE_CONTENT_DEVELOPER, self::ROLE_TA));
 	}
 
 	public function hasValidRole()
 	{
-		return $this->hasRole(array(self::ROLE_LEARNER, self::ROLE_STUDENT, self::ROLE_INSTRUCTOR, self::ROLE_ADMINISTRATOR, self::ROLE_CONTENT_DEVELOPER));
+		return $this->hasRole(array(self::ROLE_LEARNER, self::ROLE_STUDENT, self::ROLE_INSTRUCTOR, self::ROLE_ADMINISTRATOR, self::ROLE_CONTENT_DEVELOPER, self::ROLE_TA));
 	}
 
 	private static function get($array, $key, $default = false)
