@@ -1,0 +1,225 @@
+/* global element styles*/
+a {
+	color: black;
+}
+a:hover {
+	color: #6b4b93;
+}
+
+
+/* specific styles */
+html {
+	min-width: 1105px;
+}
+
+body {
+	font-family: 'Source Sans Pro';
+	padding: 0;
+	margin: 0;
+	text-align: center;
+}
+
+	header {
+		height: 70px;
+		border-bottom: 1px solid #cccccc;
+		background: white;
+	}
+
+		header .header-container {
+			margin: 0 auto;
+			max-width: 1000px;
+			position: relative;
+		}
+
+			header .header-container .logo {
+				position: absolute;
+				top: 16px;
+				left: 20px;
+				text-indent: -9999px;
+				background: url('../images/logo.png') no-repeat center;
+				width: 127px;
+				height: 34px;
+			}
+
+			header .header-container nav {
+				position: absolute;
+				right: 20px;
+				top: 24px;
+			}
+
+				header .header-container nav ul {
+					padding: 0;
+					margin: 0;
+				}
+
+					header .header-container nav ul li {
+						list-style-type: none;
+						display: inline-block;
+						margin-left: 2em;
+					}
+
+					header .header-container nav ul li:first-child {
+						margin-left: 0;
+					}
+
+						header .header-container nav ul li a {
+							text-decoration: none;
+						}
+
+	.hero {
+		background: url('../images/hero-bg.jpg') no-repeat center;
+		height: 658px;
+		width: 100%;
+		margin-bottom: 300px;
+	}
+
+		.hero .computers {
+			background: url('../images/hero-computers.png') no-repeat center 100px;
+			width: 933px;
+			height: 710px;
+			margin: 0 auto;
+			box-sizing: border-box;
+		}
+
+		.hero h1 {
+			font-size: 60pt;
+			font-weight: 300;
+			letter-spacing: 0.03em;
+		}
+
+	.content {
+		background: url('../images/dotted-line-coverup.png') no-repeat center top, url('../images/dotted-line-coverup.png') no-repeat center bottom, url('../images/dotted-line-bg.png') center center repeat-y;
+	}
+
+	.step {
+		width: 100%;
+		height: 400px;
+		box-sizing: border-box;
+		position: relative;
+	}
+
+		.step .step-items-container {
+			width: 366px;
+			margin: 0 auto;
+			padding-top: 75px;
+		}
+
+			.step .step-items-container h1 {
+				color: #2e70bb;
+				font-size: 28pt;
+				margin: 0;
+				padding: 0;
+			}
+
+			.step .step-items-container h2 {
+				font-weight: 300;
+				font-size: 16pt;
+				margin: -8px 0 0 0;
+				padding: 0;
+			}
+
+	footer {
+		color: #888888;
+		font-size: 12pt;
+		height: 130px;
+		padding-top: 50px;
+	}
+
+		footer div {
+			width: 1000px;
+			text-align: right;
+			display: block;
+			margin: 0 auto;
+		}
+
+			footer div > span {
+				display: block;
+				margin-bottom: 0.5em;
+			}
+
+				footer div > span a {
+					color: gray;
+				}
+				footer div > span a:hover {
+					color: #333333;
+				}
+/* steps */
+.step-1 {
+	text-align: right;
+	background: url('../images/thinking.png') center center no-repeat;
+}
+.step-1 .step-items-container {
+	padding-right: 670px;
+}
+
+.step-2 {
+	text-align: left;
+	background: #3b3b3b url('../images/build.png') center center no-repeat;
+}
+.step-2 .step-items-container {
+	padding-left: 650px;
+}
+.step-2 .step-items-container h1,
+.step-2 .step-items-container h2,
+.step-2 .step-items-container p {
+	color: white;
+}
+.step-2 .step-items-container h1 {
+	/*font-family: 'Permanent Marker';*/
+}
+
+.step-3 {
+	text-align: right;
+	background: url('../images/xray.png') center center no-repeat;
+}
+.step-3 .step-items-container {
+	padding-right: 650px;
+}
+
+.step-4 {
+	text-align: left;
+	background: #acdfda url('../images/laptop.png') center center no-repeat;
+}
+.step-4 .step-items-container {
+	padding-left: 750px;
+}
+.step-4 .step-items-container h1 {
+	color: #cc4f69;
+}
+
+.step-5 {
+	text-align: right;
+	background: url('../images/analytics.png') center center no-repeat;
+}
+.step-5 .step-items-container {
+	padding-right: 650px;
+}
+
+.step-6 {
+	text-align: left;
+	background: #683893 url('../images/badge.png') center center no-repeat;
+}
+.step-6 .step-items-container {
+	padding-left: 650px;
+}
+.step-6 .step-items-container h1,
+.step-6 .step-items-container h2,
+.step-6 .step-items-container p {
+	color: white;
+}
+
+.step-7 {
+	text-align: left;
+	background: #ccffcc url('../images/many.png') center center no-repeat;
+}
+.step-7 .step-items-container {
+	padding-left: 650px;
+	padding-top: 150px;
+}
+
+/* responsive */
+@media (min-width: 1500px) {
+	.hero {
+		background-size: 100% 658px;
+	}
+}
