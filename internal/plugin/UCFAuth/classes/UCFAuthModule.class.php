@@ -605,22 +605,33 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if(!isset($user->overrideRole) || $user->overrideRole != '1')
 			{
 				$RM  = \rocketD\perms\RoleManager::getInstance();
+				// GIVE ROLES
 				if($isLibraryUser)
 				{
 					if(! $RM->doesUserHaveARole(array(\cfg_core_Role::EMPLOYEE_ROLE), $user->userID))
 					{
-						// user should be Library User, but isnt, add
-						return $RM->addUsersToRole_SystemOnly(array($user->userID), \cfg_core_Role::EMPLOYEE_ROLE);
+						$RM->addUsersToRole_SystemOnly(array($user->userID), \cfg_core_Role::EMPLOYEE_ROLE);
 					}
+
+					if(! $RM->doesUserHaveARole(array(\cfg_obo_Role::CONTENT_CREATOR), $user->userID))
+					{
+						$RM->addUsersToRole_SystemOnly(array($user->userID), \cfg_obo_Role::CONTENT_CREATOR);
+					}
+					return true;
 				}
-				// not marked as content creator
+				// REMOVE ROLES
 				else
 				{
 					if($RM->doesUserHaveARole(array(\cfg_core_Role::EMPLOYEE_ROLE), $user->userID))
 					{
-						// user shouldnt be LibraryUser, but is, remove
-						return $RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_core_Role::EMPLOYEE_ROLE));
+						$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_core_Role::EMPLOYEE_ROLE));
 					}
+
+					if($RM->doesUserHaveARole(array(\cfg_obo_Role::CONTENT_CREATOR), $user->userID))
+					{
+						$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_obo_Role::CONTENT_CREATOR));
+					}
+					return true;
 				}
 			}
 		}
