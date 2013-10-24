@@ -29,17 +29,18 @@ class WP_Plugin_Install_List_Table extends WP_List_Table {
 		$tabs['dashboard'] = __( 'Search' );
 		if ( 'search' == $tab )
 			$tabs['search']	= __( 'Search Results' );
-		$tabs['upload'] = __( 'Upload' );
-		$tabs['featured'] = _x( 'Featured','Plugin Installer' );
-		$tabs['popular']  = _x( 'Popular','Plugin Installer' );
-		$tabs['new']      = _x( 'Newest','Plugin Installer' );
+		$tabs['upload']    = __( 'Upload' );
+		$tabs['featured']  = _x( 'Featured', 'Plugin Installer' );
+		$tabs['popular']   = _x( 'Popular', 'Plugin Installer' );
+		$tabs['new']       = _x( 'Newest', 'Plugin Installer' );
+		$tabs['favorites'] = _x( 'Favorites', 'Plugin Installer' );
 
 		$nonmenu_tabs = array( 'plugin-information' ); //Valid actions to perform which do not have a Menu item.
 
 		$tabs = apply_filters( 'install_plugins_tabs', $tabs );
 		$nonmenu_tabs = apply_filters( 'install_plugins_nonmenu_tabs', $nonmenu_tabs );
 
-		// If a non-valid menu tab has been selected, And its not a non-menu action.
+		// If a non-valid menu tab has been selected, And it's not a non-menu action.
 		if ( empty( $tab ) || ( !isset( $tabs[ $tab ] ) && !in_array( $tab, (array) $nonmenu_tabs ) ) )
 			$tab = key( $tabs );
 
@@ -47,8 +48,8 @@ class WP_Plugin_Install_List_Table extends WP_List_Table {
 
 		switch ( $tab ) {
 			case 'search':
-				$type = isset( $_REQUEST['type'] ) ? stripslashes( $_REQUEST['type'] ) : 'term';
-				$term = isset( $_REQUEST['s'] ) ? stripslashes( $_REQUEST['s'] ) : '';
+				$type = isset( $_REQUEST['type'] ) ? wp_unslash( $_REQUEST['type'] ) : 'term';
+				$term = isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '';
 
 				switch ( $type ) {
 					case 'tag':
@@ -69,6 +70,17 @@ class WP_Plugin_Install_List_Table extends WP_List_Table {
 			case 'popular':
 			case 'new':
 				$args['browse'] = $tab;
+				break;
+
+			case 'favorites':
+				$user = isset( $_GET['user'] ) ? wp_unslash( $_GET['user'] ) : get_user_option( 'wporg_favorites' );
+				update_user_meta( get_current_user_id(), 'wporg_favorites', $user );
+				if ( $user )
+					$args['user'] = $user;
+				else
+					$args = false;
+
+				add_action( 'install_plugins_favorites', 'install_plugins_favorites_form', 9, 0 );
 				break;
 
 			default:
@@ -115,13 +127,11 @@ class WP_Plugin_Install_List_Table extends WP_List_Table {
 					<?php do_action( 'install_plugins_table_header' ); ?>
 				</div>
 				<?php $this->pagination( $which ); ?>
-				<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-loading list-ajax-loading" alt="" />
 				<br class="clear" />
 			</div>
 		<?php } else { ?>
 			<div class="tablenav bottom">
 				<?php $this->pagination( $which ); ?>
-				<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-loading list-ajax-loading" alt="" />
 				<br class="clear" />
 			</div>
 		<?php

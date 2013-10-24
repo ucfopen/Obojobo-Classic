@@ -2,9 +2,9 @@
 Contributors: conjur3r
 Donate link: 
 Tags: table of contents, indexes, toc, sitemap, cms, options, list, page listing, category listing
-Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 1208
+Requires at least: 3.2
+Tested up to: 3.6
+Stable tag: 1308
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,30 +13,37 @@ A powerful yet user friendly plugin that automatically creates a table of conten
 
 == Description ==
 
-A powerful yet user friendly plugin that automatically creates a context specific index or table of contents (TOC) for long pages (and custom post types).  More than just a table of contents plugin, this plugin can also output a sitemap listing pages and/or categories.
+A powerful yet user friendly plugin that automatically creates a context specific index or table of contents (TOC) for long pages (and custom post types).  More than just a table of contents plugin, this plugin can also output a sitemap listing pages and/or categories across your entire site.
 
 Built from the ground up and with Wikipedia in mind, the table of contents by default appears before the first heading on a page.  This allows the author to insert lead-in content that may summarise or introduce the rest of the page.  It also uses a unique numbering scheme that doesn't get lost through CSS differences across themes.
 
-This plugin is a great companion for content rich sites such as content management system oriented configurations.  That said, bloggers also have the same benefits when writing long structured articles.
+This plugin is a great companion for content rich sites such as content management system oriented configurations.  That said, bloggers also have the same benefits when writing long structured articles.  [Discover how Google](http://dublue.com/2012/05/12/another-benefit-to-structure-your-web-pages/) uses this index to provide 'Jump To' links to your content.
 
-Includes an administration options panel where you can customise settings like display position, define the minimum number of headings before an index is displayed, appearance, etc.  Using shortcodes, you can override default behaviour such as special exclusions on a specific page or even to hide the table of contents altogether.
+Includes an administration options panel where you can customise settings like display position, define the minimum number of headings before an index is displayed, other appearance, and more.  For power users, expand the advanced options to further tweak its behaviour - eg: exclude undesired heading levels like h5 and h6 from being included; disable the output of the included CSS file; adjust the top offset and more.  Using shortcodes, you can override default behaviour such as special exclusions on a specific page or even to hide the table of contents altogether.
+
+Prefer to include the index in the sidebar?  Go to Appearance > Widgets and drag the TOC+ to your desired sidebar and position.
 
 Custom post types are supported, however, auto insertion works only when the_content() has been used by the custom post type.  Each post type will appear in the options panel, so enable the ones you want.
 
 = Available Languages =
 * Australian English (default)
+* Polish - [Jakub](http://notatki.4use.pl/)
 * Simplified Chinese - [icedream](http://www.tesfans.org/)
+* Slovak - Boris Gereg
 
-Translations are more than welcome.
+Translations are more than welcome. If you have any advice in making it easier to translate, please let me know.
 
 If you have questions or suggestions, please place them at [http://dublue.com/plugins/toc/](http://dublue.com/plugins/toc/)
 
 
 == Screenshots ==
 
-1. An example of the table of contents, positioned at the top and right aligned
-2. The main options tab in the administration area
-3. The sitemap options tab
+1. An example of the table of contents, positioned at the top, right aligned, and a width of 275px
+2. An example of the sitemap_pages shortcode
+3. An example of the sitemap_posts shortcode
+4. The options panel found in Settings > TOC+
+5. Some advanced options
+6. The sitemap tab
 
 
 == Installation ==
@@ -68,7 +75,7 @@ Lets you generate the table of contents at the preferred position.  Useful for s
 Allows you to disable the table of contents for the current post, page, or custom post type.
 
 = [sitemap] =
-Produces a listing of all pages and categories for your site. You can use this on any post, page or even in a text widget.
+Produces a listing of all pages and categories for your site. You can use this on any post, page or even in a text widget.  Note that this will not include an index of posts so use sitemap_posts if you need this listing.
 
 = [sitemap_pages] =
 Lets you print out a listing of only pages. The following attributes are accepted:
@@ -76,12 +83,71 @@ Lets you print out a listing of only pages. The following attributes are accepte
 * "label": text, title of the list
 * "no_label": true/false, shows or hides the list heading
 * "exclude": IDs of the pages or categories you wish to exclude
+* "exclude_tree": ID of the page or category you wish to exclude including its all descendants
 
 = [sitemap_categories] =
 Same as `[sitemap_pages]` but for categories.
 
+= [sitemap_posts] =
+This lets you print out an index of all published posts on your site.  By default, posts are listed in alphabetical order grouped by their first letters.  The following attributes are accepted:
+* "order": text, either ASC or DESC
+* "orderby": text, popular options include "title", "date", "ID", and "rand". See [WP_Query](https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters) for a list.
+* "separate": true/false (defaults to true), does not separate the lists by first letter when set to false.
+Use the following CSS classes to customise the appearance of your listing:
+* toc_sitemap_posts_section
+* toc_sitemap_posts_letter
+* toc_sitemap_posts_list
+
 
 == Changelog ==
+
+= 1308 =
+* Released: 5 August 2013
+* Fix javascript issue with minimum jQuery version check (broke smooth scrolling using WordPress 3.6).
+* Replaced Slovak translation with a human translated version courtesy Boris Gereg.
+* Remove <!--TOC--> signature from source when using the shortcode but not allowed to print (eg on homepage).
+* Add "separate" attribute for sitemap_posts shortcode to not split by letter, thanks [DavidMjps](http://wordpress.org/support/topic/exclude-alphabetical-headings-on-sitemap) for the suggestion.
+
+= 1303.1 =
+* Released: 22 March 2013
+* New: added Polish translation, curtesy [Jakub](http://notatki.4use.pl/).
+* Fixed: an issue in 1303 that ignored headings with the opening tag on the first line and the heading text on a new line.  Thanks to [richardsng](http://wordpress.org/support/topic/unable-to-display-the-full-toc) for the quick discovery.
+
+= 1303 =
+* Released: 21 March 2013
+* New: option auto insert after the first heading.  Thanks to [@thelawnetwork](http://dublue.com/plugins/toc/comment-page-4/#comment-1782) for requesting it.
+* New: allow headings to be excluded from the table of contents.  This is available both globally under the advanced section of Settings > TOC+ and individually with the TOC shortcode.  Check out the help material for examples.  Thanks to the many of you that requested it.
+* New: advanced option to lowercase all anchors.  The default is off.
+* New: advanced option to use hyphens rather than underscores in anchors.  The default is off.
+* New: shortcode to list all posts in alphabetical order grouped by first letter.
+* New: added Slovak translation, curtesy [Branco Radenovich](http://webhostinggeeks.com/user-reviews/).
+* Add version numbers to CSS/JS files to better support setups that cache these files heavily for timely invalidation.  Thanks to [boxcarpress](http://wordpress.org/support/topic/some-changes-we-made-that-you-might-consider) for the amendments.
+* Add CSS class 'contracted' to #toc_container when the table of contents is hidden. Thanks to [Sam](http://wordpress.org/support/topic/hide-link-not-working?replies=6#post-3968019) for suggesting it.
+* With smooth scroll enabled, do not use an offset if no admin bar is present and the offset value is default.  This means that public users do not have the offset space at the top.
+* New help material for developers under the help tab.
+* Added API function: toc_get_index() lets you retrieve a table of contents to be placed within PHP.  Check out the new developer help material for examples.
+* Allow anchors to be filterable using toc_url_anchor_target to customise further through code.  Check the new developer help material for an example.  Thanks to [Russell Heimlich](http://dublue.com/plugins/toc/comment-page-4/#comment-1713) for the tip.
+* Adjust CSS and JS registration.
+* Updated jQuery Smooth Scroll to 1.4.10.
+* Fixed: When using the widget, addressed an issue where the index with special characters (such as ' and ") would not link to the correct spot within the content.  Thanks to [esandman](http://wordpress.org/support/topic/problems-with-apostrophes-and-quotation-marks) for raising it.
+* Fixed: Saving at Settings > TOC+ resets TOC+ widget options.  Thanks to [Chris](http://dublue.com/plugins/toc/comment-page-4/#comment-1808) for reporting it.
+
+= 1211 =
+* Released: 17 November 2012
+* New: allow %PAGE_TITLE% to be used in the TOC title.  Note that this also works in the widget title too.  When used, this variable will be replaced with the current page's title.  Thanks to [Peter](http://dublue.com/plugins/toc/comment-page-3/#comment-4782) for the request.
+* New: new option to hide the TOC initially.  Thanks to [Jonas](http://dublue.com/plugins/toc/comment-page-2/#comment-852), [Jonathan](http://dublue.com/plugins/toc/comment-page-2/#comment-2161), and [Doc Germanicus](http://dublue.com/plugins/toc/comment-page-4/#comment-5048) for requesting it.
+* New: added ability to customise visited TOC link colour.
+* New: option to restrict generation to a URL path match.  For example, you can restrict to wiki pages that fall under http://domain/wiki/ by entering /wiki/ into the field.  The setting can be found in the advanced options.  Thanks to [Tux](http://dublue.com/plugins/toc/comment-page-3/#comment-4466) and [Justine Smithies](http://dublue.com/plugins/toc/comment-page-3/#comment-5000) for suggesting it.
+* Make regular expressions less greedy.  That means you can have multiple headings on a single line whereas before you needed to ensure each heading was on their own line.  Thanks to [drdamour](http://wordpress.org/support/topic/widget-isnt-showing-up) for raising and providing a fix.
+* Also make regular expressions match across multiple lines.  This means you can have your single heading split across many lines.
+* Better accessibility: when using smooth scrolling, allow for focus to follow the target, eg tabbing through will continue from the content block you clicked through to.
+* Better performance: as requested by a few, javascript files have been consolidated into one and both javascript and CSS files are now minified.
+* 'Auto' is now the default width which means it'll take up the needed amount of space up to 100%.  The previous default was a fixed width of 275px.
+* Added the ability to exclude entire branches when using [sitemap_pages] and [sitemap_categories] using the exclude_tree attribute.  Thanks to [Benny Powers](http://dublue.com/plugins/toc/comment-page-3/#comment-3607) for requesting it.
+* Wrap index numbers around span tags to enable easier CSS customisation.  The spans are have two classes: toc_number and toc_depth_X where X is between 1 and 6.  Thanks to [Matthias Krok](http://dublue.com/plugins/toc/comment-page-3/#comment-3922) for requesting it.
+* Moved the 'preserve theme bullets' option into the advanced section.
+* Updated and simplified the translation file.
+* Fixed: [sitemap_categories] using the wrong label when none was specified.  Thanks to [brandt-net](http://wordpress.org/support/topic/plugin-table-of-contents-plus-sitemap-setting-categories-label-of-sitemap_categories-not-shown) for raising it.  The labels for both [sitemap_pages] and [sitemap_categories] may be removed in a future update as you can insert the title within your content.
 
 = 1208 =
 * Released: 2 August 2012
@@ -179,9 +245,9 @@ Same as `[sitemap_pages]` but for categories.
 
 == Frequently Asked Questions ==
 
-Check out the FAQs / Scenarios at [http://dublue.com/plugins/toc/](http://dublue.com/plugins/toc/)
+Check out the FAQs / Scenarios at [http://dublue.com/plugins/toc/#Scenarios_FAQs](http://dublue.com/plugins/toc/#Scenarios_FAQs)
 
 
 == Upgrade Notice ==
 
-Update folder with the latest files.  Any previous options will be saved.
+Update folder with the latest files.  All previous options will be saved.

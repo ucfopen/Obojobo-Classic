@@ -43,10 +43,10 @@ $min_enableBuilder = false;
 //$min_cachePath = '/tmp';
 //$min_cachePath = preg_replace('/^\\d+;/', '', session_save_path());
 
-require 'lib/Minify/Cache/Memcache.php';
-$memcache = new Memcache;
-$memcache->connect('localhost', 11211);
-$min_cachePath = new Minify_Cache_Memcache($memcache);
+// require 'lib/Minify/Cache/Memcache.php';
+// $memcache = new Memcache;
+// $memcache->connect('localhost', 11211);
+// $min_cachePath = new Minify_Cache_Memcache($memcache);
 
 /**
  * Leave an empty string to use PHP's $_SERVER['DOCUMENT_ROOT'].

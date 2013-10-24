@@ -27,7 +27,6 @@ function wp_unregister_GLOBALS() {
 	$input = array_merge( $_GET, $_POST, $_COOKIE, $_SERVER, $_ENV, $_FILES, isset( $_SESSION ) && is_array( $_SESSION ) ? $_SESSION : array() );
 	foreach ( $input as $k => $v )
 		if ( !in_array( $k, $no_unset ) && isset( $GLOBALS[$k] ) ) {
-			$GLOBALS[$k] = null;
 			unset( $GLOBALS[$k] );
 		}
 }
@@ -105,12 +104,12 @@ function wp_check_php_mysql_versions() {
 	$php_version = phpversion();
 	if ( version_compare( $required_php_version, $php_version, '>' ) ) {
 		wp_load_translations_early();
-		wp_die( sprintf( __( 'Your server is running PHP version %1$s but WordPress %2$s requires at least %3$s.' ), $php_version, $wp_version, $required_php_version ) );
+		die( sprintf( __( 'Your server is running PHP version %1$s but WordPress %2$s requires at least %3$s.' ), $php_version, $wp_version, $required_php_version ) );
 	}
 
 	if ( ! extension_loaded( 'mysql' ) && ! file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
 		wp_load_translations_early();
-		wp_die( __( 'Your PHP installation appears to be missing the MySQL extension which is required by WordPress.' ) );
+		die( __( 'Your PHP installation appears to be missing the MySQL extension which is required by WordPress.' ) );
 	}
 }
 
@@ -254,17 +253,14 @@ function timer_stop( $display = 0, $precision = 3 ) { // if called like timer_st
  * When WP_DEBUG_LOG is true, errors will be logged to wp-content/debug.log.
  * WP_DEBUG_LOG defaults to false.
  *
+ * Errors are never displayed for XML-RPC requests.
+ *
  * @access private
  * @since 3.0.0
  */
 function wp_debug_mode() {
 	if ( WP_DEBUG ) {
-		// E_DEPRECATED is a core PHP constant in PHP 5.3. Don't define this yourself.
-		// The two statements are equivalent, just one is for 5.3+ and for less than 5.3.
-		if ( defined( 'E_DEPRECATED' ) )
-			error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
-		else
-			error_reporting( E_ALL );
+		error_reporting( E_ALL );
 
 		if ( WP_DEBUG_DISPLAY )
 			ini_set( 'display_errors', 1 );
@@ -278,6 +274,8 @@ function wp_debug_mode() {
 	} else {
 		error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
 	}
+	if ( defined( 'XMLRPC_REQUEST' ) )
+		ini_set( 'display_errors', 0 );
 }
 
 /**
@@ -356,7 +354,7 @@ function wp_set_wpdb_vars() {
 		dead_db();
 
 	$wpdb->field_types = array( 'post_author' => '%d', 'post_parent' => '%d', 'menu_order' => '%d', 'term_id' => '%d', 'term_group' => '%d', 'term_taxonomy_id' => '%d',
-		'parent' => '%d', 'count' => '%d','object_id' => '%d', 'term_order' => '%d', 'ID' => '%d', 'commment_ID' => '%d', 'comment_post_ID' => '%d', 'comment_parent' => '%d',
+		'parent' => '%d', 'count' => '%d','object_id' => '%d', 'term_order' => '%d', 'ID' => '%d', 'comment_ID' => '%d', 'comment_post_ID' => '%d', 'comment_parent' => '%d',
 		'user_id' => '%d', 'link_id' => '%d', 'link_owner' => '%d', 'link_rating' => '%d', 'option_id' => '%d', 'blog_id' => '%d', 'meta_id' => '%d', 'post_id' => '%d',
 		'user_status' => '%d', 'umeta_id' => '%d', 'comment_karma' => '%d', 'comment_count' => '%d',
 		// multisite:
@@ -381,7 +379,7 @@ function wp_set_wpdb_vars() {
  * @since 3.0.0
  */
 function wp_start_object_cache() {
-	global $_wp_using_ext_object_cache;
+	global $_wp_using_ext_object_cache, $blog_id;
 
 	$first_init = false;
  	if ( ! function_exists( 'wp_cache_init' ) ) {
@@ -403,13 +401,13 @@ function wp_start_object_cache() {
 	// If cache supports reset, reset instead of init if already initialized.
 	// Reset signals to the cache that global IDs have changed and it may need to update keys
 	// and cleanup caches.
-	if ( !$first_init && function_exists('wp_cache_reset') )
-		wp_cache_reset();
+	if ( ! $first_init && function_exists( 'wp_cache_switch_to_blog' ) )
+		wp_cache_switch_to_blog( $blog_id );
 	else
 		wp_cache_init();
 
 	if ( function_exists( 'wp_cache_add_global_groups' ) ) {
-		wp_cache_add_global_groups( array( 'users', 'userlogins', 'usermeta', 'user_meta', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'rss', 'global-posts' ) );
+		wp_cache_add_global_groups( array( 'users', 'userlogins', 'usermeta', 'user_meta', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'rss', 'global-posts', 'blog-id-cache' ) );
 		wp_cache_add_non_persistent_groups( array( 'comment', 'counts', 'plugins' ) );
 	}
 }
@@ -514,7 +512,8 @@ function wp_get_active_and_valid_plugins() {
  */
 function wp_set_internal_encoding() {
 	if ( function_exists( 'mb_internal_encoding' ) ) {
-		if ( !@mb_internal_encoding( get_option( 'blog_charset' ) ) )
+		$charset = get_option( 'blog_charset' );
+		if ( ! $charset || ! @mb_internal_encoding( $charset ) )
 			mb_internal_encoding( 'UTF-8' );
 	}
 }
@@ -583,8 +582,11 @@ function wp_clone( $object ) {
  * @return bool True if inside WordPress administration pages.
  */
 function is_admin() {
-	if ( defined( 'WP_ADMIN' ) )
+	if ( isset( $GLOBALS['current_screen'] ) )
+		return $GLOBALS['current_screen']->in_admin();
+	elseif ( defined( 'WP_ADMIN' ) )
 		return WP_ADMIN;
+
 	return false;
 }
 
@@ -599,8 +601,11 @@ function is_admin() {
  * @return bool True if inside WordPress network administration pages.
  */
 function is_blog_admin() {
-	if ( defined( 'WP_BLOG_ADMIN' ) )
+	if ( isset( $GLOBALS['current_screen'] ) )
+		return $GLOBALS['current_screen']->in_admin( 'site' );
+	elseif ( defined( 'WP_BLOG_ADMIN' ) )
 		return WP_BLOG_ADMIN;
+
 	return false;
 }
 
@@ -615,8 +620,11 @@ function is_blog_admin() {
  * @return bool True if inside WordPress network administration pages.
  */
 function is_network_admin() {
-	if ( defined( 'WP_NETWORK_ADMIN' ) )
+	if ( isset( $GLOBALS['current_screen'] ) )
+		return $GLOBALS['current_screen']->in_admin( 'network' );
+	elseif ( defined( 'WP_NETWORK_ADMIN' ) )
 		return WP_NETWORK_ADMIN;
+
 	return false;
 }
 
@@ -631,8 +639,11 @@ function is_network_admin() {
  * @return bool True if inside WordPress user administration pages.
  */
 function is_user_admin() {
-	if ( defined( 'WP_USER_ADMIN' ) )
+	if ( isset( $GLOBALS['current_screen'] ) )
+		return $GLOBALS['current_screen']->in_admin( 'user' );
+	elseif ( defined( 'WP_USER_ADMIN' ) )
 		return WP_USER_ADMIN;
+
 	return false;
 }
 
@@ -651,6 +662,18 @@ function is_multisite() {
 		return true;
 
 	return false;
+}
+
+/**
+ * Retrieve the current blog id
+ *
+ * @since 3.1.0
+ *
+ * @return int Blog id
+ */
+function get_current_blog_id() {
+	global $blog_id;
+	return absint($blog_id);
 }
 
 /**
@@ -685,7 +708,6 @@ function wp_load_translations_early() {
 	require_once ABSPATH . WPINC . '/locale.php';
 
 	// General libraries
-	require_once ABSPATH . WPINC . '/functions.php';
 	require_once ABSPATH . WPINC . '/plugin.php';
 
 	$locales = $locations = array();

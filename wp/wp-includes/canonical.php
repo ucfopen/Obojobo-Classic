@@ -18,7 +18,9 @@
  * one or the other.
  *
  * Prevents redirection for feeds, trackbacks, searches, comment popup, and
- * admin URLs. Does not redirect on IIS, page/post previews, and on form data.
+ * admin URLs. Does not redirect on non-pretty-permalink-supporting IIS 7+,
+ * page/post previews, WP admin, Trackbacks, robots.txt, searches, or on POST
+ * requests.
  *
  * Will also attempt to find the correct link when a user enters a URL that does
  * not exist based on exact WordPress query. Will instead try to parse the URL
@@ -37,7 +39,7 @@
 function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 	global $wp_rewrite, $is_IIS, $wp_query, $wpdb;
 
-	if ( is_trackback() || is_search() || is_comments_popup() || is_admin() || !empty($_POST) || is_preview() || is_robots() || $is_IIS )
+	if ( is_trackback() || is_search() || is_comments_popup() || is_admin() || !empty($_POST) || is_preview() || is_robots() || ( $is_IIS && !iis7_supports_permalinks() ) )
 		return;
 
 	if ( !$requested_url ) {
@@ -270,9 +272,9 @@ function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 				$redirect['query'] = remove_query_arg( 'cpage', $redirect['query'] );
 			}
 
-			$redirect['path'] = user_trailingslashit( preg_replace('|/index.php/?$|', '/', $redirect['path']) ); // strip off trailing /index.php/
-			if ( !empty( $addl_path ) && $wp_rewrite->using_index_permalinks() && strpos($redirect['path'], '/index.php/') === false )
-				$redirect['path'] = trailingslashit($redirect['path']) . 'index.php/';
+			$redirect['path'] = user_trailingslashit( preg_replace('|/' . preg_quote( $wp_rewrite->index, '|' ) . '/?$|', '/', $redirect['path']) ); // strip off trailing /index.php/
+			if ( !empty( $addl_path ) && $wp_rewrite->using_index_permalinks() && strpos($redirect['path'], '/' . $wp_rewrite->index . '/') === false )
+				$redirect['path'] = trailingslashit($redirect['path']) . $wp_rewrite->index . '/';
 			if ( !empty( $addl_path ) )
 				$redirect['path'] = trailingslashit($redirect['path']) . $addl_path;
 			$redirect_url = $redirect['scheme'] . '://' . $redirect['host'] . $redirect['path'];
@@ -280,7 +282,7 @@ function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 
 		if ( 'wp-register.php' == basename( $redirect['path'] ) ) {
 			if ( is_multisite() )
-				$redirect_url = apply_filters( 'wp_signup_location', site_url( 'wp-signup.php' ) );
+				$redirect_url = apply_filters( 'wp_signup_location', network_site_url( 'wp-signup.php' ) );
 			else
 				$redirect_url = site_url( 'wp-login.php?action=register' );
 			wp_redirect( $redirect_url, 301 );
@@ -322,7 +324,7 @@ function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 		unset($redirect['port']);
 
 	// trailing /index.php
-	$redirect['path'] = preg_replace('|/index.php/*?$|', '/', $redirect['path']);
+	$redirect['path'] = preg_replace('|/' . preg_quote( $wp_rewrite->index, '|' ) . '/*?$|', '/', $redirect['path']);
 
 	// Remove trailing spaces from the path
 	$redirect['path'] = preg_replace( '#(%20| )+$#', '', $redirect['path'] );
@@ -335,7 +337,7 @@ function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 		$redirect['query'] = trim(preg_replace( '#(^|&)(p|page_id|cat|tag)=?(&|$)#', '&', $redirect['query']), '&');
 
 		// Redirect obsolete feeds
-		$redirect['query'] = preg_replace( '#(^|&)feed=rss(&|$)#', '$1feed=rss2$3', $redirect['query'] );
+		$redirect['query'] = preg_replace( '#(^|&)feed=rss(&|$)#', '$1feed=rss2$2', $redirect['query'] );
 
 		// Remove redundant leading ampersands
 		$redirect['query'] = preg_replace( '#^\??&*?#', '', $redirect['query'] );
@@ -343,7 +345,7 @@ function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 
 	// strip /index.php/ when we're not using PATHINFO permalinks
 	if ( !$wp_rewrite->using_index_permalinks() )
-		$redirect['path'] = str_replace('/index.php/', '/', $redirect['path']);
+		$redirect['path'] = str_replace( '/' . $wp_rewrite->index . '/', '/', $redirect['path'] );
 
 	// trailing slashes
 	if ( is_object($wp_rewrite) && $wp_rewrite->using_permalinks() && !is_404() && (!is_front_page() || ( is_front_page() && (get_query_var('paged') > 1) ) ) ) {

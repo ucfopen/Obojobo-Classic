@@ -59,12 +59,14 @@ function get_404_template() {
  * @return string
  */
 function get_archive_template() {
-	$post_type = get_query_var( 'post_type' );
+	$post_types = array_filter( (array) get_query_var( 'post_type' ) );
 
 	$templates = array();
 
-	if ( $post_type )
+	if ( count( $post_types ) == 1 ) {
+		$post_type = reset( $post_types );
 		$templates[] = "archive-{$post_type}.php";
+	}
 	$templates[] = 'archive.php';
 
 	return get_query_template( 'archive', $templates );
@@ -82,8 +84,10 @@ function get_author_template() {
 
 	$templates = array();
 
-	$templates[] = "author-{$author->user_nicename}.php";
-	$templates[] = "author-{$author->ID}.php";
+	if ( $author ) {
+		$templates[] = "author-{$author->user_nicename}.php";
+		$templates[] = "author-{$author->ID}.php";
+	}
 	$templates[] = 'author.php';
 
 	return get_query_template( 'author', $templates );
@@ -92,8 +96,8 @@ function get_author_template() {
 /**
  * Retrieve path of category template in current or parent template.
  *
- * Works by first retrieving the current slug for example 'category-default.php' and then
- * trying category ID, for example 'category-1.php' and will finally fallback to category.php
+ * Works by first retrieving the current slug, for example 'category-default.php', and then
+ * trying category ID, for example 'category-1.php', and will finally fall back to category.php
  * template, if those files don't exist.
  *
  * @since 1.5.0
@@ -106,8 +110,10 @@ function get_category_template() {
 
 	$templates = array();
 
-	$templates[] = "category-{$category->slug}.php";
-	$templates[] = "category-{$category->term_id}.php";
+	if ( $category ) {
+		$templates[] = "category-{$category->slug}.php";
+		$templates[] = "category-{$category->term_id}.php";
+	}
 	$templates[] = 'category.php';
 
 	return get_query_template( 'category', $templates );
@@ -116,8 +122,8 @@ function get_category_template() {
 /**
  * Retrieve path of tag template in current or parent template.
  *
- * Works by first retrieving the current tag name, for example 'tag-wordpress.php' and then
- * trying tag ID, for example 'tag-1.php' and will finally fallback to tag.php
+ * Works by first retrieving the current tag name, for example 'tag-wordpress.php', and then
+ * trying tag ID, for example 'tag-1.php', and will finally fall back to tag.php
  * template, if those files don't exist.
  *
  * @since 2.3.0
@@ -130,8 +136,10 @@ function get_tag_template() {
 
 	$templates = array();
 
-	$templates[] = "tag-{$tag->slug}.php";
-	$templates[] = "tag-{$tag->term_id}.php";
+	if ( $tag ) {
+		$templates[] = "tag-{$tag->slug}.php";
+		$templates[] = "tag-{$tag->term_id}.php";
+	}
 	$templates[] = 'tag.php';
 
 	return get_query_template( 'tag', $templates );
@@ -156,12 +164,14 @@ function get_tag_template() {
  */
 function get_taxonomy_template() {
 	$term = get_queried_object();
-	$taxonomy = $term->taxonomy;
 
 	$templates = array();
 
-	$templates[] = "taxonomy-$taxonomy-{$term->slug}.php";
-	$templates[] = "taxonomy-$taxonomy.php";
+	if ( $term ) {
+		$taxonomy = $term->taxonomy;
+		$templates[] = "taxonomy-$taxonomy-{$term->slug}.php";
+		$templates[] = "taxonomy-$taxonomy.php";
+	}
 	$templates[] = 'taxonomy.php';
 
 	return get_query_template( 'taxonomy', $templates );
@@ -181,7 +191,7 @@ function get_date_template() {
 /**
  * Retrieve path of home template in current or parent template.
  *
- * This is the template used for the page containing the blog posts
+ * This is the template used for the page containing the blog posts.
  *
  * Attempts to locate 'home.php' first before falling back to 'index.php'.
  *
@@ -215,9 +225,9 @@ function get_front_page_template() {
 /**
  * Retrieve path of page template in current or parent template.
  *
- * Will first look for the specifically assigned page template
- * The will search for 'page-{slug}.php' followed by 'page-id.php'
- * and finally 'page.php'
+ * Will first look for the specifically assigned page template.
+ * Then will search for 'page-{slug}.php', followed by 'page-{id}.php',
+ * and finally 'page.php'.
  *
  * @since 1.5.0
  *
@@ -280,7 +290,8 @@ function get_single_template() {
 
 	$templates = array();
 
-	$templates[] = "single-{$object->post_type}.php";
+	if ( $object )
+		$templates[] = "single-{$object->post_type}.php";
 	$templates[] = "single.php";
 
 	return get_query_template( 'single', $templates );
@@ -303,15 +314,21 @@ function get_single_template() {
  */
 function get_attachment_template() {
 	global $posts;
-	$type = explode('/', $posts[0]->post_mime_type);
-	if ( $template = get_query_template($type[0]) )
-		return $template;
-	elseif ( $template = get_query_template($type[1]) )
-		return $template;
-	elseif ( $template = get_query_template("$type[0]_$type[1]") )
-		return $template;
-	else
-		return get_query_template('attachment');
+
+	if ( ! empty( $posts ) && isset( $posts[0]->post_mime_type ) ) {
+		$type = explode( '/', $posts[0]->post_mime_type );
+
+		if ( ! empty( $type ) ) {
+			if ( $template = get_query_template( $type[0] ) )
+				return $template;
+			elseif ( $template = get_query_template( $type[1] ) )
+				return $template;
+			elseif ( $template = get_query_template( "$type[0]_$type[1]" ) )
+				return $template;
+		}
+	}
+
+	return get_query_template( 'attachment' );
 }
 
 /**
