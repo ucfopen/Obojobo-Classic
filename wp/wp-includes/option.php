@@ -32,14 +32,14 @@
 function get_option( $option, $default = false ) {
 	global $wpdb;
 
+	$option = trim( $option );
+	if ( empty( $option ) )
+		return false;
+
 	// Allow plugins to short-circuit options.
 	$pre = apply_filters( 'pre_option_' . $option, false );
 	if ( false !== $pre )
 		return $pre;
-
-	$option = trim($option);
-	if ( empty($option) )
-		return false;
 
 	if ( defined( 'WP_SETUP_CONFIG' ) )
 		return false;
@@ -104,8 +104,7 @@ function get_option( $option, $default = false ) {
  * @param string $option Option name.
  */
 function wp_protect_special_option( $option ) {
-	$protected = array( 'alloptions', 'notoptions' );
-	if ( in_array( $option, $protected ) )
+	if ( 'alloptions' === $option || 'notoptions' === $option )
 		wp_die( sprintf( __( '%s is a protected WP option and may not be modified' ), esc_html( $option ) ) );
 }
 
@@ -174,7 +173,7 @@ function wp_load_core_site_options( $site_id = null ) {
 	if ( empty($site_id) )
 		$site_id = $wpdb->siteid;
 
-	$core_options = array('site_name', 'siteurl', 'active_sitewide_plugins', '_site_transient_timeout_theme_roots', '_site_transient_theme_roots', 'site_admins', 'can_compress_scripts', 'global_terms_enabled' );
+	$core_options = array('site_name', 'siteurl', 'active_sitewide_plugins', '_site_transient_timeout_theme_roots', '_site_transient_theme_roots', 'site_admins', 'can_compress_scripts', 'global_terms_enabled', 'ms_files_rewriting' );
 
 	$core_options_in = "'" . implode("', '", $core_options) . "'";
 	$options = $wpdb->get_results( $wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->sitemeta WHERE meta_key IN ($core_options_in) AND site_id = %d", $site_id) );
@@ -248,10 +247,10 @@ function update_option( $option, $newvalue ) {
 	if ( ! defined( 'WP_INSTALLING' ) ) {
 		$alloptions = wp_load_alloptions();
 		if ( isset( $alloptions[$option] ) ) {
-			$alloptions[$option] = $_newvalue;
+			$alloptions[$option] = $newvalue;
 			wp_cache_set( 'alloptions', $alloptions, 'options' );
 		} else {
-			wp_cache_set( $option, $_newvalue, 'options' );
+			wp_cache_set( $option, $newvalue, 'options' );
 		}
 	}
 
@@ -359,6 +358,10 @@ function add_option( $option, $value = '', $deprecated = '', $autoload = 'yes' )
  */
 function delete_option( $option ) {
 	global $wpdb;
+
+	$option = trim( $option );
+	if ( empty( $option ) )
+		return false;
 
 	wp_protect_special_option( $option );
 
@@ -512,8 +515,8 @@ function set_transient( $transient, $value, $expiration = 0 ) {
 		}
 	}
 	if ( $result ) {
-		do_action( 'set_transient_' . $transient );
-		do_action( 'setted_transient', $transient );
+		do_action( 'set_transient_' . $transient, $value, $expiration );
+		do_action( 'setted_transient', $transient, $value, $expiration );
 	}
 	return $result;
 }
@@ -540,6 +543,11 @@ function wp_user_settings() {
 	if ( ! $user = wp_get_current_user() )
 		return;
 
+	if ( is_super_admin( $user->ID ) &&
+		! in_array( get_current_blog_id(), array_keys( get_blogs_of_user( $user->ID ) ) )
+		)
+		return;
+
 	$settings = get_user_option( 'user-settings', $user->ID );
 
 	if ( isset( $_COOKIE['wp-settings-' . $user->ID] ) ) {
@@ -560,8 +568,8 @@ function wp_user_settings() {
 		}
 	}
 
-	setcookie( 'wp-settings-' . $user->ID, $settings, time() + 31536000, SITECOOKIEPATH );
-	setcookie( 'wp-settings-time-' . $user->ID, time(), time() + 31536000, SITECOOKIEPATH );
+	setcookie( 'wp-settings-' . $user->ID, $settings, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
+	setcookie( 'wp-settings-time-' . $user->ID, time(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 	$_COOKIE['wp-settings-' . $user->ID] = $settings;
 }
 
@@ -697,6 +705,11 @@ function wp_set_all_user_settings($all) {
 	if ( ! $user = wp_get_current_user() )
 		return false;
 
+	if ( is_super_admin( $user->ID ) &&
+		! in_array( get_current_blog_id(), array_keys( get_blogs_of_user( $user->ID ) ) )
+		)
+		return;
+
 	$_updated_user_settings = $all;
 	$settings = '';
 	foreach ( $all as $k => $v ) {
@@ -724,7 +737,7 @@ function delete_all_user_settings() {
 		return;
 
 	update_user_option( $user->ID, 'user-settings', '', false );
-	setcookie('wp-settings-' . $user->ID, ' ', time() - 31536000, SITECOOKIEPATH);
+	setcookie('wp-settings-' . $user->ID, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH);
 }
 
 /**
@@ -1039,8 +1052,8 @@ function set_site_transient( $transient, $value, $expiration = 0 ) {
 		}
 	}
 	if ( $result ) {
-		do_action( 'set_site_transient_' . $transient );
-		do_action( 'setted_site_transient', $transient );
+		do_action( 'set_site_transient_' . $transient, $value, $expiration );
+		do_action( 'setted_site_transient', $transient, $value, $expiration );
 	}
 	return $result;
 }

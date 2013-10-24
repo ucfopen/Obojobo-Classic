@@ -44,57 +44,24 @@ if ( $_POST ) {
 
 	check_admin_referer( 'siteoptions' );
 
-	if ( isset( $_POST['WPLANG'] ) && ( '' === $_POST['WPLANG'] || in_array( $_POST['WPLANG'], get_available_languages() ) ) )
-		update_site_option( 'WPLANG', $_POST['WPLANG'] );
-
-	if ( is_email( $_POST['admin_email'] ) )
-		update_site_option( 'admin_email', $_POST['admin_email'] );
-
-	$illegal_names = explode( ' ', $_POST['illegal_names'] );
-	foreach ( (array) $illegal_names as $name ) {
-		$name = trim( $name );
-		if ( $name != '' )
-			$names[] = trim( $name );
-	}
-	update_site_option( 'illegal_names', $names );
-
-	if ( $_POST['limited_email_domains'] != '' ) {
-		$limited_email_domains = str_replace( ' ', "\n", $_POST['limited_email_domains'] );
-		$limited_email_domains = explode( "\n", stripslashes( $limited_email_domains ) );
-		$limited_email = array();
-		foreach ( (array) $limited_email_domains as $domain ) {
-			$domain = trim( $domain );
-			if ( ! preg_match( '/(--|\.\.)/', $domain ) && preg_match( '|^([a-zA-Z0-9-\.])+$|', $domain ) )
-				$limited_email[] = trim( $domain );
-		}
-		update_site_option( 'limited_email_domains', $limited_email );
-	} else {
-		update_site_option( 'limited_email_domains', '' );
-	}
-
-	if ( $_POST['banned_email_domains'] != '' ) {
-		$banned_email_domains = explode( "\n", stripslashes( $_POST['banned_email_domains'] ) );
-		$banned = array();
-		foreach ( (array) $banned_email_domains as $domain ) {
-			$domain = trim( $domain );
-			if ( ! preg_match( '/(--|\.\.)/', $domain ) && preg_match( '|^([a-zA-Z0-9-\.])+$|', $domain ) )
-				$banned[] = trim( $domain );
-		}
-		update_site_option( 'banned_email_domains', $banned );
-	} else {
-		update_site_option( 'banned_email_domains', '' );
-	}
-
-	$options = array( 'registrationnotification', 'registration', 'add_new_users', 'menu_items', 'upload_space_check_disabled', 'blog_upload_space', 'upload_filetypes', 'site_name', 'first_post', 'first_page', 'first_comment', 'first_comment_url', 'first_comment_author', 'welcome_email', 'welcome_user_email', 'fileupload_maxk', 'global_terms_enabled' );
 	$checked_options = array( 'menu_items' => array(), 'registrationnotification' => 'no', 'upload_space_check_disabled' => 1, 'add_new_users' => 0 );
 	foreach ( $checked_options as $option_name => $option_unchecked_value ) {
 		if ( ! isset( $_POST[$option_name] ) )
 			$_POST[$option_name] = $option_unchecked_value;
 	}
+
+	$options = array(
+		'registrationnotification', 'registration', 'add_new_users', 'menu_items',
+		'upload_space_check_disabled', 'blog_upload_space', 'upload_filetypes', 'site_name',
+		'first_post', 'first_page', 'first_comment', 'first_comment_url', 'first_comment_author',
+		'welcome_email', 'welcome_user_email', 'fileupload_maxk', 'global_terms_enabled',
+		'illegal_names', 'limited_email_domains', 'banned_email_domains', 'WPLANG', 'admin_email',
+	);
+
 	foreach ( $options as $option_name ) {
 		if ( ! isset($_POST[$option_name]) )
 			continue;
-		$value = stripslashes_deep( $_POST[$option_name] );
+		$value = wp_unslash( $_POST[$option_name] );
 		update_site_option( $option_name, $value );
 	}
 
@@ -214,7 +181,7 @@ if ( isset( $_GET['updated'] ) ) {
 				<th scope="row"><label for="welcome_email"><?php _e( 'Welcome Email' ) ?></label></th>
 				<td>
 					<textarea name="welcome_email" id="welcome_email" rows="5" cols="45" class="large-text">
-<?php echo esc_textarea( stripslashes( get_site_option( 'welcome_email' ) ) ) ?></textarea>
+<?php echo esc_textarea( get_site_option( 'welcome_email' ) ) ?></textarea>
 					<br />
 					<?php _e( 'The welcome email sent to new site owners.' ) ?>
 				</td>
@@ -223,7 +190,7 @@ if ( isset( $_GET['updated'] ) ) {
 				<th scope="row"><label for="welcome_user_email"><?php _e( 'Welcome User Email' ) ?></label></th>
 				<td>
 					<textarea name="welcome_user_email" id="welcome_user_email" rows="5" cols="45" class="large-text">
-<?php echo esc_textarea( stripslashes( get_site_option( 'welcome_user_email' ) ) ) ?></textarea>
+<?php echo esc_textarea( get_site_option( 'welcome_user_email' ) ) ?></textarea>
 					<br />
 					<?php _e( 'The welcome email sent to new users.' ) ?>
 				</td>
@@ -232,7 +199,7 @@ if ( isset( $_GET['updated'] ) ) {
 				<th scope="row"><label for="first_post"><?php _e( 'First Post' ) ?></label></th>
 				<td>
 					<textarea name="first_post" id="first_post" rows="5" cols="45" class="large-text">
-<?php echo esc_textarea( stripslashes( get_site_option( 'first_post' ) ) ) ?></textarea>
+<?php echo esc_textarea( get_site_option( 'first_post' ) ) ?></textarea>
 					<br />
 					<?php _e( 'The first post on a new site.' ) ?>
 				</td>
@@ -241,7 +208,7 @@ if ( isset( $_GET['updated'] ) ) {
 				<th scope="row"><label for="first_page"><?php _e( 'First Page' ) ?></label></th>
 				<td>
 					<textarea name="first_page" id="first_page" rows="5" cols="45" class="large-text">
-<?php echo esc_textarea( stripslashes( get_site_option('first_page') ) ) ?></textarea>
+<?php echo esc_textarea( get_site_option( 'first_page' ) ) ?></textarea>
 					<br />
 					<?php _e( 'The first page on a new site.' ) ?>
 				</td>
@@ -250,7 +217,7 @@ if ( isset( $_GET['updated'] ) ) {
 				<th scope="row"><label for="first_comment"><?php _e( 'First Comment' ) ?></label></th>
 				<td>
 					<textarea name="first_comment" id="first_comment" rows="5" cols="45" class="large-text">
-<?php echo esc_textarea( stripslashes( get_site_option('first_comment') ) ) ?></textarea>
+<?php echo esc_textarea( get_site_option( 'first_comment' ) ) ?></textarea>
 					<br />
 					<?php _e( 'The first comment on a new site.' ) ?>
 				</td>

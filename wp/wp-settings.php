@@ -23,7 +23,7 @@ require( ABSPATH . WPINC . '/default-constants.php' );
 require( ABSPATH . WPINC . '/version.php' );
 
 // Set initial default constants including WP_MEMORY_LIMIT, WP_MAX_MEMORY_LIMIT, WP_DEBUG, WP_CONTENT_DIR and WP_CACHE.
-wp_initial_constants( );
+wp_initial_constants();
 
 // Check for the required PHP version and for the MySQL extension or a database drop-in.
 wp_check_php_mysql_versions();
@@ -32,15 +32,11 @@ wp_check_php_mysql_versions();
 @ini_set( 'magic_quotes_runtime', 0 );
 @ini_set( 'magic_quotes_sybase',  0 );
 
-// Set default timezone in PHP 5.
-if ( function_exists( 'date_default_timezone_set' ) )
-	date_default_timezone_set( 'UTC' );
+// WordPress calculates offsets from UTC.
+date_default_timezone_set( 'UTC' );
 
 // Turn register_globals off.
 wp_unregister_GLOBALS();
-
-// Ensure these global variables do not exist so they do not interfere with WordPress.
-unset( $wp_filter, $cache_lastcommentmodified );
 
 // Standardize $_SERVER variables across setups.
 wp_fix_server_vars();
@@ -121,6 +117,8 @@ require( ABSPATH . WPINC . '/link-template.php' );
 require( ABSPATH . WPINC . '/author-template.php' );
 require( ABSPATH . WPINC . '/post.php' );
 require( ABSPATH . WPINC . '/post-template.php' );
+require( ABSPATH . WPINC . '/revision.php' );
+require( ABSPATH . WPINC . '/post-formats.php' );
 require( ABSPATH . WPINC . '/post-thumbnail-template.php' );
 require( ABSPATH . WPINC . '/category.php' );
 require( ABSPATH . WPINC . '/category-template.php' );
@@ -138,6 +136,7 @@ require( ABSPATH . WPINC . '/taxonomy.php' );
 require( ABSPATH . WPINC . '/update.php' );
 require( ABSPATH . WPINC . '/canonical.php' );
 require( ABSPATH . WPINC . '/shortcodes.php' );
+require( ABSPATH . WPINC . '/class-wp-embed.php' );
 require( ABSPATH . WPINC . '/media.php' );
 require( ABSPATH . WPINC . '/http.php' );
 require( ABSPATH . WPINC . '/class-http.php' );
@@ -155,7 +154,7 @@ if ( is_multisite() ) {
 
 // Define constants that rely on the API to obtain the default value.
 // Define must-use plugin directory constants, which may be overridden in the sunrise.php drop-in.
-wp_plugin_directory_constants( );
+wp_plugin_directory_constants();
 
 // Load must-use plugins.
 foreach ( wp_get_mu_plugins() as $mu_plugin ) {
@@ -177,10 +176,10 @@ if ( is_multisite() )
 	ms_cookie_constants(  );
 
 // Define constants after multisite is loaded. Cookie-related constants may be overridden in ms_network_cookies().
-wp_cookie_constants( );
+wp_cookie_constants();
 
 // Define and enforce our SSL constants
-wp_ssl_constants( );
+wp_ssl_constants();
 
 // Create common globals.
 require( ABSPATH . WPINC . '/vars.php' );
@@ -212,7 +211,7 @@ if ( WP_CACHE && function_exists( 'wp_cache_postload' ) )
 do_action( 'plugins_loaded' );
 
 // Define constants which affect functionality if not already defined.
-wp_functionality_constants( );
+wp_functionality_constants();
 
 // Add magic quotes and set up $_REQUEST ( $_GET + $_POST )
 wp_magic_quotes();
@@ -232,7 +231,7 @@ $wp_the_query = new WP_Query();
  * @global object $wp_query
  * @since 1.5.0
  */
-$wp_query =& $wp_the_query;
+$wp_query = $wp_the_query;
 
 /**
  * Holds the WordPress Rewrite object for creating pretty URLs
@@ -254,6 +253,13 @@ $wp = new WP();
  * @since 2.8.0
  */
 $GLOBALS['wp_widget_factory'] = new WP_Widget_Factory();
+
+/**
+ * WordPress User Roles
+ * @global object $wp_roles
+ * @since 2.0.0
+ */
+$GLOBALS['wp_roles'] = new WP_Roles();
 
 do_action( 'setup_theme' );
 

@@ -6,7 +6,7 @@
  */
 
 /**
- * Whether this is a XMLRPC Request
+ * Whether this is an XML-RPC Request
  *
  * @var bool
  */
@@ -42,7 +42,7 @@ header('Content-Type: text/xml; charset=' . get_option('blog_charset'), true);
       <api name="Movable Type" blogID="1" preferred="false" apiLink="<?php echo site_url('xmlrpc.php', 'rpc') ?>" />
       <api name="MetaWeblog" blogID="1" preferred="false" apiLink="<?php echo site_url('xmlrpc.php', 'rpc') ?>" />
       <api name="Blogger" blogID="1" preferred="false" apiLink="<?php echo site_url('xmlrpc.php', 'rpc') ?>" />
-      <api name="Atom" blogID="" preferred="false" apiLink="<?php echo site_url('wp-app.php/service', 'rpc') ?>" />
+      <?php do_action( 'xmlrpc_rsd_apis' ); ?>
     </apis>
   </service>
 </rsd>
@@ -55,7 +55,7 @@ include_once(ABSPATH . WPINC . '/class-IXR.php');
 include_once(ABSPATH . WPINC . '/class-wp-xmlrpc-server.php');
 
 /**
- * Posts submitted via the xmlrpc interface get that title
+ * Posts submitted via the XML-RPC interface get that title
  * @name post_default_title
  * @var string
  */

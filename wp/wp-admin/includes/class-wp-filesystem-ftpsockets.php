@@ -97,7 +97,7 @@ class WP_Filesystem_ftpsockets extends WP_Filesystem_Base {
 		if ( ! $this->ftp->fget($temphandle, $file) ) {
 			fclose($temphandle);
 			unlink($temp);
-			return ''; //Blank document, File does exist, Its just blank.
+			return ''; //Blank document, File does exist, It's just blank.
 		}
 
 		fseek($temphandle, 0); //Skip back to the start of the file being written to
@@ -317,6 +317,10 @@ class WP_Filesystem_ftpsockets extends WP_Filesystem_Base {
 				else
 					$struc['files'] = array();
 			}
+
+			// Replace symlinks formatted as "source -> target" with just the source name
+			if ( $struc['islink'] )
+				$struc['name'] = preg_replace( '/(\s*->\s*.*)$/', '', $struc['name'] );
 
 			$ret[ $struc['name'] ] = $struc;
 		}

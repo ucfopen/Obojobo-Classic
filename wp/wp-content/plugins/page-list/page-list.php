@@ -1,24 +1,28 @@
 <?php
 /*
-Plugin Name: [pagelist]
-Plugin URI: http://web-profile.com.ua/wordpress/plugins/page-list/
+Plugin Name: Page-list
+Plugin URI: http://wordpress.org/plugins/page-list/
 Description: [pagelist], [subpages], [siblings] and [pagelist_ext] shortcodes
-Version: 3.7
+Version: 4.2
 Author: webvitaly
-Author Email: webvitaly(at)gmail.com
-Author URI: http://web-profile.com.ua/wordpress/
+Author URI: http://web-profile.com.ua/wordpress/plugins/
+License: GPLv2 or later
 */
 
-add_action('wp_print_styles', 'pagelist_add_stylesheet');
-function pagelist_add_stylesheet() {
-	wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '3.7', 'all' );
+if ( !function_exists('pagelist_unqprfx_add_stylesheet') ) {
+	function pagelist_unqprfx_add_stylesheet() {
+		wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '4.2', 'all' );
+	}
+	add_action('wp_print_styles', 'pagelist_unqprfx_add_stylesheet');
 }
 
-$pagelist_powered_line = "\n".'<!-- Page-list plugin v.3.7 (wordpress.org/extend/plugins/page-list/) -->'."\n";
 
-if ( !function_exists('pagelist_shortcode') ) {
-	function pagelist_shortcode( $atts ) {
-		global $post, $pagelist_powered_line;
+$pagelist_unqprfx_powered_line = "\n".'<!-- Page-list plugin v.4.2 wordpress.org/plugins/page-list/ -->'."\n";
+
+
+if ( !function_exists('pagelist_unqprfx_shortcode') ) {
+	function pagelist_unqprfx_shortcode( $atts ) {
+		global $post, $pagelist_unqprfx_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -41,8 +45,8 @@ if ( !function_exists('pagelist_shortcode') ) {
 
 		$page_list_args = array(
 			'depth'        => $depth,
-			'child_of'     => pagelist_norm_params($child_of),
-			'exclude'      => pagelist_norm_params($exclude),
+			'child_of'     => pagelist_unqprfx_norm_params($child_of),
+			'exclude'      => pagelist_unqprfx_norm_params($exclude),
 			'exclude_tree' => $exclude_tree,
 			'include'      => $include,
 			'title_li'     => $title_li,
@@ -62,23 +66,24 @@ if ( !function_exists('pagelist_shortcode') ) {
 		);
 		$list_pages = wp_list_pages( $page_list_args );
 
+		$return = $pagelist_unqprfx_powered_line;
 		if ($list_pages) {
-			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
-			$return = '';
+			$return .= '<!-- no pages to show -->';
 		}
 		return $return;
 	}
-	add_shortcode( 'pagelist', 'pagelist_shortcode' );
-	add_shortcode( 'page_list', 'pagelist_shortcode' );
-	add_shortcode( 'page-list', 'pagelist_shortcode' ); // not good (Shortcode names should be all lowercase and use all letters, but numbers and underscores (not dashes!) should work fine too.)
-	add_shortcode( 'sitemap', 'pagelist_shortcode' );
+	add_shortcode( 'pagelist', 'pagelist_unqprfx_shortcode' );
+	add_shortcode( 'page_list', 'pagelist_unqprfx_shortcode' );
+	add_shortcode( 'page-list', 'pagelist_unqprfx_shortcode' ); // not good (Shortcode names should be all lowercase and use all letters, but numbers and underscores (not dashes!) should work fine too.)
+	add_shortcode( 'sitemap', 'pagelist_unqprfx_shortcode' );
 }
 
-if ( !function_exists('subpages_shortcode') ) {
-	function subpages_shortcode( $atts ) {
-		global $post, $pagelist_powered_line;
+
+if ( !function_exists('subpages_unqprfx_shortcode') ) {
+	function subpages_unqprfx_shortcode( $atts ) {
+		global $post, $pagelist_unqprfx_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -102,7 +107,7 @@ if ( !function_exists('subpages_shortcode') ) {
 		$page_list_args = array(
 			'depth'        => $depth,
 			'child_of'     => $post->ID,
-			'exclude'      => pagelist_norm_params($exclude),
+			'exclude'      => pagelist_unqprfx_norm_params($exclude),
 			'exclude_tree' => $exclude_tree,
 			'include'      => $include,
 			'title_li'     => $title_li,
@@ -122,23 +127,24 @@ if ( !function_exists('subpages_shortcode') ) {
 		);
 		$list_pages = wp_list_pages( $page_list_args );
 
+		$return = $pagelist_unqprfx_powered_line;
 		if ($list_pages) {
-			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list subpages-page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
-			$return = '';
+			$return .= '<!-- no pages to show -->';
 		}
 		return $return;
 	}
-	add_shortcode( 'subpages', 'subpages_shortcode' );
-	add_shortcode( 'sub_pages', 'subpages_shortcode' );
-	add_shortcode( 'sub-pages', 'subpages_shortcode' ); // not good (Shortcode names should be all lowercase and use all letters, but numbers and underscores (not dashes!) should work fine too.)
-	add_shortcode( 'children', 'subpages_shortcode' );
+	add_shortcode( 'subpages', 'subpages_unqprfx_shortcode' );
+	add_shortcode( 'sub_pages', 'subpages_unqprfx_shortcode' );
+	add_shortcode( 'sub-pages', 'subpages_unqprfx_shortcode' ); // not good (Shortcode names should be all lowercase and use all letters, but numbers and underscores (not dashes!) should work fine too.)
+	add_shortcode( 'children', 'subpages_unqprfx_shortcode' );
 }
 
-if ( !function_exists('siblings_shortcode') ) {
-	function siblings_shortcode( $atts ) {
-		global $post, $pagelist_powered_line;
+
+if ( !function_exists('siblings_unqprfx_shortcode') ) {
+	function siblings_unqprfx_shortcode( $atts ) {
+		global $post, $pagelist_unqprfx_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'depth' => '0',
@@ -166,7 +172,7 @@ if ( !function_exists('siblings_shortcode') ) {
 		$page_list_args = array(
 			'depth'        => $depth,
 			'child_of'     => $post->post_parent,
-			'exclude'      => pagelist_norm_params($exclude),
+			'exclude'      => pagelist_unqprfx_norm_params($exclude),
 			'exclude_tree' => $exclude_tree,
 			'include'      => $include,
 			'title_li'     => $title_li,
@@ -186,20 +192,21 @@ if ( !function_exists('siblings_shortcode') ) {
 		);
 		$list_pages = wp_list_pages( $page_list_args );
 
+		$return = $pagelist_unqprfx_powered_line;
 		if ($list_pages) {
-			$return = $pagelist_powered_line;
 			$return .= '<ul class="page-list siblings-page-list '.$class.'">'."\n".$list_pages."\n".'</ul>';
 		}else{
-			$return = '';
+			$return .= '<!-- no pages to show -->';
 		}
 		return $return;
 	}
-	add_shortcode( 'siblings', 'siblings_shortcode' );
+	add_shortcode( 'siblings', 'siblings_unqprfx_shortcode' );
 }
 
-if ( !function_exists('pagelist_ext_shortcode') ) {
-	function pagelist_ext_shortcode( $atts ) {
-		global $post, $pagelist_powered_line;
+
+if ( !function_exists('pagelist_unqprfx_ext_shortcode') ) {
+	function pagelist_unqprfx_ext_shortcode( $atts ) {
+		global $post, $pagelist_unqprfx_powered_line;
 		$return = '';
 		extract( shortcode_atts( array(
 			'show_image' => 1,
@@ -208,8 +215,8 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'show_content' => 1,
 			'more_tag' => 1,
 			'limit_content' => 250,
-			'image_width' => '50',
-			'image_height' => '50',
+			'image_width' => '150',
+			'image_height' => '150',
 			'child_of' => '',
 			'sort_order' => 'ASC',
 			'sort_column' => 'menu_order, post_title',
@@ -247,16 +254,48 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'limit_content' => $limit_content,
 			'image_width' => $image_width,
 			'image_height' => $image_height,
-			'child_of' => pagelist_norm_params($child_of),
+			'child_of' => pagelist_unqprfx_norm_params($child_of),
 			'sort_order' => $sort_order,
 			'sort_column' => $sort_column,
 			'hierarchical' => $hierarchical,
-			'exclude' => pagelist_norm_params($exclude),
+			'exclude' => pagelist_unqprfx_norm_params($exclude),
 			'include' => $include,
 			'meta_key'     => $meta_key,
 			'meta_value'   => $meta_value,
 			'authors' => $authors,
-			'parent' => pagelist_norm_params($parent),
+			'parent' => pagelist_unqprfx_norm_params($parent),
+			'exclude_tree' => $exclude_tree,
+			'number' => '', // $number - own counter
+			'offset' => 0, // $offset - own offset
+			'post_type' => $post_type,
+			'post_status' => $post_status,
+			'class' => $class,
+			'strip_tags' => $strip_tags,
+			'strip_shortcodes' => $strip_shortcodes,
+			'show_child_count' => $show_child_count,
+			'child_count_template' => $child_count_template,
+			'show_meta_key' => $show_meta_key,
+			'meta_template' => $meta_template
+		);
+		$page_list_ext_args_all = array(
+			'show_image' => $show_image,
+			'show_first_image' => $show_first_image,
+			'show_title' => $show_title,
+			'show_content' => $show_content,
+			'more_tag' => $more_tag,
+			'limit_content' => $limit_content,
+			'image_width' => $image_width,
+			'image_height' => $image_height,
+			'child_of' => 0, // for showing all pages
+			'sort_order' => $sort_order,
+			'sort_column' => $sort_column,
+			'hierarchical' => $hierarchical,
+			'exclude' => pagelist_unqprfx_norm_params($exclude),
+			'include' => $include,
+			'meta_key'     => $meta_key,
+			'meta_value'   => $meta_value,
+			'authors' => $authors,
+			'parent' => pagelist_unqprfx_norm_params($parent),
 			'exclude_tree' => $exclude_tree,
 			'number' => '', // $number - own counter
 			'offset' => 0, // $offset - own offset
@@ -271,6 +310,9 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 			'meta_template' => $meta_template
 		);
 		$list_pages = get_pages( $page_list_ext_args );
+		if( count( $list_pages ) == 0 ){ // if there is no subpages
+			$list_pages = get_pages( $page_list_ext_args_all ); // we are showing all pages
+		}
 		$list_pages_html = '';
 		$count = 0;
 		$offset_count = 0;
@@ -285,24 +327,29 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 					$link = get_permalink( $page->ID );
 					$list_pages_html .= '<div class="page-list-ext-item">';
 					if( $show_image == 1 ){
-						if (function_exists('get_the_post_thumbnail')) {
-							if( get_the_post_thumbnail($page->ID) ){
+						if ( function_exists( 'get_the_post_thumbnail' ) ) { // if we have WordPress 2.9+
+							if( get_the_post_thumbnail( $page->ID ) ){ // if there is a featured image
 								$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
-								$list_pages_html .= get_the_post_thumbnail($page->ID, array($image_width,$image_height));
+								//$list_pages_html .= get_the_post_thumbnail($page->ID, array($image_width,$image_height)); // doesn't work good with image size
+
+								$image = wp_get_attachment_image_src( get_post_thumbnail_id( $page->ID ), array($image_width,$image_height) ); // get featured img; 'large'
+								$img_url = $image[0]; // get the src of the featured image
+								$list_pages_html .= '<img src="'.$img_url.'" width="'.$image_width.'" alt="'.esc_attr($page->post_title).'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+
 								$list_pages_html .= '</a></div> ';
 							}else{
 								if( $show_first_image == 1 ){
-									$img_scr = page_list_get_first_image( $page->post_content );
+									$img_scr = pagelist_unqprfx_get_first_image( $page->post_content );
 									if( !empty( $img_scr ) ){
 										$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
-										$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+										$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" alt="'.esc_attr($page->post_title).'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
 										$list_pages_html .= '</a></div> ';
 									}
 								}
 							}
-						}else{
+						}else{ // if we have old WordPress 2.8 or lower
 							if( $show_first_image == 1 ){
-								$img_scr = page_list_get_first_image( $page->post_content );
+								$img_scr = pagelist_unqprfx_get_first_image( $page->post_content );
 								if( !empty( $img_scr ) ){
 									$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
 									$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
@@ -329,7 +376,7 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 						if ( post_password_required($page) ) {
 							$content = '<!-- password protected -->';
 						}else{
-							$content = page_list_parse_content( $text_content, $limit_content, $strip_tags, $strip_shortcodes, $more_tag );
+							$content = pagelist_unqprfx_parse_content( $text_content, $limit_content, $strip_tags, $strip_shortcodes, $more_tag );
 							$content = do_shortcode( $content );
 							
 							if( $show_title == 0 ){ // make content as a link if there is no title
@@ -370,19 +417,21 @@ if ( !function_exists('pagelist_ext_shortcode') ) {
 				}
 			}
 		}
+		$return = $pagelist_unqprfx_powered_line;
 		if ($list_pages_html) {
-			$return = $pagelist_powered_line;
 			$return .= '<div class="page-list page-list-ext '.$class.'">'."\n".$list_pages_html."\n".'</div>';
 		}else{
-			$return = '';
+			$return .= '<!-- no pages to show -->'; // this line will not work, because we show all pages if there is no pages to show
 		}
 		return $return;
 	}
-	add_shortcode( 'pagelist_ext', 'pagelist_ext_shortcode' );
+	add_shortcode( 'pagelist_ext', 'pagelist_unqprfx_ext_shortcode' );
+	add_shortcode( 'pagelistext', 'pagelist_unqprfx_ext_shortcode' );
 }
 
-if ( !function_exists('pagelist_norm_params') ) {
-	function pagelist_norm_params( $str ) {
+
+if ( !function_exists('pagelist_unqprfx_norm_params') ) {
+	function pagelist_unqprfx_norm_params( $str ) {
 		global $post;
 		$new_str = $str;
 		$new_str = str_replace('this', $post->ID, $new_str); // exclude this page
@@ -393,8 +442,9 @@ if ( !function_exists('pagelist_norm_params') ) {
 	}
 }
 
-if ( !function_exists('page_list_parse_content') ) {
-	function page_list_parse_content($content, $limit_content = 250, $strip_tags = 1, $strip_shortcodes = 1, $more_tag = 1) {
+
+if ( !function_exists('pagelist_unqprfx_parse_content') ) {
+	function pagelist_unqprfx_parse_content($content, $limit_content = 250, $strip_tags = 1, $strip_shortcodes = 1, $more_tag = 1) {
 
 		$more_tag_found = 0;
 		$content_before_more_tag_length = 0;
@@ -451,16 +501,27 @@ if ( !function_exists('page_list_parse_content') ) {
 	}
 }
 
-if ( !function_exists('page_list_get_first_image') ) {
-	function page_list_get_first_image( $content='' ) {
+
+if ( !function_exists('pagelist_unqprfx_get_first_image') ) {
+	function pagelist_unqprfx_get_first_image( $content='' ) {
 		$first_img = '';
 		//ob_start();
 		//ob_end_clean();
-		$output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $content, $matches);
-		$first_img = $matches[1][0];
-		if(empty($first_img)){ // no image found
-			$first_img = '';
+		$matchCount = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $content, $matches);
+		if ( $matchCount !== 0 ) { // if we found first image
+			$first_img = $matches[1][0];
 		}
 		return $first_img;
 	}
+}
+
+if ( ! function_exists('pagelist_unqprfx_plugin_meta') ) {
+	function pagelist_unqprfx_plugin_meta( $links, $file ) { // add 'Plugin page' and 'Donate' links to plugin meta row
+		if ( strpos( $file, 'page-list.php' ) !== false ) {
+			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/wordpress/plugins/page-list/" title="Plugin page">' . __('Page-list') . '</a>' ) );
+			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/donate/" title="Support the development">' . __('Donate') . '</a>' ) );
+		}
+		return $links;
+	}
+	add_filter( 'plugin_row_meta', 'pagelist_unqprfx_plugin_meta', 10, 2 );
 }

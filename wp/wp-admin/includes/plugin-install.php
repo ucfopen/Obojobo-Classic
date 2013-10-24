@@ -74,14 +74,14 @@ function install_popular_tags( $args = array() ) {
 	if ( is_wp_error($tags) )
 		return $tags;
 
-	set_site_transient('poptags_' . $key, $tags, 10800); // 3 * 60 * 60 = 10800
+	set_site_transient( 'poptags_' . $key, $tags, 3 * HOUR_IN_SECONDS );
 
 	return $tags;
 }
 
 function install_dashboard() {
 	?>
-	<p><?php printf( __( 'Plugins extend and expand the functionality of WordPress. You may automatically install plugins from the <a href="http://wordpress.org/extend/plugins/">WordPress Plugin Directory</a> or upload a plugin in .zip format via <a href="%s">this page</a>.' ), self_admin_url( 'plugin-install.php?tab=upload' ) ); ?></p>
+	<p><?php printf( __( 'Plugins extend and expand the functionality of WordPress. You may automatically install plugins from the <a href="%1$s">WordPress Plugin Directory</a> or upload a plugin in .zip format via <a href="%2$s">this page</a>.' ), 'http://wordpress.org/plugins/', self_admin_url( 'plugin-install.php?tab=upload' ) ); ?></p>
 
 	<h4><?php _e('Search') ?></h4>
 	<?php install_search_form( false ); ?>
@@ -116,8 +116,8 @@ add_action('install_plugins_dashboard', 'install_dashboard');
  * @since 2.7.0
  */
 function install_search_form( $type_selector = true ) {
-	$type = isset($_REQUEST['type']) ? stripslashes( $_REQUEST['type'] ) : 'term';
-	$term = isset($_REQUEST['s']) ? stripslashes( $_REQUEST['s'] ) : '';
+	$type = isset($_REQUEST['type']) ? wp_unslash( $_REQUEST['type'] ) : 'term';
+	$term = isset($_REQUEST['s']) ? wp_unslash( $_REQUEST['s'] ) : '';
 
 	?><form id="search-plugins" method="get" action="">
 		<input type="hidden" name="tab" value="search" />
@@ -128,7 +128,7 @@ function install_search_form( $type_selector = true ) {
 			<option value="tag"<?php selected('tag', $type) ?>><?php _ex('Tag', 'Plugin Installer'); ?></option>
 		</select>
 		<?php endif; ?>
-		<input type="search" name="s" value="<?php echo esc_attr($term) ?>" />
+		<input type="search" name="s" value="<?php echo esc_attr($term) ?>" autofocus="autofocus" />
 		<label class="screen-reader-text" for="plugin-search-input"><?php _e('Search Plugins'); ?></label>
 		<?php submit_button( __( 'Search Plugins' ), 'button', 'plugin-search-input', false ); ?>
 	</form><?php
@@ -142,17 +142,37 @@ function install_search_form( $type_selector = true ) {
  */
 function install_plugins_upload( $page = 1 ) {
 ?>
-	<h4><?php _e('Install a plugin in .zip format') ?></h4>
-	<p class="install-help"><?php _e('If you have a plugin in a .zip format, you may install it by uploading it here.') ?></p>
-	<form method="post" enctype="multipart/form-data" action="<?php echo self_admin_url('update.php?action=upload-plugin') ?>">
-		<?php wp_nonce_field( 'plugin-upload') ?>
+	<h4><?php _e('Install a plugin in .zip format'); ?></h4>
+	<p class="install-help"><?php _e('If you have a plugin in a .zip format, you may install it by uploading it here.'); ?></p>
+	<form method="post" enctype="multipart/form-data" class="wp-upload-form" action="<?php echo self_admin_url('update.php?action=upload-plugin'); ?>">
+		<?php wp_nonce_field( 'plugin-upload'); ?>
 		<label class="screen-reader-text" for="pluginzip"><?php _e('Plugin zip file'); ?></label>
 		<input type="file" id="pluginzip" name="pluginzip" />
-		<input type="submit" class="button" value="<?php esc_attr_e('Install Now') ?>" />
+		<?php submit_button( __( 'Install Now' ), 'button', 'install-plugin-submit', false ); ?>
 	</form>
 <?php
 }
 add_action('install_plugins_upload', 'install_plugins_upload', 10, 1);
+
+/**
+ * Show a username form for the favorites page
+ * @since 3.5.0
+ *
+ */
+function install_plugins_favorites_form() {
+	$user = ! empty( $_GET['user'] ) ? wp_unslash( $_GET['user'] ) : get_user_option( 'wporg_favorites' );
+	?>
+	<p class="install-help"><?php _e( 'If you have marked plugins as favorites on WordPress.org, you can browse them here.' ); ?></p>
+	<form method="get" action="">
+		<input type="hidden" name="tab" value="favorites" />
+		<p>
+			<label for="user"><?php _e( 'Your WordPress.org username:' ); ?></label>
+			<input type="search" id="user" name="user" value="<?php echo esc_attr( $user ); ?>" />
+			<input type="submit" class="button" value="<?php esc_attr_e( 'Get Favorites' ); ?>" />
+		</p>
+	</form>
+	<?php
+}
 
 /**
  * Display plugin content based on plugin list.
@@ -162,12 +182,16 @@ add_action('install_plugins_upload', 'install_plugins_upload', 10, 1);
 function display_plugins_table() {
 	global $wp_list_table;
 
+	if ( current_filter() == 'install_plugins_favorites' && empty( $_GET['user'] ) && ! get_user_option( 'wporg_favorites' ) )
+			return;
+
 	$wp_list_table->display();
 }
-add_action('install_plugins_search', 'display_plugins_table');
-add_action('install_plugins_featured', 'display_plugins_table');
-add_action('install_plugins_popular', 'display_plugins_table');
-add_action('install_plugins_new', 'display_plugins_table');
+add_action( 'install_plugins_search',    'display_plugins_table' );
+add_action( 'install_plugins_featured',  'display_plugins_table' );
+add_action( 'install_plugins_popular',   'display_plugins_table' );
+add_action( 'install_plugins_new',       'display_plugins_table' );
+add_action( 'install_plugins_favorites', 'display_plugins_table' );
 
 /**
  * Determine the status we can perform on a plugin.
@@ -205,7 +229,8 @@ function install_plugin_install_status($api, $loop = false) {
 				if ( current_user_can('install_plugins') )
 					$url = wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=' . $api->slug), 'install-plugin_' . $api->slug);
 			} else {
-				$key = array_shift( $key = array_keys($installed_plugin) ); //Use the first plugin regardless of the name, Could have issues for multiple-plugins in one directory if they share different version numbers
+				$key = array_keys( $installed_plugin );
+				$key = array_shift( $key ); //Use the first plugin regardless of the name, Could have issues for multiple-plugins in one directory if they share different version numbers
 				if ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '=') ){
 					$status = 'latest_installed';
 				} elseif ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '<') ) {
@@ -227,7 +252,7 @@ function install_plugin_install_status($api, $loop = false) {
 		}
 	}
 	if ( isset($_GET['from']) )
-		$url .= '&amp;from=' . urlencode(stripslashes($_GET['from']));
+		$url .= '&amp;from=' . urlencode( wp_unslash( $_GET['from'] ) );
 
 	return compact('status', 'url', 'version');
 }
@@ -240,7 +265,7 @@ function install_plugin_install_status($api, $loop = false) {
 function install_plugin_information() {
 	global $tab;
 
-	$api = plugins_api('plugin_information', array('slug' => stripslashes( $_REQUEST['plugin'] ) ));
+	$api = plugins_api('plugin_information', array('slug' => wp_unslash( $_REQUEST['plugin'] ) ));
 
 	if ( is_wp_error($api) )
 		wp_die($api);
@@ -271,7 +296,7 @@ function install_plugin_information() {
 			$api->$key = wp_kses( $api->$key, $plugins_allowedtags );
 	}
 
-	$section = isset($_REQUEST['section']) ? stripslashes( $_REQUEST['section'] ) : 'description'; //Default to the Description tab, Do not translate, API returns English.
+	$section = isset($_REQUEST['section']) ? wp_unslash( $_REQUEST['section'] ) : 'description'; //Default to the Description tab, Do not translate, API returns English.
 	if ( empty($section) || ! isset($api->sections[ $section ]) )
 		$section = array_shift( $section_titles = array_keys((array)$api->sections) );
 
@@ -334,7 +359,7 @@ function install_plugin_information() {
 <?php endif; if ( ! empty($api->downloaded) ) : ?>
 			<li><strong><?php _e('Downloaded:') ?></strong> <?php printf(_n('%s time', '%s times', $api->downloaded), number_format_i18n($api->downloaded)) ?></li>
 <?php endif; if ( ! empty($api->slug) && empty($api->external) ) : ?>
-			<li><a target="_blank" href="http://wordpress.org/extend/plugins/<?php echo $api->slug ?>/"><?php _e('WordPress.org Plugin Page &#187;') ?></a></li>
+			<li><a target="_blank" href="http://wordpress.org/plugins/<?php echo $api->slug ?>/"><?php _e('WordPress.org Plugin Page &#187;') ?></a></li>
 <?php endif; if ( ! empty($api->homepage) ) : ?>
 			<li><a target="_blank" href="<?php echo $api->homepage ?>"><?php _e('Plugin Homepage &#187;') ?></a></li>
 <?php endif; ?>
@@ -362,7 +387,7 @@ function install_plugin_information() {
 			else
 				$title = ucwords( str_replace( '_', ' ', $section_name ) );
 
-			$content = links_add_base_url($content, 'http://wordpress.org/extend/plugins/' . $api->slug . '/');
+			$content = links_add_base_url($content, 'http://wordpress.org/plugins/' . $api->slug . '/');
 			$content = links_add_target($content, '_blank');
 
 			$san_section = esc_attr( $section_name );

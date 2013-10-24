@@ -448,12 +448,10 @@ function wp_mail( $to, $subject, $message, $headers = '', $attachments = array()
 
 	// Send!
 	try {
-		$phpmailer->Send();
+		return $phpmailer->Send();
 	} catch ( phpmailerException $e ) {
 		return false;
 	}
-
-	return true;
 }
 endif;
 
@@ -529,7 +527,7 @@ function wp_validate_auth_cookie($cookie = '', $scheme = '') {
 
 	// Allow a grace period for POST and AJAX requests
 	if ( defined('DOING_AJAX') || 'POST' == $_SERVER['REQUEST_METHOD'] )
-		$expired += 3600;
+		$expired += HOUR_IN_SECONDS;
 
 	// Quick check to see if an honest cookie has expired
 	if ( $expired < time() ) {
@@ -651,9 +649,9 @@ if ( !function_exists('wp_set_auth_cookie') ) :
  */
 function wp_set_auth_cookie($user_id, $remember = false, $secure = '') {
 	if ( $remember ) {
-		$expiration = $expire = time() + apply_filters('auth_cookie_expiration', 1209600, $user_id, $remember);
+		$expiration = $expire = time() + apply_filters('auth_cookie_expiration', 14 * DAY_IN_SECONDS, $user_id, $remember);
 	} else {
-		$expiration = time() + apply_filters('auth_cookie_expiration', 172800, $user_id, $remember);
+		$expiration = time() + apply_filters('auth_cookie_expiration', 2 * DAY_IN_SECONDS, $user_id, $remember);
 		$expire = 0;
 	}
 
@@ -694,24 +692,24 @@ if ( !function_exists('wp_clear_auth_cookie') ) :
 function wp_clear_auth_cookie() {
 	do_action('clear_auth_cookie');
 
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+	setcookie( AUTH_COOKIE,        ' ', time() - YEAR_IN_SECONDS, ADMIN_COOKIE_PATH,   COOKIE_DOMAIN );
+	setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, ADMIN_COOKIE_PATH,   COOKIE_DOMAIN );
+	setcookie( AUTH_COOKIE,        ' ', time() - YEAR_IN_SECONDS, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN );
+	setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN );
+	setcookie( LOGGED_IN_COOKIE,   ' ', time() - YEAR_IN_SECONDS, COOKIEPATH,          COOKIE_DOMAIN );
+	setcookie( LOGGED_IN_COOKIE,   ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH,      COOKIE_DOMAIN );
 
 	// Old cookies
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+	setcookie( AUTH_COOKIE,        ' ', time() - YEAR_IN_SECONDS, COOKIEPATH,     COOKIE_DOMAIN );
+	setcookie( AUTH_COOKIE,        ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
+	setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH,     COOKIE_DOMAIN );
+	setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
 
 	// Even older cookies
-	setcookie(USER_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(PASS_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(USER_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-	setcookie(PASS_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+	setcookie( USER_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH,     COOKIE_DOMAIN );
+	setcookie( PASS_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH,     COOKIE_DOMAIN );
+	setcookie( USER_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
+	setcookie( PASS_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
 }
 endif;
 
@@ -748,11 +746,11 @@ function auth_redirect() {
 
 	// If https is required and request is http, redirect
 	if ( $secure && !is_ssl() && false !== strpos($_SERVER['REQUEST_URI'], 'wp-admin') ) {
-		if ( 0 === strpos($_SERVER['REQUEST_URI'], 'http') ) {
-			wp_redirect(preg_replace('|^http://|', 'https://', $_SERVER['REQUEST_URI']));
+		if ( 0 === strpos( $_SERVER['REQUEST_URI'], 'http' ) ) {
+			wp_redirect( set_url_scheme( $_SERVER['REQUEST_URI'], 'https' ) );
 			exit();
 		} else {
-			wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+			wp_redirect( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 			exit();
 		}
 	}
@@ -767,11 +765,11 @@ function auth_redirect() {
 
 		// If the user wants ssl but the session is not ssl, redirect.
 		if ( !$secure && get_user_option('use_ssl', $user_id) && false !== strpos($_SERVER['REQUEST_URI'], 'wp-admin') ) {
-			if ( 0 === strpos($_SERVER['REQUEST_URI'], 'http') ) {
-				wp_redirect(preg_replace('|^http://|', 'https://', $_SERVER['REQUEST_URI']));
+			if ( 0 === strpos( $_SERVER['REQUEST_URI'], 'http' ) ) {
+				wp_redirect( set_url_scheme( $_SERVER['REQUEST_URI'], 'https' ) );
 				exit();
 			} else {
-				wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+				wp_redirect( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 				exit();
 			}
 		}
@@ -782,12 +780,7 @@ function auth_redirect() {
 	// The cookie is no good so force login
 	nocache_headers();
 
-	if ( is_ssl() )
-		$proto = 'https://';
-	else
-		$proto = 'http://';
-
-	$redirect = ( strpos($_SERVER['REQUEST_URI'], '/options.php') && wp_get_referer() ) ? wp_get_referer() : $proto . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$redirect = ( strpos( $_SERVER['REQUEST_URI'], '/options.php' ) && wp_get_referer() ) ? wp_get_referer() : set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 
 	$login_url = wp_login_url($redirect, true);
 
@@ -821,7 +814,8 @@ function check_admin_referer($action = -1, $query_arg = '_wpnonce') {
 	}
 	do_action('check_admin_referer', $action, $result);
 	return $result;
-}endif;
+}
+endif;
 
 if ( !function_exists('check_ajax_referer') ) :
 /**
@@ -948,6 +942,7 @@ if ( !function_exists('wp_validate_redirect') ) :
  * @return string redirect-sanitized URL
  **/
 function wp_validate_redirect($location, $default = '') {
+	$location = trim( $location );
 	// browsers will assume 'http' is your protocol, and will obey a redirect to a URL starting with '//'
 	if ( substr($location, 0, 2) == '//' )
 		$location = 'http:' . $location;
@@ -1003,6 +998,10 @@ function wp_notify_postauthor( $comment_id, $comment_type = '' ) {
 	if ( $post->post_author == get_current_user_id() )
 		return false;
 
+	// The post author is no longer a member of the blog
+	if ( ! user_can( $post->post_author, 'read_post', $post->ID ) )
+		return false;
+
 	// If there's no email to send the comment to
 	if ( '' == $author->user_email )
 		return false;
@@ -1047,11 +1046,14 @@ function wp_notify_postauthor( $comment_id, $comment_type = '' ) {
 	}
 	$notify_message .= get_permalink($comment->comment_post_ID) . "#comments\r\n\r\n";
 	$notify_message .= sprintf( __('Permalink: %s'), get_permalink( $comment->comment_post_ID ) . '#comment-' . $comment_id ) . "\r\n";
-	if ( EMPTY_TRASH_DAYS )
-		$notify_message .= sprintf( __('Trash it: %s'), admin_url("comment.php?action=trash&c=$comment_id") ) . "\r\n";
-	else
-		$notify_message .= sprintf( __('Delete it: %s'), admin_url("comment.php?action=delete&c=$comment_id") ) . "\r\n";
-	$notify_message .= sprintf( __('Spam it: %s'), admin_url("comment.php?action=spam&c=$comment_id") ) . "\r\n";
+
+	if ( user_can( $post->post_author, 'edit_comment', $comment_id ) ) {
+		if ( EMPTY_TRASH_DAYS )
+			$notify_message .= sprintf( __('Trash it: %s'), admin_url("comment.php?action=trash&c=$comment_id") ) . "\r\n";
+		else
+			$notify_message .= sprintf( __('Delete it: %s'), admin_url("comment.php?action=delete&c=$comment_id") ) . "\r\n";
+		$notify_message .= sprintf( __('Spam it: %s'), admin_url("comment.php?action=spam&c=$comment_id") ) . "\r\n";
+	}
 
 	$wp_email = 'wordpress@' . preg_replace('#^www\.#', '', strtolower($_SERVER['SERVER_NAME']));
 
@@ -1195,29 +1197,26 @@ if ( !function_exists('wp_new_user_notification') ) :
  * @param string $plaintext_pass Optional. The user's plaintext password
  */
 function wp_new_user_notification($user_id, $plaintext_pass = '') {
-	$user = new WP_User($user_id);
-
-	$user_login = stripslashes($user->user_login);
-	$user_email = stripslashes($user->user_email);
+	$user = get_userdata( $user_id );
 
 	// The blogname option is escaped with esc_html on the way into the database in sanitize_option
 	// we want to reverse this for the plain text arena of emails.
 	$blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
 	$message  = sprintf(__('New user registration on your site %s:'), $blogname) . "\r\n\r\n";
-	$message .= sprintf(__('Username: %s'), $user_login) . "\r\n\r\n";
-	$message .= sprintf(__('E-mail: %s'), $user_email) . "\r\n";
+	$message .= sprintf(__('Username: %s'), $user->user_login) . "\r\n\r\n";
+	$message .= sprintf(__('E-mail: %s'), $user->user_email) . "\r\n";
 
 	@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration'), $blogname), $message);
 
 	if ( empty($plaintext_pass) )
 		return;
 
-	$message  = sprintf(__('Username: %s'), $user_login) . "\r\n";
+	$message  = sprintf(__('Username: %s'), $user->user_login) . "\r\n";
 	$message .= sprintf(__('Password: %s'), $plaintext_pass) . "\r\n";
 	$message .= wp_login_url() . "\r\n";
 
-	wp_mail($user_email, sprintf(__('[%s] Your username and password'), $blogname), $message);
+	wp_mail($user->user_email, sprintf(__('[%s] Your username and password'), $blogname), $message);
 
 }
 endif;
@@ -1234,7 +1233,7 @@ if ( !function_exists('wp_nonce_tick') ) :
  * @return int
  */
 function wp_nonce_tick() {
-	$nonce_life = apply_filters('nonce_life', 86400);
+	$nonce_life = apply_filters( 'nonce_life', DAY_IN_SECONDS );
 
 	return ceil(time() / ( $nonce_life / 2 ));
 }
@@ -1256,14 +1255,16 @@ if ( !function_exists('wp_verify_nonce') ) :
 function wp_verify_nonce($nonce, $action = -1) {
 	$user = wp_get_current_user();
 	$uid = (int) $user->ID;
+	if ( ! $uid )
+		$uid = apply_filters( 'nonce_user_logged_out', $uid, $action );
 
 	$i = wp_nonce_tick();
 
 	// Nonce generated 0-12 hours ago
-	if ( substr(wp_hash($i . $action . $uid, 'nonce'), -12, 10) == $nonce )
+	if ( substr(wp_hash($i . $action . $uid, 'nonce'), -12, 10) === $nonce )
 		return 1;
 	// Nonce generated 12-24 hours ago
-	if ( substr(wp_hash(($i - 1) . $action . $uid, 'nonce'), -12, 10) == $nonce )
+	if ( substr(wp_hash(($i - 1) . $action . $uid, 'nonce'), -12, 10) === $nonce )
 		return 2;
 	// Invalid nonce
 	return false;
@@ -1282,6 +1283,8 @@ if ( !function_exists('wp_create_nonce') ) :
 function wp_create_nonce($action = -1) {
 	$user = wp_get_current_user();
 	$uid = (int) $user->ID;
+	if ( ! $uid )
+		$uid = apply_filters( 'nonce_user_logged_out', $uid, $action );
 
 	$i = wp_nonce_tick();
 
@@ -1501,13 +1504,13 @@ function wp_generate_password( $length = 12, $special_chars = true, $extra_speci
 endif;
 
 if ( !function_exists('wp_rand') ) :
- /**
+/**
  * Generates a random number
  *
  * @since 2.6.2
  *
- * @param int $min Lower limit for the generated number (optional, default is 0)
- * @param int $max Upper limit for the generated number (optional, default is 4294967295)
+ * @param int $min Lower limit for the generated number
+ * @param int $max Upper limit for the generated number
  * @return int A random number between min and max
  */
 function wp_rand( $min = 0, $max = 0 ) {
@@ -1536,10 +1539,12 @@ function wp_rand( $min = 0, $max = 0 ) {
 
 	$value = abs(hexdec($value));
 
+	// Some misconfigured 32bit environments (Entropy PHP, for example) truncate integers larger than PHP_INT_MAX to PHP_INT_MAX rather than overflowing them to floats.
+	$max_random_number = 3000000000 === 2147483647 ? (float) "4294967295" : 4294967295; // 4294967295 = 0xffffffff
+
 	// Reduce the value to be within the min - max range
-	// 4294967295 = 0xffffffff = max random number
 	if ( $max != 0 )
-		$value = $min + (($max - $min + 1) * ($value / (4294967295 + 1)));
+		$value = $min + ( $max - $min + 1 ) * $value / ( $max_random_number + 1 );
 
 	return abs(intval($value));
 }
@@ -1562,7 +1567,7 @@ if ( !function_exists('wp_set_password') ) :
 function wp_set_password( $password, $user_id ) {
 	global $wpdb;
 
-	$hash = wp_hash_password($password);
+	$hash = wp_hash_password( trim( $password ) );
 	$wpdb->update($wpdb->users, array('user_pass' => $hash, 'user_activation_key' => ''), array('ID' => $user_id) );
 
 	wp_cache_delete($user_id, 'users');
@@ -1577,7 +1582,7 @@ if ( !function_exists( 'get_avatar' ) ) :
  * @param int|string|object $id_or_email A user ID,  email address, or comment object
  * @param int $size Size of the avatar image
  * @param string $default URL to a default image to use if no avatar is available
- * @param string $alt Alternate text to use in image tag. Defaults to blank
+ * @param string $alt Alternative text to use in image tag. Defaults to blank
  * @return string <img> tag for the user's avatar
 */
 function get_avatar( $id_or_email, $size = '96', $default = '', $alt = false ) {
@@ -1639,7 +1644,7 @@ function get_avatar( $id_or_email, $size = '96', $default = '', $alt = false ) {
 	if ( 'mystery' == $default )
 		$default = "$host/avatar/ad516503a11cd5ca435acc9bb6523536?s={$size}"; // ad516503a11cd5ca435acc9bb6523536 == md5('unknown@gravatar.com')
 	elseif ( 'blank' == $default )
-		$default = includes_url('images/blank.gif');
+		$default = $email ? 'blank' : includes_url( 'images/blank.gif' );
 	elseif ( !empty($email) && 'gravatar_default' == $default )
 		$default = '';
 	elseif ( 'gravatar_default' == $default )
@@ -1707,16 +1712,20 @@ function wp_text_diff( $left_string, $right_string, $args = null ) {
 
 	$left_lines  = explode("\n", $left_string);
 	$right_lines = explode("\n", $right_string);
-
 	$text_diff = new Text_Diff($left_lines, $right_lines);
-	$renderer  = new WP_Text_Diff_Renderer_Table();
+	$renderer  = new WP_Text_Diff_Renderer_Table( $args );
 	$diff = $renderer->render($text_diff);
 
 	if ( !$diff )
 		return '';
 
 	$r  = "<table class='diff'>\n";
-	$r .= "<col class='ltype' /><col class='content' /><col class='ltype' /><col class='content' />";
+
+	if ( ! empty( $args[ 'show_split_view' ] ) ) {
+		$r .= "<col class='content diffsplit left' /><col class='content diffsplit middle' /><col class='content diffsplit right' />";
+	} else {
+		$r .= "<col class='content' />";
+	}
 
 	if ( $args['title'] || $args['title_left'] || $args['title_right'] )
 		$r .= "<thead>";
@@ -1737,3 +1746,4 @@ function wp_text_diff( $left_string, $right_string, $args = null ) {
 	return $r;
 }
 endif;
+
