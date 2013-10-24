@@ -92,7 +92,7 @@
 			<section id="step-3" class="step step-3">
 				<div class="step-items-container">
 					<h1>Vet it with X-RAY</h1>
-					<h2>Avoid mistakes with our expert guidelines</h2>
+					<h2>Avoid mistakes with our guidelines</h2>
 					<p>
 						With a team of world renowned instructional designers, PhDs, and teaching faculty, we designed a clear and precise set of guidelines to keep you on track.  You'll build with confidence on your first try.
 					</p>
