@@ -25,9 +25,8 @@ function check_upload_size( $file ) {
 	if ( defined( 'WP_IMPORTING' ) )
 		return $file;
 
-	$space_allowed = 1048576 * get_space_allowed();
-	$space_used = get_dirsize( BLOGUPLOADDIR );
-	$space_left = $space_allowed - $space_used;
+	$space_left = get_upload_space_available();
+
 	$file_size = filesize( $file['tmp_name'] );
 	if ( $space_left < $file_size )
 		$file['error'] = sprintf( __( 'Not enough space to upload. %1$s KB needed.' ), number_format( ($file_size - $space_left) /1024 ) );
@@ -56,13 +55,12 @@ function wpmu_delete_blog( $blog_id, $drop = false ) {
 	global $wpdb, $current_site;
 
 	$switch = false;
-	if ( $blog_id != $wpdb->blogid ) {
+	if ( get_current_blog_id() != $blog_id ) {
 		$switch = true;
 		switch_to_blog( $blog_id );
-		$blog = get_blog_details( $blog_id );
-	} else {
-		$blog = $GLOBALS['current_blog'];
 	}
+
+	$blog = get_blog_details( $blog_id );
 
 	do_action( 'delete_blog', $blog_id, $drop );
 
@@ -82,8 +80,7 @@ function wpmu_delete_blog( $blog_id, $drop = false ) {
 		$drop = false;
 
 	if ( $drop ) {
-
-		$drop_tables = apply_filters( 'wpmu_drop_tables', $wpdb->tables( 'blog' ) );
+		$drop_tables = apply_filters( 'wpmu_drop_tables', $wpdb->tables( 'blog' ), $blog_id );
 
 		foreach ( (array) $drop_tables as $table ) {
 			$wpdb->query( "DROP TABLE IF EXISTS `$table`" );
@@ -91,7 +88,8 @@ function wpmu_delete_blog( $blog_id, $drop = false ) {
 
 		$wpdb->delete( $wpdb->blogs, array( 'blog_id' => $blog_id ) );
 
-		$dir = apply_filters( 'wpmu_delete_blog_upload_dir', WP_CONTENT_DIR . "/blogs.dir/{$blog_id}/files/", $blog_id );
+		$uploads = wp_upload_dir();
+		$dir = apply_filters( 'wpmu_delete_blog_upload_dir', $uploads['basedir'], $blog_id );
 		$dir = rtrim( $dir, DIRECTORY_SEPARATOR );
 		$top_dir = $dir;
 		$stack = array($dir);
@@ -112,6 +110,7 @@ function wpmu_delete_blog( $blog_id, $drop = false ) {
 					else if ( @is_file( $dir . DIRECTORY_SEPARATOR . $file ) )
 						@unlink( $dir . DIRECTORY_SEPARATOR . $file );
 				}
+				@closedir( $dh );
 			}
 			$index++;
 		}
@@ -121,6 +120,8 @@ function wpmu_delete_blog( $blog_id, $drop = false ) {
 			if ( $dir != $top_dir)
 			@rmdir( $dir );
 		}
+
+		clean_blog_cache( $blog );
 	}
 
 	if ( $switch )
@@ -133,6 +134,9 @@ function wpmu_delete_user( $id ) {
 
 	$id = (int) $id;
 	$user = new WP_User( $id );
+
+	if ( !$user->exists() )
+		return false;
 
 	do_action( 'wpmu_delete_user', $id );
 
@@ -223,12 +227,12 @@ function send_confirmation_on_profile_email() {
 
 	if ( $current_user->user_email != $_POST['email'] ) {
 		if ( !is_email( $_POST['email'] ) ) {
-			$errors->add( 'user_email', __( "<strong>ERROR</strong>: The e-mail address isn't correct." ), array( 'form-field' => 'email' ) );
+			$errors->add( 'user_email', __( "<strong>ERROR</strong>: The email address isn&#8217;t correct." ), array( 'form-field' => 'email' ) );
 			return;
 		}
 
 		if ( $wpdb->get_var( $wpdb->prepare( "SELECT user_email FROM {$wpdb->users} WHERE user_email=%s", $_POST['email'] ) ) ) {
-			$errors->add( 'user_email', __( "<strong>ERROR</strong>: The e-mail address is already used." ), array( 'form-field' => 'email' ) );
+			$errors->add( 'user_email', __( "<strong>ERROR</strong>: The email address is already used." ), array( 'form-field' => 'email' ) );
 			delete_option( $current_user->ID . '_new_email' );
 			return;
 		}
@@ -273,106 +277,82 @@ function new_user_email_admin_notice() {
 add_action( 'admin_notices', 'new_user_email_admin_notice' );
 
 /**
- * Determines if there is any upload space left in the current blog's quota.
+ * Check whether a blog has used its allotted upload space.
  *
- * @since 3.0.0
- * @return bool True if space is available, false otherwise.
+ * @since MU
+ *
+ * @param bool $echo Optional. If $echo is set and the quota is exceeded, a warning message is echoed. Default is true.
+ * @return int
  */
-function is_upload_space_available() {
+function upload_is_user_over_quota( $echo = true ) {
 	if ( get_site_option( 'upload_space_check_disabled' ) )
-		return true;
-
-	if ( !( $space_allowed = get_upload_space_available() ) )
 		return false;
 
-	return true;
-}
+	$space_allowed = get_space_allowed();
+	if ( empty( $space_allowed ) || !is_numeric( $space_allowed ) )
+		$space_allowed = 10; // Default space allowed is 10 MB
 
-/**
- * @since 3.0.0
- *
- * @return int of upload size limit in bytes
- */
-function upload_size_limit_filter( $size ) {
-	$fileupload_maxk = 1024 * get_site_option( 'fileupload_maxk', 1500 );
-	if ( get_site_option( 'upload_space_check_disabled' ) )
-		return min( $size, $fileupload_maxk );
+	$space_used = get_space_used();
 
-	return min( $size, $fileupload_maxk, get_upload_space_available() );
-}
-/**
- * Determines if there is any upload space left in the current blog's quota.
- *
- * @return int of upload space available in bytes
- */
-function get_upload_space_available() {
-	$space_allowed = get_space_allowed() * 1024 * 1024;
-	if ( get_site_option( 'upload_space_check_disabled' ) )
-		return $space_allowed;
-
-	$dir_name = trailingslashit( BLOGUPLOADDIR );
-	if ( !( is_dir( $dir_name) && is_readable( $dir_name ) ) )
-		return $space_allowed;
-
-  	$dir = dir( $dir_name );
-   	$size = 0;
-
-	while ( $file = $dir->read() ) {
-		if ( $file != '.' && $file != '..' ) {
-			if ( is_dir( $dir_name . $file) ) {
-				$size += get_dirsize( $dir_name . $file );
-			} else {
-				$size += filesize( $dir_name . $file );
-			}
-		}
+	if ( ( $space_allowed - $space_used ) < 0 ) {
+		if ( $echo )
+			_e( 'Sorry, you have used your space allocation. Please delete some files to upload more files.' );
+		return true;
+	} else {
+		return false;
 	}
-	$dir->close();
-
-	if ( ( $space_allowed - $size ) <= 0 )
-		return 0;
-
-	return $space_allowed - $size;
 }
 
 /**
- * Returns the upload quota for the current blog.
+ * Displays the amount of disk space used by the current blog. Not used in core.
  *
- * @return int Quota
+ * @since MU
  */
-function get_space_allowed() {
-	$space_allowed = get_option( 'blog_upload_space' );
-
-	if ( ! is_numeric( $space_allowed ) )
-		$space_allowed = get_site_option( 'blog_upload_space' );
-
-	if ( empty( $space_allowed ) || ! is_numeric( $space_allowed ) )
-		$space_allowed = 50;
-
-	return $space_allowed;
-}
-
 function display_space_usage() {
-	$space = get_space_allowed();
-	$used = get_dirsize( BLOGUPLOADDIR ) / 1024 / 1024;
+	$space_allowed = get_space_allowed();
+	$space_used = get_space_used();
 
-	$percentused = ( $used / $space ) * 100;
+	$percent_used = ( $space_used / $space_allowed ) * 100;
 
-	if ( $space > 1000 ) {
-		$space = number_format( $space / 1024 );
+	if ( $space_allowed > 1000 ) {
+		$space = number_format( $space_allowed / 1024 );
 		/* translators: Gigabytes */
 		$space .= __( 'GB' );
 	} else {
+		$space = number_format( $space_allowed );
 		/* translators: Megabytes */
 		$space .= __( 'MB' );
 	}
 	?>
-	<strong><?php printf( __( 'Used: %1s%% of %2s' ), number_format( $percentused ), $space ); ?></strong>
+	<strong><?php printf( __( 'Used: %1$s%% of %2$s' ), number_format( $percent_used ), $space ); ?></strong>
 	<?php
+}
+
+/**
+ * Get the remaining upload space for this blog.
+ *
+ * @since MU
+ * @uses upload_is_user_over_quota()
+ * @uses get_space_allowed()
+ * @uses get_upload_space_available()
+ *
+ * @param int $size Current max size in bytes
+ * @return int Max size in bytes
+ */
+function fix_import_form_size( $size ) {
+	if ( upload_is_user_over_quota( false ) == true )
+		return 0;
+
+	$available = get_upload_space_available();
+	return min( $size, $available );
 }
 
 // Edit blog upload space setting on Edit Blog page
 function upload_space_setting( $id ) {
-	$quota = get_blog_option( $id, 'blog_upload_space' );
+	switch_to_blog( $id );
+	$quota = get_option( 'blog_upload_space' );
+	restore_current_blog();
+
 	if ( !$quota )
 		$quota = '';
 
@@ -391,7 +371,7 @@ function update_user_status( $id, $pref, $value, $deprecated = null ) {
 	if ( null !== $deprecated )
 		_deprecated_argument( __FUNCTION__, '3.1' );
 
-	$wpdb->update( $wpdb->users, array( $pref => $value ), array( 'ID' => $id ) );
+	$wpdb->update( $wpdb->users, array( sanitize_key( $pref ) => $value ), array( 'ID' => $id ) );
 
 	$user = new WP_User( $id );
 	clean_user_cache( $user );
@@ -548,7 +528,7 @@ function site_admin_notice() {
 	if ( !is_super_admin() )
 		return false;
 	if ( get_site_option( 'wpmu_upgrade_site' ) != $wp_db_version )
-		echo "<div class='update-nag'>" . sprintf( __( 'Thank you for Updating! Please visit the <a href="%s">Update Network</a> page to update all your sites.' ), esc_url( network_admin_url( 'upgrade.php' ) ) ) . "</div>";
+		echo "<div class='update-nag'>" . sprintf( __( 'Thank you for Updating! Please visit the <a href="%s">Upgrade Network</a> page to update all your sites.' ), esc_url( network_admin_url( 'upgrade.php' ) ) ) . "</div>";
 }
 add_action( 'admin_notices', 'site_admin_notice' );
 add_action( 'network_admin_notices', 'site_admin_notice' );
@@ -615,22 +595,13 @@ function choose_primary_blog() {
 	<?php if ( in_array( get_site_option( 'registration' ), array( 'all', 'blog' ) ) ) : ?>
 		<tr>
 			<th scope="row" colspan="2" class="th-full">
-				<a href="<?php echo apply_filters( 'wp_signup_location', network_home_url( 'wp-signup.php' ) ); ?>"><?php _e( 'Create a New Site' ); ?></a>
+				<a href="<?php echo apply_filters( 'wp_signup_location', network_site_url( 'wp-signup.php' ) ); ?>"><?php _e( 'Create a New Site' ); ?></a>
 			</th>
 		</tr>
 	<?php endif; ?>
 	</table>
 	<?php
 }
-
-function ms_deprecated_blogs_file() {
-	if ( ! is_super_admin() )
-		return;
-	if ( ! file_exists( WP_CONTENT_DIR . '/blogs.php' ) )
-		return;
-	echo '<div class="update-nag">' . sprintf( __( 'The <code>%1$s</code> file is deprecated. Please remove it and update your server rewrite rules to use <code>%2$s</code> instead.' ), 'wp-content/blogs.php', 'wp-includes/ms-files.php' ) . '</div>';
-}
-add_action( 'network_admin_notices', 'ms_deprecated_blogs_file' );
 
 /**
  * Grants super admin privileges.
@@ -650,8 +621,8 @@ function grant_super_admin( $user_id ) {
 	// Directly fetch site_admins instead of using get_super_admins()
 	$super_admins = get_site_option( 'site_admins', array( 'admin' ) );
 
-	$user = new WP_User( $user_id );
-	if ( ! in_array( $user->user_login, $super_admins ) ) {
+	$user = get_userdata( $user_id );
+	if ( $user && ! in_array( $user->user_login, $super_admins ) ) {
 		$super_admins[] = $user->user_login;
 		update_site_option( 'site_admins' , $super_admins );
 		do_action( 'granted_super_admin', $user_id );
@@ -678,8 +649,8 @@ function revoke_super_admin( $user_id ) {
 	// Directly fetch site_admins instead of using get_super_admins()
 	$super_admins = get_site_option( 'site_admins', array( 'admin' ) );
 
-	$user = new WP_User( $user_id );
-	if ( $user->user_email != get_site_option( 'admin_email' ) ) {
+	$user = get_userdata( $user_id );
+	if ( $user && $user->user_email != get_site_option( 'admin_email' ) ) {
 		if ( false !== ( $key = array_search( $user->user_login, $super_admins ) ) ) {
 			unset( $super_admins[$key] );
 			update_site_option( 'site_admins', $super_admins );
@@ -720,28 +691,7 @@ function _thickbox_path_admin_subfolder() {
 <script type="text/javascript">
 //<![CDATA[
 var tb_pathToImage = "../../wp-includes/js/thickbox/loadingAnimation.gif";
-var tb_closeImage = "../../wp-includes/js/thickbox/tb-close.png";
 //]]>
 </script>
 <?php
-}
-
-/**
- * Whether or not we have a large network.
- *
- * The default criteria for a large network is either more than 10,000 users or more than 10,000 sites.
- * Plugins can alter this criteria using the 'wp_is_large_network' filter.
- *
- * @since 3.3.0
- * @param string $using 'sites or 'users'. Default is 'sites'.
- * @return bool True if the network meets the criteria for large. False otherwise.
- */
-function wp_is_large_network( $using = 'sites' ) {
-	if ( 'users' == $using ) {
-		$count = get_user_count();
-		return apply_filters( 'wp_is_large_network', $count > 10000, 'users', $count );
-	}
-
-	$count = get_blog_count();
-	return apply_filters( 'wp_is_large_network', $count > 10000, 'sites', $count );
 }

@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	$('.tab_content, #toc_advanced_usage, #sitemap_advanced_usage, div.more_toc_options.disabled, tr.disabled').hide();
+	$('.tab_content, #toc_advanced_usage, #sitemap_advanced_usage, #toc_for_developers, div.more_toc_options.disabled, tr.disabled').hide();
 	$('ul#tabbed-nav li:first').addClass('active').show(); // show first tab
 	$('.tab_content:first').show(); // show first tab content
 

@@ -125,6 +125,12 @@ table#theme_custom img:hover {
 div#farbtastic_colour_wheel {
 	margin-left: 20px;
 }
+#tab3 h3:not(:first-child) {
+	margin-top: 2em;
+}
+#shortcode_table th:first-child {
+	width: 150px;
+}
 #shortcode_table th {
 	background: #f5f5f5;
 	padding: 0.5em;
@@ -133,4 +139,7 @@ div#farbtastic_colour_wheel {
 	vertical-align: top;
 	border-bottom: #f5f5f5 1px solid;
 	padding: 1em 0 1em 0;
+}
+#shortcode_table ul {
+	margin: 0;
 }

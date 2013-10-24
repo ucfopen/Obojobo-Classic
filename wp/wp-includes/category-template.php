@@ -37,11 +37,11 @@ function get_category_link( $category ) {
  * @param string $separator Optional, default is '/'. How to separate categories.
  * @param bool $nicename Optional, default is false. Whether to use nice name for display.
  * @param array $visited Optional. Already linked to categories to prevent duplicates.
- * @return string
+ * @return string|WP_Error A list of category parents on success, WP_Error on failure.
  */
 function get_category_parents( $id, $link = false, $separator = '/', $nicename = false, $visited = array() ) {
 	$chain = '';
-	$parent = &get_category( $id );
+	$parent = get_category( $id );
 	if ( is_wp_error( $parent ) )
 		return $parent;
 
@@ -73,7 +73,7 @@ function get_category_parents( $id, $link = false, $separator = '/', $nicename =
  */
 function get_the_category( $id = false ) {
 	$categories = get_the_terms( $id, 'category' );
-	if ( ! $categories )
+	if ( ! $categories || is_wp_error( $categories ) )
 		$categories = array();
 
 	$categories = array_values( $categories );
@@ -131,11 +131,11 @@ function _usort_terms_by_ID( $a, $b ) {
  * @since 0.71
  *
  * @param int $cat_ID Category ID.
- * @return string Category name.
+ * @return string|WP_Error Category name on success, WP_Error on failure.
  */
 function get_the_category_by_ID( $cat_ID ) {
 	$cat_ID = (int) $cat_ID;
-	$category = &get_category( $cat_ID );
+	$category = get_category( $cat_ID );
 	if ( is_wp_error( $category ) )
 		return $category;
 	return $category->name;
@@ -671,7 +671,7 @@ function wp_generate_tag_cloud( $tags, $args = '' ) {
 		$tag_link = '#' != $tag->link ? esc_url( $tag->link ) : '#';
 		$tag_id = isset($tags[ $key ]->id) ? $tags[ $key ]->id : $key;
 		$tag_name = $tags[ $key ]->name;
-		$a[] = "<a href='$tag_link' class='tag-link-$tag_id' title='" . esc_attr( call_user_func( $topic_count_text_callback, $real_count ) ) . "' style='font-size: " .
+		$a[] = "<a href='$tag_link' class='tag-link-$tag_id' title='" . esc_attr( call_user_func( $topic_count_text_callback, $real_count, $tag, $args ) ) . "' style='font-size: " .
 			str_replace( ',', '.', ( $smallest + ( ( $count - $min_count ) * $font_step ) ) )
 			. "$unit;'>$tag_name</a>";
 	}
@@ -933,7 +933,7 @@ class Walker_CategoryDropdown extends Walker {
 	 * @param int $depth Depth of category. Used for padding.
 	 * @param array $args Uses 'selected' and 'show_count' keys, if they exist.
 	 */
-	function start_el( &$output, $category, $depth, $args, $id = 0 ) {
+	function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
 		$pad = str_repeat('&nbsp;', $depth * 3);
 
 		$cat_name = apply_filters('list_cats', $category->name, $category);
@@ -980,7 +980,7 @@ function get_tag_link( $tag ) {
  * @uses apply_filters() Calls 'get_the_tags' filter on the list of post tags.
  *
  * @param int $id Post ID.
- * @return array
+ * @return array|bool Array of tag objects on success, false on failure.
  */
 function get_the_tags( $id = 0 ) {
 	return apply_filters( 'get_the_tags', get_the_terms( $id, 'post_tag' ) );
@@ -996,7 +996,7 @@ function get_the_tags( $id = 0 ) {
  * @param string $sep Optional. Between tags.
  * @param string $after Optional. After tags.
  * @param int $id Optional. Post ID. Defaults to the current post.
- * @return string
+ * @return string|bool|WP_Error A list of tags on success, false or WP_Error on failure.
  */
 function get_the_tag_list( $before = '', $sep = '', $after = '', $id = 0 ) {
 	return apply_filters( 'the_tags', get_the_term_list( $id, 'post_tag', $before, $sep, $after ), $before, $sep, $after, $id );
@@ -1010,7 +1010,6 @@ function get_the_tag_list( $before = '', $sep = '', $after = '', $id = 0 ) {
  * @param string $before Optional. Before list.
  * @param string $sep Optional. Separate items using this.
  * @param string $after Optional. After list.
- * @return string
  */
 function the_tags( $before = null, $sep = ', ', $after = '' ) {
 	if ( null === $before )
@@ -1054,29 +1053,21 @@ function term_description( $term = 0, $taxonomy = 'post_tag' ) {
  *
  * @since 2.5.0
  *
- * @param int $id Post ID.
+ * @param int|object $post Post ID or object.
  * @param string $taxonomy Taxonomy name.
- * @return array|bool False on failure. Array of term objects on success.
+ * @return array|bool|WP_Error Array of term objects on success, false or WP_Error on failure.
  */
-function get_the_terms( $id, $taxonomy ) {
-	global $post;
+function get_the_terms( $post, $taxonomy ) {
+	if ( ! $post = get_post( $post ) )
+		return false;
 
- 	$id = (int) $id;
-
-	if ( !$id ) {
-		if ( empty( $post->ID ) )
-			return false;
-		else
-			$id = (int) $post->ID;
-	}
-
-	$terms = get_object_term_cache( $id, $taxonomy );
+	$terms = get_object_term_cache( $post->ID, $taxonomy );
 	if ( false === $terms ) {
-		$terms = wp_get_object_terms( $id, $taxonomy );
-		wp_cache_add($id, $terms, $taxonomy . '_relationships');
+		$terms = wp_get_object_terms( $post->ID, $taxonomy );
+		wp_cache_add($post->ID, $terms, $taxonomy . '_relationships');
 	}
 
-	$terms = apply_filters( 'get_the_terms', $terms, $id, $taxonomy );
+	$terms = apply_filters( 'get_the_terms', $terms, $post->ID, $taxonomy );
 
 	if ( empty( $terms ) )
 		return false;
@@ -1094,7 +1085,7 @@ function get_the_terms( $id, $taxonomy ) {
  * @param string $before Optional. Before list.
  * @param string $sep Optional. Separate items using this.
  * @param string $after Optional. After list.
- * @return string
+ * @return string|bool|WP_Error A list of terms on success, false or WP_Error on failure.
  */
 function get_the_term_list( $id, $taxonomy, $before = '', $sep = '', $after = '' ) {
 	$terms = get_the_terms( $id, $taxonomy );
