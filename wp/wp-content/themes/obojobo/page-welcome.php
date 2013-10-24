@@ -8,9 +8,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title>Learning Modules, Reinvented.</title>
-		<meta name="description" content="">
+		<title>Learning Modules, Reinvented. | Obojobo</title>
 		<meta name="viewport" content="width=device-width">
+
 		<link rel="stylesheet" href="/wp/wp-content/themes/obojobo/css/main.css">
 		<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
@@ -23,10 +23,40 @@
 				<span class="logo">Obojobo</span>
 				<nav>
 					<ul>
-						<li><a href="/about">About</a></li>
-						<li><a href="/help/students">Students</a></li>
-						<li><a href="/help/instructors">Instructors</a></li>
-						<li><a href="/help">Help</a></li>
+						<li class="about">
+							<a href="/about">About</a>
+							<ul>
+								<li><a href="/about/learning-objects/">Learning Objects</a></li>
+								<li><a href="/about/obojobo-features">Obojobo Features</a></li>
+								<li><a href="/about/minimum-software-requirements">Minimum Software Requirements</a></li>
+								<li><a href="/about/known-issues">Known Issues</a></li>
+								<li><a href="/about/version-history">Version History</a></li>
+							</ul>
+						</li>
+						<li class="students">
+							<a href="/help/students">Students</a>
+							<ul>
+								<li><a href="/help/students/quick-start-guide-for-students">Student Quick Start Guide</a></li>
+							</ul>
+						</li>
+						<li class="instructors">
+							<a href="/help/instructors">Instructors</a>
+							<ul>
+								<li><a href="/repository">Learning Object Repository</a></li>
+								<li><a href="/help/instructors/basic-and-pro-accounts">Basic and Pro Accounts</a></li>
+								<li><a href="/help/instructors/quick-start-guide-for-basic-accounts">Quick Start Guide for Basic Accounts</a></li>
+								<li><a href="/help/instructors/quick-start-guide-for-pro-accounts">Quick Start Guide for Pro Accounts</a></li>
+							</ul>
+						</li>
+						<li class="help">
+							<a href="/help">Help</a>
+							<ul>
+								<li><a href="/help/faq">FAQ</a></li>
+								<li><a href="/help/login-help">Login Help</a></li>
+								<li><a href="/help/students/quick-start-guide-for-students">Student Quick Start Guide</a></li>
+								<li><a href="/help/support">Support</a></li>
+							</ul>
+						</li>
 					</ul>
 				</nav>
 			</div>
@@ -110,6 +140,7 @@
 				<script type="text/javascript">document.getElementById('copyright-date').innerHTML = (new Date()).getFullYear();</script>
 			</div>
 		</footer>
+
 		<script type='text/javascript'>
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-3665955-1']);
