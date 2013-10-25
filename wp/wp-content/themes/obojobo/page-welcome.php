@@ -20,7 +20,7 @@
 
 		<header>
 			<div class="header-container">
-				<span class="logo">Obojobo</span>
+				<div class="logo"><span>Obojobo</span></div>
 				<nav>
 					<ul>
 						<li class="about">
