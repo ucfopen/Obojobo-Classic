@@ -114,66 +114,36 @@ class OAuth
 		$request = \OAuthRequest::from_consumer_and_token($consumer, '', 'POST', $endpoint, array('oauth_body_hash' => $bodyHash) );
 		$request->sign_request(new \OAuthSignatureMethod_HMAC_SHA1(), $consumer, '');
 
-		$attemptCount = 0;
-		$maxAttempts = 3;
-
-		while($attemptCount < $maxAttempts)
+		$response = false;
+		$timeouts = array(10, 25, 35);
+		foreach ($timeouts as $timeoutIndex => $timeout)
 		{
-			// ================= SEND REQUEST =================================
-			// try stream first
-			$attemptCount++;
+			$attemptCount = $timeoutIndex + 1;
 
-			$sendMethod = 'Stream';
+			// ================= SEND REQUEST =================================
 			$streamHeaders = $request->to_header() . "\r\n" . 'Content-Type: application/xml' . "\r\n"; // add content type header
-			$params = array('http' => array('timeout' => 25, 'method' => 'POST', 'content' => $body, 'header' => $streamHeaders));
+			$params = array('http' => array('timeout' => $timeout, 'method' => 'POST', 'content' => $body, 'header' => $streamHeaders));
 			$streamContext = stream_context_create($params);
 			$fp = @fopen($endpoint, 'rb', false, $streamContext);
 
 			if($fp)
 			{
-				$sendMethod = 'StreamOpened';
 				$response = @stream_get_contents($fp);
+
+				if(!$response)
+				{
+					\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
+				}
+				else
+				{
+					break;
+				}
 			}
-			// fall back to pecl_http
-			elseif(defined('HTTP_METH_POST'))
+			else
 			{
-				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Stream Error:".print_r(error_get_last(), true));
-				$sendMethod = 'HttpRequest';
-				// create an keyed array 'name' => 'value'
-				$headers = explode("\r\n", $streamHeaders);
-				$peclHeaders = array();
-				foreach($headers as $h)
-				{
-					if(!empty($h))
-					{
-						$name = substr($h, 0, strpos($h, ':'));
-						$peclHeaders[$name] = substr($h, strpos($h, ':')+2);
-					}
-				}
-				try
-				{
-					$request = new \HttpRequest($endpoint, HTTP_METH_POST);
-					$request->setHeaders($peclHeaders);
-					$request->setBody($body);
-
-					$request->send();
-					$response = $request->getResponseBody();
-				}
-				catch(Exception $e)
-				{
-					\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: HttpRequest Failure:\n".print_r($e, true)."\nBody:".print_r($body, true));
-					$response = false;
-				}
+				// No way to contact server, so write it in the log!
+				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Can't Send Data:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
 			}
-
-			if(!$response)
-			{
-				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nSend Method: $sendMethod \nLast Error:".print_r(error_get_last(), true));
-			}
-			else{
-				break;
-			}
-
 		}
 
 		if(!$response)
@@ -187,7 +157,7 @@ class OAuth
 		$xml = simplexml_load_string($response);
 		if(!$xml)
 		{
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Unable to read XML:\n".print_r($response, true)."\nBody:".print_r($body, true)."\nSend Method: $sendMethod");
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Unable to read XML:\n".print_r($response, true)."\nBody:".print_r($body, true));
 			return false;
 		}
 
@@ -201,7 +171,7 @@ class OAuth
 		if(!$result['success'])
 		{
 			$result['error'] = $xml->imsx_POXHeader->imsx_POXResponseHeaderInfo->imsx_statusInfo->imsx_description;
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Result Error:\n".print_r($response, true)."\nBody:".print_r($body, true)."\nSend Method: $sendMethod");
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Result Error:\n".print_r($response, true)."\nBody:".print_r($body, true));
 		}
 
 		return $result;
