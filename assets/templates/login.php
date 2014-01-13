@@ -52,9 +52,6 @@ date.format.js"></script>
 <!--[if lte IE 8]>
 <link rel="stylesheet" type="text/css" href="/assets/css/ie.css" media="screen" />
 <![endif]-->
-<!--[if IE 9]>
-<link rel="stylesheet" type="text/css" href="/assets/css/ie9.css" media="screen" />
-<![endif]-->
 <!-- END IE CONDITIONALS -->
 
 <style type="text/css">.__oldBrowser { background: #eeeeee; }</style>
