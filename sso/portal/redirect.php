@@ -26,7 +26,7 @@ if(isset($_REQUEST['instID']) )
 	elseif((int)$timestamp < (time() - \AppCfg::UCF_PORTAL_TIMEOUT))
 	{
 		trace('PORTAL SSO hash timeout', true);
-		trace("Now:".time().", HashTime: {$_REQUEST['hash']}, Timeout: ".\AppCfg::UCF_PORTAL_TIMEOUT, true);
+		trace("Now:".time().", HashTime: {$timestamp}, Timeout: ".\AppCfg::UCF_PORTAL_TIMEOUT, true);
 	}
 	// good hash! go go
 	else
