@@ -114,49 +114,34 @@ class OAuth
 		$request = \OAuthRequest::from_consumer_and_token($consumer, '', 'POST', $endpoint, array('oauth_body_hash' => $bodyHash) );
 		$request->sign_request(new \OAuthSignatureMethod_HMAC_SHA1(), $consumer, '');
 
-		$streamHeaders = $request->to_header() . "\r\n" . 'Content-Type: application/xml' . "\r\n"; // add content type header
-
-		// ================= SEND REQUEST =================================
-		// try stream first
-		$params = array('http' => array('method' => 'POST', 'content' => $body, 'header' => $streamHeaders)); 
-		$streamContext = stream_context_create($params);
-		$fp = @fopen($endpoint, 'rb', false, $streamContext);
-
-		if($fp)
+		$response = false;
+		$timeouts = array(10, 25, 35);
+		foreach ($timeouts as $timeoutIndex => $timeout)
 		{
-			$response = @stream_get_contents($fp);
-		}
-		// fall back to pecl_http
-		elseif(defined('HTTP_METH_POST'))
-		{
-			// create an keyed array 'name' => 'value'
-			$headers = explode("\r\n", $streamHeaders);
-			$peclHeaders = array();
-			foreach($headers as $h)
-			{
-				if(!empty($h))
-				{
-					$name = substr($h, 0, strpos($h, ':'));
-					$peclHeaders[$name] = substr($h, strpos($h, ':')+2);
-				}
-			}
-			try
-			{
-				$request = new \HttpRequest($endpoint, HTTP_METH_POST);
-				$request->setHeaders($peclHeaders);
-				$request->setBody($body);
+			$attemptCount = $timeoutIndex + 1;
 
-				$request->send();
-				$response = $request->getResponseBody();
-			}
-			catch(Exception $e)
+			// ================= SEND REQUEST =================================
+			$streamHeaders = $request->to_header() . "\r\n" . 'Content-Type: application/xml' . "\r\n"; // add content type header
+			$params = array('http' => array('timeout' => $timeout, 'method' => 'POST', 'content' => $body, 'header' => $streamHeaders));
+			$streamContext = stream_context_create($params);
+			$fp = @fopen($endpoint, 'rb', false, $streamContext);
+
+			if(!$fp)
 			{
-				$response = false;
+				// No way to contact server, so write it in the log!
+				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Can't Send Data:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
+				continue; // Stop this attempt, try again
 			}
+
+			if($response = @stream_get_contents($fp)) break; //Success
+
+			// This attempt didn't work - log the error and try again
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
 		}
 
 		if(!$response)
 		{
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] OUT OF ATTEMPTS");
 			return false;
 		}
 
@@ -165,6 +150,7 @@ class OAuth
 		$xml = simplexml_load_string($response);
 		if(!$xml)
 		{
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Unable to read XML:\n".print_r($response, true)."\nBody:".print_r($body, true));
 			return false;
 		}
 
@@ -178,6 +164,7 @@ class OAuth
 		if(!$result['success'])
 		{
 			$result['error'] = $xml->imsx_POXHeader->imsx_POXResponseHeaderInfo->imsx_statusInfo->imsx_description;
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Result Error:\n".print_r($response, true)."\nBody:".print_r($body, true));
 		}
 
 		return $result;

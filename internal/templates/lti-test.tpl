@@ -16,21 +16,52 @@
 				<label><input onclick="toggleVariableWidthIFrame()" type="checkbox" id="variable_iframe" checked />Variable width iframe</label>
 			</div>
 
-			<iframe style="border: 1px solid black;" name="embed_iframe" id="embed_iframe" width="700px" height="600px"></iframe>
 			<script type="text/javascript">
-				function toggleVariableWidthIFrame()
+				jQuery(function() {
+					if(typeof window.localStorage !== 'undefined' && typeof localStorage.ltiUrl !== 'undefined')
+					{
+						document.getElementById('assignment-url').value = localStorage.ltiUrl;
+					}
+
+					function toggleVariableWidthIFrame()
+					{
+						var iframe = document.getElementById('embed_iframe');
+						if(typeof __iframeInitWidth === 'undefined')
+						{
+							__iframeInitWidth = iframe.width;
+						}
+						var variableWidth = document.getElementById('variable_iframe').checked;
+						iframe.width = variableWidth ? '100%' : __iframeInitWidth;
+					}
+
+					toggleVariableWidthIFrame();
+				});
+
+				function onIFrameLoad()
 				{
 					var iframe = document.getElementById('embed_iframe');
-					if(typeof __iframeInitWidth === 'undefined')
+					var returnUrl = iframe.contentWindow.location.href;
+
+					if(returnUrl.indexOf('embed_type=basic_lti') > 0 && returnUrl.indexOf('url=') > 0)
 					{
-						__iframeInitWidth = iframe.width;
+						var urlInput = document.getElementById('assignment-url');
+						urlInput.value = returnUrl.substr(returnUrl.indexOf('url=') + 4);
+
+						if(window.localStorage)
+						{
+							localStorage.ltiUrl = urlInput.value;
+						}
 					}
-					var variableWidth = document.getElementById('variable_iframe').checked;
-					iframe.width = variableWidth ? '100%' : __iframeInitWidth;
 				}
 
-				toggleVariableWidthIFrame();
-			</script>
+				function setLtiUrl(form)
+				{
+					jQuery(form).find('.lti_url').val(jQuery('#assignment-url').val());
+					jQuery(form).attr('action', jQuery('#assignment-url').val());
+				}
+		</script>
+
+			<iframe style="border: 1px solid black;" name="embed_iframe" id="embed_iframe" width="700px" height="600px" onLoad="onIFrameLoad()"></iframe>
 
 			<form method="POST" target="embed_iframe" action="{$instructorEndpoint}" >
 				{foreach from=$instructorParams key=name item=value}
@@ -53,17 +84,28 @@
 				<input type="submit" value="As Instructor (Assignment)">
 			</form>
 
-			<form method="POST" target="embed_iframe" action="{$learnerEndpoint}" >
+			<hr />
+
+			<div>
+				<span>
+					LTI Assignment URL:
+				</span>
+				<input id="assignment-url" style="width:400px;" type="text"></input>
+			</div>
+
+			<form onsubmit="setLtiUrl(this)" method="POST" target="embed_iframe" action="{$learnerEndpoint}" >
 				{foreach from=$learnerParams key=name item=value}
 				<input type="hidden" name="{$name}" value="{$value}" />
 				{/foreach}
+				<input type="hidden" class="lti_url" name="lti_url" />
 				<input type="submit" value="As Learner">
 			</form>
 
-			<form method="POST" target="embed_iframe" action="{$learnerNewEndpoint}" >
+			<form onsubmit="setLtiUrl(this)" method="POST" target="embed_iframe" action="{$learnerNewEndpoint}" >
 				{foreach from=$learnerNewParams key=name item=value}
 				<input type="hidden" name="{$name}" value="{$value}" />
 				{/foreach}
+				<input type="hidden" class="lti_url" name="lti_url" />
 				<input type="submit" value="As NEW Learner">
 			</form>
 
@@ -73,6 +115,8 @@
 				{/foreach}
 				<input type="submit" value="As Learner (Picker)">
 			</form>
+
+			<hr />
 
 			<form method="POST" target="embed_iframe" action="{$unknownRoleEndpoint}" >
 				{foreach from=$unknownRoleParams key=name item=value}
