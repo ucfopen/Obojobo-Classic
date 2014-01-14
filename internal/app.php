@@ -52,7 +52,7 @@ function classAutoLoader($className)
 				break;
 			default: // Look in the app classes dir EX: \rocketD\auth\AuthModule
 				// log the class that wasn't found
-				if(preg_match('/^Smarty/', $className)) error_log($className);
+				if( ! preg_match('/^Smarty/', $className)) error_log($className);
 				$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES . str_replace('_', '/', $className) . '.class.php';
 		}
 	}
