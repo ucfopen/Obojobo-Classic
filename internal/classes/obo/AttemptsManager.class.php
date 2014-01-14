@@ -700,7 +700,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			$assessmentData = $ltiApi->getAssessmentSessionData($instData->instID);
 			if(!$assessmentData)
 			{
-				\rocketD\util\Log::profile('lti',"'cant-find-assessment-session-data', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$instData->instID', '$submittableScore', '".time()."'");
+				\rocketD\util\Log::profile('lti',"'cant-find-assessment-session-data', {$_SESSION["userID"]}, '$submittableScore', '".time()."'");
 				\lti\Views::logError();
 			}
 			else
@@ -710,7 +710,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 				if(!$success)
 				{
-					\rocketD\util\Log::profile('lti',"'send-score-failed', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$instData->instID', '$submittableScore'");
+					\rocketD\util\Log::profile('lti', "'send-score-failed', {$_SESSION["userID"]}, '$submittableScore'");
 					\lti\Views::logError();
 				}
 			}
