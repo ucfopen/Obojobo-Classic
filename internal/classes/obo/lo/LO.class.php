@@ -208,9 +208,9 @@ class LO
 		}
 
 		// always get perms for the current user
-		$permman = \obo\perms\PermissionsManager::getInstance();
-		if(isset($_SESSION))
+		if(!empty($_SESSION['userID']))
 		{
+			$permman = \obo\perms\PermissionsManager::getInstance();
 			$this->perms = $permman->getMergedPerms((int)$this->rootID, \cfg_obo_Perm::TYPE_LO, $_SESSION['userID']);
 		}
 		
