@@ -27,5 +27,5 @@ function outputrsscontent(){
 	readfile($localfile); //return the contents of the cache file
 }
 
-outputrsscontent();
+// outputrsscontent();
 ?>
