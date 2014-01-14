@@ -20,13 +20,13 @@ if(isset($_REQUEST['instID']) )
 	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) !== $hash)
 	{
 		trace('PORTAL SSO hash mismatch', true);
-		trace('our hash: '.md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET).' received: '.$hash);
+		trace('our hash: '.md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET).' received: '.$hash, true);
 	}
 	// check timeout: is hashtime less then now - maxage?
 	elseif((int)$timestamp < (time() - \AppCfg::UCF_PORTAL_TIMEOUT))
 	{
 		trace('PORTAL SSO hash timeout', true);
-		trace("Now:".time().", HashTime: {$_REQUEST['hash']}, Timeout: ".\AppCfg::UCF_PORTAL_TIMEOUT);
+		trace("Now:".time().", HashTime: {$_REQUEST['hash']}, Timeout: ".\AppCfg::UCF_PORTAL_TIMEOUT, true);
 	}
 	// good hash! go go
 	else
