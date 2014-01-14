@@ -142,7 +142,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		}
 
 		$tm = \obo\log\LogManager::getInstance();
-		$tm->trackSubmitLTIAssessment($source, $instID, $visitID, $a->{\cfg_obo_LO::ID}, $a->{\cfg_core_User::ID}, $qGroupID, $questionID, $score);
+		$tm->trackSubmitLTIAssessment($instID, $visitID, $a->{\cfg_obo_LO::ID}, $a->{\cfg_core_User::ID}, $qGroupID, $questionID, $score);
 
 		return  array(true, "Score for item $sourceid saved as $score");;
 	}
