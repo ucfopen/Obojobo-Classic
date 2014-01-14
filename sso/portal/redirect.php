@@ -7,30 +7,50 @@ if(isset($_REQUEST['instID']) )
 	// Already logged in
 	if($API->getSessionValid())
 	{
-		// already logged in, just send them in
 		redirectToLO($_REQUEST['instID']);
+		exit();
 	}
 
-	// not already logged in, Check hash again
-	$NID = $_REQUEST['nid'];
+	// not already logged in, Check hash
+	$NID       = $_REQUEST['nid'];
 	$timestamp = $_REQUEST['epoch'];
-	$hash = $_REQUEST['hash'];
-	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) === $hash && (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_TIMEOUT /*30 minutes ago*/)
+	$hash      = $_REQUEST['hash'];
+
+	// check hash
+	if(md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET) !== $hash)
 	{
-		// store session variables for the authentication module
+		trace('PORTAL SSO hash mismatch', true);
+		trace('our hash: '.md5($NID.$timestamp.\AppCfg::UCF_PORTAL_SECRET).' received: '.$hash);
+	}
+	// check timeout: is hashtime less then now - maxage?
+	elseif((int)$timestamp < (time() - \AppCfg::UCF_PORTAL_TIMEOUT))
+	{
+		trace('PORTAL SSO hash timeout', true);
+		trace("Now:".time().", HashTime: {$_REQUEST['hash']}, Timeout: ".\AppCfg::UCF_PORTAL_TIMEOUT);
+	}
+	// good hash! go go
+	else
+	{
+		// store session variables for authentication
 		$_SESSION['PORTAL_SSO_NID'] = $NID;
 		$_SESSION['PORTAL_SSO_EPOCH'] = $timestamp;
 
-		if( $API->doLogin('', '') )
+		if($API->doLogin('', ''))
 		{
 			redirectToLO($_REQUEST['instID']);
+			exit();
+		}
+		else
+		{
+			trace('PORTAL SSO doLogin FAILED', true);
 		}
 	}
 }
-$API->getSessionValid(); // needed to get session variables
-trace('SSO REDIRECT ERROR', true);
-trace('isntid:' . $_REQUEST['instID'] . ' nid:' . $_SESSION['PORTAL_SSO_NID'] . ' epoch:' . $_SESSION['PORTAL_SSO_EPOCH'] . ' timed out? ' . ($_SESSION['PORTAL_SSO_EPOCH'] >= time()- \AppCfg::UCF_PORTAL_TIMEOUT ? 'nope' : 'yes'), true);
-
+else
+{
+	trace('PORTAL SSO no instID in request', true);
+	trace($_REQUEST, true);
+}
 
 function redirectToLO($instID)
 {
