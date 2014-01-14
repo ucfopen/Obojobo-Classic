@@ -664,7 +664,7 @@ class LogManager extends \rocketD\db\DBEnabled
 		$this->track(new \obo\log\Trackable('SubmitMedia', 0, 0, $questionID, (int)$score, (int)$qGroupID));
 	}
 
-	public function trackSubmitLTIAssessment($source, $instID, $visitID, $loID, $userID, $qGroupID, $questionID, $score)
+	public function trackSubmitLTIAssessment($instID, $visitID, $loID, $userID, $qGroupID, $questionID, $score)
 	{
 		$qstr = "
 		INSERT INTO `".\cfg_obo_Track::TABLE."`
