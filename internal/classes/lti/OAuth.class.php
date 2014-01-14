@@ -126,24 +126,17 @@ class OAuth
 			$streamContext = stream_context_create($params);
 			$fp = @fopen($endpoint, 'rb', false, $streamContext);
 
-			if($fp)
-			{
-				$response = @stream_get_contents($fp);
-
-				if(!$response)
-				{
-					\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
-				}
-				else
-				{
-					break;
-				}
-			}
-			else
+			if(!$fp)
 			{
 				// No way to contact server, so write it in the log!
 				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Can't Send Data:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
+				continue; // Stop this attempt, try again
 			}
+
+			if($response = @stream_get_contents($fp)) break; //Success
+
+			// This attempt didn't work - log the error and try again
+			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
 		}
 
 		if(!$response)
