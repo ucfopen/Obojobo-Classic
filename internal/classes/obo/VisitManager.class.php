@@ -163,8 +163,10 @@ class VisitManager extends \rocketD\db\DBEnabled
 			}
 		}
 		
-		
+		trace('couldnt find view key', true);
 		\rocketD\util\Error::getError(4005);
+		trace($_SESSION, true);
+		trace($_REQUEST, true);
 		return false;
 	}
 	
