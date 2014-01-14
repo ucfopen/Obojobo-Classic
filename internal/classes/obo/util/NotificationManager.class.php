@@ -52,12 +52,8 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	
 	protected function mail($to, $subject, $body, $headers = '')
 	{
+		trace("email sent to $to: $subject", true);
 		return mail($to, $subject, $body, $headers);
-		// trace('subject: ' .$subject);
-		// trace('to: ' .$to);
-		// trace('headers: ' .$headers);
-		// trace('body: ' .$body);
-		// return mail('iturgeon@gmail.com', $subject . " ($to)", $body, $headers);
 	}
 	
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
