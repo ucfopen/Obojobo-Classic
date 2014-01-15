@@ -46,11 +46,7 @@ class AppCfg extends AppCfgDefault
 	const UCF_DB_TYPE = ''; // either mysql or oci8
 	
 	//--------------------   AUTHENTICATION   -----------------------//
-	
-	//const UCF_USE_WS_AUTH = false;  // use the ucf web service to check for reasons of password failure
-	const UCF_WSDL = ''; // the web service wsdl needed for the ws query
-	const UCF_APP_ID = ''; // the app id needed to connect to the web service
-		
+
 	const LDAP = ''; // The LDAP URL for accessing UCF Authentication
 
 }
