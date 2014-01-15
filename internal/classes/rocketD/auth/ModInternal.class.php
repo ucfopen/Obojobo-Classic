@@ -172,44 +172,35 @@ class ModInternal extends AuthModule {
 		// security first, check request vars for valid data
 		// check for required vars
 		// require userName
+		// 
+		$success = false;
 		if($this->validateUsername($requestVars['userName']) !== true)
 		{
-			return false;	
-		} 
+			$success = false;
+		}
 		// requre password
-		if($this->validatePassword($requestVars['password']) !== true)
+		elseif($this->validatePassword($requestVars['password']) !== true)
 		{
-			return false;
+			$success = false;
 		}
 		// begin authentication, lookup user id by username
-		if($userID = $this->getUIDforUsername($requestVars['userName']))
+		elseif($userID = $this->getUIDforUsername($requestVars['userName']))
 		{
 			// fetch the user
 			if($tmpUser = $this->fetchUserByID($userID))
-			{	
+			{
 				// verify the password
 				if($this->verifyPassword($tmpUser, $requestVars['password']))
 				{
 					// login
 					$this->storeLogin($tmpUser->userID);
 					$this->internalUser = $tmpUser;
-					return true;
-				}
-				else
-				{
-					trace('incorrect password');
+					$success = true;
 				}
 			}
-			else
-			{
-				trace('unable to fetch user', true);
-			}
 		}
-		else
-		{
-			trace('unable to fetch username');
-		}
-		return false;
+		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','internal','0','".($success?'1':'0')."'");
+		return $success;
 	}
 	
 	/**

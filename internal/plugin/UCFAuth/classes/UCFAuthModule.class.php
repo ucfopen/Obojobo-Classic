@@ -189,37 +189,28 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
 		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
 
-		// handle a portal-based SSO authentication request:
-		if(empty($requestVars['userName']) && empty($requestVars['password']))
-		{
-			//**************** Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
-			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
-		}
-		// handle an LTI SSO authentication request
-		else if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
-		{
-			if(!empty($requestVars['createIfMissing']) && $requestVars['createIfMissing'] === true)
-			{
-				$weakExternalSync = true;
-			}
-			$validSSO = true;
-		}
-
 		// filter the username to be all lowercase
 		$requestVars['userName'] = strtolower($requestVars['userName']);
+
+		// Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
+		if(empty($requestVars['userName']) && empty($requestVars['password']))
+		{
+			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
+		}
+		// LTI SSO 
+		else
+		{
+			$this->checkForValidLTILogin($requestVars, $validSSO, $weakExternalSync);
+		}
 		
 		if($this->validateUsername($requestVars['userName']) !== true) return false;
 		if($validSSO == false && $this->validatePassword($requestVars['password']) !== true) return false;
 		
-		// begin authentication
-		
-		$time = time();
 		// create/update the user with the external database
 		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
 		
 		if($user instanceof \rocketD\auth\User)
 		{
-			
 			// if the user is not signed in by SSO, authenticate using WebService/LDAP
 			if($validSSO != true)
 			{
@@ -229,7 +220,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			// if they are valid, allow them in
 			if($validSSO === true || $checkPassword['success'])
 			{
-				trace("$user->login logged in", true);
 				$this->storeLogin($user->userID);
 				$this->internalUser = $user;
 				return true;
@@ -237,9 +227,23 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		else
 		{
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','".round((microtime(true) - $time),5)."','".time().",'0'");
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','0','".time().",'0'");
 		}
 		return false;
+	}
+
+	protected function checkForValidLTILogin(&$requestVars, &$validSSO, &$weakExternalSync)
+	{
+		// handle an LTI SSO authentication request
+		if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
+		{
+			if(!empty($requestVars['createIfMissing']) && $requestVars['createIfMissing'] === true)
+			{
+				$weakExternalSync = true;
+			}
+			$validSSO = true;
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','LTI','0','".time().",'1'");
+		}
 	}
 
 	protected function checkForValidPortalSession(&$requestVars, &$validSSO, &$weakExternalSync)
@@ -251,7 +255,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
 			$validSSO = true;
 			$weakExternalSync = true; // allow the user to not exist in external db
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','func_PortalSSO','0','".time().",'".($validSSO?'1':'0')."'");
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','PortalSSO','0','".time().",'1'");
 		}
 	}
 
@@ -283,7 +287,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			{
 				ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 				$success = @ldap_bind($ds, "cn=".$userName.",ou=people,dc=net,dc=ucf,dc=edu", $password); // true if LDAP verifies
-				\rocketD\util\Log::profile('login', "'$userName','func_LDAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'".($success?'1':'0')."'");
+				\rocketD\util\Log::profile('login', "'$userName','LDAP','".round((microtime(true) - $time),5)."','".time().",'".($success?'1':'0')."'");
 			}
 		}
 		catch(Exception $e)
@@ -292,35 +296,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			$NM->sendCriticalError('Oracle DB Connection Failure', 'LDAP Threw an Error ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
 			trace('ldap threw and exception', true);
 			trace($e);
-		}
-
-		
-		//  on failure, attempt to find out reason for failure by asking our web service if its enabled
-		if($success != true && \AppCfg::UCF_USE_WS_AUTH == true)
-		{
-			try
-			{
-				$soapClient = new SoapClient(\AppCfg::UCF_WSDL);
-				$time = microtime(true); // time the soap call
-				$soapRes = $soapClient->AuthenticateNid(array('sNid' => $userName,'sPassword' => $password,'sAppID' => \AppCfg::UCF_APP_ID));
-				\rocketD\util\Log::profile('login', "'$userName','func_WSSOAPAuthenticate','".round((microtime(true) - $time),5)."','".time().",'{$soapRes->AuthenticateNidResult}'");
-
-				// if the responce is valid but is not an error
-				if(isset($soapRes->AuthenticateNidResult))
-				{
-					// set the return values
-					$success = ($soapRes->AuthenticateNidResult == \cfg_plugin_AuthModUCF::WS_SUCCESS); // true if the result is the same string
-					$code = $soapRes->AuthenticateNidResult;
-				}
-			}
-			catch(Exception $e)
-			{
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendCriticalError('AD Web Service Failure', 'Failed to connect to the AD Web Service via soap on ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
-				trace('webservice threw an exception', true);
-				trace($e, true);
-			}
-
 		}
 		
 		return array('success' => $success, 'code' => $code);

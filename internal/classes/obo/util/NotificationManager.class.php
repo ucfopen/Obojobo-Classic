@@ -26,7 +26,6 @@ class NotificationManager extends \rocketD\db\DBEnabled
 		
 	protected function mail($to, $subject, $body, $headers = '')
 	{
-		trace("email sent to $to: $subject", true);
 		return mail($to, $subject, $body, $headers);
 	}
 	
