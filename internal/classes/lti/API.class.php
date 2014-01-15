@@ -305,13 +305,15 @@ class API extends \rocketD\db\DBEnabled
 		$score = $score / 100;
 
 		// render message body:
-		$smarty = \rocketD\util\Template::getInstance();
-		$smarty->assign('score', $score);
-		$smarty->assign('message', uniqid());
-		$smarty->assign('sourceId', $sourceID);
-		$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
+		if ($smarty = \rocketD\util\Template::getInstance())
+		{
+			$smarty->assign('score', $score);
+			$smarty->assign('message', uniqid());
+			$smarty->assign('sourceId', $sourceID);
+			$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
 
-		$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
+			$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
+		}
 
 		\rocketD\util\Log::profile('lti', "'outcome-".($result['success'] ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '{$result['error']}', '".time()."'");
 
