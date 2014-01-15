@@ -62,8 +62,12 @@ function classAutoLoader($className)
 		// log error on failure
 		if(\AppCfg::DEBUG_MODE == true)
 		{
-			@$dt = debug_backtrace();
-			error_log('autoload failed to load class "'. basename($className) . '" referenced from ' . basename($dt[2]['file']) . '#' . $dt[2]['line'] . ' -> ' . $dt[2]['function']);
+			@$dt = debug_backtrace(3);
+			error_log('autoload failed to load class "'. basename($className). " file $file");
+			if(count($dt) > 3)
+			{
+				error_log(' -> referenced from ' . basename($dt[2]['file']) . '#' . $dt[2]['line'] . ' -> ' . $dt[2]['function']);
+			}
 		}
 	}
 }
