@@ -316,13 +316,19 @@ class API extends \rocketD\db\DBEnabled
 			$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
 
 			$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
-			$success = $result['success'];
-			$error = $result['error'];
+			if(isset($result['success']))
+			{
+				$success = $result['success'];
+			}
+			if(isset($result['error']))
+			{
+				$error = $result['error'];
+			}
 		}
 
 		\rocketD\util\Log::profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$error', '".time()."'");
 
-		return $result['success'];
+		return $success;
 	}
 
 	// Uses the Obojobo way to start the session by utilizing getSessionValid.
