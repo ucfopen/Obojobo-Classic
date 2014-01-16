@@ -12,7 +12,9 @@
 	include \AppCfg::DIR_BASE.\AppCfg::DIR_AMFPHP."core/json/app/Gateway.php";
 	$gateway = new Gateway();
 	$gateway->setBaseClassPath($servicesPath);
-	
+
+	$GLOBALS['amfphp']['errorLevel'] = \AppCfg::DEBUG_MODE ? E_ALL ^ E_NOTICE : E_ERROR;
+
 	//Service now
 	$gateway->service();
 ?>

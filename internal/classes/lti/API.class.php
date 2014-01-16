@@ -304,18 +304,31 @@ class API extends \rocketD\db\DBEnabled
 		$score = (int) $score;
 		$score = $score / 100;
 
+		$success = false;
+		$error = false;
+
 		// render message body:
-		$smarty = \rocketD\util\Template::getInstance();
-		$smarty->assign('score', $score);
-		$smarty->assign('message', uniqid());
-		$smarty->assign('sourceId', $sourceID);
-		$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
+		if ($smarty = \rocketD\util\Template::getInstance())
+		{
+			$smarty->assign('score', $score);
+			$smarty->assign('message', uniqid());
+			$smarty->assign('sourceId', $sourceID);
+			$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
 
-		$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
+			$result = \lti\OAuth::sendBodyHashedPOST($serviceUrl, $messageBody, $secret);
+			if(isset($result['success']))
+			{
+				$success = $result['success'];
+			}
+			if(isset($result['error']))
+			{
+				$error = $result['error'];
+			}
+		}
 
-		\rocketD\util\Log::profile('lti', "'outcome-".($result['success'] ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '{$result['error']}', '".time()."'");
+		\rocketD\util\Log::profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$error', '".time()."'");
 
-		return $result['success'];
+		return $success;
 	}
 
 	// Uses the Obojobo way to start the session by utilizing getSessionValid.
