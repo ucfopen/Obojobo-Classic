@@ -737,7 +737,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				$attempts = array();
 			}
 			$NM = \obo\util\NotificationManager::getInstance();
-			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $score);
+			$NM->sendScoreNotice($instData, $_SESSION['userID'], $scores['additional'], $attempts, $submittableScore);
 		}
 
 		$BM = \obo\lo\BadgeManager::getInstance();
