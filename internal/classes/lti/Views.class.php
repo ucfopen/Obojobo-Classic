@@ -71,7 +71,7 @@ class Views
 
 	static public function renderUnknownRoleError($ltiData)
 	{
-		\rocketD\util\Log::profile('lti',"'unkown-role', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		\rocketD\util\Log::profile('lti',"'unknown-role', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-role');
 	}
