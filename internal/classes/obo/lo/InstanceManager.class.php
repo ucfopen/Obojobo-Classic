@@ -437,7 +437,6 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			WHERE
 				`".\cfg_obo_Instance::ID."` = '?'";
 		
-		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 		//Send query to DB, checking for errors
 		// TODO:future course code: if( !($q = $this->DBM->querySafe($qstr, $name, $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID, $instID)) )
 		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $instID)) )
@@ -446,6 +445,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			trace(mysql_error(), true);
 			return false;
 		}
+
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 		
 		return true;
 	}
@@ -460,8 +461,6 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	public function updateInstanceExternalLink($instID, $externalLinkName)
 	{
 		if(!is_string($externalLinkName)) return \rocketD\util\Error::getError(2);
-
-		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 
 		if(strlen($externalLinkName) === 0)
 		{
@@ -490,6 +489,8 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			trace(mysql_error(), true);
 			return false;
 		}
+
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
 
 		return true;
 	}
@@ -540,16 +541,16 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		$pMan = \obo\perms\PermManager::getInstance();
 		$pMan->clearPermsForItem(\cfg_core_Perm::TYPE_INSTANCE, $instID);
 		
-		// clear cache
-		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
-		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
-		\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $_SESSION['userID']);
-		
 		$tracking = \obo\log\LogManager::getInstance();
 		$tracking->trackDeleteInstance($instID);
 		
 		// mark the instance as deleted
 		$this->DBM->querySafe("UPDATE ".\cfg_obo_Instance::TABLE." SET ".\cfg_obo_Instance::DELETED." = '1' WHERE ".\cfg_obo_Instance::ID." = '?'", $instID);
+
+		// clear cache
+		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
+		\rocketD\util\Cache::getInstance()->clearScoresForAllUsers($instID);
+		\rocketD\util\Cache::getInstance()->clearScoresForUser($instID, $_SESSION['userID']);
 		return true;
 	}
 
