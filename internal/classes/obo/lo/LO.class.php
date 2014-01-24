@@ -288,8 +288,6 @@ class LO
 				
 				if($this->isValidMaster() !== true) return \rocketD\util\Error::getError(2); // Validate
 				
-				\rocketD\util\Cache::getInstance()->clearLO($this->loID); // delete the cache
-				
 				$rootDraftLoID = ($this->rootID == 0 ? $this->loID : $this->rootID); // store the rootID for later use - if root is zero - this is the root
 				
 				/********* CHECK FOR PR-EXISTING DESIRED VERSION **********/
@@ -352,6 +350,8 @@ class LO
 				
 				/************* KEEP TRACK OF MEDIA USED IN LO *******************/
 				$this->associateMediaUsedInLO();
+
+				\rocketD\util\Cache::getInstance()->clearLO($this->loID); // delete the cache
 				
 				break;
 				
@@ -440,6 +440,7 @@ class LO
 		while($r = $DBM->fetch_obj($q))
 		{
 			$drafts[] = $r->{\cfg_obo_LO::ID};
+			//TODO DELETE CACHE AFTER ITEMS HAVE BEEN DELETED
 			\rocketD\util\Cache::getInstance()->clearLO($r->{\cfg_obo_LO::ID}); // delete the cache
 		}
 
