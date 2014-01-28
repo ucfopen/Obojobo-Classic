@@ -201,8 +201,7 @@ class API extends \rocketD\db\DBEnabled
 	{
 		$qstr = "	SELECT * FROM obo_lti
 					WHERE original_item_id = '?'
-					ORDER BY created_at DESC
-					LIMIT 1";
+					ORDER BY created_at ASC";
 
 		if(!($q = $this->DBM->querySafe($qstr, $originalItemId)))
 		{
