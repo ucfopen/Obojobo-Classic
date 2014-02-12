@@ -119,8 +119,8 @@ foreach ($los AS $instID)
 
 <section class="modules">
 	<? if (count($output)): ?>
-			<p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in <?= \AppCfg::UCF_PORTAL_ADMITTED ?></strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
-			<p>You need to score <strong><?= \AppCfg::UCF_PORTAL_MIN_SCORE ?>% or higher on all required modules before <?= \AppCfg::UCF_PORTAL_DUE ?></strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
+			<p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in <?= \AppCfg::UCF_PORTAL_ORIENTATION_ADMITTED ?></strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
+			<p>You need to score <strong><?= \AppCfg::UCF_PORTAL_ORIENTATION_MIN_SCORE ?>% or higher on all required modules before <?= \AppCfg::UCF_PORTAL_ORIENTATION_DUE ?></strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
 
 		<? if( ! $validHash || ! $notExpired): ?>
 			<div class="warning">
