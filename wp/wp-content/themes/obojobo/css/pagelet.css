@@ -1,0 +1,432 @@
+/* icomoon - obojobo logo */
+@font-face {
+	font-family: 'icomoon';
+	src:url('../fonts/icomoon.eot');
+	src:url('../fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/icomoon.ttf') format('truetype'),
+		url('../fonts/icomoon.woff') format('woff'),
+		url('../fonts/icomoon.svg#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.logo:before {
+	content: "\e600";
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+
+/* global element styles*/
+
+a {
+	color: black;
+}
+a:hover {
+	color: #6b4b93;
+	background: #EBE5F8;
+	text-decoration: underline;
+}
+
+
+/* specific styles */
+
+/* Set a defined width for browsers that
+   don't understand media queries */
+html {
+	min-width: 1105px;
+}
+@media (min-width: 1px) {
+	html {
+		min-width: 0;
+	}
+}
+
+body {
+	font-family: 'Source Sans Pro', Arial, sans;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+}
+
+	header {
+		height: 70px;
+		border-bottom: 1px solid #cccccc;
+		background: white;
+	}
+
+		header .header-container {
+			margin: 0 auto;
+			max-width: 1000px;
+			position: relative;
+		}
+
+			header .header-container .logo {
+				position: absolute;
+				top: 16px;
+				left: 20px;
+				font-size: 33px;
+				color: #0C59B0;
+				width: 127px;
+				height: 33px;
+			}
+
+				header .header-container .logo span {
+					visibility: hidden;
+				}
+
+			header .header-container nav {
+				position: absolute;
+				right: 20px;
+				top: 11px;
+			}
+
+				header .header-container nav > ul {
+					padding: 0;
+					margin: 0;
+				}
+
+					header .header-container nav > ul > li {
+						list-style-type: none;
+						display: inline-block;
+						position: relative;
+						padding: 0;
+						height: 50px;
+						border: 1px solid white;
+						/*line-height: 0;*/
+						-moz-box-sizing: border-box;
+						box-sizing: border-box;
+					}
+					header .header-container nav > ul > li:first-child {
+						margin-left: 0;
+					}
+					header .header-container nav > ul > li:hover {
+						border: 1px solid gray;
+						box-shadow: 0 2px 2px rgba(0, 0, 0, .5);
+					}
+
+						header .header-container nav > ul > li > a {
+							text-decoration: none;
+							padding: 0 1.5em;
+							-moz-box-sizing: border-box;
+							box-sizing: border-box;
+							display: inline-block;
+							border-bottom: 1px solid white;
+							position: relative;
+							height: 100%;
+							line-height: 3em;
+						}
+						header .header-container nav > ul > li:hover > a {
+							z-index: 3;
+						}
+						header .header-container nav > ul > li > a:hover {
+							text-decoration: underline;
+							background: #EBE5F8;
+							z-index: 3;
+						}
+
+						header .header-container nav > ul > li > ul {
+							padding: 0;
+							margin: 0;
+							text-align: right;
+							background: #5e5e5e;
+							position: absolute;
+							right: -1px;
+							/*top: 51px;*/
+							display: none;
+							background: white;
+							box-shadow: 0 2px 2px rgba(0, 0, 0, .5);
+							border: 1px solid gray;
+							top: 47px;
+							z-index: 2;
+						}
+						header .header-container nav > ul > li:hover > ul {
+							display: block;
+						}
+
+							header .header-container nav > ul > li > ul > li {
+								list-style-type: none;
+								padding: 0;
+								margin: 0;
+							}
+								header .header-container nav > ul > li > ul > li a {
+									padding: 1em 1.5em;
+									display: block;
+									text-decoration: none;
+								}
+								header .header-container nav > ul > li > ul > li a:hover {
+									background: #EBE5F8;
+									text-decoration: underline;
+								}
+
+
+
+	.hero h1 {
+		font-size: 48pt;
+		font-weight: 300;
+		letter-spacing: 0.03em;
+		margin-bottom:.3em;
+	}
+
+	.content {
+		overflow: hidden;
+		background: url('../images/dotted-line-coverup.png') no-repeat center top, url('../images/dotted-line-coverup.png') no-repeat center bottom, url('../images/dotted-line-bg.png') center center repeat-y;
+	}
+
+	.modules {
+		max-width: 822px;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		position: relative;
+		text-align: left;
+		margin:auto;
+	}
+
+
+		.modules h1 {
+			color: #2e70bb;
+			font-size: 28pt;
+			margin: 1.3em 0 .7em 0;
+			padding: 0;
+			line-height: 1em;
+			text-align: center;
+		}
+
+		.modules h2 {
+			color: #6b4b93;
+			font-weight: 500;
+			font-size: 16pt;
+			padding: 0;
+		}
+
+		.modules li{
+			text-align: left;
+		}
+
+		.modules li a{
+			display: block;
+			padding: .6em 1.5em;
+		}
+
+		.modules .warning {
+			background: #FFFACD;
+			padding:20px;
+		}
+
+		.modules .warning h2{
+			margin: 0;
+			color: black;
+			font-weight: 800;
+		}
+
+		.modules .warning .cause{
+			font-size:12px;
+		}
+
+
+	footer {
+		color: #888888;
+		font-size: 12pt;
+		height: 130px;
+		padding-top: 50px;
+	}
+
+		footer div {
+			text-align: center;
+			display: block;
+			margin: 0 auto;
+			padding-left: 1em;
+			padding-right: 1em;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+
+			footer div > span {
+				display: block;
+				margin-bottom: 0.5em;
+			}
+
+				footer div > span a {
+					color: gray;
+				}
+				footer div > span a:hover {
+					color: #333333;
+				}
+
+/* top menu widths */
+header .header-container nav > ul > .about > ul {
+	width: 280px;
+}
+header .header-container nav > ul > .students > ul {
+	width: 230px;
+}
+header .header-container nav > ul > .instructors > ul {
+	width: 300px;
+}
+header .header-container nav > ul > .help > ul {
+	width: 230px;
+}
+
+/* Portrait tablet to landscape and desktop */
+/*@media (min-width: 768px) and (max-width: 979px) {*/
+/*@media (max-width: 979px) {*/
+@media (max-width: 1025px) {
+
+	.hero h1 {
+		font-size: 38pt;
+	}
+
+	.content {
+		background: transparent;
+	}
+
+	.modules {
+		width: auto;
+		padding: 0 40px 20px 40px;
+	}
+
+	.modules h1 {
+		font-size: 24pt;
+	}
+
+	.modules h2 {
+		font-size: 17pt;
+	}
+
+
+
+	/* 70% */
+	.step-1 {
+		background-size: 363px;
+	}
+	.step-2 {
+		background-size: 194px;
+	}
+	.step-3 {
+		background-size: 169px;
+	}
+	.step-4 {
+		background-position: 10%;
+		background-size: 305px;
+	}
+	.step-5 {
+		background-size: 219px;
+	}
+	.step-7 {
+		background-size: 493px; /* smaller */
+	}
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+	header {
+		height: auto;
+	}
+
+	header .header-container .logo {
+		left: 50%;
+		margin-left: -62px;
+	}
+
+	header .header-container nav {
+		position: static;
+		margin: 0 auto;
+		padding-top: 60px;
+	}
+
+	header .header-container nav > ul > li:hover {
+		position: static;
+	}
+
+	header .header-container nav > ul > li > ul {
+		width: auto !important;
+		top: 108px;
+		left: 0;
+		right: 0;
+		text-align: center;
+	}
+
+
+	.hero h1 {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 600px;
+	}
+
+	.modules {
+		width: 100%;
+		padding: 0 40px 20px 40px;
+		text-align: center;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		padding-bottom: 2em;
+	}
+
+	.modules h1 {
+		font-size: 22pt;
+	}
+
+	.modules h2 {
+		font-size: 17pt;
+		margin-bottom: 1.5em;
+		text-align: left;
+	}
+
+	.modules p {
+		text-align: justify;
+	}
+
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+	.hero h1 {
+		margin: 5px 20px;
+		font-size: 20pt;
+	}
+
+	header .header-container nav > ul > li > a {
+		font-size: 10pt;
+		padding: 0 1em;
+	}
+
+	header .header-container nav > ul > li > ul > li a {
+		font-size: 10pt;
+	}
+
+	.modules {
+		padding: 0px 20px 20px;
+	}
+
+	.modules h1 {
+		font-size: 18pt;
+		margin-bottom: 1em;
+	}
+
+	.modules h2 {
+		font-size: 13pt;
+	}
+
+	.modules li{
+		margin-left: -20px;
+	}
+
+	.modules a {
+		padding: .6em 0;
+	}
+
+	footer {
+		font-size: 9pt;
+	}
+
+
+}
