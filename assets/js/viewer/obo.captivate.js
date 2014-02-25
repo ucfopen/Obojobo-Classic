@@ -41,8 +41,6 @@ obo.captivate = function()
 		
 		var scoreData = targetScoreDatas[event.id];
 
-		
-		
 		// we listen for two versions of captivate - 2 (AS2) and 5 (AS3):
 		switch(event.version)
 		{
@@ -61,10 +59,17 @@ obo.captivate = function()
 					case 'CPInteractiveItemSubmitEvent':
 					case 'CPQuestionSubmitEvent':
 						var page = obo.model.getPage();
-						
 						var questionEventData = event.data.questionEventData;
-						
 						var index = questionEventData.questionNumber;
+						var total = 0;
+						var percent;
+
+						// ignore this event if I can't get a numeric index
+						if(isNaN(index))
+						{
+							break;
+						}
+
 						//check to see if the question was already answered
 						if(scoreData.responses[index] == undefined)
 						{
@@ -75,14 +80,12 @@ obo.captivate = function()
 						scoreData.responses[index] = (questionEventData.questionScore / questionEventData.questionMaxScore);
 						
 						// if all questions answered, send info to obojobo
-						var total = 0;
-						var len = scoreData.responses.length;
-						for(var i = 0; i < len; i++)
+						for(var i in scoreData.responses)
 						{
 							total += scoreData.responses[i];
 						}
 						
-						var percent = Math.round((total / event.data.cpQuizInfoTotalQuestionsPerProject) * 100);
+						percent = Math.round((total / event.data.cpQuizInfoTotalQuestionsPerProject) * 100);
 						
 						obo.view.updateInteractiveScore(percent, targetPage, targetSection);
 						break;
