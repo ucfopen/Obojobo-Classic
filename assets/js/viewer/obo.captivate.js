@@ -77,7 +77,7 @@ obo.captivate = function()
 						// if all questions answered, send info to obojobo
 						var total = 0;
 						var len = scoreData.responses.length;
-						for(var i = 0; i < len; i++)
+						for(var i in scoreData.responses)
 						{
 							total += scoreData.responses[i];
 						}
