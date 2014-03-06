@@ -197,6 +197,12 @@ class API extends \rocketD\db\DBEnabled
 		return $this->DBM->affected_rows() > 0;
 	}
 
+
+	// Builds an array of data from the lti association table BY RESOURCE_LINK
+	// In the case where there are multiple LTI associations for a resource_link
+	// the newest one is returned.
+	// Multiple associations for the same link can occur when a user changes
+	// the instance linked to the resource
 	protected function getAssociationsForOriginalItemId($originalItemId)
 	{
 		$qstr = "	SELECT * FROM obo_lti
