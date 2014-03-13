@@ -18,7 +18,7 @@
   }
 </style>
 <script type="text/javascript">
-  var SWF_URL = "Repository_2_1_2.swf";
+  var SWF_URL = "Repository_2_1_3.swf";
 
   // START PREVENT CLOSE
   window.onbeforeunload = confirmExit;
@@ -38,12 +38,12 @@
     }
   }
   // END PREVENT CLOSE
-</script> 
-<script type="text/javascript" defer="defer"> 
+</script>
+<script type="text/javascript" defer="defer">
   // SWFOBJECT
   var flashvars = new Object();
-  flashvars.view = ""; 
-  flashvars.preview = ""; 
+  flashvars.view = "";
+  flashvars.preview = "";
 
   var params = new Object();
   params.menu = "false";
@@ -52,7 +52,7 @@
   params.base = "/assets/flash/";
   params.bgcolor = "#869ca7";
 
-  var attributes = new Object(); 
+  var attributes = new Object();
   attributes.id = SWF_URL;
   attributes.name = SWF_URL;
 
