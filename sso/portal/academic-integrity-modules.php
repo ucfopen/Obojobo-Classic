@@ -33,6 +33,7 @@ foreach ($los AS $instID)
 
 	<script src="/wp/wp-content/themes/obojobo/js/vendor/modernizr-2.6.2.min.js"></script>
 </head>
+<body>
 <header>
 	<div class="header-container">
 		<div class="logo"><span>Obojobo</span></div>
