@@ -3,8 +3,8 @@ Contributors: conjur3r
 Donate link: 
 Tags: table of contents, indexes, toc, sitemap, cms, options, list, page listing, category listing
 Requires at least: 3.2
-Tested up to: 3.6
-Stable tag: 1308
+Tested up to: 3.9
+Stable tag: 1404
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,8 @@ Custom post types are supported, however, auto insertion works only when the_con
 
 = Available Languages =
 * Australian English (default)
+* Dutch - [Renee](http://101themes.com/)
+* German - [Cord Peter](http://drv-gemeinschaft.de/)
 * Polish - [Jakub](http://notatki.4use.pl/)
 * Simplified Chinese - [icedream](http://www.tesfans.org/)
 * Slovak - Boris Gereg
@@ -61,6 +63,7 @@ This plugin requires PHP 5.
 
 
 == Shortcodes ==
+The plugin was designed to be as seamless and painfree as possible and did not require you to insert a shortcode for operation.  However, using the shortcode allows you to fully control the position of the table of contents within your page.  The following shortcodes are available with this plugin.
 
 When attributes are left out for the shortcodes below, they will fallback to the settings you defined under Settings > TOC+.  The following are detailed in the help tab.
 
@@ -99,7 +102,34 @@ Use the following CSS classes to customise the appearance of your listing:
 * toc_sitemap_posts_list
 
 
+== I love it, how can I show my appreciation? ==
+If you have been impressed with this plugin and would like to somehow show some appreciation, rather than send a donation my way, please donate to your charity of choice.
+
+I will never ask for any form of reward or compensation.  Helping others achieve their goals is satisfying for me :)
+
+
 == Changelog ==
+
+= 1404 =
+* Released: 18 April 2014
+* Bump WordPress support to 3.9
+* Fixed: Strip HTML tags from post titles for sitemap_posts so those items do not appear under a < heading. Thanks to [Rose](http://dublue.com/plugins/toc/comment-page-6/#comment-2311) for reporting it.
+* Fictitious: This release was powered by three blind mice.
+
+= 1402 =
+* Released: 19 February 2014
+* Added German translation courtesy [Cord Peter](http://drv-gemeinschaft.de/)
+* Modify toc_get_index API function to also reset minimum number of headings to 0.
+* Removing the TOC+ widget from the sidebar no longer requires you to uncheck the 'Show the table of contents only in the sidebar' option. It will be reset on removal.
+* Delay count of headings until disqualified have been removed. Thanks to [Simone di Saintjust](http://dublue.com/plugins/toc/comment-page-6/#comment-2190) for raising it.
+* Using the TOC+ widget, you can now limit the display to selected post types. Thanks to [Pete Markovic](http://dublue.com/plugins/toc/comment-page-6/#comment-2248) for the idea.
+* Updated translation file (extra options added).
+
+= 1311 =
+* Released: 10 November 2013
+* Added third parameter to toc_get_index API function to enable eligibility check (eg apply minimum heading check, is post type enabled, etc). This has been switched off by default and only affects those using the API. Thanks [Jonon](http://dublue.com/plugins/toc/comment-page-5/#comment-1943) for your comment.
+* Added Dutch translation courtesy [Renee](http://101themes.com/)
+* Apply bullet option to TOC+ widget, thanks to [Thomas Pani for the patch](http://dublue.com/plugins/toc/comment-page-5/#comment-2040).
 
 = 1308 =
 * Released: 5 August 2013
