@@ -173,18 +173,37 @@ body {
 	}
 
 		.hero .computers {
-			background: url('../images/hero-computer-compressed.png') no-repeat center 100px;
+			background: url('../images/hero-computer-new.png') no-repeat center 100px;
 			width: 933px;
 			height: 710px;
 			margin: 0 auto;
+			position: relative;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+		}
+
+		.hero .computers .ipad {
+			background: url('../images/hero-ipad.png') no-repeat;
+			width: 302px;
+			height: 280px;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			position: absolute;
+			bottom: -12px;
+			right: -92px;
 		}
 
 		.hero h1 {
 			font-size: 54pt;
 			font-weight: 300;
 			letter-spacing: 0.03em;
+		}
+
+		.hero iframe {
+			margin-top: 126px;
+			width: 694px;
+			margin-right: 33px;
+			height: 390px;
 		}
 
 	.content {
@@ -416,6 +435,17 @@ header .header-container nav > ul > .help > ul {
 		background-size: 770px;
 	}
 
+	.hero .computers .ipad {
+		display:none;
+	}
+
+	.hero iframe {
+		margin-top: 121px;
+		width: 570px;
+		margin-right: 26px;
+		height: 321px;
+	}
+
 	.content {
 		background: transparent;
 	}
@@ -531,6 +561,13 @@ header .header-container nav > ul > .help > ul {
 		background-size: 500px;
 	}
 
+	.hero iframe {
+		margin-top: 113px;
+		width: 370px;
+		margin-right: 16px;
+		height: 209px;
+	}
+
 	.step {
 		height: auto;
 		background-position: center 60px;
@@ -601,6 +638,13 @@ header .header-container nav > ul > .help > ul {
 		height: 250px;
 		background-size: 310px;
 		background-position: center 30px;
+	}
+
+	.hero iframe {
+		margin-top: 38px;
+		width: 230px;
+		margin-right: 10px;
+		height: 129px;
 	}
 
 	header .header-container nav > ul > li > a {
