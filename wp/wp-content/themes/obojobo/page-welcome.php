@@ -63,7 +63,10 @@
 		</header>
 
 		<section class="hero">
-			<div class="computers"></div>
+			<div class="computers">
+				<div class="ipad"></div>
+				<iframe src="//player.vimeo.com/video/92078970?byline=0&amp;color=8069AF" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+			</div>
 			<h1>Learning Objects, Reinvented</h1>
 		</section>
 
