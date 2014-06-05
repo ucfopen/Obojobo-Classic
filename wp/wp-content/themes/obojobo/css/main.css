@@ -184,13 +184,13 @@ body {
 
 		.hero .computers .ipad {
 			background: url('../images/hero-ipad.png') no-repeat;
-			width: 302px;
-			height: 280px;
+			width: 181px;
+			height: 279px;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
 			position: absolute;
 			bottom: -12px;
-			right: -92px;
+			right: -38px;
 		}
 
 		.hero h1 {
