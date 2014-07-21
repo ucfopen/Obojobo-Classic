@@ -199,51 +199,31 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			}
 		}
 
-		if (!$auth->isAuthenticated()) {
-			$auth->login();
-			return false;
-		}
-		header("Location: " . $_SESSION['redirect']);
-		echo "<h1>DONE</h1>";
-		return;
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
 		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
 
+		if (!$auth->isAuthenticated() && !$this->checkForValidLTILogin($requestVars, $validSSO, $weakExternalSync)) {
+			$auth->login();
+			return false;
+		}
+		// AUTHENTICATED
+
+		header("Location: " . $_SESSION['redirect']);
+
 		// filter the username to be all lowercase
 		$requestVars['userName'] = strtolower($requestVars['userName']);
-
-		// Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
-		if(empty($requestVars['userName']) && empty($requestVars['password']))
-		{
-			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
-		}
-		// LTI SSO 
-		else
-		{
-			$this->checkForValidLTILogin($requestVars, $validSSO, $weakExternalSync);
-		}
 		
 		if($this->validateUsername($requestVars['userName']) !== true) return false;
 		if($validSSO == false && $this->validatePassword($requestVars['password']) !== true) return false;
 		
 		// create/update the user with the external database
-		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
+		$user = $this->syncSamlUser($requestVars['userName'], $weakExternalSync);
 		
 		if($user instanceof \rocketD\auth\User)
 		{
-			// if the user is not signed in by SSO, authenticate using WebService/LDAP
-			if($validSSO != true)
-			{
-				$checkPassword = $this->verifyPassword($user->login, $requestVars['password']);
-			}
-
-			// if they are valid, allow them in
-			if($validSSO === true || $checkPassword['success'])
-			{
-				$this->storeLogin($user->userID);
-				$this->internalUser = $user;
-				return true;
-			}
+			$this->storeLogin($user->userID);
+			$this->internalUser = $user;
+			return true;
 		}
 		else
 		{
@@ -414,6 +394,72 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return true;
 	}
+
+	public function syncSamlUser($userName, $attributes)
+	{
+		$email = "notreal@not.real";
+		$first = $attributes[\cfg_plugin_AuthModUCF::FIRST];
+		$last = $attributes[\cfg_plugin_AuthModUCF::LAST] ;
+		
+		// determine user's role
+		$isCreator    = false;
+		$author_roles = ["faculty", "staff", "employee", "CF_STAFF"];
+
+		foreach ($attributes[$attr['roles']] as $role)
+		{
+			if (in_array($role, $author_roles))
+			{
+				$isCreator = true;
+				break;
+			}
+		}
+
+		if($userID = $this->getUIDforUsername($userName))
+		{
+			// update internal record
+			if($user = $this->fetchUserByID($userID))
+			{
+				// update user data changes
+				if($first != $user->first || $last != $user->last || $email != $user->email){
+					//trace('updating user info: ' . $user->mi .'='. $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE} .','. $user->first .'='. $externalUser->{\cfg_plugin_AuthModUCF::FIRST}.','.$user->last .'='. $externalUser->{\cfg_plugin_AuthModUCF::LAST}.','.$user->email .'='. $externalUser->{\cfg_plugin_AuthModUCF::EMAIL});
+					// external record differs from ours, update ours to match the external data
+					$user->first = $first;
+					$user->last = $last;
+					$user->email = $email;
+					parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
+				}
+			}
+			else
+			{
+				trace('fetchUserByID failed', true);
+				return false;
+			}
+		}
+		else
+		{
+			// create internal record
+			$created = $this->createNewUser($userName, $first, $last, "", $email, array());
+			if(!$created['success'])
+			{
+				trace('createNewUser Failed', true);
+				return false;
+			}
+			else
+			{
+				trace("creating new internal user $userName" , true);
+				// load user data from db
+				if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
+				{
+					trace('fetchUserByID failed', true);
+					return false;
+				}
+			}
+		}
+		// update roles
+		$this->updateRole($user->userID, $isCreator);
+		
+		return $user;
+	}
 	
 	public function syncExternalUser($userName, $allowWeakSync=false, $createIfMissing = false)
 	{
@@ -422,53 +468,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// look for user in external data
 		if($externalUser = $this->getUCFUserData($userName))
 		{
-			if($userID = $this->getUIDforUsername($userName))
-			{
-				// update internal record
-				if($user = $this->fetchUserByID($userID))
-				{
-					// update user data changes
-					if($externalUser->{\cfg_plugin_AuthModUCF::FIRST} != $user->first || substr(trim($externalUser->{\cfg_plugin_AuthModUCF::MIDDLE}), 0, 1) != trim($user->mi) || $externalUser->{\cfg_plugin_AuthModUCF::LAST} != $user->last || $externalUser->{\cfg_plugin_AuthModUCF::EMAIL} != $user->email){
-						trace('updating user info: ' . $user->mi .'='. $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE} .','. $user->first .'='. $externalUser->{\cfg_plugin_AuthModUCF::FIRST}.','.$user->last .'='. $externalUser->{\cfg_plugin_AuthModUCF::LAST}.','.$user->email .'='. $externalUser->{\cfg_plugin_AuthModUCF::EMAIL});
-						// external record differs from ours, update ours to match the external data
-						$user->mi = $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE};
-						$user->first = $externalUser->{\cfg_plugin_AuthModUCF::FIRST};
-						$user->last = $externalUser->{\cfg_plugin_AuthModUCF::LAST};
-						$user->email = $externalUser->{\cfg_plugin_AuthModUCF::EMAIL};
-						parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
-					}
-				}
-				else
-				{
-					trace('fetchUserByID failed', true);
-					return false;
-				}
-			}
-			else
-			{
-				// create internal record
-				$created = $this->createNewUser($userName, $externalUser->{\cfg_plugin_AuthModUCF::FIRST}, $externalUser->{\cfg_plugin_AuthModUCF::LAST}, $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE}, $externalUser->{\cfg_plugin_AuthModUCF::EMAIL}, array());
-				if(!$created['success'])
-				{
-					trace('createNewUser Failed', true);
-					return false;
-				}
-				else
-				{
-					trace("creating new internal user $userName" , true);
-					// load user data from db
-					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
-					{
-						trace('fetchUserByID failed', true);
-						return false;
-					}
-				}
-			}
-			// update roles
-			$this->updateRole($user->userID, $externalUser->isCreator);
-			
-			return $user;
-		}
 		
 		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
 		if($allowWeakSync === true)
