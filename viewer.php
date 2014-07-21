@@ -3,8 +3,9 @@ require_once("internal/app.php");
 $API = \obo\API::getInstance();
 
 // ================ LOGIN OR CHECK EXISTING LOGIN ===========================
-if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
+if( isset($_REQUEST['username']) && isset($_REQUEST['password']) || isset($_REQUEST['SAMLResponse']))
 {
+  $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
   $loggedIn = $API->doLogin($_REQUEST['username'],  $_REQUEST['password']);
   if($loggedIn !== true)
   {
