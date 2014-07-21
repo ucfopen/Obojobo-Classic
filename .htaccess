@@ -25,6 +25,10 @@ RewriteRule ^repository/?$ repository.php [L,QSA]
 # OBOJOBO  Media
 RewriteRule ^media/([0-9]+)/?.*?$ assets/getAsset.php?id=$1 [L,QSA]
 
+# OBOJOBO Shibboleth Integration
+RewriteRule ^saml/metadata/?$ metadata.php [L,QSA]
+RewriteRule ^saml/acs/?$ viewer.php [L,QSA]
+
 # BEGIN WordPress
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
