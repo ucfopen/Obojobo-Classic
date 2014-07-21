@@ -1,7 +1,8 @@
 <?php
+require_once(dirname(__FILE__).'/../packages/php-saml/_toolkit_loader.php');
+
 class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 {
-	
 	protected $oDBM;
 	protected static $instance;
 
@@ -186,6 +187,25 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
+		$auth = new OneLogin_Saml2_Auth(\AppCfg::$SAML_SETTINGS['saml']['config']);
+
+		if (isset($_POST['SAMLResponse'])) {
+			$auth->processResponse();
+			$attributes = $auth->getAttributes();
+
+			if (!$auth->isAuthenticated()) {
+				trace("Authentication failed after returning from IdP");
+				return false;
+			}
+		}
+
+		if (!$auth->isAuthenticated()) {
+			$auth->login();
+			return false;
+		}
+		header("Location: " . $_SESSION['redirect']);
+		echo "<h1>DONE</h1>";
+		return;
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
 		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
 
