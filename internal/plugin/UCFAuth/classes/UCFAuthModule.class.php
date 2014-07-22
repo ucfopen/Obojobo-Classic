@@ -187,7 +187,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
-		$auth = new OneLogin_Saml2_Auth(\cfg_plugin_AuthModUCF::$SAML_SETTINGS['saml']['config']);
+		$auth = new OneLogin_Saml2_Auth(\cfg_plugin_AuthModUCF::$SAML_CONFIG);
 
 		if (isset($_POST['SAMLResponse'])) {
 			$auth->processResponse();
