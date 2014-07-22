@@ -25,7 +25,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if(!$this->oDBM->connected)
 			{
 				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Lerxst on ' . date("F j, Y, g:i a"));
+				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Cerebro on ' . date("F j, Y, g:i a"));
 				
 			}
 		}
@@ -187,7 +187,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
-		$auth = new OneLogin_Saml2_Auth(\AppCfg::$SAML_SETTINGS['saml']['config']);
+		$auth = new OneLogin_Saml2_Auth(\cfg_plugin_AuthModUCF::$SAML_SETTINGS['saml']['config']);
 
 		if (isset($_POST['SAMLResponse'])) {
 			$auth->processResponse();
@@ -211,7 +211,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		header("Location: " . $_SESSION['redirect']);
 
 		// create/update the user with the external database
-		$user = $this->syncSamlUser($attributes[$attr[\cfg_plugin_AuthModUCF::USERNAME]], $weakExternalSync);
+		$user = $this->syncSamlUser($attributes[\cfg_plugin_AuthModUCF::USERNAME], $attributes);
 		
 		if($user instanceof \rocketD\auth\User)
 		{
@@ -282,12 +282,25 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	
 	}
+
+	static protected function get_upstream_email($username)
+	{
+		if (\cfg_plugin_AuthModUCF::FAKE_UPSTREAM_EMAIL) return "$username@ucf.edu";
+
+		$user_table = 'CDLPS_PEOPLE';
+		$user_id    = 'network_id';
+		$email      = 'email';
+		$db         = 'cerebro';
+
+		$q = $this->oDBM->querySafe("SELECT $email FROM $user_table WHERE $user_id = '?' ", $username);
+		return $this->oDBM->fetch($q);
+	}
 	
 	public function syncSamlUser($userName, $attributes)
 	{
-		$email = "notreal@not.real";
 		$first = $attributes[\cfg_plugin_AuthModUCF::FIRST];
 		$last = $attributes[\cfg_plugin_AuthModUCF::LAST] ;
+		$email = static::get_upstream_email($userName);
 		
 		// determine user's role
 		$isCreator    = false;
