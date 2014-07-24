@@ -112,11 +112,12 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			return 'Invalid email address';
 		}
 		// registration requires a password
-		$vPass = $this->validatePassword($optionalVars['MD5Pass']);
+		/*$vPass = $this->validatePassword($optionalVars['MD5Pass']);
 		if($vPass !== true)
 		{
 			return $vPass;
 		}
+		 */
 		// check local db for username		
 		$this->defaultDBM();
 		if(!$this->oDBM->connected || !$this->DBM->connected)
@@ -208,10 +209,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		// AUTHENTICATED
 
-		header("Location: " . $_SESSION['redirect']);
-
 		// create/update the user with the external database
-		$user = $this->syncSamlUser($attributes[\cfg_plugin_AuthModUCF::USERNAME], $attributes);
+		$user = $this->syncSamlUser($attributes[\cfg_plugin_AuthModUCF::USERNAME][0], $attributes);
 		
 		if($user instanceof \rocketD\auth\User)
 		{
@@ -246,7 +245,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// TODO: this should not be setting any passwords, if its not used, look into using this funciton 
 		if(!$this->validateUID($userID)) return false;
 		if($this->validateUsername($userName) !== true) return false;
-		if($this->validatePassword($password) !== true) return false;
+		//if($this->validatePassword($password) !== true) return false;
 
 		$this->defaultDBM();
 		if(!$this->oDBM->connected || !$this->DBM->connected)
@@ -298,15 +297,15 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	
 	public function syncSamlUser($userName, $attributes)
 	{
-		$first = $attributes[\cfg_plugin_AuthModUCF::FIRST];
-		$last = $attributes[\cfg_plugin_AuthModUCF::LAST] ;
+		$first = $attributes[\cfg_plugin_AuthModUCF::FIRST][0];
+		$last = $attributes[\cfg_plugin_AuthModUCF::LAST][0];
 		$email = static::get_upstream_email($userName);
 		
 		// determine user's role
 		$isCreator    = false;
 		$author_roles = ["faculty", "staff", "employee", "CF_STAFF"];
 
-		foreach ($attributes[$attr['roles']] as $role)
+		foreach ($attributes[\cfg_plugin_AuthModUCF::ROLES] as $role)
 		{
 			if (in_array($role, $author_roles))
 			{
