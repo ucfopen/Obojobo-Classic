@@ -3,7 +3,7 @@
   $API = \obo\API::getInstance();
   require("login.php");
   if (!$loggedIn) {
-    $title = "Obojobo Repostitory";
+    $title = "Obojobo Repository";
     include("assets/templates/login.php");
     exit;
   }
