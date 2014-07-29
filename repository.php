@@ -1,3 +1,13 @@
+<?php
+  require_once("internal/app.php");
+  $API = \obo\API::getInstance();
+  require("login.php");
+  if (!$loggedIn) {
+    $title = "Obojobo Repostitory";
+    include("assets/templates/login.php");
+    exit;
+  }
+?>
 <!DOCTYPE html>
 <html dir="ltr" lang="en-US">
 <head>
