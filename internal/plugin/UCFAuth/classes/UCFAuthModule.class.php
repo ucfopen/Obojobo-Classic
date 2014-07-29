@@ -209,8 +209,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		// AUTHENTICATED
 
-		header("Location: " . $_SESSION['redirect']);
-
 		// create/update the user with the external database
 		$user = $this->syncSamlUser($attributes[\cfg_plugin_AuthModUCF::USERNAME][0], $attributes);
 		
