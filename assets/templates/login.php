@@ -137,7 +137,11 @@ function initLoginScreen()
 				<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
 				
 				<ul>
-					<?php if (isset($_REQUEST['bypass'])) { ?>
+					<?php
+					$loginDest = "with UCF";
+					if (isset($_REQUEST['bypass'])) {
+					    $loginDest = "to Obojobo";
+					?>
 					<li>
 						<label for="username">UCF NID</label><br>
 						<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
@@ -148,7 +152,7 @@ function initLoginScreen()
 					</li>
 					<?php } ?>
 					<li>
-						<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login with UCF" tabindex="3">
+					<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login <?= $loginDest ?>" tabindex="3">
 					</li>
 				</ul>
 				<ul class="foot">
