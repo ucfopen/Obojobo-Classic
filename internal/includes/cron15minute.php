@@ -10,19 +10,6 @@ This script is the main scheduled task runner
 require_once(dirname(__FILE__)."/../app.php");
 ini_set('error_log', AppCfg::DIR_BASE.AppCfg::DIR_LOGS.'php_cron_'. date('m_d_y', time()) .'.txt');
 
-//******************************** NID UPDATES ****************************
-$t = microtime(1);
-$AM = \rocketD\auth\AuthManager::getInstance();
-$authMods = $AM->getAllAuthModules();
-foreach($authMods AS $curAuthMod)
-{
-	if(method_exists($curAuthMod, 'updateNIDChanges'))
-	{
-		$result = $curAuthMod->updateNIDChanges();
-		\rocketD\util\Log::profile('cron', "'updateNIDChanges','".time()."','".time()."','".round((microtime(true) - $t),5)."','{$result['updated']}','{$result['total']}'");
-	}
-}
-
 //******************************** CALCULATE VISIT LOGS ****************************
 $t = microtime(1);
 $VM = \obo\VisitManager::getInstance();
