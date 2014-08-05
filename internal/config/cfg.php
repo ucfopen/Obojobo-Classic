@@ -166,4 +166,3 @@ class AppCfgDefault
 	// Never set true in production, [true, false]
 	const UCF_AUTH_BYPASS_PASSWORDS = false;
 }
-?>
