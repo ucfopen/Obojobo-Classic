@@ -297,5 +297,3 @@ class plg_UCFAuth_SsoHash {
 		return $hash == $this->generateHash($params);
 	}
 }
-
-?>

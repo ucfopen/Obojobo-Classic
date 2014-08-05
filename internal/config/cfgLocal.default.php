@@ -50,4 +50,3 @@ class AppCfg extends AppCfgDefault
 	const LDAP = ''; // The LDAP URL for accessing UCF Authentication
 
 }
-?>

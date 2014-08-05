@@ -1,8 +1,7 @@
 <?php
 class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 {
-	
-	protected $oDBM;
+
 	protected static $instance;
 
 	static public function getInstance()
@@ -14,41 +13,22 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return self::$instance;
 	}
-	// security check: Ian Turgeon 2008-05-06 - PASS
-	protected function defaultDBM()
-	{
-		if(!$this->oDBM) // if DBM isnt set use the default
-		{ 
-			// load this module's config
-			$this->oDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE));
-			if(!$this->oDBM->connected)
-			{
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Lerxst on ' . date("F j, Y, g:i a"));
-				
-			}
-		}
-		parent::defaultDBM(); // build default dbm still for use with internal db
-	}
-	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
+
 	public function getAllUsers()
 	{
 		return parent::getAllUsers();
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
 		return parent::recordExistsForID($userID);
 	}
 	
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function fetchUserByID($userID = 0)
 	{
 		return parent::fetchUserByID($userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$optionalVars['MD5Pass'] = md5(microtime() . $email . $userName . $fName); // create a random password that is unguessable
@@ -56,11 +36,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($valid === true)
 		{
 			$this->defaultDBM();
-			if(!$this->oDBM->connected || !$this->DBM->connected)
-			{
-				trace('not connected', true);
-				return false;
-			}
 			$this->DBM->startTransaction();
 			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success'] === true)
@@ -116,9 +91,9 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			return $vPass;
 		}
-		// check local db for username		
+
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -149,7 +124,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -261,8 +236,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	public function verifyPassword($userName, $password)
 	{
-		
-		
 		// for local testing, ldap access may not be possible, if in local test mode just return an ok
 		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS && $_SERVER['SERVER_ADDR'] != \AppCfg::PRODUCTION_IP)
 		{
@@ -310,13 +283,11 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function addRecord($userID, $userName, $password)
 	{
-		// TODO: this should not be setting any passwords, if its not used, look into using this funciton 
 		if(!$this->validateUID($userID)) return false;
 		if($this->validateUsername($userName) !== true) return false;
-		if($this->validatePassword($password) !== true) return false;
 
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -370,7 +341,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('Username is empty', true);
 			return 'Username is empty';
 		}
-		//if(preg_match("/^[[:alnum:]]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
 		if(preg_match("/^[[:alnum:]_]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
 		{
 			trace('User name can only contain alpha numeric characters. ' . $userName, true);
@@ -400,7 +370,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($this->validateUsername($userName) !== true) return false;
 
 		// look for user in external data
-		if($externalUser = $this->getUCFUserData($userName))
+		if($eUser = $this->getUCFUserData($userName))
 		{
 			if($userID = $this->getUIDforUsername($userName))
 			{
@@ -408,14 +378,16 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				if($user = $this->fetchUserByID($userID))
 				{
 					// update user data changes
-					if($externalUser->{\cfg_plugin_AuthModUCF::FIRST} != $user->first || substr(trim($externalUser->{\cfg_plugin_AuthModUCF::MIDDLE}), 0, 1) != trim($user->mi) || $externalUser->{\cfg_plugin_AuthModUCF::LAST} != $user->last || $externalUser->{\cfg_plugin_AuthModUCF::EMAIL} != $user->email){
-						trace('updating user info: ' . $user->mi .'='. $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE} .','. $user->first .'='. $externalUser->{\cfg_plugin_AuthModUCF::FIRST}.','.$user->last .'='. $externalUser->{\cfg_plugin_AuthModUCF::LAST}.','.$user->email .'='. $externalUser->{\cfg_plugin_AuthModUCF::EMAIL});
-						// external record differs from ours, update ours to match the external data
-						$user->mi = $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE};
-						$user->first = $externalUser->{\cfg_plugin_AuthModUCF::FIRST};
-						$user->last = $externalUser->{\cfg_plugin_AuthModUCF::LAST};
-						$user->email = $externalUser->{\cfg_plugin_AuthModUCF::EMAIL};
+					if($eUser->first != $user->first || $eUser->mi != $user->mi || $eUser->last != $user->last || $eUser->email != $user->email){
+
+						$user->mi    = $eUser->mi;
+						$user->first = $eUser->first;
+						$user->last  = $eUser->last;
+						$user->email = $eUser->email;
+
 						parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
+
+						trace("updating user info: {$user->mi} = {$eUser->mi}, {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
 					}
 				}
 				else
@@ -427,7 +399,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			else
 			{
 				// create internal record
-				$created = $this->createNewUser($userName, $externalUser->{\cfg_plugin_AuthModUCF::FIRST}, $externalUser->{\cfg_plugin_AuthModUCF::LAST}, $externalUser->{\cfg_plugin_AuthModUCF::MIDDLE}, $externalUser->{\cfg_plugin_AuthModUCF::EMAIL}, array());
+				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, $eUser->mi, $eUser->email, array());
 				if(!$created['success'])
 				{
 					trace('createNewUser Failed', true);
@@ -445,7 +417,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				}
 			}
 			// update roles
-			$this->updateRole($user->userID, $externalUser->isCreator);
+			$this->updateRole($user->userID, $eUser->isCreator);
 			
 			return $user;
 		}
@@ -494,52 +466,64 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return false;
 	}
-	
-	// TODO: FIX RETURN FOR DB ABSTRACTION
-	protected function getUCFUserData($userName)
+
+	protected function getUcfDb()
 	{
-		//check memcache
-	
-		$return = false;
-		
-		// TODO: need to filter sql variables to prevent sql injection
-		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		static $ucfDB;
+		if ( ! isset($ucfDB) || ! $ucfDB->connected)
+		{
+			$con = new DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE);
+			$ucfDB = DBManager::getConnection($con);
+		}
+		return $ucfDB;
+	}
+
+	protected function getUCFUserData($username)
+	{
+
+		$ucfDB = $this->getUcfDb();
+		if ( ! $ucfDB->connected)
 		{
 			trace('not connected', true);
 			return false;
 		}
-		$this->updateNIDChanges(); //  update internal nids if needed
-		
-		// try faculty first
-		$q = $this->oDBM->querySafe("Select * FROM ".\cfg_plugin_AuthModUCF::TABLE_EMPLOYEE." WHERE ".\cfg_plugin_AuthModUCF::NID." = '?'", $userName);
-		if($r = $this->oDBM->fetch_obj($q))
+
+		$userTable = \cfg_plugin_AuthModUCF::TABLE_PEOPLE;
+		$userId    = \cfg_plugin_AuthModUCF::NID;
+		$first     = \cfg_plugin_AuthModUCF::FIRST;
+		$middle    = \cfg_plugin_AuthModUCF::MIDDLE;
+		$last      = \cfg_plugin_AuthModUCF::LAST;
+		$email     = \cfg_plugin_AuthModUCF::EMAIL;
+		$isStaff   = \cfg_plugin_AuthModUCF::IS_STAFF;
+		$isStudent = \cfg_plugin_AuthModUCF::IS_STUDENT;
+
+		$q = $ucfDB->querySafe("SELECT * FROM {$userTable} WHERE {$userId} = '?' ", $username);
+
+		if ( !($result = $ucfDB->fetch_array($q))) return false;
+
+		$result = $this->trimArray($result);
+
+		// provide a default email if needed
+		if ( ! isset($result[$email]))
 		{
-			$r->isCreator = true;
-			$return = $this->trimArray($r);
+			trace("$username has no email from cerebro, using default", true);
+			$result[$email] = "$username@ucf.edu";
 		}
-		else
-		{
-			// try students second
-			$q = $this->oDBM->querySafe("Select * FROM ".\cfg_plugin_AuthModUCF::TABLE_STUDENT." WHERE ".\cfg_plugin_AuthModUCF::NID." = '?'", $userName);
-			if($r = $this->oDBM->fetch_obj($q))
-			{
-				$r->isCreator = false;
-				$return =  $this->trimArray($r);
-			}
-		}
-		
-		if($return)
-		{
-			
-			//store in memcache
-			\rocketD\util\Cache::getInstance()->setModUCFExternalUser($userName, $return);
-		}
-		trace($return ? "$userName found, employee:$r->isCreator" : "$userName not found");
-		return $return;
+
+		// Build a standardized result
+		$user = (object) [
+			'first'     => $result[$first],
+			'mi'        => substr($result[$middle], 0, 1),
+			'last'      => $result[$last],
+			'email'     => $result[$email],
+			'isCreator' => ((int) $result[$isStaff] === 1),
+		];
+
+		return $user;
 	}
 	
-	protected function trimArray($array){
+	protected function trimArray($array)
+	{
 		if(count($array) > 0 )
 		{
 			foreach($array as $value)
@@ -553,7 +537,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function updateRole($UIDorUser, $isLibraryUser=0)
 	{
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -631,73 +615,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return false;
 	}
 
-	public function updateNIDChanges($force=false)
-	{
-		$total = 0;
-		$updated = 0;
-		// TODO: remove memcache for any updated users
-		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
-		$lastUpdate = -1;
-		// get last successful update date
-		$q = $this->DBM->query("SELECT ".\cfg_core_Temp::VALUE." FROM ".\cfg_core_Temp::TABLE." WHERE ".\cfg_core_Temp::ID."='".\cfg_plugin_AuthModUCF::COL_EXTERNAL_SYNC_NAME."' ");
-		if($r = $this->DBM->fetch_obj($q))
-		{
-			// if the last time we checked was anytime after the first second of today, skip updates unless overrided
-			$now = getdate();
-			if($r->{\cfg_core_Temp::VALUE} > mktime(0,0, 0, $now['mon'], $now['mday'], $now['year']) && $force == false)
-			{
-				return array('updated' => $updated, 'total' => $total);
-			}
-			// convert to string for comparison with oracle
-			$lastUpdate = strftime("%d-%b-%y", $r->{\cfg_core_Temp::VALUE});
-			trace('looking for updates after '. $lastUpdate, true);
-		}
-		// get all updates since last update
-		if($q = $this->oDBM->query("SELECT * FROM ".\cfg_plugin_AuthModUCF::TABLE_NID." WHERE ".\cfg_plugin_AuthModUCF::NID_CHANGE_DATE." >= '$lastUpdate'")) // no need for querySafe
-		{ 
-
-			while($r = $this->oDBM->fetch_obj($q))
-			{
-				$total++;
-				// the latest update date will be first, lets keep track of it in case the EFFDT doesn't match up with every day
-				// update each NID
-				if($q2 = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::LOGIN."='?' LIMIT 1", $r->{\cfg_plugin_AuthModUCF::NEW_NID}, $r->{\cfg_plugin_AuthModUCF::OLD_NID}))
-				{
-					if($this->DBM->affected_rows($q2) != 0)
-					{
-						$updated++;
-						\rocketD\util\Cache::getInstance()->clearUserByID($userID);
-						trace('NID changed: ' . $r->{\cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{\cfg_plugin_AuthModUCF::NEW_NID}, true);
-					}  
-					else
-					{
-						trace('NID change may not be needed: ' . $r->{\cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{\cfg_plugin_AuthModUCF::NEW_NID}, true);
-					}
-				}
-				// double check to make sure the old NID isnt in our db anymore
-				$saftyQ = $this->DBM->querySafe("SELECT * FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::LOGIN."='?'", $r->{\cfg_plugin_AuthModUCF::OLD_NID});
-				if($this->DBM->fetch_num($saftyQ) > 0 )
-				{
-					trace('NID change failed, record for old NID still exists in Obojobo: '. $r->{\cfg_plugin_AuthModUCF::OLD_NID} .'->'. $r->{\cfg_plugin_AuthModUCF::NEW_NID}, true);
-				}
-			}
-		}
-		// update last log
-		if($lastUpdate == -1)
-		{
-			$q = $this->DBM->query("INSERT INTO ".\cfg_core_Temp::TABLE." SET ".\cfg_core_Temp::ID."='".\cfg_plugin_AuthModUCF::COL_EXTERNAL_SYNC_NAME."', ".\cfg_core_Temp::VALUE."='". time() ."'");
-		}
-		else
-		{
-			$q = $this->DBM->query("UPDATE ".\cfg_core_Temp::TABLE." SET ".\cfg_core_Temp::VALUE."='". time() ."' WHERE ".\cfg_core_Temp::ID."='".\cfg_plugin_AuthModUCF::COL_EXTERNAL_SYNC_NAME."' ");
-		}
-		return array('updated' => $updated, 'total' => $total);
-	}
 	public function requestPasswordReset($userName, $email, $returnURL)
 	{
 		return false;
@@ -713,4 +630,3 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return false;
 	}	
 }
-?>
