@@ -3,7 +3,6 @@ require_once(dirname(__FILE__).'/../packages/php-saml/_toolkit_loader.php');
 
 class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 {
-	protected $oDBM;
 	protected static $instance;
 
 	static public function getInstance()
@@ -15,41 +14,23 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return self::$instance;
 	}
-	// security check: Ian Turgeon 2008-05-06 - PASS
-	protected function defaultDBM()
-	{
-		if(!$this->oDBM) // if DBM isnt set use the default
-		{ 
-			// load this module's config
-			$this->oDBM = \rocketD\db\DBManager::getConnection(new \rocketD\db\DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE));
-			if(!$this->oDBM->connected)
-			{
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendCriticalError('Oracle DB Connection Failure', 'Failed to connect to Cerebro on ' . date("F j, Y, g:i a"));
-				
-			}
-		}
-		parent::defaultDBM(); // build default dbm still for use with internal db
-	}
-	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
+
 	public function getAllUsers()
 	{
 		return parent::getAllUsers();
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
 		return parent::recordExistsForID($userID);
 	}
 	
-	// security check: Ian Turgeon 2008-05-06 - PASS
+
 	public function fetchUserByID($userID = 0)
 	{
 		return parent::fetchUserByID($userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$optionalVars['MD5Pass'] = md5(microtime() . $email . $userName . $fName); // create a random password that is unguessable
@@ -57,11 +38,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($valid === true)
 		{
 			$this->defaultDBM();
-			if(!$this->oDBM->connected || !$this->DBM->connected)
-			{
-				trace('not connected', true);
-				return false;
-			}
 			$this->DBM->startTransaction();
 			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
 			if($result['success'] === true)
@@ -118,9 +94,9 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			return $vPass;
 		}
 		 */
-		// check local db for username		
+		// check local db for username
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -151,7 +127,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -248,7 +224,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		//if($this->validatePassword($password) !== true) return false;
 
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
@@ -286,13 +262,27 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		if (\cfg_plugin_AuthModUCF::FAKE_UPSTREAM_EMAIL) return "$username@ucf.edu";
 
+		$con = new DBConnectData(\cfg_plugin_AuthModUCF::DB_HOST, \cfg_plugin_AuthModUCF::DB_USER, \cfg_plugin_AuthModUCF::DB_PASS, \cfg_plugin_AuthModUCF::DB_NAME, \cfg_plugin_AuthModUCF::DB_TYPE);
+		$cerebroDBM = DBManager::getConnection($con);
+		if(!$cerebroDBM->connected)
+		{
+			trace('not connected', true);
+			return false;
+		}
+
 		$user_table = 'CDLPS_PEOPLE';
 		$user_id    = 'network_id';
 		$email      = 'email';
-		$db         = 'cerebro';
 
-		$q = $this->oDBM->querySafe("SELECT $email FROM $user_table WHERE $user_id = '?' ", $username);
-		return $this->oDBM->fetch($q);
+		$q = $cerebroDBM->querySafe("SELECT $email FROM $user_table WHERE $user_id = '?' ", $username);
+		$result = $cerebroDBM->fetch_array($q);
+		if(!isset($result['email']))
+		{
+			trace('no email from cerebro', true);
+			return false;
+		}
+
+		return $result['email'];
 	}
 	
 	public function syncSamlUser($userName, $attributes)
@@ -376,7 +366,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function updateRole($UIDorUser, $isLibraryUser=0)
 	{
 		$this->defaultDBM();
-		if(!$this->oDBM->connected || !$this->DBM->connected)
+		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;

@@ -3,6 +3,13 @@ class cfg_plugin_AuthModUCF
 {
 	const UCF_TEST_MODE = true;
 	
+	// UCF AUTH DB Connection
+	const DB_HOST = 'localhost';
+	const DB_USER = 'root';
+	const DB_PASS = 'root';
+	const DB_NAME = 'externalauth_dev';
+	const DB_TYPE = 'mysql'; // either mysql or oci8
+
 	// External Employee Table
 	const TABLE_EMPLOYEE = 'NM_EMPLOYEE';
 	const NID = 'NETWORK_ID';
