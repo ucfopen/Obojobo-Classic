@@ -23,7 +23,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		return parent::recordExistsForID($userID);
 	}
-	
+
 	public function fetchUserByID($userID = 0)
 	{
 		return parent::fetchUserByID($userID);
@@ -61,8 +61,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			return array('success' => false, 'error' => $valid);
 		}
 	}
-	
-	// security check: Ian Turgeon 2008-05-08 - PASS	
+
+	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$validUsername = $this->validateUsername($userName);
@@ -105,10 +105,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('username already exists', true);
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($userName)
 	{
@@ -128,8 +128,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			trace('not connected', true);
 			return false;
-		}		
-		
+		}
+
 		$user = $this->fetchUserByID($userID);
 		if($user != false)
 		{
@@ -141,16 +141,16 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				if($this->updateRecord($userID, $userName))
 				{
 					return array('success' => true);
-				}		
+				}
 			}
 			$this->DBM->rollBack();
 			trace('Unable to update user.', true);
-			return array('success' => false, 'error' => 'Unable to update user.');			
+			return array('success' => false, 'error' => 'Unable to update user.');
 		}
 		trace('Unable to locate user.', true);
 		return array('success' => false, 'error' => 'Unable to locate user.');
 	}
-	
+
 	/**
 	 * Authenticates the user.  This module checks an external data source, and will create internal users based on the external data if they don't already exist
 	 * Parent doc: Main Authentication function. This function will verify the user's crudentials and log them in. Must be extended to return a nm_los_User upon success, and false on failure.
@@ -172,18 +172,18 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
 		}
-		// LTI SSO 
+		// LTI SSO
 		else
 		{
 			$this->checkForValidLTILogin($requestVars, $validSSO, $weakExternalSync);
 		}
-		
+
 		if($this->validateUsername($requestVars['userName']) !== true) return false;
 		if($validSSO == false && $this->validatePassword($requestVars['password']) !== true) return false;
-		
+
 		// create/update the user with the external database
 		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
-		
+
 		if($user instanceof \rocketD\auth\User)
 		{
 			// if the user is not signed in by SSO, authenticate using WebService/LDAP
@@ -378,16 +378,16 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				if($user = $this->fetchUserByID($userID))
 				{
 					// update user data changes
-					if($eUser->first != $user->first || $eUser->mi != $user->mi || $eUser->last != $user->last || $eUser->email != $user->email){
+					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email){
 
-						$user->mi    = $eUser->mi;
+						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
+
 						$user->first = $eUser->first;
 						$user->last  = $eUser->last;
 						$user->email = $eUser->email;
 
-						parent::updateUser($user->userID, $userName, $user->first, $user->last, $user->mi, $user->email);
+						parent::updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email);
 
-						trace("updating user info: {$user->mi} = {$eUser->mi}, {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
 					}
 				}
 				else
@@ -399,7 +399,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			else
 			{
 				// create internal record
-				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, $eUser->mi, $eUser->email, array());
+				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array());
 				if(!$created['success'])
 				{
 					trace('createNewUser Failed', true);
@@ -472,8 +472,8 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		static $ucfDB;
 		if ( ! isset($ucfDB) || ! $ucfDB->connected)
 		{
-			$con = new DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE);
-			$ucfDB = DBManager::getConnection($con);
+			$con = new \rocketD\db\DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE);
+			$ucfDB = \rocketD\db\DBManager::getConnection($con);
 		}
 		return $ucfDB;
 	}
@@ -491,7 +491,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		$userTable = \cfg_plugin_AuthModUCF::TABLE_PEOPLE;
 		$userId    = \cfg_plugin_AuthModUCF::NID;
 		$first     = \cfg_plugin_AuthModUCF::FIRST;
-		$middle    = \cfg_plugin_AuthModUCF::MIDDLE;
 		$last      = \cfg_plugin_AuthModUCF::LAST;
 		$email     = \cfg_plugin_AuthModUCF::EMAIL;
 		$isStaff   = \cfg_plugin_AuthModUCF::IS_STAFF;
@@ -513,7 +512,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// Build a standardized result
 		$user = (object) [
 			'first'     => $result[$first],
-			'mi'        => substr($result[$middle], 0, 1),
 			'last'      => $result[$last],
 			'email'     => $result[$email],
 			'isCreator' => ((int) $result[$isStaff] === 1),
