@@ -202,7 +202,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		else
 		{
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','not_in_external_db','0','".time().",'0'");
+			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','external_sync_fail','0','".time().",'0'");
 		}
 		return false;
 	}
@@ -498,7 +498,11 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		$q = $ucfDB->querySafe("SELECT * FROM {$userTable} WHERE {$userId} = '?' ", $username);
 
-		if ( !($result = $ucfDB->fetch_array($q))) return false;
+		if ( !($result = $ucfDB->fetch_array($q)))
+		{
+			\rocketD\util\Log::profile('login', "'".$username."','not_in_external_db','0','".time().",'0'");
+			return false;
+		}
 
 		$result = $this->trimArray($result);
 
