@@ -125,9 +125,9 @@ function initLoginScreen()
 				<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
 
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
-					
-				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3> 
-				<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3> 
+
+				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
+				<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3>
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">
@@ -148,7 +148,7 @@ function initLoginScreen()
 				</ul>
 				<ul class="foot">
 					<li><a href="https://my.ucf.edu/nid.html">Lookup NID</a></li>
-					<li><a href="http://mynid.net.ucf.edu/">Reset Password</a></li>
+					<li><a href="http://mynid.ucf.edu/">Reset Password</a></li>
 					<li><a href="/help">Help</a></li>
 				</ul>
 			</form>
