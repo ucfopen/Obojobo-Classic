@@ -13,7 +13,7 @@ class API extends \rocketD\db\DBEnabled
 {
 
 	private static $instance;
-	
+
 	static public function getInstance($isRemoting = false)
 	{
 		if(!isset(self::$instance))
@@ -32,22 +32,22 @@ class API extends \rocketD\db\DBEnabled
 		// 	//$config->timeLimit = \AppCfg::AUTH_TIMEOUT_REMOTING;
 		// }
 	}
-	
+
 	/**
-	 * Verifies that the user has a current session and generates a new SESSID for them 
+	 * Verifies that the user has a current session and generates a new SESSID for them
 	 * @return (bool) true if user is logged in, false if not
-	 */    
+	 */
 	public function getSessionValid($roleName='')
 	{
 		$UM = \rocketD\auth\AuthManager::getInstance();
-		//trace($UM->verifySession($roleName)); 
+		//trace($UM->verifySession($roleName));
 		return $UM->verifySession($roleName);
 	}
 
 	/**
 	 * Verifies session and role with a more granular return then verifySession
 	 * @param	(args - either one array or multiple strings)	Role names to check for current session
-	 * @return 	(array)	array with the following keys: validSession (bool, user currently has a valid session), roleName (string, name of role checked), hasRole (bool, user is in the role returned in roleName).   
+	 * @return 	(array)	array with the following keys: validSession (bool, user currently has a valid session), roleName (string, name of role checked), hasRole (bool, user is in the role returned in roleName).
 	 */
 	public function getSessionRoleValid()
 	{
@@ -64,10 +64,10 @@ class API extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$return = array();
-		$return['validSession'] = $AM->verifySession();	
+		$return['validSession'] = $AM->verifySession();
 		$return['roleNames'] = $roleNames;
 		$return['hasRoles'] = array();
 		if($return['validSession'] === true && $roleNames != '')
@@ -82,12 +82,12 @@ class API extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		return $return;	
+		return $return;
 	}
-	
+
 	/**** Login Functions ****/
-	
-	/** 
+
+	/**
 	 * Logs user into system
 	 * @param $userID (string) user login name
 	 * @param $pwd (string) hashed password
@@ -99,25 +99,25 @@ class API extends \rocketD\db\DBEnabled
 		$UM = \rocketD\auth\AuthManager::getInstance();
 		return $UM->login($uname, $pwd);
 	}
-	
+
 	public function doPluginCall($plugin, $method, $args = -1)
 	{
 		$PM = \rocketD\plugin\PluginManager::getInstance();
 		return $PM->callAPI($plugin, $method, $args, false); // call the plugin method, but restrict it to whitelisted functions
 	}
-	
+
 	/**
 	 * Logs out the current active user
 	 */
 	public function doLogout()
 	{
 		if($this->getSessionValid())
-		{	
+		{
 			$UM = \rocketD\auth\AuthManager::getInstance();
 			$UM->logout($_SESSION['userID']);
 		}
 	}
-	
+
 	/**
 	 * Gets information about the current user
 	 * $return (User) User object
@@ -139,7 +139,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					$result = $UM->fetchUserByUserName($username);
 				}
-				
+
 			}
 		}
 		else
@@ -155,7 +155,7 @@ class API extends \rocketD\db\DBEnabled
 	//  */
 	// public function removeUser($userID)
 	// {
-	// 
+	//
 	// 	if($this->getSessionValid())
 	// 	{
 	// 		$this->DBM->startTransaction();
@@ -189,7 +189,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getUserNames($userIDs)
 	{
 		if($this->getSessionValid())
@@ -209,18 +209,18 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result =  \rocketD\util\Error::getError(1);
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Gets a list of all the users
 	 * @return (Array<User>) array of user objects
 	 * @return (bool) False if error or no login
 	 */
-	// TODO: this may have to change, user list may be too long, 
+	// TODO: this may have to change, user list may be too long,
 	//or actually unknown to us because of external authentication systems
-	
+
 	public function getUsers()
 	{
 		if($this->getSessionValid())
@@ -232,9 +232,9 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result = \rocketD\util\Error::getError(1);
 		}
-		return $result;	
+		return $result;
 	}
-	
+
 	public function getUserCMSData($username)
 	{
 		if($this->getSessionValid())
@@ -267,7 +267,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getUserInteractionLogs($userID)
 	{
 		if($this->getSessionValid())
@@ -285,7 +285,7 @@ class API extends \rocketD\db\DBEnabled
 			return $result;
 		}
 	}
-	
+
 	public function getUsersMatchingUsername($searchString)
 	{
 		if($this->getSessionValid())
@@ -358,8 +358,8 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $loArr;
 	}
-	
-	
+
+
 	/**
 	 * Gets only the metadata for the LO (for listing)
 	 * @param $loID (number) learning object id
@@ -369,7 +369,7 @@ class API extends \rocketD\db\DBEnabled
 	public function getLOMeta($loID, $newest=false)
 	{
 
-		//TODO: make sure this is secure as possible, it will be open to the public w/o 
+		//TODO: make sure this is secure as possible, it will be open to the public w/o
 		//authentication so it must be safe and as light on processes as possible
 		$loMan = \obo\lo\LOManager::getInstance();
 		if($newest === true)
@@ -383,7 +383,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getDrafts()
 	{
 		if($this->getSessionValid())
@@ -397,7 +397,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Returns both drafts and masters.
 	 * @author Zachary Berry
@@ -427,7 +427,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
     public function getLibraryLOs()
     {
 		if($this->getSessionValid())
@@ -441,7 +441,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
     }
-	
+
 	/**
 	 * Saves a new draft (even if the learning object is a new root)  and returns the new id number
 	 * @param $loObj (LO) new learning object
@@ -464,7 +464,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $loObj;
 	}
-	
+
 	/**
 	 * Makes the draft into the final LO, and removes all drafts previous to it
 	 * @param $loID (number) learning object id
@@ -487,7 +487,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	//@TODO: Change the name of this to 'createCopy' or 'createDuplicate'
 	public function createDerivative($loID)
 	{
@@ -504,7 +504,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
     public function removeLibraryLO($loID)
 	{
 
@@ -561,14 +561,14 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $loObj;
 	}
-	
+
 	/**
 	 * Unlocks the LO
 	 * @param $loID (number) learning object id
 	 */
 	public function removeLOLock($loID)
 	{
-		
+
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -582,10 +582,10 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	// TODO: this should get all instances of an LO with permissions showing ownership optional param to only return the current user's instances
 	public function getInstancesOfLO($loID)
-	{		
+	{
 		if($this->getSessionValid())
 		{
 			$instMan = \obo\lo\InstanceManager::getInstance();
@@ -619,7 +619,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Retrieves an instance from the database
 	 * @param $instID (number) ID of instance to retrieve
@@ -646,9 +646,9 @@ class API extends \rocketD\db\DBEnabled
 
 	public function getInstanceData($instID)
 	{
-		
+
 		$instman = \obo\lo\InstanceManager::getInstance();
-		// return 
+		// return
 		return $instman->getInstanceData($instID);
 
 	}
@@ -660,7 +660,7 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getInstances()
 	{
-		
+
 		if($this->getSessionValid())
 		{
 			$instman = \obo\lo\InstanceManager::getInstance();
@@ -672,7 +672,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Updates an instance of a learning object
 	 * @param $instArr (Array) Array of information about the instance
@@ -688,7 +688,7 @@ class API extends \rocketD\db\DBEnabled
 
 			// ONLY DELETE External link if start and end times are set properly
 			if ($startTime > 0 && $endTime > $startTime && $removeExternalLink === true) $instman->updateInstanceExternalLink($instID, '');
-			
+
 			$this->DBM->commit();
 		}
 		else
@@ -721,7 +721,7 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getMedia($optMediaIDArray=false)
 	{
-		
+
 		if($this->getSessionValid())
 		{
 			$mediaMan = \obo\lo\MediaManager::getInstance();
@@ -733,7 +733,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Alters an existing media object in the database
 	 * @param $mediaObj (Media) media object
@@ -759,7 +759,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					return \rocketD\util\Error::getError(5);
 				}
-			}			
+			}
 			$this->DBM->startTransaction();
 			$mediaMan = \obo\lo\MediaManager::getInstance();
 			$result = $mediaMan->saveMedia(new \obo\lo\Media($mediaObj));
@@ -771,7 +771,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Deletes an existing media object from the database
 	 * @param $mid (number) media ID
@@ -782,9 +782,9 @@ class API extends \rocketD\db\DBEnabled
 	    if(!\obo\util\Validator::isPosInt($mid))
 		{
 	        return false;
-	    }   
-		
-		
+	    }
+
+
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -798,9 +798,9 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/**** Permission Functions ****/
-	/** 
+	/**
 	 * Sets permissions for all users for an item
 	 * @param $itemID (number) item ID to set permissions for
 	 * @param $item_type (string) l = learning object, m = media(future), q = question(future)
@@ -821,24 +821,24 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/*
-	
+
 	!!! example JSON call to add 1,2,3,4,5,6 perms and remove 1,2,3,4,5 perms for instancID 500
 	[{"userID":1,"perm":"1"},{"userID":1,"perm":"2"},{"userID":1,"perm":"3"},{"userID":1,"perm":"4"},{"userID":1,"perm":"5"},{"userID":1,"perm":"6"}]
 	500
 	1
 	[{"userID":1,"perm":"1"},{"userID":1,"perm":"2"},{"userID":1,"perm":"3"},{"userID":1,"perm":"4"},{"userID":1,"perm":"5"}]
-	
-	
+
+
 	*/
 	public function editUsersPerms($permObjects, $itemID = 0, $itemType = 'l', $removePerms = 0)
-	{		
+	{
 	    if(!\obo\util\Validator::isPosInt($itemID))
 		{
 			return \rocketD\util\Error::getError(2);
-	    }   
-		
+	    }
+
 		if($this->getSessionValid())
 		{
 			// Switch used temporarily to allow us to use 2 permission systems
@@ -861,8 +861,8 @@ class API extends \rocketD\db\DBEnabled
 						{
 							$result = $PMan->setPermsForUserToItem($value['userID'], \cfg_core_Perm::TYPE_INSTANCE, $itemID, array(), $value['perm'] );
 						}
-					} 
-					
+					}
+
 					break;
 				default:
 					if(!\obo\util\Validator::isItemType($itemType))
@@ -896,7 +896,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function removeUsersPerms($users, $itemID, $itemType)
 	{
 	    if(!\obo\util\Validator::isUserArray($users) || !\obo\util\Validator::isPosInt($itemID) || !\obo\util\Validator::isItemType($itemType))
@@ -921,10 +921,10 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result = \rocketD\util\Error::getError(1);
 		}
-		
-		return $result;	    
+
+		return $result;
 	}
-	
+
 	/**
 	 * Enter description here...
 	 *
@@ -937,17 +937,17 @@ class API extends \rocketD\db\DBEnabled
 	    if(!\obo\util\Validator::isPosInt($itemID))
 		{
 			return \rocketD\util\Error::getError(2);
-	    }    
-		
+	    }
+
 		if($this->getSessionValid())
 		{
-			
+
 			switch($itemType)
 			{
 				case \cfg_core_Perm::TYPE_INSTANCE:
 					$PMan = \obo\perms\PermManager::getInstance();
 					$result = $PMan->getAllUsersIDsForItem(\cfg_core_Perm::TYPE_INSTANCE, $itemID);
-					
+
 					break;
 				default:
 					if(!\obo\util\Validator::isItemType($itemType))
@@ -965,13 +965,13 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 
 	/****  Quiz Functions ****/
 	/**
 	 * Starts a new attempt if there are no unfinished attempts for the qGroupID
 	 * If an unfinshed attempt is found it return the quiz state array with past answered questions
-	 * 
+	 *
 	 * @param $qGroupID (number) question group id
 	 * @return (bool) false if error
 	 * @return (bool) true if new attempt was created
@@ -981,7 +981,7 @@ class API extends \rocketD\db\DBEnabled
 	{
 		if(\obo\util\Validator::isPosInt($qGroupID))
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
@@ -999,11 +999,11 @@ class API extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(1);
 			}
-			
+
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	/**
 	 * Submits a question for grading (if the user has an open instance)
 	 * @param $qGroupID (number) question group id
@@ -1017,7 +1017,7 @@ class API extends \rocketD\db\DBEnabled
 		// register visitKey first
 		if(\obo\util\Validator::isPosInt($qGroupID) && !empty($questionID))
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
@@ -1035,18 +1035,18 @@ class API extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(1);
 			}
-			
+
 		}
 		return \rocketD\util\Error::getError(2);
-		
+
 	}
-	
+
 	/**
 	 * Submits a media score (if the user has an open instance)
 	 * @param $qGroupID (number) question group id
 	 * @param $mid (number) media id
 	 * @param $score (number) submitted score (from user)
-	 * 
+	 *
 	 * @todo fix what it should it return
 	 * @return (Array) array with elements 'answerID', 'weight', and 'feedback'
 	 * @return (bool) False if error or no login
@@ -1056,8 +1056,8 @@ class API extends \rocketD\db\DBEnabled
 		// register visitKey first
 
 		if(\obo\util\Validator::isPosInt($qGroupID) && \obo\util\Validator::isPosInt($questionID) && \obo\util\Validator::isScore($score))
-		{	
-			
+		{
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
@@ -1075,14 +1075,14 @@ class API extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(1);
 			}
-			
+
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	/**
 	 * This function end the attempt with the specified qGroupID.
-	 * 
+	 *
 	 * @param $qGroupID (Number) question group id
 	 * @return (bool) false if error
 	 * @return (Number) the score of the submitted quiz
@@ -1093,14 +1093,14 @@ class API extends \rocketD\db\DBEnabled
 
 		if(\obo\util\Validator::isPosInt($qGroupID))
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
 				if(!$VM->registerCurrentViewKey($visitKey))
 				{
 					return \rocketD\util\Error::getError(5);
-				}				
+				}
 				$this->DBM->startTransaction();
 				$attemptMan = \obo\AttemptsManager::getInstance();
 				$result = $attemptMan->endAttempt($qGroupID);
@@ -1114,20 +1114,20 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
 
-	
+
+
 /*
-	
+
 	 * Gets the final score for a certain question group
 	 * @param $qGroupID (number) question group id
 	 * @return (number) final score for the question group
 	 * @return (bool) False if error or no login
-	 
+
 	public function getScore($qGroupID)
 	{
 		$this->DBM->startTransaction();
-		
+
 		if($this->getSessionValid())
 		{
 			$scoreman = \obo\ScoreManager::getInstance();
@@ -1148,7 +1148,7 @@ class API extends \rocketD\db\DBEnabled
 	public function getScoresForInstance($instid)
 	{
 		if(\obo\util\Validator::isPosInt($instid))
-		{		
+		{
 			if($this->getSessionValid())
 			{
 				$scoreman = \obo\ScoreManager::getInstance();
@@ -1162,7 +1162,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	/**
 	 * Gets a listing of each question response (qscores data) for an instance.
 	 * @param $instid (number) instance id
@@ -1187,7 +1187,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function getVisitTrackingData($userID, $instid)
 	{
 		if(\obo\util\Validator::isPosInt($instid) && \obo\util\Validator::isPosInt($userID))
@@ -1204,7 +1204,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	
+
 	public function getInstanceTrackingData($instID)
 	{
 		if(\obo\util\Validator::isPosInt($instID) && \obo\util\Validator::isPosInt($instID))
@@ -1218,7 +1218,7 @@ class API extends \rocketD\db\DBEnabled
 			{
 				$result = \rocketD\util\Error::getError(1);
 			}
-				
+
 		}
 		return false;
 	}
@@ -1231,7 +1231,7 @@ class API extends \rocketD\db\DBEnabled
 	 * @return (number) -1 if error or no login
 	 */
 	public function getLanguages()
-	{	
+	{
 		$langman = \obo\lo\LanguageManager::getInstance();
 		$result = $langman->getAllLanguages();
 		return $result;
@@ -1239,7 +1239,7 @@ class API extends \rocketD\db\DBEnabled
 
 	public function getSession()
 	{
-		
+
 		if($this->getSessionValid())
 		{
 			$UM = \rocketD\auth\AuthManager::getInstance();
@@ -1251,7 +1251,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	/****  Roles Functions ****/
 	public function getRoles()
 	{
@@ -1266,12 +1266,12 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getUserRoles($userID = 0)
 	{
 		if(\obo\util\Validator::isPosInt($userID, true))
-		{		
-			
+		{
+
 			if($this->getSessionValid())
 			{
 				$roleMan = \obo\perms\RoleManager::getInstance();
@@ -1285,7 +1285,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	// TODO: this is quite similar to getUserInRole, either rename or redundent
 	// Function accepts RoleID as a positive int, or a stringRoleName
 	public function getUsersInRole($roleNames)
@@ -1298,7 +1298,7 @@ class API extends \rocketD\db\DBEnabled
 			{
 				return false;
 			}
-			
+
 			$result = $roleMan->getUsersInRole($roleIDs);
 		}
 		else
@@ -1312,8 +1312,8 @@ class API extends \rocketD\db\DBEnabled
 	public function createRole($roleName)
 	{
 		if(\obo\util\Validator::isRoleName($roleName))
-		{		
-			
+		{
+
 			if($this->getSessionValid())
 			{
 				$roleMan = \obo\perms\RoleManager::getInstance();
@@ -1327,7 +1327,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function createExternalMediaLink($mediaObj)
 	{
 		if($this->getSessionValid())
@@ -1343,7 +1343,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	//@TODO: Consider renaming to uploadMedia and funnel all media uploads through here.
 	public function uploadMedia($fileData, $filename, $title, $description, $copyright, $length=0)
 	{
@@ -1360,12 +1360,12 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function removeRole($roleName)
 	{
 		if(\obo\util\Validator::isRoleName($roleName))
-		{		
-			
+		{
+
 			if($this->getSessionValid())
 			{
 				$roleMan = \obo\perms\RoleManager::getInstance();
@@ -1379,18 +1379,18 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function removeUsersRoles($users, $roles)
 	{
 		if(\obo\util\Validator::isUserArray($users) && \obo\util\Validator::isRoleArray($roles))
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$this->DBM->startTransaction();
 				$roleMan = \obo\perms\RoleManager::getInstance();
 				$result = $roleMan->removeUsersFromRoles($users, $roles);
-				$this->DBM->commit();	
+				$this->DBM->commit();
 			}
 			else
 			{
@@ -1400,15 +1400,15 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	/**
 	 * @author Zachary Berry
 	 */
 	public function editUsersRoles($users, $roles)
 	{
 		if(\obo\util\Validator::isUserArray($users) && \obo\util\Validator::isRoleArray($roles))
-		{		
-			
+		{
+
 			if($this->getSessionValid())
 			{
 				$this->DBM->startTransaction();
@@ -1424,14 +1424,14 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	/****	Tracking Functions ***/
 
 	public function trackPageChanged($visitKey, $pageID, $section)
 	{
 		if(!empty($pageID) && \obo\util\Validator::isSection($section))
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
@@ -1439,7 +1439,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					return \rocketD\util\Error::getError(5);
 				}
-				
+
 				if($VM->getCurrentViewKeyInstID() > 0)
 				{
 					$this->DBM->startTransaction();
@@ -1463,9 +1463,9 @@ class API extends \rocketD\db\DBEnabled
 
 	public function trackSectionChanged($visitKey, $section)
 	{
-		if(\obo\util\Validator::isSection($section) )	
+		if(\obo\util\Validator::isSection($section) )
 		{
-			
+
 			if($this->getSessionValid())
 			{
 				$VM = \obo\VisitManager::getInstance();
@@ -1473,7 +1473,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					return \rocketD\util\Error::getError(5);
 				}
-								
+
 				if( $VM->getCurrentViewKeyInstID() > 0 )
 				{
 					$this->DBM->startTransaction();
@@ -1495,7 +1495,7 @@ class API extends \rocketD\db\DBEnabled
 		return \rocketD\util\Error::getError(2);
 	}
 
-	
+
 	// TODO: validation
 	public function trackComputerData($data)
 	{
@@ -1512,7 +1512,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 
     public function trackVisitResume($visitKey, $instID)
     {
@@ -1527,7 +1527,7 @@ class API extends \rocketD\db\DBEnabled
 				{
 					return \rocketD\util\Error::getError(5);
 				}
-				
+
 				$this->DBM->startTransaction();
 	            $visitMan = \obo\VisitManager::getInstance();
 	            $result = $visitMan->resumeVisit($instID);
@@ -1552,18 +1552,18 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function editPassword($oldPassword, $newPassword)
 	{
 		if(\obo\util\Validator::isString($oldPassword) && \obo\util\Validator::isString($newPassword) )
-		{		
+		{
 			// session wont verify, so can't do it here
 			$AM = \rocketD\auth\AuthManager::getInstance();
 			return $AM->changePassword($oldPassword, $newPassword);
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function editPasswordWithKey($username, $key, $newpass)
 	{
 		if(\obo\util\Validator::isString($username) && \obo\util\Validator::isSHA1($key) && \obo\util\Validator::isString($newpass))
@@ -1582,7 +1582,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return \rocketD\util\Error::getError(2);
 	}
-	
+
 	public function editExtraAttempts($userID, $instID, $count)
 	{
 		if(	\obo\util\Validator::isPosInt($userID) &&
@@ -1606,10 +1606,10 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result = \rocketD\util\Error::getError(2);
 		}
-		
+
 		return $result;
 	}
-	
+
 	public function removeExtraAttempts($userID, $instID)
 	{
 		if(\obo\util\Validator::isPosInt($userID) && \obo\util\Validator::isPosInt($instID))
@@ -1630,10 +1630,10 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result = \rocketD\util\Error::getError(2);
 		}
-		
+
 		return $result;
 	}
-	
+
 	/* @author: Zachary Berry */
 	public function trackClientError($client, $message, $data)
 	{
@@ -1662,11 +1662,11 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$result = \rocketD\util\Error::getError(1);
 		}
-		
+
 		return $result;
 
 	}
-	
+
 	public function getLOsWithMedia($mid)
 	{
 		if($this->getSessionValid())
@@ -1685,7 +1685,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getLoginOptions()
 	{
 		$options = array();
@@ -1702,14 +1702,14 @@ class API extends \rocketD\db\DBEnabled
 			'canActivate' => false,
 			'activateAction' => '',
 			'canReset' => true,
-			'resetAction' => 'https://www.secure.net.ucf.edu/extranet/reset/validation.aspx?type=nid',
+			'resetAction' => 'http://mynid.ucf.edu/',
 			'resetRequestDialog' => "Use this form if your username starts with a '~' (tilde).\n\nWe'll send you an email with further details.",
 			'resetRequestHelp' => 'You must know your username and email address that we have on record. Use this form only if your username starts with a tilde (example: ~ucf123). <br><br>Once submitted, you will receive an email containing instructions about completing the reset process.',
 			'priority' => 1
  		);
 		return $options;
 	}
-	
+
 	public function doMergeUsers($userIDFrom, $userIDTo)
 	{
 		if($this->getSessionValid())
@@ -1723,7 +1723,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function doImportEquivalentAttempt($visitKey)
 	{
 		if($this->getSessionValid())
@@ -1737,7 +1737,7 @@ class API extends \rocketD\db\DBEnabled
 		}
 		return $result;
 	}
-	
+
 	public function getLOStats($los, $stats, $start, $end, $resolution, $preview=true)
 	{
 		if($this->getSessionValid())
@@ -1754,12 +1754,12 @@ class API extends \rocketD\db\DBEnabled
 
 	/**
 	 * Build a set of arguments needed to create an LTI Post request for an outcomes module
-	 * 
+	 *
 	 * 3 Modes are possible with this
 	 * Play Mode:  getLTIParams($widgetId, $pageId, $loID, $visitKey), requires login and active visitKey
 	 * Preview Mode:  getLTIParams($widgetId, $pageId, $loID) - you dont have a visitKey, requires lib user
 	 * Creator Mode: if you know your itemID - getLTIParams($widgetId) or if you dont - getLTIParams(), requires lib user
-	 * 
+	 *
 	 * @param string Optional - Id of the object you want from the tool (in Materia this is a widgetID)
 	 * @param string Optional - Id of the current page that item is shown on
 	 * @param string Optional - LOid of the lo that the item is sown in
@@ -1774,7 +1774,7 @@ class API extends \rocketD\db\DBEnabled
 		// ============================= CHOOSE PARAMS BASED ON MODE ============================
 		switch($mode)
 		{
-			
+
 			case 'select': // select a widget in creator mode
 				if(!empty($loID) || !empty($pageOrQuestionID) || !empty($pageItemIndex) || !empty($visitKey) ) return \rocketD\util\Error::getError(2); // nothing but the itemID
 				$roleMan = \obo\perms\RoleManager::getInstance();
