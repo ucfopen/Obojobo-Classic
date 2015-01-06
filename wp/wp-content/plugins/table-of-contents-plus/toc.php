@@ -5,7 +5,7 @@ Plugin URI: 	http://dublue.com/plugins/toc/
 Description: 	A powerful yet user friendly plugin that automatically creates a table of contents. Can also output a sitemap listing all pages and categories.
 Author: 		Michael Tran
 Author URI: 	http://dublue.com/
-Version: 		1404
+Version: 		1408
 License:		GPL2
 */
 
@@ -117,6 +117,7 @@ if ( !class_exists( 'toc' ) ) :
 				'exclude' => '',
 				'heading_levels' => array('1', '2', '3', '4', '5', '6'),
 				'restrict_path' => '',
+				'css_container_class' => '',
 				'sitemap_show_page_listing' => true,
 				'sitemap_show_category_listing' => true,
 				'sitemap_heading_type' => 3,
@@ -211,6 +212,7 @@ if ( !class_exists( 'toc' ) ) :
 				'label_show' => $this->options['visibility_show'],
 				'label_hide' => $this->options['visibility_hide'],
 				'no_label' => false,
+				'class' => false,
 				'wrapping' => $this->options['wrapping'],
 				'heading_levels' => $this->options['heading_levels'],
 				'exclude' => $this->options['exclude']
@@ -221,6 +223,7 @@ if ( !class_exists( 'toc' ) ) :
 			if ( $label ) $this->options['heading_text'] = html_entity_decode( $label );
 			if ( $label_show ) $this->options['visibility_show'] = html_entity_decode( $label_show );
 			if ( $label_hide ) $this->options['visibility_hide'] = html_entity_decode( $label_hide );
+			if ( $class ) $this->options['css_container_class'] = $class;
 			if ( $wrapping ) {
 				switch ( strtolower(trim($wrapping)) ) {
 					case 'left':
@@ -929,7 +932,7 @@ if ( !class_exists( 'toc' ) ) :
 	<tr>
 		<th><label for="exclude"><?php _e('Exclude headings', 'toc+'); ?></label></th>
 		<td>
-			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['exclude'] ); ?>" id="exclude" name="exclude" style="width: 100%;" /><br />
+			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['exclude'], ENT_COMPAT, 'UTF-8' ); ?>" id="exclude" name="exclude" style="width: 100%;" /><br />
 			<label for="exclude"><?php _e('Specify headings to be excluded from appearing in the table of contents.  Separate multiple headings with a pipe <code>|</code>.  Use an asterisk <code>*</code> as a wildcard to match other text.  Note that this is not case sensitive. Some examples:', 'toc+'); ?></label><br/>
 			<ul>
 				<li><?php _e('<code>Fruit*</code> ignore headings starting with "Fruit"', 'toc+'); ?></li>
@@ -948,7 +951,7 @@ if ( !class_exists( 'toc' ) ) :
 	<tr>
 		<th><label for="restrict_path"><?php _e('Restrict path', 'toc+'); ?></label></th>
 		<td>
-			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['restrict_path'] ); ?>" id="restrict_path" name="restrict_path" /><br />
+			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['restrict_path'], ENT_COMPAT, 'UTF-8' ); ?>" id="restrict_path" name="restrict_path" /><br />
 			<label for="restrict_path"><?php _e('Restrict generation of the table of contents to pages that match the required path. This path is from the root of your site and always begins with a forward slash.', 'toc+'); ?><br />
 			<span class="description"><?php 
 			/* translators: example URL path restriction */
@@ -958,7 +961,7 @@ if ( !class_exists( 'toc' ) ) :
 	<tr>
 		<th><label for="fragment_prefix"><?php _e('Default anchor prefix', 'toc+'); ?></label></th>
 		<td>
-			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['fragment_prefix'] ); ?>" id="fragment_prefix" name="fragment_prefix" /><br />
+			<input type="text" class="regular-text" value="<?php echo htmlentities( $this->options['fragment_prefix'], ENT_COMPAT, 'UTF-8' ); ?>" id="fragment_prefix" name="fragment_prefix" /><br />
 			<label for="fragment_prefix"><?php _e('Anchor targets are restricted to alphanumeric characters as per HTML specification (see readme for more detail). The default anchor prefix will be used when no characters qualify. When left blank, a number will be used instead.', 'toc+'); ?><br />
 			<?php _e('This option normally applies to content written in character sets other than ASCII.', 'toc+'); ?><br />
 			<span class="description"><?php 
@@ -1092,6 +1095,7 @@ h1, h2, h3, h4, h5, h6 { clear: none; }
 			<li><strong>wrapping</strong>: <?php _e('text, either "left" or "right"', 'toc+'); ?></li>
 			<li><strong>heading_levels</strong>: <?php _e('numbers, this lets you select the heading levels you want included in the table of contents. Separate multiple levels with a comma. Example: include headings 3, 4 and 5 but exclude the others with', 'toc+'); ?> <code>heading_levels="3,4,5"</code></li>
 			<li><strong>exclude</strong>: <?php _e('text, enter headings to be excluded.  Separate multiple headings with a pipe <code>|</code>. Use an asterisk <code>*</code> as a wildcard to match other text. You could also use regular expressions for more advanced matching.', 'toc+'); ?></li>
+			<li><strong>class</strong>: <?php _e('text, enter CSS classes to be added to the container.  Separate multiple classes with a space.', 'toc+'); ?></li>
 		</ul>
 	</td>
 </tr>
@@ -1478,6 +1482,15 @@ wp_reset_postdata();
 						}
 					}
 
+					// remove empty headings
+					$new_matches = array();
+					for ($i = 0; $i < count($matches); $i++) {
+						if ( trim( strip_tags($matches[$i][0]) ) != false )
+							$new_matches[] = $matches[$i];
+					}
+					if ( count($matches) != count($new_matches) )
+						$matches = $new_matches;
+
 					// check minimum number of headings
 					if ( count($matches) >= $this->options['start'] ) {
 
@@ -1620,6 +1633,8 @@ wp_reset_postdata();
 						else
 							$css_classes .= ' no_bullets';
 						
+						if ( $this->options['css_container_class'] ) $css_classes .= ' ' . $this->options['css_container_class'];
+
 						$css_classes = trim($css_classes);
 						
 						// an empty class="" is invalid markup!
