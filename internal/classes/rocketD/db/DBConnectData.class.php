@@ -3,6 +3,7 @@ namespace rocketD\db;
 class DBConnectData
 {
 
+	public $key='';
 	public $type='';
 	public $host='';
 	public $user='';
@@ -17,7 +18,6 @@ class DBConnectData
 		$this->pass = $pass;
 		$this->db = $db;
 		$this->type = $type;
+		$this->key = md5("{$host}:{$user}:{$type}:{$db}");
 	}
-
 }
-?>

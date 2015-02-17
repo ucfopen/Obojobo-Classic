@@ -47,12 +47,17 @@ class DBManager
 			switch($conDataType)
 			{
 				case 'string':
-					return $DBM->loadConnectData($conData);
+					$conn = $DBM->loadConnectData($conData);
 					break;
+
 				case 'object':
-					return $DBM->loadConnectObj($conData);
+					$conn = $DBM->loadConnectObj($conData);
 					break;
+
+				default:
+					$conn = false;
 			}
+			return $conn;
 		}
 	}
 
@@ -76,20 +81,14 @@ class DBManager
 		}
 	}
 
-	static protected function connectionKey($conObj)
-	{
-		md5("{$conObj->host},{$conObj->user},{$conObj->type},{$conObj->db}");
-	}
-
 	protected function locateConnection($conObj)
 	{
 		// look for connection already made
 		if(count($this->connections) > 0 )
 		{
-			$key = static::connectionKey($conObj);
-			if ( ! empty($this->connections[$key]))
+			if ( ! empty($this->connections[$conObj->key]))
 			{
-				return $this->connections[$key];
+				return $this->connections[$conObj->key];
 			}
 		}
 		return false;
@@ -127,8 +126,7 @@ class DBManager
 
 		if($newConn)
 		{
-			$key = static::connectionKey($conObj);
-			$this->connections[$key] = $newConn;
+			$this->connections[$conObj->key] = $newConn;
 			return $newConn;
 		}
 
