@@ -1,5 +1,6 @@
 <?php
 namespace rocketD\db;
+
 class DBManager
 {
 	static $instance;
@@ -17,7 +18,7 @@ class DBManager
 			switch($conDataType)
 			{
 				case 'string':
-					$this->loadConnectData($conData);	
+					$this->loadConnectData($conData);
 					break;
 				case 'object':
 					$this->loadConnectObj($conData);
@@ -25,8 +26,7 @@ class DBManager
 			}
 		}
 	}
-	
-	
+
 	static public function getInstance($conData = false)
 	{
 		if(!isset(self::$instance))
@@ -36,7 +36,7 @@ class DBManager
 		}
 		return self::$instance;
 	}
-	
+
 	static function getConnection($conData = false)
 	{
 		$DBM = self::getInstance();
@@ -47,14 +47,13 @@ class DBManager
 			switch($conDataType)
 			{
 				case 'string':
-					return $DBM->loadConnectData($conData);	
+					return $DBM->loadConnectData($conData);
 					break;
 				case 'object':
 					return $DBM->loadConnectObj($conData);
 					break;
 			}
 		}
-		
 	}
 
 	// load a connection object by passing the class name
@@ -63,11 +62,11 @@ class DBManager
 		$dbcd = new $conData();
 		return $this->loadConnectObj($dbcd);
 	}
-	
+
 	// load a connection object by passing a DBConnectData object reference
 	public function loadConnectObj($conObj)
 	{
-		if($conn = $this->locateConnection($conObj->host, $conObj->user, $conObj->pass, $conObj->type, $conObj->db))
+		if($conn = $this->locateConnection($conObj))
 		{
 			return $conn;
 		}
@@ -77,17 +76,20 @@ class DBManager
 		}
 	}
 
-	protected function locateConnection($host, $user, $pw, $type, $db='')
+	static protected function connectionKey($conObj)
+	{
+		md5("{$conObj->host},{$conObj->user},{$conObj->type},{$conObj->db}");
+	}
+
+	protected function locateConnection($conObj)
 	{
 		// look for connection already made
 		if(count($this->connections) > 0 )
 		{
-			foreach($this->connections AS $conn)
+			$key = static::connectionKey($conObj);
+			if ( ! empty($this->connections[$key]))
 			{
-				if($conn->connData->type == $type && $conn->connData->user == $user && $conn->connData->pass == $pw && $conn->connData->db == $db)
-				{
-					return $conn;
-				}
+				return $this->connections[$key];
 			}
 		}
 		return false;
@@ -107,7 +109,7 @@ class DBManager
 					}
 				}
 				break;
-				
+
 			case 'mysql':
 				$newConn = new DBConnectionMYSQL($conObj);
 				if($newConn->checkRequirements())
@@ -122,14 +124,14 @@ class DBManager
 				trace('DBManager4 createNewConnection call, no matching connection type defined.', true);
 				break;
 		}
-		
+
 		if($newConn)
 		{
-			$this->connections[] = $newConn;
+			$key = static::connectionKey($conObj);
+			$this->connections[$key] = $newConn;
 			return $newConn;
 		}
-		
+
 		return false;
 	}
 }
-?>
