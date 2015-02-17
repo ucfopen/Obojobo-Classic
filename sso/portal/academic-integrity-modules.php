@@ -81,12 +81,10 @@ foreach ($los AS $instID)
 		<h2>New Undergraduate Students</h2>
 			<ul>
 				<?= $output[0] ?>
-				<?= $output[1] ?>
-				<?= $output[2] ?>
 			</ul>
 		<h2>New Master's Program Students</h2>
 			<ul>
-				<?= $output[3] ?>
+				<?= $output[1] ?>
 			</ul>
 
 	<? else: ?>
