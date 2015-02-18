@@ -364,7 +364,7 @@ class LOManager extends \rocketD\db\DBEnabled
 	 * @return (LO) learning object
 	 * @return (bool) False if error
 	 */
-	public function getLO($loIDArrOrInt=0, $amount='full', $inc_weight=true)
+	public function getLO($loIDArrOrInt=0, $amount='full')
 	{
 		// whitelist input
 		// loid can be an array of pos integers for grabbing meta objects
