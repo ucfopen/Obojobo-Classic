@@ -164,11 +164,13 @@ class DBConnectionMYSQL extends DBConnection
 		switch($returnType)
 		{
 			case 'array':
-				$method = 'fetch_assoc';
+				$method = 'fetch_array';
 				break;
 			case 'object':
 				$method = 'fetch_obj';
-			default:
+				break;
+			case 'assoc':
+				$method = 'fetch_assoc';
 				break;
 		}
 		$returnType == 'obj';
