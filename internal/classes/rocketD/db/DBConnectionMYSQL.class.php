@@ -125,8 +125,8 @@ class DBConnectionMYSQL extends DBConnection
 
 	public function qfetch_array($query)
 	{
-		$q = $this->query($query);
-		return $this->fetch_array($query);
+		$res = $this->query($query);
+		return $this->fetch_array($res);
 	}
 
 	public function fetch_assoc($res)
@@ -136,8 +136,8 @@ class DBConnectionMYSQL extends DBConnection
 
 	public function qfetch_assoc($query)
 	{
-		$q = $this->query($query);
-		return $this->fetch_assoc($q);
+		$res = $this->query($query);
+		return $this->fetch_assoc($res);
 	}
 
 	public function fetch_num($res)
@@ -149,15 +149,15 @@ class DBConnectionMYSQL extends DBConnection
 	{
 		if(isset($objName)) return @mysql_fetch_object($res, $objName);
 		else return @mysql_fetch_object($res);
-		
+
 	}
 
 	public function qfetch_obj($query, $objName=null)
 	{
-		$q = $this->query($query);
+		$res = $this->query($query);
 		return $this->fetch_obj($res, $objName);
 	}
-	
+
 	public function getAllRows($res, $returnType='object')
 	{
 		$rows = array();
