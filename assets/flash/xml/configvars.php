@@ -99,19 +99,23 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	<pro_account_formID>
 		<![CDATA[<?php echo \AppCfg::ACCOUNT_FORM_ID; ?>]]>
 	</pro_account_formID>
-	
+
 	<student_guide_url>
 		<![CDATA[<?php echo \AppCfg::URL_STUDENT_QSTART; ?>]]>
 	</student_guide_url>
 
+	<flickr_api_url>
+		<![CDATA[<?php echo \AppCfg::URL_FLICKR_API; ?>]]>
+	</flickr_api_url>
+
 	<help_url>
 		<![CDATA[/help/]]>
 	</help_url>
-		
+
 	<shared_object_name>
 		<![CDATA[mindshare]]>
 	</shared_object_name>
-	
+
 	<next_minimum_flash_version>
 		<![CDATA[<?php echo \AppCfg::FLASH_VER_WARN; ?>]]>
 	</next_minimum_flash_version>
