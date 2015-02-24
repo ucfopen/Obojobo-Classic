@@ -1696,7 +1696,7 @@ class API extends \rocketD\db\DBEnabled
 			'userNameLabel' => 'NID/Username',
 			'userNameHelp' => 'Your NID, or Network ID, is typically composed of the first two letters of your first name and a random six-digit number. If your first name has only one character, the character is duplicated to create the two letters for your NID. If you work at UCF, your NID may be different from the default format. <u><a href="https://my.ucf.edu/static_support/pidnidwrapper.html" target="_blank">Get your NID</a></u>.',
 			'passwordLabel' => 'Password',
-			'passwordHelp' => 'Your NID password is shared for several systems on campus including the Main Computer Labs, Webcourses@UCF, Obojobo, and several others.  Visit the central reset form to <u><a href="https://www.secure.net.ucf.edu/extranet/reset/validation.aspx?type=nid" target="_blank">change your password</a></u>.   If you are a guests without a UCF ID Card will need to call the Service Desk (407-823-5117) to reset your password.',
+			'passwordHelp' => 'Your NID password is shared for several systems on campus including the Main Computer Labs, Webcourses@UCF, Obojobo, and several others.  Visit the central reset form to <u><a href="http://mynid.ucf.edu/" target="_blank">change your password</a></u>.   If you are a guests without a UCF ID Card will need to call the Service Desk (407-823-5117) to reset your password.',
 			'overviewHelp' => 'Overview help here!',
 			'md5Password' => false,
 			'canActivate' => false,
