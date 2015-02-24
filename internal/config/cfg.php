@@ -84,22 +84,25 @@ class AppCfgDefault
 	// Define location of the twitter proxy
 	const URL_TWITTER_PROXY = 'assets/twitterlog.php';
 
+	// Define location of the Flickr API
+	const URL_FLICKR_API = 'https://api.flickr.com/services/rest/';
+
 	// Define location of the Known Issues page
 	const URL_KNOWN_ISSUES = 'about/knownIssues.html';
-	
+
 	// Define location of the Pro account request form
 	const URL_ACCOUNT_FORM = 'https://formmanager.ucf.edu/formsubmit.cfm';
-	
+
 	// Define the relative location for the remoting gateway
 	const AMF_GATEWAY  = 'api/amf.php';
-	
+
 	// Define the json gateway location
 	const JSON_GATEWAY = 'api/json.php';
 
 	// Define the Form Manager form ID
 	const ACCOUNT_FORM_ID = '27373';
-	
-	//--------------------   ERRORS   -----------------------//	
+
+	//--------------------   ERRORS   -----------------------//
 	// Mail Error File Name
 	const ERROR_FILE = 'php_errors';
 
