@@ -45,10 +45,19 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 					$this->DBM->rollBack();
 					return array('success' => false, 'error' => 'Unable to create user.');
 				}
-				//
+
+				if($optionalVars && isset($optionalVars['ucfID']))
+				{
+					if(!$this->addOrUpdateMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
+					{
+						$this->DBM->rollBack();
+						return array('success' => false, 'error' => 'Unable to create user.');
+					}
+				}
+
 				$this->DBM->commit();
 				return array('success' => true, 'userID' => $result['userID']);
-				}
+			}
 			else
 			{
 				$this->DBM->rollBack();
@@ -138,10 +147,22 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if($result['success']==true)
 			{
 				// update with md5 pass
-				if($this->updateRecord($userID, $userName))
+				if(!$this->updateRecord($userID, $userName))
 				{
-					return array('success' => true);
+					$this->DBM->rollBack();
+					trace('Unable to update user.', true);
+					return array('success' => false, 'error' => 'Unable to update user.');
 				}
+
+				if(!$this->addOrUpdateMetaField($userID, 'ucfID', $optionalVars['ucfID']))
+				{
+					$this->DBM->rollBack();
+					trace('Unable to update user.', true);
+					return array('success' => false, 'error' => 'Unable to update user.');
+				}
+
+				$this->DBM->commit();
+				return array('success' => true);
 			}
 			$this->DBM->rollBack();
 			trace('Unable to update user.', true);
@@ -297,30 +318,30 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	}
 
 	// security check: Ian Turgeon 2008-05-08 - PASS
-	public function updateRecord($userID, $userName, $password)
+	public function updateRecord($userID, $userName, $password = null)
 	{
 		if(!$this->validateUID($userID)) return false;
-		
+
 		$this->defaultDBM();
 		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
 		}
-		
+
 		// update login
 		if($this->validateUsername($userName) === true)
 		{
 			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
-			
+
 			// update username
 			 return $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, $userID);
-			
+
 		}
 		return true;
-	
+
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validateUsername($userName)
 	{
@@ -377,17 +398,17 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				// update internal record
 				if($user = $this->fetchUserByID($userID))
 				{
+					$ucfID = $this->getMetaField($user->userID, 'ucfID');
 					// update user data changes
-					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email){
+					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email || $ucfID != $eUser->ucfID){
 
-						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
+						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}, {$ucfID} = {$eUser->ucfID}", true);
 
 						$user->first = $eUser->first;
 						$user->last  = $eUser->last;
 						$user->email = $eUser->email;
 
-						parent::updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email);
-
+						$this->updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email, array('ucfID' => $eUser->ucfID));
 					}
 				}
 				else
@@ -399,7 +420,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			else
 			{
 				// create internal record
-				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array());
+				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array('ucfID' => $eUser->ucfID));
 				if(!$created['success'])
 				{
 					trace('createNewUser Failed', true);
@@ -457,14 +478,34 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						trace('fetchUserByID failed', true);
 						return false;
 					}
-				
-					$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?'";
-					$result = $this->DBM->querySafe($qstr, $user->userID, 'portal_sso', '1'); // add record to track where the user was originally created
+
+					$this->addOrUpdateMetaField($user->userID, 'portal_sso', '1');
+
 					return $user;
 				}
 			}
 		}
 		return false;
+	}
+
+	protected function getMetaField($userID, $key)
+	{
+		$qstr = "SELECT value FROM obo_user_meta WHERE userID = '?' AND meta = '?';";
+		$result = $this->DBM->querySafe($qstr, $userID, $key);
+		$fetched = $this->DBM->fetch_obj($result);
+
+		if(!$fetched || !isset($fetched->value))
+		{
+			return false;
+		}
+
+		return $fetched->value;
+	}
+
+	protected function addOrUpdateMetaField($userID, $key, $value)
+	{
+		$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?' ON DUPLICATE KEY UPDATE value='?'";
+		return $this->DBM->querySafe($qstr, $userID, $key, $value, $value);
 	}
 
 	protected function getUcfDb()
@@ -489,6 +530,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		$userTable = \cfg_plugin_AuthModUCF::TABLE_PEOPLE;
 		$userId    = \cfg_plugin_AuthModUCF::NID;
+		$ucfID     = \cfg_plugin_AuthModUCF::PPS_NUMBER;
 		$first     = \cfg_plugin_AuthModUCF::FIRST;
 		$last      = \cfg_plugin_AuthModUCF::LAST;
 		$email     = \cfg_plugin_AuthModUCF::EMAIL;
@@ -514,6 +556,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		// Build a standardized result
 		$user = (object) [
+			'ucfID'     => $result[$ucfID],
 			'first'     => $result[$first],
 			'last'      => $result[$last],
 			'email'     => $result[$email],
