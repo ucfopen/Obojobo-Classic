@@ -242,7 +242,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('WARNING LOCAL AUTHENTICATION TEST MODE ENABLED', true);
 			return array('success' => true, 'code' => '');
 		}
-		
+
 		// make the LDAP request
 		$success = false;
 		$code = '';
@@ -270,7 +270,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('ldap threw and exception', true);
 			trace($e);
 		}
-		
+
 		return array('success' => $success, 'code' => $code);
 	}
 
@@ -335,7 +335,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			trace('User name minimum length is '.\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.' characters. ' . $userName, true);
 			return 'User name minimum length is 2 characters.';
-		}			
+		}
 		if(empty($userName))
 		{
 			trace('Username is empty', true);
@@ -345,7 +345,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			trace('User name can only contain alpha numeric characters. ' . $userName, true);
 			return 'User name can only contain alpha numeric characters.';
-		}		
+		}
 		return true;
 	}
 
@@ -418,10 +418,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			}
 			// update roles
 			$this->updateRole($user->userID, $eUser->isCreator);
-			
+
 			return $user;
 		}
-		
+
 		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
 		if($allowWeakSync === true)
 		{
@@ -480,7 +480,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	protected function getUCFUserData($username)
 	{
-
 		$ucfDB = $this->getUcfDb();
 		if ( ! $ucfDB->connected)
 		{
@@ -523,7 +522,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		return $user;
 	}
-	
+
 	protected function trimArray($array)
 	{
 		if(count($array) > 0 )
@@ -535,7 +534,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return $array;
 	}
-	
+
 	public function updateRole($UIDorUser, $isLibraryUser=0)
 	{
 		$this->defaultDBM();
@@ -544,7 +543,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('not connected', true);
 			return false;
 		}
-		
+
 		// if UIDorUser is a UID
 		if(\obo\util\Validator::isPosInt($UIDorUser))
 		{
@@ -558,7 +557,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			$user = $UIDorUser;
 		}
-		
+
 		// grab our user first to see if overrrideRoll has been set to 1
 		if($user instanceof \rocketD\auth\User)
 		{
@@ -597,7 +596,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			}
 		}
 	}
-	
+
 	public function removeRecord($userID)
 	{
 		return parent::removeRecord($userID); // remove user
@@ -607,7 +606,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		if($this->validateUID($userID))
 		{
-			return true; // USER password is maintained in LDAP	
+			return true; // USER password is maintained in LDAP
 		}
 		return false;
 	}
@@ -621,7 +620,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		return false;
 	}
-	
+
 	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey)
 	{
 		return false;
@@ -630,5 +629,5 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function changePasswordWithKey($userName, $key, $newpass)
 	{
 		return false;
-	}	
+	}
 }
