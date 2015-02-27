@@ -2,7 +2,7 @@
 namespace rocketD\auth;
 abstract class AuthModule extends \rocketD\db\dbEnabled
 {
-	protected $internalUser;	
+	protected $internalUser;
 	// TODO: Move reset to internal authmod
 	const COL_PW_RESET_KEY = 'ResetPasswordKey';
 	const COL_PW_RESET_DATE = 'resetPasswordDate';
@@ -18,7 +18,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	abstract protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey);
 	abstract public function changePasswordWithKey($username, $key, $newpass);
 	abstract static public function getInstance();
-	
+
 	/**
 	 * Fetch the Obojobo user data by it's ID
 	 *
@@ -34,20 +34,20 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			return false;
 		}
 		//check memcache
-		
+
 		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user;
 		}
-		
+
 		$this->defaultDBM();
 		//Fetch user data
-		
+
 		// TODO: change constant($authModDBC.'::TABLE') to $authModDBC::TABLE when PHP 5.3.0 is out
 		$qstr = "SELECT * FROM  ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' and ".\cfg_core_User::AUTH_MODULE." = '?' ";
 		$q = $this->DBM->querySafe($qstr ,$userID, get_class($this));
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
-		
+
 		//store in memcache
 		\rocketD\util\Cache::getInstance()->setUserByID($userID, $return);
 		return $return;
@@ -69,7 +69,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		return $users;
 	}
-	
+
 	// TODO: add password current info to user so that we can use memcache to determine if password is current
 	protected function buildUserFromQueryResult($r)
 	{
@@ -81,7 +81,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		return false;
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUser()
 	{
@@ -92,51 +92,51 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	**/
 	protected function verifyAuthModuleAvail()
 	{
-		
+
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($username)
 	{
 		if($this->validateUsername($username) === true)
 		{
 			$this->defaultDBM();
-				
+
 			if($userID = \rocketD\util\Cache::getInstance()->getUIDForUserName($username))
 			{
 				return $userID;
 			}
-			
+
 			if(!$this->DBM->connected)
 			{
 				trace('not connected', true);
 				return false;
 			}
-			
+
 			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, get_class($this));
 			if($r = $this->DBM->fetch_obj($q))
 			{
 				// store in memcache
 				\rocketD\util\Cache::getInstance()->setUIDForUserName($username, $r->{\cfg_core_User::ID});
-				
+
 				return $r->{\cfg_core_User::ID}; // return found user id
 			}
-	
+
 		}
 		return false;
 	}
-	
-	// security check: Ian Turgeon 2008-05-08 - PASS	
+
+	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
-		// Only update if valid (empty keeps existing value)		
+		// Only update if valid (empty keeps existing value)
 		if($this->validateFirstName($fName) && $this->validateLastName($lName) && $this->validateMiddleName($mName) && $this->validateEmail($email))
 		{
 			// Invalidating memcache that has a list of all users
 			// TODO: may be better to just append to the list then delete it
-			
+
 			\rocketD\util\Cache::getInstance()->clearAllUsers();
-						
+
 			$this->defaultDBM();
 			$qstr = "INSERT INTO ".\cfg_core_User::TABLE."
 			 SET ".\cfg_core_User::FIRST."='?',
@@ -155,7 +155,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return array('success' => false, 'error' => 'Unable to create User.');
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS	
+	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// require a valid UID
@@ -167,20 +167,20 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			{
 
 				// Only update if valid (empty keeps existing value)
-				if(!$this->validateFirstName($fName)) $fName = $user->first; 
+				if(!$this->validateFirstName($fName)) $fName = $user->first;
 				if(!$this->validateLastName($lName)) $lName = $user->last;
 				if(!$this->validateMiddleName($mName)) $mName = $user->mi;
 				if(!$this->validateEmail($email)) $email = $user->email;
 
 				$this->defaultDBM();
-				$qstr = "UPDATE ".\cfg_core_User::TABLE." 
+				$qstr = "UPDATE ".\cfg_core_User::TABLE."
 				SET ".\cfg_core_User::FIRST."='?',
 				 ".\cfg_core_User::LAST."='?',
 				 ".\cfg_core_User::MIDDLE."='?',
 				 ".\cfg_core_User::EMAIL."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1";
 				if($q = $this->DBM->querySafe($qstr, $fName, $lName, $mName, $email, $userID))
 				{
-					
+
 					\rocketD\util\Cache::getInstance()->clearUserByID($userID);
 					return array('success' => true, 'userID' => $userID);
 				}
@@ -210,12 +210,12 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		else
 		{
-			
+
 			$this->defaultDBM();
 			if(!session_id())
 			{
 				@session_name(\AppCfg::SESSION_NAME);
-				@session_start();	
+				@session_start();
 			}
 			@session_regenerate_id(false);
 			$_SESSION = array();// force a fresh start on the session variables
@@ -234,7 +234,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		$q = $this->DBM->querySafe("SELECT * FROM ". \cfg_core_User::TABLE ." WHERE ". \cfg_core_User::ID ."='?' AND ".\cfg_core_User::AUTH_MODULE." = '?'", $userID, get_class($this));
 		return $this->DBM->fetch_num($q) > 0;
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function validateUID($userID)
 	{;
@@ -251,7 +251,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		return true;
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - FAIL (needs to do something)
 	protected function validateLastName($name)
 	{
@@ -263,31 +263,31 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		return true;
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-08 - FAIL (needs to do something)
 	protected function validateEmail($email)
 	{
 		return true;
-	}	
-	
+	}
+
 	protected function validateResetURL($URL)
 	{
 		return true;
 	}
-	
-	// security check: Ian Turgeon 	2008-05-08 - PASS 
+
+	// security check: Ian Turgeon 	2008-05-08 - PASS
 	public function removeRecord($userID)
 	{
 		if($this->validateUID($userID))
 		{
 			// invalidate the memcache for this user
-			
+
 			if(\AppCfg::CACHE_MEMCACHE)
 			{
-				
+
 				\rocketD\util\Cache::getInstance()->delete('\rocketD\auth\AuthModule:fetchUserByID:'.$userID);
 			}
-			
+
 			$this->defaultDBM();
 			if($q = $this->DBM->querySafe("DELETE FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID))
 			{
@@ -298,11 +298,11 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		return false;
 	}
-	
+
 	public function getUserName($userID)
 	{
 		//use fetchUserBYID if memcahe is on
-		
+
 		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user->login;
@@ -314,13 +314,13 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			return $r->{\cfg_core_User::LOGIN};
 		}
 		return false;
-	}	
+	}
 
 	protected function makeResetKey()
 	{
 		return sha1(microtime(true));
 	}
-	
+
 	// security check: Ian Turgeon 2008-05-06 - PASS
 	protected function makePassword()
 	{
@@ -328,6 +328,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		$password = substr(md5(time()), $startNumber, $startNumber + 10); // make one if one wasn't sent
 		return array('password' => $password, 'MD5Pass' => md5($password));
 	}
-	
+
 }
 ?>
