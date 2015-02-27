@@ -21,7 +21,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 **/
 	public function fetchUserByID($userID = false)
 	{
-				
+
 		// need to get the user from the authmodule so that we can get the login name or login from the module
 		if(\rocketD\util\Validator::isPosInt($userID))
 		{
@@ -30,14 +30,14 @@ class AuthManager extends \rocketD\db\DBEnabled
 				return $authMod->fetchUserByID($userID);
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Gets a user object from the database based on their username
 	 *
-	 * @param string $userName 
+	 * @param string $userName
 	 * @return (User) requested user object or false if not found
 	 * @author Ian Turgeon
 	 */
@@ -52,7 +52,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Deletes a user with id
 	 * Only SuperUsers can delete a user
@@ -79,7 +79,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * @param $userName (string) The user's login name
 	 * @param @pwd (string) the user's password (plaintext)
 	 * @return (bool) True if login successful, False if not
-	 * 
+	 *
 	 * @todo Change this to a better hashing scheme
 	 */
 	//function login($userName='', $pwd='')
@@ -98,17 +98,17 @@ class AuthManager extends \rocketD\db\DBEnabled
 			}
 			else
 			{
-				
-				
+
+
 				return \rocketD\util\Error::getError(1004); // error: change password error
 			}
 		}
-		
+
 		// monitor repeat failed logins and throttle them
-		
+
 		\rocketD\util\Cache::getInstance()->doRateLimit($_SERVER['REMOTE_ADDR']);
-		
-		
+
+
 		return \rocketD\util\Error::getError(1003); // error: incorrect password
 	}
 
@@ -118,7 +118,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * @param $userID (number) user ID
 	 * @param $sessid (string) PHP session ID
 	 * @return (bool) True if they are the same, False if not
-	 */	 	
+	 */
 	public function cmpSessID($userID, $sessid){
 		//TODO: check to see if the session has past the expiration time
 		$qstr = "SELECT ".\cfg_core_User::SID." FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1";
@@ -128,7 +128,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 		//Compare the two session IDs
 		if( $r = $this->DBM->fetch_obj($q) )
 		{
@@ -141,15 +141,15 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * Starts the session, verifys that the session is still valid, and logs
 	 * the user out if it is not.
 	 *
-	 * Also checks to see if the session id in the session variable is the same 
+	 * Also checks to see if the session id in the session variable is the same
 	 * as the one in the database.  Then it creates a new session id.
 	 *
 	 * Call this every time a new request is made of the server.
-	 * 
+	 *
 	 * @param $skipRegen (bool) False to generate a new session ID on each exchange, True to skip this step
 	 * @param $skipcompare (bool) False to compare the session ID to the stored one, True to skip this step
 	 * @return (bool) True if login is valid, False if invalid
-	 */	 
+	 */
 
 	// TODO: migrate role manager to a reusable package
 	public function verifySession($roleName='')
@@ -191,11 +191,11 @@ class AuthManager extends \rocketD\db\DBEnabled
 
 	public function checkTimeOut()
 	{
-		
-		// current time is past the 
+
+		// current time is past the
 		if(time() >= $_SESSION['timestamp'])
 		{
-			
+
 			\rocketD\util\Error::getError(3);
 			$this->logout($_SESSION['userID']);
 			return false;
@@ -215,7 +215,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	/**
 	 * Logs the user out of the system, completely clearing the session variable and destroying the session.
 	 * @param $userID (number) User ID to log out of the system
-	 */	 	 	
+	 */
 	public function logout()
 	{
 		if(!headers_sent() && !isset($_SESSION))
@@ -238,7 +238,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				return false;
 			}
 			// clear cache that may contain this user's data
-			
+
 			\rocketD\util\Cache::getInstance()->clearUserByID($_SESSION['userID']);
 		}
 		if(session_id())
@@ -253,18 +253,18 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * Updates a user entry, trys to create a new one if the id is 0
 	 * @param $usrObj (\rocketD\auth\User) updated user information
 	 * @param $usrObj (\rocketD\auth\User) the same info you just gave it
-	 * 
+	 *
 	 * @todo Maybe we don't need to return anything here?
 	 */
 	public function saveUser($usrObj, $optionalVars=0)
 	{
 		if(! \obo\util\Validator::isUserArr($usrObj) )
 		{
-			
-			
+
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$roleMan = \rocketD\perms\RoleManager::getInstance();
 		// current user must be superUser OR the same as the user to edit
 		if(! $roleMan->isSuperUser() )
@@ -272,8 +272,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 			// check user is editing own info
 			if( ($usrObj['userID'] == 0) || ($usrObj['userID'] != $_SESSION['userID'])) //if not current user
 			{
-				
-				
+
+
 				return \rocketD\util\Error::getError(4);
 			}
 		}
@@ -289,8 +289,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 					return true;
 				}
 			}
-			
-			
+
+
 			return \rocketD\util\Error::getError(0);
 		}
 		// edit user
@@ -303,8 +303,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 			}
 			trace('Unable to update user.', true);
 		}
-		
-		
+
+
 		return \rocketD\util\Error::getError(0);
 	}
 
@@ -452,8 +452,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return false;
 
 	}
-	
-	
+
+
 	/**
 	 * Handle checking all the authentication modules in order of priority
 	 *
@@ -466,6 +466,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		// get array of authmodules in order, first to last
 		$authModList = $this->getAllAuthModules();
+
 		// loop through authmods
 		if(count($authModList > 0))
 		{
@@ -497,12 +498,12 @@ class AuthManager extends \rocketD\db\DBEnabled
 	// security check: Ian Turgeon 	2008-05-12 - FAIL ish (need to make sure this isnt used directly by the api)
 	public function getAllUsers(){
 		// check memcache
-		
+
 		if($allUsers = \rocketD\util\Cache::getInstance()->getAllUsers)
 		{
 				return $allUsers;
 		}
-	
+
 		// get array of authmodules in order, first to last
 		$authMods = $this->getAllAuthModules();
 		$allUsers = array();
@@ -519,7 +520,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		\rocketD\util\Cache::getInstance()->setAllUsers($allUsers); // store in memcache
 		return $allUsers;
 	}
-	
+
 	public function getUsersMatchingUsername($searchString)
 	{
 		/*select * from obo_users where lower(concat_ws(' ',first,last)) like '%jag%'*/
@@ -536,25 +537,25 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return $users;
 	}
 
-	// remove all records for this user 
+	// remove all records for this user
 	public function removeUser($userID)
 	{
 		if(!\obo\util\Validator::isPosInt($userID))
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$roleMan = \rocketD\perms\RoleManager::getInstance();
 		if(!$roleMan->isSuperUser())
 		{
 			return \rocketD\util\Error::getError(4);
 		}
-		
+
 		if($userID == $_SESSION['userID'])
 		{
 			return \rocketD\util\Error::getError(0);
 		}
-		
+
 		$result = false;
 		$authMods = $this->getAllAuthModules();
 		foreach($authMods AS $authMod)
@@ -582,7 +583,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		}
 		return $authMods;
 	}
-	
+
 	// TODO: add getUser
 
 	public function getAuthModuleForUserID($userID=false)
@@ -590,7 +591,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		if($userID !== false)
 		{
 			// check memcache
-			
+
 			if($authModClass = \rocketD\util\Cache::getInstance()->getAuthModClassForUser($userID))
 			{
 				return new $authModClass();
@@ -618,7 +619,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			{
 				return call_user_func(array($authModClass, 'getInstance'));
 			}
-			
+
 			$this->defaultDBM();
 			$q = $this->DBM->querySafe("SELECT auth_module FROM obo_users WHERE login = '?'", $username);
 			if($r = $this->DBM->fetch_obj($q))
