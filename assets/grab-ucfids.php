@@ -3,9 +3,13 @@
 ini_set('display_errors', 1);
 
 
+
 require_once(dirname(__FILE__)."/../internal/app.php");
 require_once (dirname( __FILE__ )."/../internal/classes/rocketD/db/DBEnabled.class.php");
 require_once (dirname( __FILE__ )."/../internal/classes/rocketD/db/DBConnectData.class.php");
+
+session_name(\AppCfg::SESSION_NAME);
+session_start();
 
 $cerebroConn = new \rocketD\db\DBConnectData(\AppCfg::UCF_DB_HOST, \AppCfg::UCF_DB_USER, \AppCfg::UCF_DB_PASS, \AppCfg::UCF_DB_NAME, \AppCfg::UCF_DB_TYPE);
 $cerebroDB = \rocketD\db\DBManager::getConnection($cerebroConn);
