@@ -26,7 +26,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	public function fetchUserByID($userID = 0)
 	{
-		return parent::fetchUserByID($userID);
+		$user = parent::fetchUserByID($userID);
+		$user->ucfID = $this->getMetaField($user->userID, 'ucfID');
+
+		return $user;
 	}
 
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
