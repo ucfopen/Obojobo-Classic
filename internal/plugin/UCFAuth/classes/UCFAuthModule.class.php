@@ -34,7 +34,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
-		$optionalVars['MD5Pass'] = md5(microtime() . $email . $userName . $fName); // create a random password that is unguessable
+		$optionalVars['MD5Pass'] = $this->createSalt(); // create a random password that is unguessable
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
 		if($valid === true)
 		{
@@ -51,7 +51,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 				if($optionalVars && isset($optionalVars['ucfID']))
 				{
-					if(!$this->addOrUpdateMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
+					if(!$this->setMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
 					{
 						$this->DBM->rollBack();
 						return array('success' => false, 'error' => 'Unable to create user.');
@@ -74,7 +74,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$validUsername = $this->validateUsername($userName);
@@ -121,12 +120,11 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($userName)
 	{
 		return parent::getUIDforUsername($userName);
 	}
-	// security check: Ian Turgeon 2008-05-08 - PASS
+
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// validate arguments
@@ -139,7 +137,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
-			return false;
+			array('success' => false, 'error' => 'Database connection error.');
 		}
 
 		$user = $this->fetchUserByID($userID);
@@ -150,18 +148,22 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if($result['success']==true)
 			{
 				// update with md5 pass
-				if(!$this->updateRecord($userID, $userName))
+				if(!$this->updateRecord($userID, $userName, false))
 				{
 					$this->DBM->rollBack();
 					trace('Unable to update user.', true);
 					return array('success' => false, 'error' => 'Unable to update user.');
 				}
 
-				if(!$this->addOrUpdateMetaField($userID, 'ucfID', $optionalVars['ucfID']))
+				// Update the ucfID if it's set
+				if(isset($optionalVars['ucfID']))
 				{
-					$this->DBM->rollBack();
-					trace('Unable to update user.', true);
-					return array('success' => false, 'error' => 'Unable to update user.');
+					if(!$this->setMetaField($userID, 'ucfID', $optionalVars['ucfID']))
+					{
+						$this->DBM->rollBack();
+						trace('Unable to update user.', true);
+						return array('success' => false, 'error' => 'Unable to update user.');
+					}
 				}
 
 				$this->DBM->commit();
@@ -182,7 +184,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	 * @return true/false
 	 * @author Ian Turgeon
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
@@ -261,7 +262,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function verifyPassword($userName, $password)
 	{
 		// for local testing, ldap access may not be possible, if in local test mode just return an ok
-		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS && $_SERVER['SERVER_ADDR'] != \AppCfg::PRODUCTION_IP)
+		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS)
 		{
 			trace('WARNING LOCAL AUTHENTICATION TEST MODE ENABLED', true);
 			return array('success' => true, 'code' => '');
@@ -298,13 +299,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return array('success' => $success, 'code' => $code);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
-	protected function createSalt()
-	{
-		return md5(uniqid(rand(), true));
-	}
-
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function addRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
@@ -320,8 +314,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return (bool) $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
-	public function updateRecord($userID, $userName, $password = null)
+	public function updateRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
 
@@ -345,7 +338,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validateUsername($userName)
 	{
 		// make sure the string length is less then 255, our usernames aren't that long
@@ -373,7 +365,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validatePassword($pass)
 	{
 		if(empty($pass))
@@ -388,7 +379,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return true;
 	}
-	
+
 	public function syncExternalUser($userName, $allowWeakSync=false, $createIfMissing = false)
 	{
 		if($this->validateUsername($userName) !== true) return false;
@@ -482,33 +473,13 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						return false;
 					}
 
-					$this->addOrUpdateMetaField($user->userID, 'portal_sso', '1');
+					$this->setMetaField($user->userID, 'portal_sso', '1');
 
 					return $user;
 				}
 			}
 		}
 		return false;
-	}
-
-	protected function getMetaField($userID, $key)
-	{
-		$qstr = "SELECT value FROM obo_user_meta WHERE userID = '?' AND meta = '?';";
-		$result = $this->DBM->querySafe($qstr, $userID, $key);
-		$fetched = $this->DBM->fetch_obj($result);
-
-		if(!$fetched || !isset($fetched->value))
-		{
-			return false;
-		}
-
-		return $fetched->value;
-	}
-
-	protected function addOrUpdateMetaField($userID, $key, $value)
-	{
-		$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?' ON DUPLICATE KEY UPDATE value='?'";
-		return $this->DBM->querySafe($qstr, $userID, $key, $value, $value);
 	}
 
 	protected function getUcfDb()
