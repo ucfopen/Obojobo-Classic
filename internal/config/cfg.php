@@ -7,8 +7,6 @@
 class AppCfgDefault
 {
 	//--------------------   GENERAL   -----------------------//
-	const PRODUCTION_IP = '132.170.240.85';
-
 	// Define the system email address
 	const SYS_EMAIL = 'noReply@obojobo.ucf.edu';
 
@@ -154,14 +152,14 @@ class AppCfgDefault
 
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
-		
+
 	//--------------------   PLUGINS   -----------------------//
 	// add in camma seperated class names of authentication plugins to us
 	const AUTH_PLUGINS = '\rocketD\auth\ModInternal,plg_UCFAuth_UCFAuthModule';
-	
+
 	// add in camma seperated names of plugins from the internal/plugins/ directory
 	const CORE_PLUGINS = '';
-	
+
 	//-----------------   PLUGIN SETTINGS   -----------------//
 	// Never set true in production, [true, false]
 	const UCF_AUTH_BYPASS_PASSWORDS = false;
