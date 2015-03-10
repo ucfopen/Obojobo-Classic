@@ -204,34 +204,21 @@ class ModInternal extends AuthModule
 	public function verifyPassword($user, $password)
 	{
 		$user->verified = false; // reset user verified flag
-		// validate input
+
 		// if password isnt md5, md5 it
-		if( !\obo\util\Validator::isMD5($password) )
+		if( ! \obo\util\Validator::isMD5($password))
 		{
 			$password = md5($password);
 		}
 
 		if($this->validatePassword($password) !== true) return false;
-		if(!$this->validateUID($user->userID))
-		{
-			trace('invalid User ID', true);
-			return false;
-		}
-		// establish db connection
-		$this->defaultDBM();
-		if(!$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
+		if($this->validateUID($user->userID) !== true) return false;
 
 		// check the db for a correct salt/pw hash
-
-		$this->get
-		$q = $this->DBM->querySafe("SELECT * FROM (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'password') AS B WHERE `value` = MD5(CONCAT( (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'salt'), '?'))", $user->userID, $user->userID, $password);
-		if($r = $this->DBM->fetch_obj($q))
+		$dbSalt = $this->getMetaField($userID, 'salt');
+		$dbPw   = $this->getMetaField($userID, 'password');
+		if ($dbSalt.$password === $dbPw)
 		{
-			//ok session id was successfull, so store the stuff we need and return true
 			$user->verified = true;
 		}
 
