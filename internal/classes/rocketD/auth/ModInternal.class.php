@@ -215,9 +215,9 @@ class ModInternal extends AuthModule
 		if($this->validateUID($user->userID) !== true) return false;
 
 		// check the db for a correct salt/pw hash
-		$dbSalt = $this->getMetaField($userID, 'salt');
-		$dbPw   = $this->getMetaField($userID, 'password');
-		if ($dbSalt.$password === $dbPw)
+		$dbSalt = $this->getMetaField($user->userID, 'salt');
+		$dbPw   = $this->getMetaField($user->userID, 'password');
+		if (md5($dbSalt.$password) === $dbPw)
 		{
 			$user->verified = true;
 		}
