@@ -316,7 +316,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	protected function createSalt()
 	{
 		// return md5(uniqid(rand(), true));
-		return md5(openssl_random_pseudo_bytes(50))
+		return md5(openssl_random_pseudo_bytes(50));
 	}
 
 	protected function makeResetKey()
