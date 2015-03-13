@@ -82,6 +82,9 @@ class AppCfgDefault
 	// Define location of the twitter proxy
 	const URL_TWITTER_PROXY = 'assets/twitterlog.php';
 
+	// Define location of the Flickr API
+	const URL_FLICKR_API = 'https://api.flickr.com/services/rest/';
+
 	// Define location of the Known Issues page
 	const URL_KNOWN_ISSUES = 'about/knownIssues.html';
 

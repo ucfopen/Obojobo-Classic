@@ -21,7 +21,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 **/
 	public function fetchUserByID($userID = false)
 	{
-
 		// need to get the user from the authmodule so that we can get the login name or login from the module
 		if(\rocketD\util\Validator::isPosInt($userID))
 		{
@@ -30,7 +29,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 				return $authMod->fetchUserByID($userID);
 			}
 		}
-
 		return false;
 	}
 
@@ -44,7 +42,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	public function fetchUserByUserName($userName = false)
 	{
 		// need to get the user from the authmodule so that we can get the login name or login from the module
-
 		if($authMod = $this->getAuthModuleForUsername($userName))
 		{
 			$userID = $authMod->getUIDforUsername($userName);
@@ -71,7 +68,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		return $this->removeUser($userID);
-
 	}
 
 	/**
@@ -92,23 +88,18 @@ class AuthManager extends \rocketD\db\DBEnabled
 			if($_SESSION['passed'] === true)
 			{
 				//TODO: add this back in
-			    //$trackingMan = \obo\log\LogManager::getInstance();
-	            //$trackingMan->trackLoggedIn();
+				//$trackingMan = \obo\log\LogManager::getInstance();
+				//$trackingMan->trackLoggedIn();
 				return true;
 			}
 			else
 			{
-
-
 				return \rocketD\util\Error::getError(1004); // error: change password error
 			}
 		}
 
 		// monitor repeat failed logins and throttle them
-
 		\rocketD\util\Cache::getInstance()->doRateLimit($_SERVER['REMOTE_ADDR']);
-
-
 		return \rocketD\util\Error::getError(1003); // error: incorrect password
 	}
 
@@ -179,7 +170,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				return $this->checkTimeOut() && $inRole;
 			}
 		}
-        else
+		else
 		{
 			if(isset($_SESSION['userID']))
 			{
@@ -195,7 +186,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		// current time is past the
 		if(time() >= $_SESSION['timestamp'])
 		{
-
 			\rocketD\util\Error::getError(3);
 			$this->logout($_SESSION['userID']);
 			return false;
@@ -248,7 +238,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		}
 	}
 
-
 	/**
 	 * Updates a user entry, trys to create a new one if the id is 0
 	 * @param $usrObj (\rocketD\auth\User) updated user information
@@ -260,8 +249,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		if(! \obo\util\Validator::isUserArr($usrObj) )
 		{
-
-
 			return \rocketD\util\Error::getError(2);
 		}
 
@@ -272,8 +259,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 			// check user is editing own info
 			if( ($usrObj['userID'] == 0) || ($usrObj['userID'] != $_SESSION['userID'])) //if not current user
 			{
-
-
 				return \rocketD\util\Error::getError(4);
 			}
 		}
@@ -290,7 +275,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 				}
 			}
 
-
 			return \rocketD\util\Error::getError(0);
 		}
 		// edit user
@@ -303,7 +287,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 			}
 			trace('Unable to update user.', true);
 		}
-
 
 		return \rocketD\util\Error::getError(0);
 	}
@@ -330,7 +313,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		else
 		{
 			return \rocketD\util\Error::getError(2);
-
 		}
 
 		if($user)
@@ -429,18 +411,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	/*
-	public function resetPassword($username)
-	{
-		$username = trim($username);
-		$authMod = $this->getAuthModuleForUsername($username);
-		if($authMod)
-		{
-			return $authMod->resetPassword($username);
-		}
-		return false;
-	}
-	*/
+
 	public function changePasswordWithKey($username, $key, $newpass)
 	{
 		$username = trim($username);
@@ -450,9 +421,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			return $authMod->changePasswordWithKey($username, $key, $newpass);
 		}
 		return false;
-
 	}
-
 
 	/**
 	 * Handle checking all the authentication modules in order of priority
@@ -564,7 +533,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 			$result = $result || $thisResult;
 		}
 		return $result;
-
 	}
 
 	/**
@@ -585,7 +553,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 	}
 
 	// TODO: add getUser
-
 	public function getAuthModuleForUserID($userID=false)
 	{
 		if($userID !== false)
@@ -636,4 +603,3 @@ class AuthManager extends \rocketD\db\DBEnabled
 	}
 
 }
-?>

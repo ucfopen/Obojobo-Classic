@@ -72,7 +72,8 @@ class ModInternal extends AuthModule
 				return $result;
 			}
 		}
-		else{
+		else
+		{
 			trace(print_r($valid, true), true);
 			return array('success' => false, 'error' => $valid);
 		}
@@ -126,7 +127,7 @@ class ModInternal extends AuthModule
 		// validate arguments
 		if(!$this->validateUID($userID)) return array('success' => false, 'error' => 'Invalid User Id.');
 
- 		$this->defaultDBM();
+		$this->defaultDBM();
 		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
@@ -346,8 +347,8 @@ class ModInternal extends AuthModule
 			return ((int) $lastChanged + \AppCfg::AUTH_PW_LIFE) > time();
 		}
 		return false;
-
 	}
+
 	public function requestPasswordReset($username, $email, $returnURL)
 	{
 		// validate required arguments
@@ -448,8 +449,8 @@ class ModInternal extends AuthModule
 
 		trace("mailing password reset " . $resetKey . ' ' . $sendTo, true);
 		$headers = 'From: '.\AppCfg::SYS_EMAIL . "\r\n" .
-		    'Reply-To: '. \AppCfg::SYS_EMAIL . "\r\n" .
-		    'X-Mailer: PHP/' . phpversion();
+				'Reply-To: '. \AppCfg::SYS_EMAIL . "\r\n" .
+				'X-Mailer: PHP/' . phpversion();
 		$title = \AppCfg::SYS_NAME." Password Request";
 		// if the url doesn't contain a ?, it'll need one
 		if(strripos($returnURL, '?') == false)
