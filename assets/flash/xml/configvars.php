@@ -9,7 +9,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	<json_gateway><?php echo \AppCfg::URL_WEB.\AppCfg::JSON_GATEWAY; ?></json_gateway>
 
 	<debug><?php echo \AppCfg::DEBUG_MODE; ?></debug>
-	
+
 	<show_debug_ui><?php echo false; ?></show_debug_ui>
 
 	<section_help>
@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	<viewer>
 		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_VIEWER; ?>]]>
 	</viewer>
-	
+
 	<preview>
 		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_PREVIEW; ?>]]>
 	</preview>
@@ -91,7 +91,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	<twitter_proxy_url>
 		<![CDATA[<?php echo \AppCfg::URL_WEB.\AppCfg::URL_TWITTER_PROXY; ?>]]>
 	</twitter_proxy_url>
-	
+
 	<pro_account_form_url>
 		<![CDATA[<?php echo \AppCfg::URL_ACCOUNT_FORM; ?>]]>
 	</pro_account_form_url>
@@ -129,7 +129,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	<idle_warning_seconds>900</idle_warning_seconds>
 
 	<inactive_warning_seconds>300</inactive_warning_seconds>
-	
+
 	<verify_session_interval_seconds>30</verify_session_interval_seconds>
 
 	<disable_incomplete_features>false</disable_incomplete_features>

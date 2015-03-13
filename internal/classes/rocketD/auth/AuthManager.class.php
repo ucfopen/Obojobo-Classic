@@ -435,6 +435,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 	{
 		// get array of authmodules in order, first to last
 		$authModList = $this->getAllAuthModules();
+
 		// loop through authmods
 		if(count($authModList > 0))
 		{

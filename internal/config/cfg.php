@@ -7,8 +7,6 @@
 class AppCfgDefault
 {
 	//--------------------   GENERAL   -----------------------//
-	const PRODUCTION_IP = '132.170.240.85';
-	
 	// Define the system email address
 	const SYS_EMAIL = 'noReply@obojobo.ucf.edu';
 
@@ -32,7 +30,7 @@ class AppCfgDefault
 	//--------------------   DIRECTORYS & PATHS  -----------------------//
 	// Define output of all php errors
 	const DIR_LOGS = 'internal/logs/';
-	
+
 	const DIR_ADMIN = 'internal/admin/';
 
 	const DIR_CLASSES = 'internal/classes/';
@@ -42,12 +40,12 @@ class AppCfgDefault
 
 	// Define the relative location for the scripts directory with trailing /
 	const DIR_SCRIPTS = 'internal/includes/';
-	
+
 	const DIR_TEMPLATES = 'internal/templates/';
 
 	// Define the relative location for the assets directory with trailing /
 	const DIR_ASSETS = 'assets/';
-	
+
 	// Define working directory for amfphp
 	const DIR_AMFPHP = 'internal/includes/amfphp/';
 
@@ -58,14 +56,14 @@ class AppCfgDefault
 	const URL_CREATOR = 'creator/';
 
 	const URL_VIEWER = 'view/';
-	
+
 	const URL_PREVIEW = 'preview/';
-		
+
 	const URL_REPOSITORY = 'repository/';
 
 	// Define Location of the wiki
 	const URL_WIKI = 'help/';
-	
+
 	// Define location of the student quick start guide
 	const URL_STUDENT_QSTART = '/help/view/Student-Quick-Start-Guide.html';
 
@@ -120,12 +118,12 @@ class AppCfgDefault
 
 	// Enable/Disable Profiling code [true, false]
 	const PROFILE_MODE = true;
-	
-	//--------------------   CACHE   -----------------------//	
+
+	//--------------------   CACHE   -----------------------//
 	// Should Obobjobo cache the learning objects
 	const DB_CACHE_LO = true;
 
-	// Maximum life of cache 
+	// Maximum life of cache
 	const CACHE_LIFE = 43200; //24 hours
 
 	// Clean Database Interval
@@ -133,19 +131,19 @@ class AppCfgDefault
 
 	// Memcache on?
 	const CACHE_MEMCACHE = true;
-	
+
 	// to use multiple servers seperate them with comas: 'localhost,localhost' matching to ports '11211,11212'
 	const MEMCACHE_HOSTS = 'localhost';
 	const MEMCACHE_PORTS = '11211';
 
 	// make cache class
 	const CACHE_CLASS = 'obo\util\Cache';
-	
+
 	//--------------------- NOTIFICATION ---------------------------//
 	// Send email score notifications to student
-	const NOTIFY_SCORE = true; 
-	
-	//--------------------   AUTHENTICATION   -----------------------//	
+	const NOTIFY_SCORE = true;
+
+	//--------------------   AUTHENTICATION   -----------------------//
 	// Look at the PLUGINS section for auth plugin modules
 	const SESSION_NAME = 'OBOSESSION';
 
@@ -157,14 +155,14 @@ class AppCfgDefault
 
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
-		
+
 	//--------------------   PLUGINS   -----------------------//
 	// add in camma seperated class names of authentication plugins to us
 	const AUTH_PLUGINS = '\rocketD\auth\ModInternal,plg_UCFAuth_UCFAuthModule';
-	
+
 	// add in camma seperated names of plugins from the internal/plugins/ directory
 	const CORE_PLUGINS = '';
-	
+
 	//-----------------   PLUGIN SETTINGS   -----------------//
 	// Never set true in production, [true, false]
 	const UCF_AUTH_BYPASS_PASSWORDS = false;
