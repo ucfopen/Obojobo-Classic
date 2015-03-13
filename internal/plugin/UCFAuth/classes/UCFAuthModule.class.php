@@ -26,12 +26,15 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	public function fetchUserByID($userID = 0)
 	{
-		return parent::fetchUserByID($userID);
+		$user = parent::fetchUserByID($userID);
+		$user->ucfID = $this->getMetaField($user->userID, 'ucfID');
+
+		return $user;
 	}
 
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
-		$optionalVars['MD5Pass'] = md5(microtime() . $email . $userName . $fName); // create a random password that is unguessable
+		$optionalVars['MD5Pass'] = $this->createSalt(); // create a random password that is unguessable
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
 		if($valid === true)
 		{
@@ -45,10 +48,19 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 					$this->DBM->rollBack();
 					return array('success' => false, 'error' => 'Unable to create user.');
 				}
-				//
+
+				if($optionalVars && isset($optionalVars['ucfID']))
+				{
+					if(!$this->setMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
+					{
+						$this->DBM->rollBack();
+						return array('success' => false, 'error' => 'Unable to create user.');
+					}
+				}
+
 				$this->DBM->commit();
 				return array('success' => true, 'userID' => $result['userID']);
-				}
+			}
 			else
 			{
 				$this->DBM->rollBack();
@@ -62,7 +74,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$validUsername = $this->validateUsername($userName);
@@ -109,12 +120,11 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($userName)
 	{
 		return parent::getUIDforUsername($userName);
 	}
-	// security check: Ian Turgeon 2008-05-08 - PASS
+
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// validate arguments
@@ -127,7 +137,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
-			return false;
+			array('success' => false, 'error' => 'Database connection error.');
 		}
 
 		$user = $this->fetchUserByID($userID);
@@ -138,10 +148,26 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			if($result['success']==true)
 			{
 				// update with md5 pass
-				if($this->updateRecord($userID, $userName))
+				if(!$this->updateRecord($userID, $userName, false))
 				{
-					return array('success' => true);
+					$this->DBM->rollBack();
+					trace('Unable to update user.', true);
+					return array('success' => false, 'error' => 'Unable to update user.');
 				}
+
+				// Update the ucfID if it's set
+				if(isset($optionalVars['ucfID']))
+				{
+					if(!$this->setMetaField($userID, 'ucfID', $optionalVars['ucfID']))
+					{
+						$this->DBM->rollBack();
+						trace('Unable to update user.', true);
+						return array('success' => false, 'error' => 'Unable to update user.');
+					}
+				}
+
+				$this->DBM->commit();
+				return array('success' => true);
 			}
 			$this->DBM->rollBack();
 			trace('Unable to update user.', true);
@@ -158,7 +184,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	 * @return true/false
 	 * @author Ian Turgeon
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
 		$validSSO = false; // flag to indicate a SSO authentication is assumed
@@ -237,12 +262,12 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function verifyPassword($userName, $password)
 	{
 		// for local testing, ldap access may not be possible, if in local test mode just return an ok
-		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS && $_SERVER['SERVER_ADDR'] != \AppCfg::PRODUCTION_IP)
+		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS)
 		{
 			trace('WARNING LOCAL AUTHENTICATION TEST MODE ENABLED', true);
 			return array('success' => true, 'code' => '');
 		}
-		
+
 		// make the LDAP request
 		$success = false;
 		$code = '';
@@ -270,17 +295,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('ldap threw and exception', true);
 			trace($e);
 		}
-		
+
 		return array('success' => $success, 'code' => $code);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
-	protected function createSalt()
-	{
-		return md5(uniqid(rand(), true));
-	}
-
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function addRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
@@ -296,32 +314,30 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return (bool) $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function updateRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
-		
+
 		$this->defaultDBM();
 		if(!$this->DBM->connected)
 		{
 			trace('not connected', true);
 			return false;
 		}
-		
+
 		// update login
 		if($this->validateUsername($userName) === true)
 		{
 			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
-			
+
 			// update username
 			 return $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, $userID);
-			
+
 		}
 		return true;
-	
+
 	}
-	
-	// security check: Ian Turgeon 2008-05-06 - PASS
+
 	public function validateUsername($userName)
 	{
 		// make sure the string length is less then 255, our usernames aren't that long
@@ -335,7 +351,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			trace('User name minimum length is '.\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.' characters. ' . $userName, true);
 			return 'User name minimum length is 2 characters.';
-		}			
+		}
 		if(empty($userName))
 		{
 			trace('Username is empty', true);
@@ -345,11 +361,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			trace('User name can only contain alpha numeric characters. ' . $userName, true);
 			return 'User name can only contain alpha numeric characters.';
-		}		
+		}
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validatePassword($pass)
 	{
 		if(empty($pass))
@@ -364,7 +379,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return true;
 	}
-	
+
 	public function syncExternalUser($userName, $allowWeakSync=false, $createIfMissing = false)
 	{
 		if($this->validateUsername($userName) !== true) return false;
@@ -377,17 +392,17 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				// update internal record
 				if($user = $this->fetchUserByID($userID))
 				{
+					$ucfID = $this->getMetaField($user->userID, 'ucfID');
 					// update user data changes
-					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email){
+					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email || $ucfID != $eUser->ucfID){
 
-						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
+						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}, {$ucfID} = {$eUser->ucfID}", true);
 
 						$user->first = $eUser->first;
 						$user->last  = $eUser->last;
 						$user->email = $eUser->email;
 
-						parent::updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email);
-
+						$this->updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email, array('ucfID' => $eUser->ucfID));
 					}
 				}
 				else
@@ -399,7 +414,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			else
 			{
 				// create internal record
-				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array());
+				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array('ucfID' => $eUser->ucfID));
 				if(!$created['success'])
 				{
 					trace('createNewUser Failed', true);
@@ -418,10 +433,10 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			}
 			// update roles
 			$this->updateRole($user->userID, $eUser->isCreator);
-			
+
 			return $user;
 		}
-		
+
 		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
 		if($allowWeakSync === true)
 		{
@@ -457,9 +472,9 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						trace('fetchUserByID failed', true);
 						return false;
 					}
-				
-					$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?'";
-					$result = $this->DBM->querySafe($qstr, $user->userID, 'portal_sso', '1'); // add record to track where the user was originally created
+
+					$this->setMetaField($user->userID, 'portal_sso', '1');
+
 					return $user;
 				}
 			}
@@ -480,7 +495,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 	protected function getUCFUserData($username)
 	{
-
 		$ucfDB = $this->getUcfDb();
 		if ( ! $ucfDB->connected)
 		{
@@ -490,6 +504,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		$userTable = \cfg_plugin_AuthModUCF::TABLE_PEOPLE;
 		$userId    = \cfg_plugin_AuthModUCF::NID;
+		$ucfID     = \cfg_plugin_AuthModUCF::PPS_NUMBER;
 		$first     = \cfg_plugin_AuthModUCF::FIRST;
 		$last      = \cfg_plugin_AuthModUCF::LAST;
 		$email     = \cfg_plugin_AuthModUCF::EMAIL;
@@ -515,6 +530,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		// Build a standardized result
 		$user = (object) [
+			'ucfID'     => $result[$ucfID],
 			'first'     => $result[$first],
 			'last'      => $result[$last],
 			'email'     => $result[$email],
@@ -523,7 +539,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 
 		return $user;
 	}
-	
+
 	protected function trimArray($array)
 	{
 		if(count($array) > 0 )
@@ -535,7 +551,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 		return $array;
 	}
-	
+
 	public function updateRole($UIDorUser, $isLibraryUser=0)
 	{
 		$this->defaultDBM();
@@ -544,7 +560,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			trace('not connected', true);
 			return false;
 		}
-		
+
 		// if UIDorUser is a UID
 		if(\obo\util\Validator::isPosInt($UIDorUser))
 		{
@@ -558,7 +574,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		{
 			$user = $UIDorUser;
 		}
-		
+
 		// grab our user first to see if overrrideRoll has been set to 1
 		if($user instanceof \rocketD\auth\User)
 		{
@@ -597,7 +613,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			}
 		}
 	}
-	
+
 	public function removeRecord($userID)
 	{
 		return parent::removeRecord($userID); // remove user
@@ -607,7 +623,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		if($this->validateUID($userID))
 		{
-			return true; // USER password is maintained in LDAP	
+			return true; // USER password is maintained in LDAP
 		}
 		return false;
 	}
@@ -621,7 +637,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	{
 		return false;
 	}
-	
+
 	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey)
 	{
 		return false;
@@ -630,5 +646,5 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	public function changePasswordWithKey($userName, $key, $newpass)
 	{
 		return false;
-	}	
+	}
 }

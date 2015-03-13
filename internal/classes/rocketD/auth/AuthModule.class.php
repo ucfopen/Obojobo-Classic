@@ -25,7 +25,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	 * @return \rocketD\auth\User on success, false on failure
 	 * @author /bin/bash: niutil: command not found
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function fetchUserByID($userID)
 	{
 		if(!is_numeric($userID) || $userID < 1)
@@ -53,7 +52,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	}
 
 	// TODO: this needs to be the one function for this call, limitations in php 5.2 required the authmods to have their own copy of this function for the retrieving the constants
-	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
 	public function getAllUsers()
 	{
 		$this->defaultDBM();
@@ -80,7 +78,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return false;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUser()
 	{
 		return $this->internalUser;
@@ -93,7 +90,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function getUIDforUsername($username)
 	{
 		if($this->validateUsername($username) === true)
@@ -122,7 +118,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return false;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// Only update if valid (empty keeps existing value)
@@ -151,7 +146,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return array('success' => false, 'error' => 'Unable to create User.');
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// require a valid UID
@@ -189,11 +183,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 	/**
 	 * Not meant to be extended, this function will create a session with appropriate variables and update the database.
-	 *
-	 * @return void
-	 * @author Ian Turgeon
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	protected function storeLogin($userID)
 	{
 		// validate arguments
@@ -219,7 +209,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
 		if(!$this->validateUID($userID)) return false;
@@ -228,7 +217,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return $this->DBM->fetch_num($q) > 0;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function validateUID($userID)
 	{;
 		return \obo\util\Validator::isPosInt($userID);
@@ -239,25 +227,21 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - FAIL (needs to do something)
 	protected function validateFirstName($name)
 	{
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - FAIL (needs to do something)
 	protected function validateLastName($name)
 	{
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function validateMiddleName($name)
 	{
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - FAIL (needs to do something)
 	protected function validateEmail($email)
 	{
 		return true;
@@ -268,26 +252,44 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return true;
 	}
 
-	// security check: Ian Turgeon 	2008-05-08 - PASS
 	public function removeRecord($userID)
 	{
+		$userGone = false;
 		if($this->validateUID($userID))
 		{
-			// invalidate the memcache for this user
-			if(\AppCfg::CACHE_MEMCACHE)
-			{
-				\rocketD\util\Cache::getInstance()->delete('\rocketD\auth\AuthModule:fetchUserByID:'.$userID);
-			}
-
 			$this->defaultDBM();
-			if($q = $this->DBM->querySafe("DELETE FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID))
+			$userGone = $this->DBM->querySafe("DELETE FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+			if ($userGone)
 			{
+				$this->DBM->querySafe("DELETE FROM obo_user_meta WHERE userID = '?'", $userID);
 				$PM = \obo\perms\PermissionsManager::getInstance();
 				$PM->removeAllPermsForUser($userID);
-				return true;
+				\rocketD\util\Cache::getInstance()->delete('\rocketD\auth\AuthModule:fetchUserByID:'.$userID);
 			}
 		}
-		return false;
+		return $userGone;
+	}
+
+	protected function getMetaField($userID, $key)
+	{
+		$this->defaultDBM();
+		$qstr = "SELECT value FROM obo_user_meta WHERE ".\cfg_core_User::ID." = '?' AND meta = '?';";
+		$result = $this->DBM->querySafe($qstr, $userID, $key);
+		$fetched = $this->DBM->fetch_obj($result);
+
+		if(!$fetched || !isset($fetched->value))
+		{
+			return false;
+		}
+
+		return $fetched->value;
+	}
+
+	protected function setMetaField($userID, $key, $value)
+	{
+		$this->defaultDBM();
+		$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?' ON DUPLICATE KEY UPDATE value='?'";
+		return $this->DBM->querySafe($qstr, $userID, $key, $value, $value);
 	}
 
 	public function getUserName($userID)
@@ -306,16 +308,15 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return false;
 	}
 
+	protected function createSalt()
+	{
+		// return md5(uniqid(rand(), true));
+		return md5(openssl_random_pseudo_bytes(50));
+	}
+
 	protected function makeResetKey()
 	{
 		return sha1(microtime(true));
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
-	protected function makePassword()
-	{
-		$startNumber = rand(0, 21);
-		$password = substr(md5(time()), $startNumber, $startNumber + 10); // make one if one wasn't sent
-		return array('password' => $password, 'MD5Pass' => md5($password));
-	}
 }
