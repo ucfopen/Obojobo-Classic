@@ -56,16 +56,20 @@ switch($_GET['function'])
 				header("Content-Type: application/download");
 				header("Content-Disposition: attachment; filename=\"{$_GET['filename']}.csv\"");
 				echo "Student,ID,SIS User ID,SIS Login ID,Section,{$column_name},Date Updated\r\n";
-				
+
 				usort($scores, "compareFunction");
-				
-				foreach ($scores as $user)
+
+				foreach ($scores as $scoreRecord)
 				{
-					$score = getCountedScore($user['attempts'], $_GET['method']);
-					$fullName = $user['user']['last'].', '.$user['user']['first'];
-					if($score != -1) echo '"'.$fullName.'","","","'.$UM->getUserName($user['userID']).'","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
+					$user = $UM->fetchUserById($scoreRecord['userID']);
+					$score = getCountedScore($scoreRecord['attempts'], $_GET['method']);
+
+					$fullName = $user->last.', '.$user->first;
+					$ucfID = isset($user->ucfID) ? $user->ucfID : '';
+
+					if($score != -1) echo '"'.$fullName.'","","'.$ucfID.'","'.$user->login.'","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
 				}
-				
+
 				exit();
 			}
 		}

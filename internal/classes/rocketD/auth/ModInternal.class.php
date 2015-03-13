@@ -11,7 +11,6 @@ class ModInternal extends AuthModule
 
 	const CAN_CHANGE_PW = true; // override this!
 
-	const PW_CHANGE_TIME = 'lastPassChange';
 	const RESET_KEY = 'resetKey';
 	const RESET_TIME = 'resetTime';
 
@@ -24,24 +23,22 @@ class ModInternal extends AuthModule
 		}
 		return self::$instance;
 	}
-	// security check: Ian Turgeon 2008-05-06 - PASS
+
 	public function fetchUserByID($userID = 0)
 	{
 		return parent::fetchUserByID($userID);
 	}
-	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
+
 	public function getAllUsers()
 	{
 		return parent::getAllUsers();
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function recordExistsForID($userID=0)
 	{
 		return parent::recordExistsForID($userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
@@ -82,9 +79,7 @@ class ModInternal extends AuthModule
 		}
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
-	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
-	{
+	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0){
 		// validate username
 		$validUsername = $this->validateUsername($userName);
 		if($validUsername !== true)
@@ -122,13 +117,11 @@ class ModInternal extends AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function getUIDforUsername($username)
 	{
 		return parent::getUIDforUsername($username);
 	}
 
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		// validate arguments
@@ -167,7 +160,6 @@ class ModInternal extends AuthModule
 	 * @return true/false
 	 * @author Ian Turgeon
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function authenticate($requestVars)
 	{
 		// security first, check request vars for valid data
@@ -210,72 +202,39 @@ class ModInternal extends AuthModule
 	 * @return true/false
 	 * @author Ian Turgeon
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function verifyPassword($user, $password)
 	{
 		$user->verified = false; // reset user verified flag
-		// validate input
+
 		// if password isnt md5, md5 it
-		if( !\obo\util\Validator::isMD5($password) )
+		if( ! \obo\util\Validator::isMD5($password))
 		{
 			$password = md5($password);
 		}
 
 		if($this->validatePassword($password) !== true) return false;
-		if(!$this->validateUID($user->userID))
-		{
-			trace('invalid User ID', true);
-			return false;
-		}
-		// establish db connection
-		$this->defaultDBM();
-		if(!$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
+		if($this->validateUID($user->userID) !== true) return false;
 
 		// check the db for a correct salt/pw hash
-		$q = $this->DBM->querySafe("SELECT * FROM (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'password') AS B WHERE `value` = MD5(CONCAT( (SELECT `value` FROM obo_user_meta WHERE userID = '?' AND meta = 'salt'), '?'))", $user->userID, $user->userID, $password);
-		if($r = $this->DBM->fetch_obj($q))
+		$dbSalt = $this->getMetaField($user->userID, 'salt');
+		$dbPw   = $this->getMetaField($user->userID, 'password');
+		if (md5($dbSalt.$password) === $dbPw)
 		{
-			//ok session id was successfull, so store the stuff we need and return true
 			$user->verified = true;
 		}
 
 		return $user->verified;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
-	protected function createSalt()
-	{
-		return md5(uniqid(rand(), true));
-	}
-
-	// security check: Ian Turgeon 2008-05-08 - PASS
 	protected function addRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
 		if($this->validateUsername($userName) !== true) return false;
-		if($this->validatePassword($password) !== true) return false;
-		$this->defaultDBM();
-		if(!$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
-		$salt = $this->createSalt();
 
-		$qstr = "INSERT INTO obo_user_meta SET userID = '?', meta='?', value = '?'";
-		$result = $this->DBM->querySafe($qstr, $userID, 'password', $password); // add password
-		$result = $result &&  $this->DBM->querySafe($qstr, $userID, 'salt', $salt); // add salt
-		// set the login and auth_module
-		$result = $result &&  $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
-
-		return $result;
+		if($this->dbSetPassword($userID, $password) !== true) return false;
+		return $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::LOGIN." = '?', ".\cfg_core_User::AUTH_MODULE." = '?' WHERE ".\cfg_core_User::ID." = '?' ", $userName, get_class($this), $userID);
 	}
 
-	// security check: Ian Turgeon 2008-05-07 - PASS
 	public function updateRecord($userID, $userName, $password)
 	{
 		if(!$this->validateUID($userID)) return false;
@@ -287,28 +246,28 @@ class ModInternal extends AuthModule
 			return false;
 		}
 
-		$successCheck1 = true;
 		// update username
 		if($this->validateUsername($userName) === true)
 		{
-			$successCheck1 = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
+			$usernameSet = $this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".\cfg_core_User::LOGIN."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userName, $userID);
 			// remove any cache references that use this username
 			\rocketD\util\Cache::getInstance()->clearUserByID($userID);
+			return $usernameSet;
 		}
-		$successCheck2 = true;
+
 		// update password
 		if($this->validatePassword($password) === true)
 		{
-			$salt = $this->createSalt();
-			$successCheck2 =  $this->DBM->querySafe("UPDATE obo_user_meta set 'value' = MD5(CONCAT('?', '?')) WHERE ".\cfg_core_User::ID."='?' AND meta = 'salt' LIMIT 1", $salt, $password, $userID);
-			$successCheck2 =  $successCheck2 && $this->DBM->querySafe("UPDATE obo_user_meta set 'value' = '?' WHERE ".\cfg_core_User::ID."='?' AND meta = 'password' LIMIT 1", $password, $userID);
-			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." set ".self::PW_CHANGE_TIME."='".time()."' WHERE ".\cfg_core_User::ID."='?'", $userID);
+			$salt    = $this->createSalt();
+			$saltSet = $this->setMetaField($userID, 'salt', md5("$salt$password"));
+			$pwSet   = $this->setMetaField($userID, 'password', $password);
+			$pwTime  = $this->setMetaField($userID, 'lastPassChange', time());
 			//  no need to update cache, password doesn't use cache
+			return $saltSet && $pwSet;
 		}
-		return $successCheck1 && $successCheck2;
+		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validateUsername($username)
 	{
 		// make sure the string length is less then 255, our usernames aren't that long
@@ -328,7 +287,6 @@ class ModInternal extends AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function validatePassword($pass)
 	{
 		// password is an md5 hash of an empty string
@@ -339,7 +297,6 @@ class ModInternal extends AuthModule
 		return true;
 	}
 
-	// security check: Ian Turgeon 2008-05-07 - PASS
 	public function removeRecord($userID)
 	{
 		if(!$this->validateUID($userID)) return false;
@@ -371,11 +328,13 @@ class ModInternal extends AuthModule
 		{
 			$salt = $this->createSalt();
 			// update password
-			$qstr = "UPDATE obo_user_meta SET value = '?' WHERE userID = '?' and meta = '?'";
-			$a = (bool) $this->DBM->querySafe($qstr, $salt, $userID, 'salt');
-			$b = (bool) $this->DBM->querySafe($qstr, md5($salt.$password), $userID, 'password');
-			$c = (bool) $this->DBM->querySafe($qstr, time(), $userID, 'lastPassChange');
-			return $a && $b && $c;
+
+			$salt    = $this->createSalt();
+			$saltSet = $this->setMetaField($userID, 'salt', $salt);
+			$pwSet   = $this->setMetaField($userID, 'password', md5("$salt$password"));
+			$pwTime  = $this->setMetaField($userID, 'lastPassChange', time());
+
+			return $saltSet && $pwSet && $pwTime;
 		}
 		return false;
 	}
@@ -384,15 +343,8 @@ class ModInternal extends AuthModule
 	{
 		if($this->validateUID($userID))
 		{
-			$this->defaultDBM();
-			if($q = $this->DBM->querySafe("SELECT value FROM obo_user_meta WHERE ".\cfg_core_User::ID."='?' AND meta='lastPassChange'", $userID))
-			{
-				if($r = $this->DBM->fetch_obj($q))
-				{
-					return ((int)$r->value +  \AppCfg::AUTH_PW_LIFE) > time();
-				}
-			}
-			return true;
+			$lastChanged = $this->getMetaField($userID, 'lastPassChange');
+			return ((int) $lastChanged + \AppCfg::AUTH_PW_LIFE) > time();
 		}
 		return false;
 	}
@@ -402,33 +354,39 @@ class ModInternal extends AuthModule
 		// validate required arguments
 		if($this->validateUsername($username) !== true)
 		{
+
 			return \rocketD\util\Error::getError(2);
 		}
 		if(!$this->validateEmail($email))
 		{
 			trace('email invalid', true);
+
 			return \rocketD\util\Error::getError(2);
 		}
 		if(!$this->validateResetURL($returnURL))
 		{
 			trace('request URL invalid', true);
+
 			return \rocketD\util\Error::getError(2);
 		}
 		// try to ge the user
 		if(!($userID = $this->getUIDforUsername($username)))
 		{
 			trace('getUID for username failed', true);
+
 			return \rocketD\util\Error::getError(2);
 		}
 		if(!($user = $this->fetchUserByID($userID)))
 		{
 			trace('couldnt fetch user by id', true);
+
 			return \rocketD\util\Error::getError(1000);
 		}
 		// validate email address
 		if(strtolower($user->{\cfg_core_User::EMAIL}) != strtolower(trim($email)))
 		{
 			trace('incorrect email '.$email, true);
+
 			return \rocketD\util\Error::getError(2);
 		}
 
@@ -458,6 +416,7 @@ class ModInternal extends AuthModule
 					}
 					else
 					{
+
 						return \rocketD\util\Error::getError(1005);
 					}
 				}
@@ -475,6 +434,7 @@ class ModInternal extends AuthModule
 				}
 				else
 				{
+
 					return \rocketD\util\Error::getError(1005);
 				}
 			}
