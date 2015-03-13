@@ -25,7 +25,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	 * @return \rocketD\auth\User on success, false on failure
 	 * @author /bin/bash: niutil: command not found
 	 **/
-	// security check: Ian Turgeon 2008-05-06 - PASS
 	public function fetchUserByID($userID)
 	{
 		if(!is_numeric($userID) || $userID < 1)
@@ -34,7 +33,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			return false;
 		}
 		//check memcache
-
 		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user;
@@ -54,7 +52,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	}
 
 	// TODO: this needs to be the one function for this call, limitations in php 5.2 required the authmods to have their own copy of this function for the retrieving the constants
-	// security check: Ian Turgeon 2008-05-07 - FAIL (need to make sure this is an administrator/system only function, client should never have a list of all users)
 	public function getAllUsers()
 	{
 		$this->defaultDBM();
@@ -76,8 +73,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		if($r)
 		{
 			return new \rocketD\auth\User($r->{\cfg_core_User::ID}, $r->{\cfg_core_User::LOGIN}, $r->{\cfg_core_User::FIRST}, $r->{\cfg_core_User::LAST},
-								   $r->{\cfg_core_User::MIDDLE}, $r->{\cfg_core_User::EMAIL},
-								   $r->{\cfg_core_User::CREATED_TIME}, $r->{\cfg_core_User::LOGIN_TIME});
+				$r->{\cfg_core_User::MIDDLE}, $r->{\cfg_core_User::EMAIL}, $r->{\cfg_core_User::CREATED_TIME}, $r->{\cfg_core_User::LOGIN_TIME});
 		}
 		return false;
 	}
@@ -116,10 +112,8 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			{
 				// store in memcache
 				\rocketD\util\Cache::getInstance()->setUIDForUserName($username, $r->{\cfg_core_User::ID});
-
 				return $r->{\cfg_core_User::ID}; // return found user id
 			}
-
 		}
 		return false;
 	}
@@ -161,7 +155,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			$user = $this->fetchUserByID($userID);
 			if($user)
 			{
-
 				// Only update if valid (empty keeps existing value)
 				if(!$this->validateFirstName($fName)) $fName = $user->first;
 				if(!$this->validateLastName($lName)) $lName = $user->last;
@@ -176,7 +169,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				 ".\cfg_core_User::EMAIL."='?' WHERE ".\cfg_core_User::ID."='?' LIMIT 1";
 				if($q = $this->DBM->querySafe($qstr, $fName, $lName, $mName, $email, $userID))
 				{
-
 					\rocketD\util\Cache::getInstance()->clearUserByID($userID);
 					return array('success' => true, 'userID' => $userID);
 				}
@@ -189,6 +181,9 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		return array('success' => false, 'error' => 'Unable to update User.');
 	}
 
+	/**
+	 * Not meant to be extended, this function will create a session with appropriate variables and update the database.
+	 **/
 	protected function storeLogin($userID)
 	{
 		// validate arguments
@@ -199,7 +194,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		}
 		else
 		{
-
 			$this->defaultDBM();
 			if(!session_id())
 			{
@@ -300,6 +294,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 	public function getUserName($userID)
 	{
+		//use fetchUserBYID if memcahe is on
 		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
 		{
 			return $user->login;

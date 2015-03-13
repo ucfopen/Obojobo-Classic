@@ -104,6 +104,10 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 		<![CDATA[<?php echo \AppCfg::URL_STUDENT_QSTART; ?>]]>
 	</student_guide_url>
 
+	<flickr_api_url>
+		<![CDATA[<?php echo \AppCfg::URL_FLICKR_API; ?>]]>
+	</flickr_api_url>
+
 	<help_url>
 		<![CDATA[/help/]]>
 	</help_url>
