@@ -24,15 +24,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return parent::recordExistsForID($userID);
 	}
 
-	public function fetchUserByID($userID = 0)
-	{
-		$user = parent::fetchUserByID($userID);
-		$user->ucfID = $this->getMetaField($user->userID, 'ucfID');
-
-		return $user;
-	}
-
-	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
+	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=[])
 	{
 		$optionalVars['MD5Pass'] = $this->createSalt(); // create a random password that is unguessable
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
@@ -47,15 +39,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				{
 					$this->DBM->rollBack();
 					return array('success' => false, 'error' => 'Unable to create user.');
-				}
-
-				if($optionalVars && isset($optionalVars['ucfID']))
-				{
-					if(!$this->setMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
-					{
-						$this->DBM->rollBack();
-						return array('success' => false, 'error' => 'Unable to create user.');
-					}
 				}
 
 				$this->DBM->commit();
@@ -74,7 +57,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 	}
 
-	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
+	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=[])
 	{
 		$validUsername = $this->validateUsername($userName);
 		if($validUsername !== true){
@@ -387,14 +370,13 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// look for user in external data
 		if($eUser = $this->getUCFUserData($userName))
 		{
-			if($userID = $this->getUIDforUsername($userName))
+			if($userID = $this->getUIDforUsername($eUser->ucfID))
 			{
 				// update internal record
 				if($user = $this->fetchUserByID($userID))
 				{
-					$ucfID = $this->getMetaField($user->userID, 'ucfID');
 					// update user data changes
-					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email || $ucfID != $eUser->ucfID){
+					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email){
 
 						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}, {$ucfID} = {$eUser->ucfID}", true);
 
@@ -402,7 +384,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 						$user->last  = $eUser->last;
 						$user->email = $eUser->email;
 
-						$this->updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email, array('ucfID' => $eUser->ucfID));
+						$this->updateUser($user->userID, $eUser->ucfID, $user->first, $user->last, '', $user->email);
 					}
 				}
 				else
@@ -414,7 +396,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			else
 			{
 				// create internal record
-				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array('ucfID' => $eUser->ucfID));
+				$created = $this->createNewUser($eUser->ucfID, $eUser->first, $eUser->last, '', $eUser->email);
 				if(!$created['success'])
 				{
 					trace('createNewUser Failed', true);
@@ -424,7 +406,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				{
 					trace("creating new internal user $userName" , true);
 					// load user data from db
-					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
+					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($eUser->ucfID) ) ) )
 					{
 						trace('fetchUserByID failed', true);
 						return false;
@@ -441,6 +423,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		if($allowWeakSync === true)
 		{
 			// if the placeholder already exists
+			//@TODO - UCF ID PHASE 2
 			if($userID = $this->getUIDforUsername($userName))
 			{
 				// load user data from db
@@ -467,6 +450,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 				{
 					trace('weak Sync used for '. $userName, true);
 					// load user data from db
+					//@TODO - UCF ID PHASE 2
 					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
 					{
 						trace('fetchUserByID failed', true);
