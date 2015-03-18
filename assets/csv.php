@@ -65,9 +65,8 @@ switch($_GET['function'])
 					$score = getCountedScore($scoreRecord['attempts'], $_GET['method']);
 
 					$fullName = $user->last.', '.$user->first;
-					$ucfID = isset($user->ucfID) ? $user->ucfID : '';
 
-					if($score != -1) echo '"'.$fullName.'","","'.$ucfID.'","'.$user->login.'","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
+					if($score != -1) echo '"'.$fullName.'","","'.$user->login.'","","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
 				}
 
 				exit();
