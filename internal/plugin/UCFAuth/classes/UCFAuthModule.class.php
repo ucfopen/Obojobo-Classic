@@ -197,7 +197,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 			// if the user is not signed in by SSO, authenticate using WebService/LDAP
 			if($validSSO != true)
 			{
-				$checkPassword = $this->verifyPassword($user->login, $requestVars['password']);
+				$checkPassword = $this->verifyPassword($requestVars['userName'], $requestVars['password']);
 			}
 
 			// if they are valid, allow them in
