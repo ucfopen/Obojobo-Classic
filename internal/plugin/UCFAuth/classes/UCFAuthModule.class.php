@@ -378,7 +378,7 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 					// update user data changes
 					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email){
 
-						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}, {$ucfID} = {$eUser->ucfID}", true);
+						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}", true);
 
 						$user->first = $eUser->first;
 						$user->last  = $eUser->last;
