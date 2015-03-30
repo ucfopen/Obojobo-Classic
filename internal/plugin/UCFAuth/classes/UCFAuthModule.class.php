@@ -1,83 +1,68 @@
 <?php
+
 class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 {
-
-	protected static $instance;
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-
-	public function getAllUsers()
-	{
-		return parent::getAllUsers();
-	}
-
-	public function recordExistsForID($userID=0)
-	{
-		return parent::recordExistsForID($userID);
-	}
+	use \rocketD\Singleton;
 
 	public function fetchUserByID($userID = 0)
 	{
 		$user = parent::fetchUserByID($userID);
-		$user->ucfID = $this->getMetaField($user->userID, 'ucfID');
+		if ($user) $user->ucfID = $this->getMetaField($user->userID, 'ucfID');
 
 		return $user;
 	}
 
-	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
+	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=[])
 	{
+		$userID = null;
+		$error = null;
+
 		$optionalVars['MD5Pass'] = $this->createSalt(); // create a random password that is unguessable
-		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
-		if($valid === true)
+		$success = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
+
+		$this->defaultDBM();
+		$this->DBM->startTransaction();
+
+		// create user
+		if ($success === true)
 		{
-			$this->defaultDBM();
-			$this->DBM->startTransaction();
-			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
-			if($result['success'] === true)
-			{
-				if(!$this->addRecord($result['userID'], $userName, $optionalVars['MD5Pass']))
-				{
-					$this->DBM->rollBack();
-					return array('success' => false, 'error' => 'Unable to create user.');
-				}
-
-				if($optionalVars && isset($optionalVars['ucfID']))
-				{
-					if(!$this->setMetaField($result['userID'], 'ucfID', $optionalVars['ucfID']))
-					{
-						$this->DBM->rollBack();
-						return array('success' => false, 'error' => 'Unable to create user.');
-					}
-				}
-
-				$this->DBM->commit();
-				return array('success' => true, 'userID' => $result['userID']);
-			}
-			else
-			{
-				$this->DBM->rollBack();
-				trace($result, true);
-				return $result;
-			}
+			$res = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
+			$success = $res['success'];
+			$userID = $res['userID'];
 		}
-		else{
-			trace($valid, true);
-			return array('success' => false, 'error' => $valid);
+
+		// update with ucf data
+		if ($success === true)
+		{
+			$success = $this->addRecord($userID, $userName, $optionalVars['MD5Pass']);
 		}
+
+		// set metadata for ucfid
+		if ($success === true && ! empty($optionalVars['ucfID']))
+		{
+			$success = $this->setMetaField($userID, 'ucfID', $optionalVars['ucfID']);
+		}
+
+		// we good?
+		if ($success === true)
+		{
+			$this->DBM->commit();
+		}
+		else
+		{
+			$this->DBM->rollBack();
+			trace($success, true);
+			$error = 'Unable to create user.';
+		}
+
+		return array('success' => $success, 'userID' => $userID, 'error' => $error);
 	}
 
 	public function checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$validUsername = $this->validateUsername($userName);
-		if($validUsername !== true){
+		if($validUsername !== true)
+		{
 			trace($validUsername, true);
 			return $validUsername;
 		}
@@ -118,11 +103,6 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		}
 
 		return true;
-	}
-
-	public function getUIDforUsername($userName)
-	{
-		return parent::getUIDforUsername($userName);
 	}
 
 	public function updateUser($userID, $userName, $fName, $lName, $mName, $email, $optionalVars=0)
@@ -186,117 +166,61 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 	 **/
 	public function authenticate($requestVars)
 	{
-		$validSSO = false; // flag to indicate a SSO authentication is assumed
-		$weakExternalSync = false; // allows the external sync to fail in case the user isn't present there
+		$success = false;
 
 		// filter the username to be all lowercase
-		$requestVars['userName'] = strtolower($requestVars['userName']);
+		$username = strtolower($requestVars['userName']);
 
-		// Portal SSO - session vars set in portal pagelet /sso/porta/orientation-academic-integrity.php ********************//
-		if(empty($requestVars['userName']) && empty($requestVars['password']))
+		if ($this->validateUsername($username) !== true) return false;
+		if ($this->validatePassword($requestVars['password']) !== true) return false;
+
+		// search external database
+		// must be before fetch below
+		$this->syncExternalUser($username);
+
+		$user = $this->fetchUserByLogin($username);
+
+		if ($user instanceof \rocketD\auth\User)
 		{
-			$this->checkForValidPortalSession($requestVars, $validSSO, $weakExternalSync);
-		}
-		// LTI SSO
-		else
-		{
-			$this->checkForValidLTILogin($requestVars, $validSSO, $weakExternalSync);
+			$success = $this->verifyPassword($user->login, $requestVars['password']);
+
+			if ($success) $this->storeLogin($user);
 		}
 
-		if($this->validateUsername($requestVars['userName']) !== true) return false;
-		if($validSSO == false && $this->validatePassword($requestVars['password']) !== true) return false;
-
-		// create/update the user with the external database
-		$user = $this->syncExternalUser($requestVars['userName'], $weakExternalSync);
-
-		if($user instanceof \rocketD\auth\User)
-		{
-			// if the user is not signed in by SSO, authenticate using WebService/LDAP
-			if($validSSO != true)
-			{
-				$checkPassword = $this->verifyPassword($user->login, $requestVars['password']);
-			}
-
-			// if they are valid, allow them in
-			if($validSSO === true || $checkPassword['success'])
-			{
-				$this->storeLogin($user->userID);
-				$this->internalUser = $user;
-				return true;
-			}
-		}
-		else
-		{
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','external_sync_fail','0','".time().",'0'");
-		}
-		return false;
-	}
-
-	protected function checkForValidLTILogin(&$requestVars, &$validSSO, &$weakExternalSync)
-	{
-		// handle an LTI SSO authentication request
-		if(!empty($requestVars['userName']) && !empty($requestVars['validLti']))
-		{
-			if(!empty($requestVars['createIfMissing']) && $requestVars['createIfMissing'] === true)
-			{
-				$weakExternalSync = true;
-			}
-			$validSSO = true;
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','LTI','0','".time().",'1'");
-		}
-	}
-
-	protected function checkForValidPortalSession(&$requestVars, &$validSSO, &$weakExternalSync)
-	{
-		if(isset($_SESSION['PORTAL_SSO_NID']) && isset($_SESSION['PORTAL_SSO_EPOCH']) && $_SESSION['PORTAL_SSO_EPOCH'] >= time() - 1800)
-		{
-			$requestVars['userName'] = $_SESSION['PORTAL_SSO_NID'];
-			// logged in, clear the session variables
-			unset( $_SESSION['PORTAL_SSO_NID'],  $_SESSION['PORTAL_SSO_EPOCH'] );
-			$validSSO = true;
-			$weakExternalSync = true; // allow the user to not exist in external db
-			\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','PortalSSO','0','".time().",'1'");
-		}
+		\rocketD\util\Log::profile('login', "'{$username}','ucf-nid','0','".time().",'".($success?'1':'0')."'");
+		return $success;
 	}
 
 	public function verifyPassword($userName, $password)
 	{
 		// for local testing, ldap access may not be possible, if in local test mode just return an ok
-		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS)
+		if(\AppCfg::UCF_AUTH_BYPASS_PASSWORDS === true)
 		{
 			trace('WARNING LOCAL AUTHENTICATION TEST MODE ENABLED', true);
-			return array('success' => true, 'code' => '');
+			return true;
 		}
 
-		// make the LDAP request
+		return $this->bindLDAP($userName, $password);
+	}
+
+	protected function bindLDAP($username, $password)
+	{
 		$success = false;
-		$code = '';
-		$time = microtime(true); // timer for LDAP call
 		try
 		{
-			$ds = @ldap_connect(\AppCfg::LDAP);
-			if (!$ds)
-			{
-				$NM = \obo\util\NotificationManager::getInstance();
-				$NM->sendCriticalError('LDAP Connection Failure', 'Failed to connect to LDAP on ' . date("F j, Y, g:i a"));
-				trace('connecting to ldap failed', true);
-			}
-			else
-			{
-				ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-				$success = @ldap_bind($ds, "cn=".$userName.",ou=people,dc=net,dc=ucf,dc=edu", $password); // true if LDAP verifies
-				\rocketD\util\Log::profile('login', "'$userName','LDAP','".round((microtime(true) - $time),5)."','".time().",'".($success?'1':'0')."'");
-			}
+			$ldap = ldap_connect(\AppCfg::UCF_LDAP);
+			$rdn = "cn={$username},ou=people,dc=net,dc=ucf,dc=edu";
+			ldap_set_option($ldap , LDAP_OPT_PROTOCOL_VERSION, 3);
+			$success = @ldap_bind($ldap, $rdn, $password); // true if LDAP says password and username match
 		}
 		catch(Exception $e)
 		{
-			$NM = \obo\util\NotificationManager::getInstance();
-			$NM->sendCriticalError('Oracle DB Connection Failure', 'LDAP Threw an Error ' . date("F j, Y, g:i a") . "\r\n" . print_r($e, true));
+			\obo\util\NotificationManager::getInstance()->sendCriticalError('LDAP Error', $e->getMessage());
 			trace('ldap threw and exception', true);
-			trace($e);
+			trace($e, true);
 		}
 
-		return array('success' => $success, 'code' => $code);
+		return $success === true;
 	}
 
 	protected function addRecord($userID, $userName, $password)
@@ -343,24 +267,20 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($userName) > \cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH)
 		{
-			trace('User name maximum length is '.\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH.' characters. ' . $userName, true);
-			return 'User name maximum length is 20 characters.';
+			return false;
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($userName) < \cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH)
 		{
-			trace('User name minimum length is '.\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.' characters. ' . $userName, true);
-			return 'User name minimum length is 2 characters.';
+			return false;
 		}
 		if(empty($userName))
 		{
-			trace('Username is empty', true);
-			return 'Username is empty';
+			return false;
 		}
 		if(preg_match("/^[[:alnum:]_]{".\cfg_plugin_AuthModUCF::MIN_USERNAME_LENGTH.",".\cfg_plugin_AuthModUCF::MAX_USERNAME_LENGTH."}$/i", $userName) == false)
 		{
-			trace('User name can only contain alpha numeric characters. ' . $userName, true);
-			return 'User name can only contain alpha numeric characters.';
+			return false;
 		}
 		return true;
 	}
@@ -380,105 +300,40 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return true;
 	}
 
-	public function syncExternalUser($userName, $allowWeakSync=false, $createIfMissing = false)
+	public function syncExternalUser($userName)
 	{
 		if($this->validateUsername($userName) !== true) return false;
 
-		// look for user in external data
+		// Ask UCF for this user
+		// note* if they don't exist, they don't have access!
 		if($eUser = $this->getUCFUserData($userName))
 		{
-			if($userID = $this->getUIDforUsername($userName))
+			// UPDATE EXISTING
+			if($user = $this->fetchUserByLogin($userName))
 			{
-				// update internal record
-				if($user = $this->fetchUserByID($userID))
+				$ucfID = $this->getMetaField($user->userID, 'ucfID');
+				if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email || $ucfID != $eUser->ucfID)
 				{
-					$ucfID = $this->getMetaField($user->userID, 'ucfID');
-					// update user data changes
-					if($eUser->first != $user->first || $eUser->last != $user->last || $eUser->email != $user->email || $ucfID != $eUser->ucfID){
-
-						trace("updating user info:  {$user->first} = {$eUser->first}, {$user->last} = {$eUser->last}, {$user->email} = {$eUser->email}, {$ucfID} = {$eUser->ucfID}", true);
-
-						$user->first = $eUser->first;
-						$user->last  = $eUser->last;
-						$user->email = $eUser->email;
-
-						$this->updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email, array('ucfID' => $eUser->ucfID));
-					}
-				}
-				else
-				{
-					trace('fetchUserByID failed', true);
-					return false;
+					$user->first = $eUser->first;
+					$user->last  = $eUser->last;
+					$user->email = $eUser->email;
+					$this->updateUser($user->userID, $userName, $user->first, $user->last, '', $user->email, array('ucfID' => $eUser->ucfID));
 				}
 			}
+			// CREATE NEW
 			else
 			{
-				// create internal record
-				$created = $this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array('ucfID' => $eUser->ucfID));
-				if(!$created['success'])
-				{
-					trace('createNewUser Failed', true);
-					return false;
-				}
-				else
-				{
-					trace("creating new internal user $userName" , true);
-					// load user data from db
-					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
-					{
-						trace('fetchUserByID failed', true);
-						return false;
-					}
-				}
+				$this->createNewUser($userName, $eUser->first, $eUser->last, '', $eUser->email, array('ucfID' => $eUser->ucfID));
+				$user = $this->fetchUserByLogin($userName);
 			}
-			// update roles
-			$this->updateRole($user->userID, $eUser->isCreator);
-
-			return $user;
 		}
 
-		// user didn't exist externally, however weakSync assumes SSO as authoritative, create a placeholder user account
-		if($allowWeakSync === true)
+		if ($user instanceof \rocketD\auth\User)
 		{
-			// if the placeholder already exists
-			if($userID = $this->getUIDforUsername($userName))
-			{
-				// load user data from db
-				if($user = $this->fetchUserByID($userID) )
-				{
-					return $user;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			// no placeholder, create
-			else
-			{
-				// create internal placeholder record
-				$created = $this->createNewUser($userName, '', '', '', '', array());
-				if(!$created['success'])
-				{
-					trace('createNewUser Failed', true);
-					return false;
-				}
-				else
-				{
-					trace('weak Sync used for '. $userName, true);
-					// load user data from db
-					if( !( $user = $this->fetchUserByID( $this->getUIDforUsername($userName) ) ) )
-					{
-						trace('fetchUserByID failed', true);
-						return false;
-					}
-
-					$this->setMetaField($user->userID, 'portal_sso', '1');
-
-					return $user;
-				}
-			}
+			$this->updateRole($user->userID, $eUser->isCreator);
+			return true;
 		}
+
 		return false;
 	}
 
@@ -552,99 +407,54 @@ class plg_UCFAuth_UCFAuthModule extends \rocketD\auth\AuthModule
 		return $array;
 	}
 
-	public function updateRole($UIDorUser, $isLibraryUser=0)
+	public function updateRole($UIDorUser, $isLibraryUser = 0)
 	{
-		$this->defaultDBM();
-		if(!$this->DBM->connected)
-		{
-			trace('not connected', true);
-			return false;
-		}
-
 		// if UIDorUser is a UID
-		if(\obo\util\Validator::isPosInt($UIDorUser))
+		if (\obo\util\Validator::isPosInt($UIDorUser))
 		{
-			if(! (	$user = $this->fetchUserByID($UIDorUser) ) )
-			{
-				trace('unable to find user ' . $UIDorUser, true);
-				return false;
-			}
+			$user = $this->fetchUserByID($UIDorUser);
 		}
 		else
 		{
 			$user = $UIDorUser;
 		}
 
+		if ( ! ($user instanceof \rocketD\auth\User)) return false;
+
 		// grab our user first to see if overrrideRoll has been set to 1
-		if($user instanceof \rocketD\auth\User)
+		// override hasnt been engaged, let external db dictate the role
+		if (isset($user->overrideRole) && $user->overrideRole == '1') return true;
+
+		$RM  = \rocketD\perms\RoleManager::getInstance();
+		// GIVE ROLES
+		if ($isLibraryUser)
 		{
-			// override hasnt been engaged, let external db dictate the role
-			if(!isset($user->overrideRole) || $user->overrideRole != '1')
-			{
-				$RM  = \rocketD\perms\RoleManager::getInstance();
-				// GIVE ROLES
-				if($isLibraryUser)
-				{
-					if(! $RM->doesUserHaveARole(array(\cfg_core_Role::EMPLOYEE_ROLE), $user->userID))
-					{
-						$RM->addUsersToRole_SystemOnly(array($user->userID), \cfg_core_Role::EMPLOYEE_ROLE);
-					}
-
-					if(! $RM->doesUserHaveARole(array(\cfg_obo_Role::CONTENT_CREATOR), $user->userID))
-					{
-						$RM->addUsersToRole_SystemOnly(array($user->userID), \cfg_obo_Role::CONTENT_CREATOR);
-					}
-					return true;
-				}
-				// REMOVE ROLES
-				else
-				{
-					if($RM->doesUserHaveARole(array(\cfg_core_Role::EMPLOYEE_ROLE), $user->userID))
-					{
-						$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_core_Role::EMPLOYEE_ROLE));
-					}
-
-					if($RM->doesUserHaveARole(array(\cfg_obo_Role::CONTENT_CREATOR), $user->userID))
-					{
-						$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_obo_Role::CONTENT_CREATOR));
-					}
-					return true;
-				}
-			}
+			$RM->addUsersToRoles_SystemOnly([$user->userID], [\cfg_core_Role::EMPLOYEE_ROLE, \cfg_obo_Role::CONTENT_CREATOR]);
+			return true;
 		}
-	}
+		// REMOVE ROLES
+		else
+		{
+			if ($RM->doesUserHaveARole(array(\cfg_core_Role::EMPLOYEE_ROLE), $user->userID))
+			{
+				$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_core_Role::EMPLOYEE_ROLE));
+			}
 
-	public function removeRecord($userID)
-	{
-		return parent::removeRecord($userID); // remove user
+			if ($RM->doesUserHaveARole(array(\cfg_obo_Role::CONTENT_CREATOR), $user->userID))
+			{
+				$RM->removeUsersFromRoles_SystemOnly(array($user->userID), array(\cfg_obo_Role::CONTENT_CREATOR));
+			}
+			return true;
+		}
 	}
 
 	public function isPasswordCurrent($userID)
 	{
-		if($this->validateUID($userID))
-		{
-			return true; // USER password is maintained in LDAP
-		}
-		return false;
+		return $this->validateUID($userID);
 	}
 
-	public function dbSetPassword($userID, $newPassword)
-	{
-		return false;
-	}
-
-	public function requestPasswordReset($userName, $email, $returnURL)
-	{
-		return false;
-	}
-
-	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey)
-	{
-		return false;
-	}
-
-	public function changePasswordWithKey($userName, $key, $newpass)
-	{
-		return false;
-	}
+	public function dbSetPassword($userID, $newPassword) { return false; }
+	public function requestPasswordReset($userName, $email, $returnURL) { return false; }
+	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey) { return false; }
+	public function changePasswordWithKey($userName, $key, $newpass) { return false; }
 }

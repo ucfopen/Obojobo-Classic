@@ -1,17 +1,17 @@
 <?php
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-$loggedIn         = \obo\API::getInstance()->getSessionValid();
-$im               = \obo\lo\InstanceManager::getInstance();
-$output           = [];
-$los              = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
+$loggedIn = \obo\API::getInstance()->getSessionValid();
+$im       = \obo\lo\InstanceManager::getInstance();
+$output   = [];
+$los      = explode(',', \AppCfg::UCF_ORIENTATION_INSTANCES);
 
 //============== BUILD LINKS
 foreach ($los AS $instID)
 {
 	$instData = $im->getInstanceData($instID);
-	
-	// if we found the instance 
+
+	// if we found the instance
 	if ($instData instanceof \obo\lo\InstanceData)
 	{
 		$output[] = '<li><a href="'.\AppCfg::URL_WEB.'view/'.$instID.'">'.$instData->name.'</a></li>';
@@ -65,8 +65,8 @@ foreach ($los AS $instID)
 
 <section class="modules">
 	<? if (count($output)): ?>
-			<p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in <?= \AppCfg::UCF_PORTAL_ORIENTATION_ADMITTED ?></strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
-			<p>You need to score <strong><?= \AppCfg::UCF_PORTAL_ORIENTATION_MIN_SCORE ?>% or higher on all required modules before <?= \AppCfg::UCF_PORTAL_ORIENTATION_DUE ?></strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
+			<p>If you are a New Undergraduate Student or a New Master's Program Student <strong>admitted in <?= \AppCfg::UCF_ORIENTATION_ADMITTED ?></strong> or later, you are required to complete all the Academic Integrity Modules listed below in your group.</p>
+			<p>You need to score <strong><?= \AppCfg::UCF_ORIENTATION_MIN_SCORE ?>% or higher on all required modules before <?= \AppCfg::UCF_ORIENTATION_DUE ?></strong>. Otherwise you will receive a hold that prevents you from registering for classes.</p>
 
 		<? if( ! $loggedIn): ?>
 			<div class="warning">

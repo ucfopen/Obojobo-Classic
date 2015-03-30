@@ -158,12 +158,12 @@ class AppCfgDefault
 
 	//--------------------   PLUGINS   -----------------------//
 	// add in camma seperated class names of authentication plugins to us
-	const AUTH_PLUGINS = '\rocketD\auth\ModInternal,plg_UCFAuth_UCFAuthModule';
+	const AUTH_PLUGINS = '\rocketD\auth\ModInternal';
 
 	// add in camma seperated names of plugins from the internal/plugins/ directory
 	const CORE_PLUGINS = '';
 
 	//-----------------   PLUGIN SETTINGS   -----------------//
 	// Never set true in production, [true, false]
-	const UCF_AUTH_BYPASS_PASSWORDS = false;
+	// const UCF_AUTH_BYPASS_PASSWORDS = false;
 }

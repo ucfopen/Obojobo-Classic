@@ -11,8 +11,8 @@ $_SESSION = array();
 
 function createTestCase($customParams, $endpoint, $user = false, $passbackUrl = false)
 {
-	$key = \AppCfg::LTI_CANVAS_KEY;
-	$secret = \AppCfg::LTI_CANVAS_SECRET;
+	$key = \AppCfg::LTI_OAUTH_KEY;
+	$secret = \AppCfg::LTI_OAUTH_SECRET;
 
 	$baseParams = array(
 		'resource_link_id'     => 'test-resource',

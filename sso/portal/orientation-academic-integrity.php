@@ -6,42 +6,10 @@
 
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-$nid              = $_REQUEST['nid'] ?: '';
-$timestamp        = $_REQUEST['epoch'] ?: 0;
-$hash             = $_REQUEST['hash'] ?: '';
-$isDevEnvironment = preg_match('/^https:\/\/(patest|padev)\d*?\.net\.ucf\.edu\/psp\/PA(TEST|DEV)/', $_SERVER['HTTP_REFERER']); // figure out if this is being accessed via the test or dev portals
-$validHash        = false;
-$notExpired       = false;
-$loggedIn         = false;
+$api = \obo\API::getInstance();
 
-
-// ************* TESTING CODE ************
-if (\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
-{
-	$nid       = 'iturgeon';
-	$timestamp = time()-90000;
-	$hash      = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_ORIENTATION_SECRET);
-	$los       = explode(',', \AppCfg::UCF_PORTAL_ORIENTATION_INSTANCES);
-}
-
-//=============== CHECK THE HASH AND TIMEOUT
-$validHash  = md5($nid.$timestamp.\AppCfg::UCF_PORTAL_ORIENTATION_SECRET) === $hash;
-$notExpired = (int)$timestamp >= time() - \AppCfg::UCF_PORTAL_ORIENTATION_TIMEOUT;
-
-if ($validHash && $notExpired)
-{
-	$loggedIn = \obo\API::getInstance()->getSessionValid();
-
-	// not already logged in...
-	if ( ! $loggedIn)
-	{
-		// store session variables for authentication
-		$_SESSION['PORTAL_SSO_NID']   = $nid;
-		$_SESSION['PORTAL_SSO_EPOCH'] = $timestamp;
-
-		$loggedIn = \obo\API::getInstance()->doLogin('', '');
-	}
-}
+// try loggin in using the current auth modules
+$api->doLogin('', '');
 
 // 307 Temporary Redirect
 header("Location: /sso/portal/academic-integrity-modules.php", true, 307);

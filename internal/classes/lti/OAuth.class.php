@@ -77,7 +77,7 @@ class OAuth
 			"lis_person_name_family"                 => $user->last,
 
 			"launch_presentation_document_target"    => 'iframe',
-			"launch_presentation_return_url"         => \AppCfg::LTI_LAUNCH_PRESENTATION_RETURN_URL
+			"launch_presentation_return_url"         => \AppCfg::URL_WEB.\AppCfg::LTI_LAUNCH_PRESENTATION_RETURN_URL
 		);
 
 		if($outcomeUrl)
