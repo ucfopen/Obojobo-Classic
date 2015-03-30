@@ -24,12 +24,9 @@ function trace($arg, $force=0, $incbacklog=0)
 
 function classAutoLoader($className)
 {
-	
-
 	// classname is using namespaces
 	if(strpos($className , '\\') !== false)
 	{
-		
 		$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES  . str_replace('\\', '/', $className) . '.class.php';
 	}
 	// classname is using old nm_class package notation
@@ -56,6 +53,7 @@ function classAutoLoader($className)
 				$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES . str_replace('_', '/', $className) . '.class.php';
 		}
 	}
+
 	// try to include
 	if(!@include($file))
 	{
@@ -71,4 +69,3 @@ function classAutoLoader($className)
 		}
 	}
 }
-?>

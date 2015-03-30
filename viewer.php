@@ -13,7 +13,7 @@ if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
 }
 else
 {
-  $loggedIn = $API->getSessionValid();  
+  $loggedIn = $API->getSessionValid();
 }
 
 // ================= CHECK FOR REQUIRED ROLE =======================
@@ -30,14 +30,14 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 
 // ================ DISPLAY OUTPUT =================================
 // logged in, show the viewer
-if($loggedIn === true) 
+if($loggedIn === true)
 {
   header('X-UA-Compatible: IE=edge');
   include("assets/templates/viewer-main.php");
 }
 
 // not logged in, show login screen
-else 
+else
 {
 
   // ================ PREPARE VARS FOR THE TEMPLATE ================
@@ -89,7 +89,7 @@ else
       exit();
     }
   }
- 
+
   // =============== RENDER LOGIN TEMPLATE ========================
   include("assets/templates/login.php");
 }

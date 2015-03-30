@@ -79,4 +79,3 @@ else
 	\rocketD\util\Log::profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
 	header('Location: ' . $viewURL);
 }
-

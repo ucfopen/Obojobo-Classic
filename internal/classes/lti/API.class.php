@@ -19,7 +19,6 @@ class API extends \rocketD\db\DBEnabled
 
 	public function updateAndAuthenticateUser($ltiData)
 	{
-		$createIfMissing = \AppCfg::LTI_CREATE_USER_IF_MISSING;
 
 		// If this is the test user we don't want to create a new
 		// user, skip authentication
@@ -30,17 +29,7 @@ class API extends \rocketD\db\DBEnabled
 
 		$AM = \rocketD\auth\AuthManager::getInstance();
 
-		$success = $AM->authenticate(array('userName' => $ltiData->username, 'validLti' => true, 'createIfMissing' => $createIfMissing));
-
-		// We need to potentially elevate this users roles if we are creating them on the fly
-		// and the external system claims them to be an instructor:
-		if($success && $createIfMissing && $ltiData->isInstructor())
-		{
-			$user = $AM->fetchUserByUserName($ltiData->username);
-
-			$RM = \obo\perms\RoleManager::getInstance();
-			$success = $RM->addUsersToRole_SystemOnly(array($user->userID), "ContentCreator");
-		}
+		$success = $AM->authenticate(array('userName' => $ltiData->username, 'validLti' => true, 'ltiData' => $ltiData));
 
 		return $success;
 	}
@@ -121,7 +110,8 @@ class API extends \rocketD\db\DBEnabled
 			// OR we don't have any lti associations with this assignment (resource link)
 			// BUT we found an association that already exists for the target instance
 			|| (!$anyAssociationsFoundWithCurrentResourceLink && $this->isInstIDInAssociationTable($targetInstId))
-		) {
+		)
+		{
 			$targetInstId = $this->duplicateInstance($originalInstID, $ltiData);
 			if(!$targetInstId || !is_numeric($targetInstId) || $targetInstId instanceof \rocketD\util\Error)
 			{
