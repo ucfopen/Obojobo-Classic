@@ -81,15 +81,15 @@ class AuthManager extends \rocketD\db\DBEnabled
 	//function login($userName='', $pwd='')
 	public function login($userName, $password)
 	{
-		$userName = trim($userName);
-		$password = trim($password);
-		if($this->authenticate(array('userName' => $userName, 'password' => $password)))
+		$requestVars = [
+			'userName' => trim($userName),
+			'password' => trim($password)
+		];
+
+		if ($this->authenticate($requestVars))
 		{
-			if($_SESSION['passed'] === true)
+			if ($_SESSION['passed'] === true)
 			{
-				//TODO: add this back in
-				//$trackingMan = \obo\log\LogManager::getInstance();
-				//$trackingMan->trackLoggedIn();
 				return true;
 			}
 			else

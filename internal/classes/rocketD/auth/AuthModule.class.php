@@ -17,7 +17,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	abstract public function requestPasswordReset($username, $email, $returnURL);
 	abstract protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey);
 	abstract public function changePasswordWithKey($username, $key, $newpass);
-	abstract static public function getInstance();
+	abstract public function syncExternalUser($userName);
 
 	/**
 	 * Fetch the Obojobo user data by it's ID
@@ -41,7 +41,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		$this->defaultDBM();
 		//Fetch user data
 
-		// TODO: change constant($authModDBC.'::TABLE') to $authModDBC::TABLE when PHP 5.3.0 is out
 		$qstr = "SELECT * FROM  ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' and ".\cfg_core_User::AUTH_MODULE." = '?' ";
 		$q = $this->DBM->querySafe($qstr ,$userID, get_class($this));
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
@@ -49,6 +48,18 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		//store in memcache
 		\rocketD\util\Cache::getInstance()->setUserByID($userID, $return);
 		return $return;
+	}
+
+
+	public function fetchUserByLogin($login)
+	{
+		// begin authentication, lookup user id by username
+		$userID = $this->getUIDforUsername($login);
+		if ($userID)
+		{
+			return $this->fetchUserByID($userID);
+		}
+		return false;
 	}
 
 	// TODO: this needs to be the one function for this call, limitations in php 5.2 required the authmods to have their own copy of this function for the retrieving the constants
@@ -81,13 +92,6 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	public function getUser()
 	{
 		return $this->internalUser;
-	}
-	/**
-		Make sure all the conditions for this authentication module's use are met.  Conditions may limit referrers, information retrival methods, encryption, keys, or various other protections.
-	**/
-	protected function verifyAuthModuleAvail()
-	{
-
 	}
 
 	public function getUIDforUsername($username)
@@ -184,29 +188,29 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	/**
 	 * Not meant to be extended, this function will create a session with appropriate variables and update the database.
 	 **/
-	protected function storeLogin($userID)
+	protected function storeLogin($user)
 	{
-		// validate arguments
-		if(!$this->validateUID($userID))
+		if ( ! $this->validateUID($user->userID))
 		{
 			trace('userID not valid', true);
 			return void;
 		}
-		else
+
+		if ( ! session_id())
 		{
-			$this->defaultDBM();
-			if(!session_id())
-			{
-				@session_name(\AppCfg::SESSION_NAME);
-				@session_start();
-			}
-			@session_regenerate_id(false);
-			$_SESSION = array();// force a fresh start on the session variables
-			$_SESSION['userID'] = $userID;
-			$_SESSION['passed'] = true;
-			$_SESSION['timestamp'] = time() + \AppCfg::AUTH_TIMEOUT;
-			$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::SID." = '".session_id()."',  ".\cfg_core_User::LOGIN_TIME." = UNIX_TIMESTAMP() WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+			@session_name(\AppCfg::SESSION_NAME);
+			@session_start();
 		}
+
+		@session_regenerate_id(false);
+		$_SESSION = array();// force a fresh start on the session variables
+		$_SESSION['userID'] = $user->userID;
+		$_SESSION['passed'] = true;
+		$_SESSION['timestamp'] = time() + \AppCfg::AUTH_TIMEOUT;
+		$this->internalUser = $user;
+
+		$this->defaultDBM();
+		$this->DBM->querySafe("UPDATE ".\cfg_core_User::TABLE." SET ".\cfg_core_User::SID." = '".session_id()."',  ".\cfg_core_User::LOGIN_TIME." = UNIX_TIMESTAMP() WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $user->userID);
 	}
 
 	public function recordExistsForID($userID=0)
@@ -224,7 +228,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 	public function validateUsername($username)
 	{
-		return true;
+		return false;
 	}
 
 	protected function validateFirstName($name)
