@@ -7,7 +7,7 @@ class Views
 	{
 		$ltiApi = \lti\API::getInstance();
 
-		$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT);
+		$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI_OAUTH_SECRET, \AppCfg::LTI_OAUTH_TIMEOUT);
 		if($valid instanceof \OAuthException)
 		{
 			if($valid->getCode() === OAUTH_TOKEN_EXPIRED)

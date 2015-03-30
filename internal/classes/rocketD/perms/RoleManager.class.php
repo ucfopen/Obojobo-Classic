@@ -11,7 +11,7 @@ namespace rocketD\perms;
 class RoleManager extends \rocketD\db\DBEnabled
 {
 	private static $instance; // singleton instance reference
-	
+
 	static public function getInstance()
 	{
 		if(!isset(self::$instance))
@@ -21,11 +21,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return self::$instance;
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	public function createRole($roleName = "")
 	{
 		if(!$this->isAdministrator())
@@ -53,11 +49,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	public function deleteRole($roleName = "")
 	{
 		if(!$this->isAdministrator())
@@ -95,55 +87,51 @@ class RoleManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
 			return false;
-		}		
+		}
 		return true;
 	}
 
-	/**
-	 * 
-	 * 
-	 */
 	public function addUsersToRole($userIDs = "", $roleName = "")
 	{
-		if(!$this->isAdministrator())
-		{
-			return false;
-		}
-		return $this->addUsersToRole_SystemOnly($userIDs, $roleName);
+		if ( ! $this->isAdministrator()) return false;
+		return $this->addUsersToRoles_SystemOnly($userIDs, [$roleName]);
 	}
-	
-	public function addUsersToRole_SystemOnly($userIDs = "", $roleName = "")
-	{
-		if($userIDs == "" || !is_array($userIDs) || $roleName == "" || !is_string($roleName))
-		{
-			return false;
-		}
-		if(($roleID = $this->getRoleID($roleName)) == 0)
-		{
-			return false;
-		}
-		foreach($userIDs as $key => $userID)
-		{
-			if(!is_numeric($userID))
-			{
-				return false;
-			}
-			//if($this->isUserInRole($userID, $roleName))
-				//continue;
-	
-			$qstr = "INSERT IGNORE INTO ".\cfg_core_Role::MAP_USER_TABLE." SET ".\cfg_core_User::ID." ='?', ".\cfg_core_Role::ID."='?'";
-			if( !($q = $this->DBM->querySafe($qstr, $userID, $roleID)))
-			{
-				$this->DBM->rollback();
-				trace(mysql_error(), true);
-				return false;
-			}
-		}
-		return true;
-	}
+
 	/**
-	 * 
+	 * This function is only for the system to call, it ignores administrator rights
+	 *
+	 * @author Zachary Berry
 	 */
+	public function addUsersToRoles_SystemOnly($userIDs = "", $roles ="")
+	{
+		if( empty($userIDs) || empty($roles) || ! is_array($userIDs) || ! is_array($roles)) return false;
+
+		$success = true;
+		$qstr = "INSERT IGNORE INTO ".\cfg_core_Role::MAP_USER_TABLE." SET ".\cfg_core_User::ID."='?', ".\cfg_core_Role::ID."='?'";
+
+		foreach($userIDs as $userID)
+		{
+			if ( ! is_numeric($userID)) continue;
+			foreach($roles as $keyRole => $roleName)
+			{
+				$roleID = $this->getRoleID($roleName);
+				if ($roleID == 0) continue;
+
+				if ($this->DBM->querySafe($qstr, $userID, $roleID))
+				{
+					\rocketD\util\Cache::getInstance()->clearUsersInRole($roleID);
+				}
+				else
+				{
+					trace(mysql_error(), true);
+					$success = false;
+				}
+			}
+		}
+
+		return $success;
+	}
+
 	public function addUserToRole($userID = 0, $roleName = "")
 	{
 		if($userID == 0 || !is_numeric($userID) || $roleName == "" || !is_string($roleName))
@@ -154,11 +142,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		$userIDArr[] = $userID;
 		return $this->addUsersToRole($userIDArr, $roleName);
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getAllRoles()
 	{
@@ -167,14 +151,14 @@ class RoleManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		$qstr = "SELECT * FROM ".\cfg_core_Role::TABLE;
-		
+
 		if( !($q = $this->DBM->query($qstr)))
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		$roles = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
@@ -183,105 +167,54 @@ class RoleManager extends \rocketD\db\DBEnabled
 		return $roles;
 	}
 
-	/**
-	 * 
-	 */
 	public function getUsersInRole($roleid = 0)
 	{
-		// TODO: is this right? can only admins know this?
-		/*
-	    if(!$this->isAdministrator())
-	    {
-		    return false;
-	    }
-		*/
-		
-		
-		if(! $this->isContentCreator())
-		{
-			return false;
-		}
-		
-		
-		if(!is_numeric($roleid))
+		if ( ! $this->isContentCreator()) return false;
+
+		if ( ! is_numeric($roleid))
 		{
 			// roleid might be a role name, convert it to an ID
 			// used in API::remote_getManagersList
 			$roleid = $this->getRoleID($roleid);
 		}
-		
-		if($roleid < 1)
-		{
-			return false;
-		}
-		
+
+		if ($roleid < 1) return false;
+
 		// TODO: we could do 1 query instead of a query then looping through it and calling more stuff
 		//  would speed things up a bit
-		
+
 		$qstr = "SELECT ".\cfg_core_User::ID." FROM ".\cfg_core_Role::MAP_USER_TABLE." WHERE ".\cfg_core_Role::ID."='?'";
-		
-		if(!($q = $this->DBM->querySafe($qstr, $roleid)))
+
+		if ( ! ($q = $this->DBM->querySafe($qstr, $roleid)))
 		{
 		    trace(mysql_error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 		$users = array();
 		$UM = \rocketD\auth\AuthManager::getInstance();
 		while($r = $this->DBM->fetch_obj($q))
 		{
 		    if($user = $UM->fetchUserByID($r->{\cfg_core_User::ID}))
 			{
-			    $users[] = $user; 
+			    $users[] = $user;
 			}
 		}
-		
+
 		return $users;
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
-	/*
-	public function isUserInRole($userID = 0, $roleName = "")
-	{
-		if($userID <= 0)
-			return false;
-		if($roleName == "" || !is_string($roleName))
-			return false;
-			
-		$qstr = "SELECT COUNT(*) as count FROM ".self::mapping." 
-					WHERE userID='?' AND a='?'";
-		
-		if( !($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
-		{
-			$this->DBM->rollback();
-			//echo "ERROR: isUserInRole";
-			trace("ERROR: isUserInRole".mysql_error());
-			//exit;
-			return false;
-		}
 
-		$r = $this->DBM->fetch_obj($q);
-		if($r->count > 0)
-			return true;
-		else
-			return false;
-	}
-	*/
-	
 	/**
 	 * @author Zachary Berry
-	 * @param $userID 
-	 * 
+	 * @param $userID
+	 *
 	 */
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getUserRoles($userID = 0)
 	{
 		$roles = array();
-		$qstr = 	"SELECT ".\cfg_core_Role::TABLE.".".\cfg_core_Role::ID.", ".\cfg_core_Role::TABLE.".".\cfg_core_Role::ROLE." 
+		$qstr = 	"SELECT ".\cfg_core_Role::TABLE.".".\cfg_core_Role::ID.", ".\cfg_core_Role::TABLE.".".\cfg_core_Role::ROLE."
 			 FROM ".\cfg_core_Role::MAP_USER_TABLE.", ".\cfg_core_Role::TABLE.
 			" WHERE ".\cfg_core_Role::MAP_USER_TABLE.".".\cfg_core_User::ID."='?' AND ".\cfg_core_Role::MAP_USER_TABLE.".".\cfg_core_Role::ID." = ".\cfg_core_Role::TABLE.".".\cfg_core_Role::ID;
 		// return logged in user's roles if id is 0 or less, non su users can only use this method
@@ -293,25 +226,25 @@ class RoleManager extends \rocketD\db\DBEnabled
 				trace(mysql_error(), true);
 				return false;
 			}
-			
+
 			while($r = $this->DBM->fetch_obj($q))
 			{
 				$roles[] = $r;
-			}			
+			}
 		}
 		// su can return a anyone's roles
 		else
 		{
 		    //unset( $_SESSION['isSuperUser']);
 			if($this->isSuperUser())
-			{	
+			{
 				if(!($q = $this->DBM->querySafe($qstr, $userID)))
 				{
 					$this->DBM->rollback();
 					trace(mysql_error(), true);
 					return false;
 				}
-				
+
 				while($r = $this->DBM->fetch_obj($q))
 				{
 					$roles[] = $r;
@@ -325,20 +258,17 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return $roles;
 	}
-	
+
 	/**
-	 * Returns true if user has any 
-	 *	If no uid is sent, default to the current user
-	
-	 */
-	/**
-	 * does a user have one of the given roles?
-	 *
-	 * @param $roles	Array of role names
-	 * @param $UID		Optional UID, defaults to the current session uid
-	 * @return Boolean	True if user has any of the passed roles, false if no roles match
-	 * @author Ian Turgeon
-	 **/
+	* Returns true if user has any
+	* If no uid is sent, default to the current user
+	* does a user have one of the given roles?
+	*
+	* @param $roles	Array of role names
+	* @param $UID		Optional UID, defaults to the current session uid
+	* @return Boolean	True if user has any of the passed roles, false if no roles match
+	* @author Ian Turgeon
+	**/
 	public function doesUserHaveARole($roles, $userID=0)
 	{
 		$storeInSession = false;
@@ -351,7 +281,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		if($userID === 0 || !\obo\util\Validator::isPosInt($userID) )
 		{
 			$userID = $_SESSION['userID'];
-		
+
 		}
 
 		$qstr = "SELECT COUNT(*) as count FROM ".\cfg_core_Role::MAP_USER_TABLE." WHERE ".\cfg_core_User::ID."='?' AND (";
@@ -379,15 +309,10 @@ class RoleManager extends \rocketD\db\DBEnabled
 		{
 			return true;
 		}
-		
-		return false;
 
+		return false;
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	private function getRoleID($roleName = "")
 	{
 		if($roleName == "" || !is_string($roleName))
@@ -406,30 +331,19 @@ class RoleManager extends \rocketD\db\DBEnabled
 			trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		$r = $this->DBM->fetch_obj($q);
 		return $r->{\cfg_core_Role::ID};
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	private function roleExists($roleName = "")
 	{
-		if($roleName == "" || !is_string($roleName))
-		{
-			//die("Role name cannot be empty");
-		}
-
 		$qstr = "SELECT COUNT(*) as count FROM ".\cfg_core_Role::TABLE." WHERE ".\cfg_core_Role::ROLE." = '?'";
 
 		if( !($q = $this->DBM->querySafe($qstr, $roleName)))
 		{
 			$this->DBM->rollback();
-		//	echo "ERROR: roleExists";
 			trace(mysql_error(), true);
-			//exit;
 			return false;
 		}
 
@@ -443,14 +357,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
-	/**
-	 * Enter description here...
-	 *
-	 * @param Array $users
-	 * @param Array $roles
-	 * @return boolean
-	 */
+
 	public function removeUsersFromRoles($users = "", $roles = "")
 	{
 		// This needs to be executable by the system
@@ -460,7 +367,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return $this->removeUsersFromRoles_SystemOnly($users, $roles);
 	}
-	
+
 	/**
 	 * This function is only for the system to call, it ignores administrator rights
 	 *
@@ -475,14 +382,14 @@ class RoleManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		$success = true;
-		
+
 		foreach($users as $userID)
 		{
 			foreach($roles as $keyRole => $roleName)
 			{
 				//
 				$qstr = "DELETE FROM ".\cfg_core_Role::MAP_USER_TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_core_Role::ID."='?'";
-			
+
 				if(!($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
 				{
 				    trace(mysql_error(), true);
@@ -491,13 +398,10 @@ class RoleManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		return $success;
 	}
-	
-	/**
-	 * @author Zachary Berry
-	 */
+
 	public function addUsersToRoles($users = "", $roles = "")
 	{
 		if(!$this->isAdministrator())
@@ -506,43 +410,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return $this->addUsersToRoles_SystemOnly($users, $roles);
 	}
-	
-	/**
-	 * This function is only for the system to call, it ignores administrator rights
-	 *
-	 * @author Zachary Berry
-	 */
-	public function addUsersToRoles_SystemOnly($users = "", $roles ="")
-	{
-		if($users == "" || $roles == "" || !is_array($users) || !is_array($roles))
-		{
-			return false;
-		}
-		$success = true;
-		
-		foreach($users as $userID)
-		{
-			foreach($roles as $keyRole => $roleName)
-			{
-				$qstr = "INSERT IGNORE INTO ".\cfg_core_Role::MAP_USER_TABLE." SET ".\cfg_core_User::ID."='?', ".\cfg_core_Role::ID."='?'";
-			
-				if(!($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
-				{
-				    trace(mysql_error(), true);
-					$this->DBM->rollback();
-					$success = false;
-				}
-			}
-		}
-		
-		return $success;
-	}
-	
-	/**
-	 * 
-	 * 
-	 */
-	// TODO: REMOVE
+
 	public function isAdministrator()
 	{
 		if(!isset($_SESSION['isAdministrator']))
@@ -552,10 +420,6 @@ class RoleManager extends \rocketD\db\DBEnabled
 		return $_SESSION['isAdministrator'];
 	}
 
-	/**
-	 * 
-	 * 
-	 */
 	public function isSuperUser()
 	{
 		if(!isset($_SESSION['isSuperUser']))
@@ -564,11 +428,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return $_SESSION['isSuperUser'];
 	}
-	
-	/**
-	 * 
-	 * 
-	 */
+
 	public function isSuperViewer()
 	{
 		if(!isset($_SESSION['isSuperViewer']))
@@ -577,11 +437,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		}
 		return $_SESSION['isSuperViewer'];
 	}
-	
-	/**
-	 * 
-	 *
-	 */
+
 	public function isContentCreator()
 	{
 		if(!isset($_SESSION['isContentCreator']))
@@ -591,4 +447,3 @@ class RoleManager extends \rocketD\db\DBEnabled
 		return $_SESSION['isContentCreator'];
 	}
 }
-?>
