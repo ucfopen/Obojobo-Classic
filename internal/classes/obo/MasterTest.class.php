@@ -2,55 +2,55 @@
 namespace obo;
 require_once('PHPUnit/Framework.php');
 require_once(dirname(__FILE__)."/../../../app.php");
- 
+
 class MasterTest extends PHPUnit_Framework_TestCase
 {
 	public  $MAS;
 	const ADMIN_USER = '~su';
 	const ADMIN_PW = 'mindshare01';
-	
+
 	protected function setUp()
 	{
-		
+
 		$config->writeErrorsToLog = true;
 		$config->dbConnData = new \rocketD\db\DBConnectData('localhost' , 'root', 'root', 'los_UnitTest');
-		
+
 	}
-	
-	
+
+
 	public function testSetupDB()
 	{
-		
+
 		$DBSchema = file_get_contents(dirname(__FILE__)."/../../../DELETEME/tests/dbStructure.sql");
 		@mysql_connect($config->dbConnData->host, $config->dbConnData->user, $config->dbConnData->pass);
 		@mysql_query('DROP DATABASE ' . $config->dbConnData->db);
 		@mysql_query('CREATE DATABASE '.$config->dbConnData->db);
 		@mysql_select_db($config->dbConnData->db);
 		@mysql_close();
-		
+
 		@$mysqli = new mysqli($config->dbConnData->host, $config->dbConnData->user, $config->dbConnData->pass, $config->dbConnData->db);
 		@$mysqli->multi_query($DBSchema);
 		$mysqli->close();
 		sleep(1);
 	}
-	
-	
+
+
  	public function testverifySessionEmpty()
  	{
 		$this->MAS = new nm_los_Master();
  		@$this->assertEquals(false, $this->MAS->verifySession());
  	}
-    
+
  	public function testverifySessionSet()
- 	{	
+ 	{
 		$this->MAS = new nm_los_Master();
  		@$this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW));
  		@$this->assertTrue($this->MAS->verifySession());
  		$this->MAS->logout();
  	}
-     
+
 	public function testVerifySessionWithRoleName()
-	{		
+	{
 		$this->MAS = new nm_los_Master();
 		@$this->assertFalse($this->MAS->verifySession('SuperUser'));
 		@$this->assertFalse($this->MAS->verifySession('Administrator'));
@@ -58,9 +58,9 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		@$this->assertFalse($this->MAS->verifySession('SuperViewer'));
 		@$this->assertFalse($this->MAS->verifySession('WikiEditor'));
 		@$this->assertFalse( $this->MAS->verifySession('LibraryUser'));
-	
+
 		@$this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW));
-	
+
 		@$this->assertTrue($this->MAS->verifySession('SuperUser'));
 		@$this->assertTrue($this->MAS->verifySession('Administrator'));
 		@$this->assertTrue( $this->MAS->verifySession('ContentCreator'));
@@ -69,11 +69,11 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		@$this->assertEquals($error, $this->MAS->verifySession('WikiEditor'));
 		@$this->assertEquals($error, $this->MAS->verifySession('LibraryUser'));
 		@$this->assertEquals(null, $this->MAS->logout());
-	
+
 	}
-    	
+
 	public function testVerifySessionRole()
-	{	
+	{
 		$this->MAS = new nm_los_Master();
 		$error = new \obo\util\Error(2);
 		$this->assertEquals($error, $this->MAS->verifySessionRole('SuperUser'));
@@ -85,31 +85,31 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		@$this->assertEquals(array('validSession' => null, 'roleNames' => array('LibraryUser'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('LibraryUser')));
 		@$this->assertEquals(array('validSession' => null, 'roleNames' => array('LibraryUser', 'WikiEditor'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('LibraryUser', 'WikiEditor')));
 
-	
+
 		@$this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('SuperUser'), 'hasRoles' => array('SuperUser')), $this->MAS->verifySessionRole(array('SuperUser')));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('Administrator'), 'hasRoles' => array('Administrator')), $this->MAS->verifySessionRole(array('Administrator')));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('ContentCreator'), 'hasRoles' => array('ContentCreator')), $this->MAS->verifySessionRole(array('ContentCreator')));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('SuperViewer'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('SuperViewer')));
-	
-	
+
+
 		$this->assertEquals($error, $this->MAS->verifySessionRole('SuperViewer'));
-	
+
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('WikiEditor'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('WikiEditor')));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('LibraryUser'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('LibraryUser')));
 		$this->assertEquals(array('validSession' => true, 'roleNames' => array('LibraryUser', 'WikiEditor'), 'hasRoles' => array()), $this->MAS->verifySessionRole(array('LibraryUser', 'WikiEditor')));
 		$this->assertEquals(null, $this->MAS->logout());
 	}
-    	
+
 	public function testLogin()
 	{
 		$this->MAS = new nm_los_Master();
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 		$this->assertEquals(null, $this->MAS->logout());
-	
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW) . ' '));
 		$this->assertEquals(null, $this->MAS->logout());
-	
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, ' '.md5(self::ADMIN_PW)));
 		$this->assertEquals(null, $this->MAS->logout());
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, ' ' .md5(self::ADMIN_PW) . ' '));
@@ -120,21 +120,21 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(null, $this->MAS->logout());
 		@$this->assertTrue($this->MAS->login(' '.self::ADMIN_USER.' ', md5(self::ADMIN_PW)));
 		$this->assertEquals(null, $this->MAS->logout());
-	
+
 		$error = new \obo\util\Error(1003);
 		@$this->assertEquals($error, $this->MAS->login(self::ADMIN_USER, md5('adsfadsfadsfdasf')));
 		@$this->assertEquals(null, $this->MAS->logout());
 	}
-    		
+
 	public function testGetUserInfo()
 	{
 		$this->MAS = new nm_los_Master();
 		$error = new \obo\util\Error(1);
 		@$this->assertEquals($error, $this->MAS->getUserInfo());
-	
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 		$user =  $this->MAS->getUserInfo();
-	
+
 		$this->assertObjectHasAttribute('id', $user);
 		$this->assertObjectHasAttribute('login', $user);
 		$this->assertObjectHasAttribute('first', $user);
@@ -148,35 +148,35 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(null, $this->MAS->logout());
 		@$this->assertEquals($error, $this->MAS->getUserInfo());
 	}
-    	
+
 	public function testGetUserName()
 	{
 		$this->MAS = new nm_los_Master();
 		$error = new \obo\util\Error(2);
-	
+
 		$this->assertEquals($error, $this->MAS->getUserName(-1));
 		$this->assertEquals($error, $this->MAS->getUserName(0));
 		$this->assertEquals($error, $this->MAS->getUserName('adsfdfs'));
 		$this->assertEquals($error, $this->MAS->getUserName(array(3)));
-	
+
 		@$this->assertEquals(new \obo\util\Error(1), $this->MAS->getUserName(1));
-	
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
-	
+
 		@$this->assertEquals('New Media', $this->MAS->getUserName(1));
 		@$this->assertFalse($this->MAS->getUserName(999999999999999999999999)); // get a user that doesnt exist
 		$this->assertEquals(null, $this->MAS->logout());
 		// TODO: test someone with a middle name
 	}
-    		
+
 	public function testGetAllUsers()
 	{
 		$this->MAS = new nm_los_Master();
 		$error = new \obo\util\Error(1);
 		@$this->assertEquals($error, $this->MAS->getAllUsers());
-		
+
 		@$this->assertTrue( $this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
-		
+
 		@$allUsers = $this->MAS->getAllUsers();
 		$this->assertGreaterThan(0, count($allUsers));
 		foreach($allUsers as &$user)
@@ -185,7 +185,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		}
 		// add and remove a user to test
 	}
-    	
+
    	public function testGetAllContentCreators()
    	{
 		$this->MAS = new nm_los_Master();
@@ -208,13 +208,13 @@ class MasterTest extends PHPUnit_Framework_TestCase
    		@$this->assertEquals(new \obo\util\Error(1), $this->MAS->deleteLO(1));
    		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->deleteLO('asdfadsfadsf'));
    		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
-   	
+
    		$lo = $this->makeBasicLO();
    		@$newLO = $this->MAS->newLODraft($lo);
    		@$this->assertTrue($this->MAS->deleteLO($newLO->id));
-   	
+
    		$this->assertEquals(null, $this->MAS->logout());
-   		
+
    	}
 
     public function testGetLOFull()
@@ -224,7 +224,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
  		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->getLOFull('afadfs'));
  		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->getLOFull(0));
  		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->getLOFull(-1));
- 		
+
 
  		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 
@@ -241,7 +241,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
  		$this->doTestLO($LOID, $lo);
  		$this->assertEquals(null, $this->MAS->logout());
  	}
-	
+
 	public function testGetLatestLODraft(){}
 	public function testGetLODrafts(){}
 	public function testGetLOMeta()
@@ -251,7 +251,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		$lo = $this->makeBasicLO();
 		@$newLO = $this->MAS->newLODraft($lo);
 		$this->assertEquals(null, $this->MAS->logout());
-		
+
 		$LOID = $newLO->id;
 		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->getLOMeta());
 		@$this->assertEquals(new \obo\util\Error(2), $this->MAS->getLOMeta('afadfs'));
@@ -266,7 +266,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 	{
 		$this->MAS = new nm_los_Master();
 		@$this->assertEquals(new \obo\util\Error(1), $this->MAS->getMyObjects());
-		
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 		$los = $this->MAS->getMyObjects();
 		$this->assertType('array', $los);
@@ -279,13 +279,13 @@ class MasterTest extends PHPUnit_Framework_TestCase
 			//$this->doTestLO($lo->id, $lo, true);
 		}
 		$this->assertEquals(null, $this->MAS->logout());
-		
+
 	}
 	public function testgetPublicMasters()
 	{
 		// $this->MAS = new nm_los_Master();
 		// @$this->assertEquals(new \obo\util\Error(1), $this->MAS->getPublicMasters());
-		// 
+		//
 		// @$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 		// $los = $this->MAS->getPublicMasters();
 		// $this->assertType('array', $los);
@@ -296,9 +296,9 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		// 	$this->assertTrue($lo->perms->read == 1 ); // we should have read to everything here
 		// 	//$this->doTestLO($lo->id, $lo, true);
 		// }
-		// $this->assertEquals(null, $this->MAS->logout());		
+		// $this->assertEquals(null, $this->MAS->logout());
 	}
-   // 		
+   //
    // 	public function testmakeDerivative(){}//!
    // 	public function testremoveFromLibrary(){}//!
 
@@ -332,56 +332,56 @@ class MasterTest extends PHPUnit_Framework_TestCase
    // 		$this->assertType('\obo\lo\LO', $lo);
    // 		// switch to the assessment tab
    // 		@$this->assertEquals(null,  $this->MAS->trackSectionChanged($lo->viewID, 3));
-   // 		
+   //
    // 		// start the attempt view
    // 		@$attempt = $this->MAS->startAttempt($lo->viewID, $lo->agroup->id);
    // 		$this->assertGreaterThan(0, count($attempt));
-   // 
+   //
    // 		@$submit = $this->MAS->trackPageChanged($lo->viewID, $attempt[0]->id, 3);
    // 		$this->assertEquals(null, $submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitMedia($lo->viewID, $lo->agroup->id, $attempt[0]->id, -1);
    // 		$this->assertEquals(new \obo\util\Error(2), $submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitMedia($lo->viewID, $lo->agroup->id, $attempt[0]->id, 101);
    // 		$this->assertEquals(new \obo\util\Error(2), $submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitMedia($lo->viewID, $lo->agroup->id, $attempt[0]->id, 0);
    // 		$this->assertType('array', $submit);
    // 		$this->assertEquals(0, $submit['weight']);
-   // 		
+   //
    // 		@$submit = $this->MAS->submitMedia($lo->viewID, $lo->agroup->id, $attempt[0]->id, 40);
    // 		$this->assertType('array', $submit);
    // 		$this->assertEquals(40, $submit['weight']);
-   // 		
+   //
    // 		@$submit = $this->MAS->submitMedia($lo->viewID, $lo->agroup->id, $attempt[0]->id, 100);
    // 		$this->assertType('array', $submit);
    // 		$this->assertEquals(100, $submit['weight']);
-   // 
+   //
    // 		@$submit = $this->MAS->trackPageChanged($lo->viewID, $attempt[1]->id, 3);
    // 		$this->assertEquals(null, $submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitQuestion($lo->viewID, $lo->agroup->id, $attempt[1]->id, $attempt[1]->answers[0]->id);
    // 		$this->assertTrue($submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitQuestion($lo->viewID, $lo->agroup->id, $attempt[1]->id, $attempt[1]->answers[1]->id);
    // 		$this->assertTrue($submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitQuestion($lo->viewID, $lo->agroup->id, $attempt[1]->id, $attempt[1]->answers[2]->id);
    // 		$this->assertTrue($submit);
-   // 
+   //
    // 		@$submit = $this->MAS->trackPageChanged($lo->viewID, $attempt[2]->id, 3);
    // 		$this->assertEquals(null, $submit);
-   // 
+   //
    // 		@$submit = $this->MAS->submitQuestion($lo->viewID, $lo->agroup->id, $attempt[2]->id, $attempt[1]->answers[0]->id);
    // 		$this->assertTrue($submit);
-   // 		
+   //
    // 		@$submit = $this->MAS->submitQuestion($lo->viewID, $lo->agroup->id, $attempt[2]->id, $attempt[1]->answers[1]->id);
    // 		$this->assertTrue($submit);
-   // 
+   //
    // 		@$end = $this->MAS->endAttempt($lo->viewID, $attempt[0]->id);
    // 		$this->assertGreaterThanOrEqual(0, $end);
-   // 		
+   //
    // 		@$this->assertEquals(null, $this->MAS->logout());
    // 	}
    // // 	public function testsubmitMedia(){}//!
@@ -409,12 +409,12 @@ class MasterTest extends PHPUnit_Framework_TestCase
    // // 	public function testremoveAdditionalAttempts(){}//!
    // // 	public function testlogClientError(){}
    // // 	public function testauth_getLoginOptions(){}
-   // 	
+   //
 	public function testGetAllLatestLODrafts()
 	{
 		$this->MAS = new nm_los_Master();
 		@$this->assertEquals(new \obo\util\Error(1), $this->MAS->getAllLatestLODrafts());
-		
+
 		@$this->assertTrue($this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
 		@$drafts = $this->MAS->getAllLatestLODrafts();
 		$this->assertGreaterThan(0, $drafts );
@@ -425,34 +425,34 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		}
 		$this->assertEquals(null, $this->MAS->logout());
 	}
-   // 	
+   //
    // 	public function testDeleteUserByID()
    // 	{
    // 		$error = new \obo\util\Error(2);
-   // 		
+   //
    // 		$this->assertEquals($error, $this->MAS->deleteUserByID('dsafadsf'));
    // 		$this->assertEquals($error, $this->MAS->deleteUserByID(-1));
    // 		$this->assertEquals($error, $this->MAS->deleteUserByID(0));
-   // 		// 
+   // 		//
    // 		// @$this->assertEquals(true, $this->MAS->login(self::ADMIN_USER, md5(self::ADMIN_PW)));
    // 		// TODO NEED a fake dataset to test this
    // 		//$this->assertEquals(null, $this->MAS->logout());
    // 	}
-	
+
 	protected function doTestLO($LOID, $lo, $testMeta=false, $testInstance=false)
 	{
-		
+
 		$qTypes = array('MC', 'QA', 'Media');
 		$pItemNames = array('TextArea', 'TextArea2', 'MediaView', 'MediaView1', 'MediaView2');
 		$boolStringValues = array('1', '0');
 		$bool = array(true, false);
-		
+
 		$this->assertType('\obo\lo\LO', $lo);
-		
+
 		$this->assertObjectHasAttribute('vers_whole', $lo);
 		$this->assertObjectHasAttribute('vers_part', $lo);
 		$isMaster = ($lo->vers_whole > 0 && $lo->vers_part == 0);
-		
+
 		$this->assertObjectHasAttribute('id', $lo);
 		$this->assertTrue(\obo\util\Validator::isPosInt($lo->id));
 		$this->assertEquals($LOID, $lo->id);
@@ -496,13 +496,13 @@ class MasterTest extends PHPUnit_Framework_TestCase
 			{
 				$this->assertFalse($lo->id == $lo->parent);
 			}
-			
+
 		}
 		$this->assertObjectHasAttribute('datec', $lo);
 		$this->assertTrue(\obo\util\Validator::isPosInt($lo->datec));
 		$this->assertObjectHasAttribute('copyright', $lo);
 		$this->assertObjectHasAttribute('pages', $lo);
-		if(!$testMeta) 
+		if(!$testMeta)
 		{
 			$this->assertGreaterThan(0, count($lo->pages));
 			// loop through pages
@@ -606,12 +606,12 @@ class MasterTest extends PHPUnit_Framework_TestCase
 			$this->assertObjectHasAttribute('id', $lo->agroup);
 			$this->assertObjectHasAttribute('author', $lo->agroup);
 			$this->assertObjectHasAttribute('is_master', $lo->agroup);
-			$this->assertContains($lo->agroup->is_master, array('0', '1'));		
+			$this->assertContains($lo->agroup->is_master, array('0', '1'));
 			$this->assertObjectHasAttribute('rand', $lo->agroup);
-			$this->assertContains($lo->agroup->rand, array('0', '1'));		
+			$this->assertContains($lo->agroup->rand, array('0', '1'));
 			$this->assertObjectHasAttribute('alts', $lo->agroup);
 			$this->assertObjectHasAttribute('alt_type', $lo->agroup);
-			$this->assertContains($lo->agroup->alt_type, array('r', 'k'));		
+			$this->assertContains($lo->agroup->alt_type, array('r', 'k'));
 			$this->assertObjectHasAttribute('kids', $lo->agroup);
 			$this->assertGreaterThan(0, count($lo->agroup->kids));
 
@@ -668,13 +668,13 @@ class MasterTest extends PHPUnit_Framework_TestCase
 				$this->assertObjectHasAttribute('feedback', $pQ);
 				$this->assertArrayHasKey('correct', $pQ->feedback);
 				$this->assertArrayHasKey('incorrect', $pQ->feedback);
-			}		
+			}
 			$this->assertObjectHasAttribute('quizSize', $lo->agroup);
-		
+
 			$this->assertObjectHasAttribute('layouts', $lo);
 			//$this->assertEquals(7, count($lo->layouts));
 			// Layouts
-		
+
 			foreach($lo->layouts AS $layout)
 			{
 				$this->assertObjectHasAttribute('id', $layout);
@@ -727,7 +727,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		$this->assertArrayHasKey('assessment_size', $lo->summary);
 		$this->assertTrue(\obo\util\Validator::isPosInt($lo->summary['assessment_size']));
 	}
- 
+
 	protected function makeBasicLO()
 	{
 		$lo = array();
@@ -738,7 +738,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 							'kids' => array(
 								array(
 								'type' => 'MC',
-							    'items' => array(array('cdata' => '', 'name' => 'TextArea', 'layoutItemID'=> 0, 'id'=> 0, 'media' => array())), 
+							    'items' => array(array('cdata' => '', 'name' => 'TextArea', 'layoutItemID'=> 0, 'id'=> 0, 'media' => array())),
 								'id' => 0,
 								'alt_group' => 0,
 								'answers' => array(array('feedback' => '', 'weight' => 0, 'author' => 0, 'id' => 0, 'atext' => ''), array('feedback' => '', 'weight' => 0, 'author' => 0, 'id' => 0, 'atext' => '')),
@@ -763,7 +763,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 							'kids' => array(
 								array(
 								'type' => 'MC',
-							    'items' => array(array('cdata' => '', 'name' => 'TextArea', 'layoutItemID'=> 0, 'id'=> 0, 'media' => array())), 
+							    'items' => array(array('cdata' => '', 'name' => 'TextArea', 'layoutItemID'=> 0, 'id'=> 0, 'media' => array())),
 								'id' => 0,
 								'alt_group' => 0,
 								'answers' => array(array('feedback' => '', 'weight' => 0, 'author' => 0, 'id' => 0, 'atext' => ''), array('feedback' => '', 'weight' => 0, 'author' => 0, 'id' => 0, 'atext' => '')),
@@ -776,7 +776,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 							'rand'=> '0',
 							'id' => 0
 						);
-		
+
 		$lo['parent'] = 0;
 		$lo['vers_whole'] = 0;
 		$lo['desc'] = array('id' => 0, 'text' => 'a');
@@ -798,7 +798,7 @@ class MasterTest extends PHPUnit_Framework_TestCase
 										'id' => 0,
 										'media' => array()
 									)
-								
+
 								),
 							'layout' => 1,
 							'id' => 0
@@ -810,4 +810,3 @@ class MasterTest extends PHPUnit_Framework_TestCase
 		return $lo;
 	}
 }
-?>

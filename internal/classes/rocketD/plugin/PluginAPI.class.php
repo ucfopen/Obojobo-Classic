@@ -5,10 +5,9 @@
 */
 namespace rocketD\plugin;
 abstract class PluginAPI extends \rocketD\db\DBEnabled
-{	
+{
 
 	const PUBLIC_FUNCTION_LIST = '';
 	abstract static public function getInstance();
 
 }
-?>

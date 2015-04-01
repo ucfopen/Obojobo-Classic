@@ -23,14 +23,12 @@ class ModInternal extends AuthModule
 			$this->defaultDBM();
 			if(!$this->DBM->connected)
 			{
-				trace('not connected', true);
-				return false;
+				return array('success' => false, 'error' => 'DB not available');
 			}
 			$this->DBM->startTransaction();
 			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
-			if($result['success'] == true)
+			if($result['success'] && ! empty($result['userID']))
 			{
-				trace('core user created');
 				// password required before this, no need to check
 				if(!$this->addRecord($result['userID'], $userName, $optionalVars['MD5Pass']))
 				{
@@ -44,13 +42,12 @@ class ModInternal extends AuthModule
 			else
 			{
 				$this->DBM->rollBack();
-				trace(print_r($result, true), true);
-				return $result;
+				trace($result, true);
+				return array('success' => false, 'error' => '');
 			}
 		}
 		else
 		{
-			trace(print_r($valid, true), true);
 			return array('success' => false, 'error' => $valid);
 		}
 	}
@@ -139,8 +136,8 @@ class ModInternal extends AuthModule
 	public function authenticate($requestVars)
 	{
 		$success = false;
-		$validUsername = (bool) $this->validateUsername($requestVars['userName']);
-		$validPassword = (bool) $this->validatePassword($requestVars['password']);
+		$validUsername = ! empty($requestVars['password']) && $this->validateUsername($requestVars['userName']);
+		$validPassword = ! empty($requestVars['password']) && $this->validatePassword($requestVars['password']);
 
 		if ($validUsername && $validPassword)
 		{
@@ -153,7 +150,7 @@ class ModInternal extends AuthModule
 			}
 		}
 
-		\rocketD\util\Log::profile('login', "'{$requestVars['userName']}','obo-internal','0','".($success?'1':'0')."'");
+		profile('login', "'{$requestVars['userName']}','obo-internal','0','".($success?'1':'0')."'");
 		return $success;
 	}
 
@@ -234,16 +231,19 @@ class ModInternal extends AuthModule
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($username) > self::MAX_USERNAME_LENGTH)
 		{
-			return "User name maximum length is {self::MAX_USERNAME_LENGTH} characters.";
+			trace("User name maximum length is {self::MAX_USERNAME_LENGTH} characters.", 1);
+			return false;
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($username) < self::MIN_USERNAME_LENGTH)
 		{
-			return "User name minimum length is {self::MIN_USERNAME_LENGTH} characters.";
+			trace("User name minimum length is {self::MIN_USERNAME_LENGTH} characters.", 1);
+			return false;
 		}
 		if(preg_match(\AppCfg::AUTH_INTERNAL_USERNAME_MATCH, $username) == false)
 		{
-			return 'User name can only contain alpha numeric characters (in addition to the tilda).';
+			trace('User name can only contain alpha numeric characters (in addition to the tilda).', 1);
+			return false;
 		}
 		return true;
 	}
@@ -278,6 +278,12 @@ class ModInternal extends AuthModule
 		if(!$this->validateUID($userID)) return false;
 
 		$this->defaultDBM();
+
+		// no password? create a random one
+		if(empty($newPassword))
+		{
+			$newPassword = $this->createSalt();
+		}
 
 		// if password isnt md5, md5 it
 		if( !\obo\util\Validator::isMD5($newPassword) )

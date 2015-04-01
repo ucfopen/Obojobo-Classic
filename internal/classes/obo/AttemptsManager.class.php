@@ -1,30 +1,13 @@
 <?php
 namespace obo;
-/**
- * This class contains all logic pertaining to Attempts
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class contains all logic pertaining to Attempts
- */
 class AttemptsManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
+	use \rocketD\Singleton;
 
 	public function __construct()
 	{
 		$this->defaultDBM();
-	}
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
 	}
 
 	public function getUnfinishedAttempt($qGroupID = 0){
@@ -700,7 +683,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			$assessmentData = $ltiApi->getAssessmentSessionData($instData->instID);
 			if(!$assessmentData)
 			{
-				\rocketD\util\Log::profile('lti',"'cant-find-assessment-session-data', {$_SESSION["userID"]}, '$submittableScore', '".time()."'");
+				profile('lti',"'cant-find-assessment-session-data', {$_SESSION["userID"]}, '$submittableScore', '".time()."'");
 				\lti\Views::logError();
 			}
 			else
@@ -710,7 +693,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 				if(!$success)
 				{
-					\rocketD\util\Log::profile('lti', "'send-score-failed', {$_SESSION["userID"]}, '$submittableScore'");
+					profile('lti', "'send-score-failed', {$_SESSION["userID"]}, '$submittableScore'");
 					\lti\Views::logError();
 				}
 			}

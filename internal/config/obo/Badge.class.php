@@ -6,4 +6,3 @@ class cfg_obo_Badge
 	const BADGE_ID = 'badgeID';
 	const MIN_SCORE = 'minScore';
 }
-?>

@@ -1,29 +1,10 @@
 <?php
-/**
- * This class contains all logic pertaining to Questions
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class contains all logic pertaining to Questions
- * This includes creating, retrieving, and deleting of data.
- */
 namespace obo\lo;
 class QuestionManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
-	
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
+	use \rocketD\Singleton;
+
 	/**
 	 * Creates a new question object in the database
 	 * @param $quest (Question) The new question object
@@ -35,13 +16,13 @@ class QuestionManager extends \rocketD\db\DBEnabled
 		{
 			$question->userID = $_SESSION['userID'];
 			$this->defaultDBM();
-			
+
 			//*************  assign each answer a unique id *******************//
 			foreach($question->answers AS $answer)
 			{
 				$answer->answerID = \rocketD\util\UID::createUID(); // assign the id
 			}
-		
+
 			$qstr = "INSERT INTO ".\cfg_obo_Question::TABLE." SET ".\cfg_obo_Question::DATA."='?'";
 			if( !($q = $this->DBM->querySafe($qstr, $this->db_serialize($question)) ) )
 			{
@@ -54,7 +35,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Retrieves a question object from the database
 	 * @param $questionID (number) question ID
@@ -68,12 +49,12 @@ class QuestionManager extends \rocketD\db\DBEnabled
 		$this->defaultDBM();
 
 		$q = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Question::TABLE." WHERE ".\cfg_obo_Question::ID."='?' LIMIT 1", $questionID);
-		
+
 		if( $r = $this->DBM->fetch_obj($q) )
 		{
-			
+
 			$quest = $this->db_unserialize($r->questionData);
-			
+
 			//@ZACH - Somewhere createTime is being set to 'NAN' which the php JSON encoder chokes on.
 			//This is needed to get the HTML5 preview (which uses the JSON gateway) to work for any
 			//question with a createTime of "NAN".
@@ -81,7 +62,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 			{
 				$quest->createTime = 0;
 			}
-			
+
 			if($quest instanceof \obo\lo\Question)
 			{
 				$quest->questionID = $questionID; // the question id isn't set in the serialized data when its inserted into the database
@@ -91,13 +72,13 @@ class QuestionManager extends \rocketD\db\DBEnabled
 		{
 			$quest = false;
 		}
-		
+
 		return $quest;
 	}
 
 	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
 	// private function addAnswer($questionID, $answerID, $order, $weight, $feedback){
-	
+
 	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
 	// public function delQuestion($questionID = 0)
 
@@ -106,12 +87,12 @@ class QuestionManager extends \rocketD\db\DBEnabled
 	 * @param $questionID (number) Question ID
 	 * @param $answer (string) answer text (to provide support for both QA and MC question types)
 	 * @return (Array) Containing the values in the following table
-	 * 
-	 * Values: 
+	 *
+	 * Values:
 	 * 'weight' = weight (from 0 to 100) of answer (final score for question)
 	 * 'answerID' = answer ID (if found)
 	 * 'feedback' = customized feedback string (ex. Congratulations! You got the wrong answer!)
-	 * 
+	 *
 	 * @todo Apply partial-credit algorithm for QA question types
 	 * @todo TEST THIS
 	 */
@@ -143,7 +124,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 				}
 				return false; //  answer not found in question, this shouldnt happen
 				break;
-				
+
 			/***************** FILL IN THE BLANK QUESTION/ANSWER *****************/
 			case \cfg_obo_Question::QTYPE_SHORT_ANSWER:
 				$userAnswer = strtolower(trim($userAnswer));// trim whitespace from the submitted answer
@@ -161,7 +142,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 						);
 					}
 				}
-				
+
 				// user's answer is not one of the correct answers
 				return array(
 					'weight' => 0,
@@ -170,7 +151,7 @@ class QuestionManager extends \rocketD\db\DBEnabled
 					'type' => $question->itemType
 				);
 				break;
-				
+
 			/***************** MEDIA QUESTION *****************/
 			case \cfg_obo_Question::QTYPE_MEDIA:
 				if(!\obo\util\Validator::isScore($userAnswer))
@@ -184,7 +165,6 @@ class QuestionManager extends \rocketD\db\DBEnabled
 				return false;
 				break;
 		}
-		
+
 	}
 }
-?>

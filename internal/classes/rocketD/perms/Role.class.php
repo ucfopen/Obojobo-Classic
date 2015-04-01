@@ -12,11 +12,10 @@ class Role
 {
 	public $roleID;			//Number:
 	public $name;		//String:  the name of the role
-	
+
 	function __construct($id = 0, $name = "")
 	{
 		$this->roleID = $roleID;
 		$this->name = $name;
 	}
 }
-?>

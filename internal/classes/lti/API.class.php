@@ -3,19 +3,9 @@ namespace lti;
 
 class API extends \rocketD\db\DBEnabled
 {
+	use \rocketD\Singleton;
+
 	const LTI_SESSION_TOKEN_ID_PREFIX = 'ltiToken';
-
-	static private $instance;
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
 
 	public function updateAndAuthenticateUser($ltiData)
 	{
@@ -118,7 +108,7 @@ class API extends \rocketD\db\DBEnabled
 				return \obo\util\Error::getError(8003);
 			}
 
-			\rocketD\util\Log::profile('lti',"'duplicate-instance','$originalInstID','$targetInstId','$ltiData->resourceId','$ltiData->contextTitle','$anyAssociationsFoundWithCurrentResourceLink','$anyAssociationsFoundWithOriginalInst','$instanceSupportsExternalLink','".time()."'");
+			profile('lti', "'duplicate-instance','$originalInstID','$targetInstId','$ltiData->resourceId','$ltiData->contextTitle','$anyAssociationsFoundWithCurrentResourceLink','$anyAssociationsFoundWithOriginalInst','$instanceSupportsExternalLink','".time()."'");
 
 			$duplicateCreated = true;
 		}
@@ -126,7 +116,7 @@ class API extends \rocketD\db\DBEnabled
 		// Associate instance with this resource link
 		if(!$anyAssociationsFoundWithOriginalInst || $duplicateCreated)
 		{
-			\rocketD\util\Log::profile('lti',"'insert-association','$originalInstID','$targetInstId','$ltiData->resourceId','$ltiData->contextTitle','$anyAssociationsFoundWithCurrentResourceLink','$anyAssociationsFoundWithOriginalInst','$instanceSupportsExternalLink','$duplicateCreated' '".time()."'");
+			profile('lti',"'insert-association','$originalInstID','$targetInstId','$ltiData->resourceId','$ltiData->contextTitle','$anyAssociationsFoundWithCurrentResourceLink','$anyAssociationsFoundWithOriginalInst','$instanceSupportsExternalLink','$duplicateCreated' '".time()."'");
 
 			if($this->insertAssociation($originalInstID, $ltiData, $targetInstId) !== 1)
 			{
@@ -274,13 +264,13 @@ class API extends \rocketD\db\DBEnabled
 		$instanceData = $API->getInstanceData($associationData->item_id);
 		if(!$instanceData || !isset($instanceData->instID))
 		{
-			\rocketD\util\Log::profile('lti',"'missing-instance','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
+			profile('lti',"'missing-instance','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
 			return false;
 		}
 
 		if ($instanceData->externalLink == '')
 		{
-			\rocketD\util\Log::profile('lti',"'no-longer-associated','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
+			profile('lti',"'no-longer-associated','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
 			return false;
 		}
 
@@ -291,7 +281,7 @@ class API extends \rocketD\db\DBEnabled
 	{
 		if(!($score >= 0) || empty($instID) || empty($sourceID) || empty($serviceUrl) || empty($secret))
 		{
-			\rocketD\util\Log::profile('lti', "'outcome-no-passback', '$inst_id', '{$_SESSION['userID']}', '$service_url', '$score', '$source_id', '".time()."'");
+			profile('lti', "'outcome-no-passback', '$inst_id', '{$_SESSION['userID']}', '$service_url', '$score', '$source_id', '".time()."'");
 			return false;
 		}
 
@@ -321,7 +311,7 @@ class API extends \rocketD\db\DBEnabled
 			}
 		}
 
-		\rocketD\util\Log::profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$error', '".time()."'");
+		profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$error', '".time()."'");
 
 		return $success;
 	}

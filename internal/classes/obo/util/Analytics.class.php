@@ -2,23 +2,8 @@
 namespace obo\util;
 class Analytics extends \rocketD\db\DBEnabled
 {
+	use \rocketD\Singleton;
 
-	private static $instance;
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-
-	function __construct()
-	{
-	    $this->defaultDBM();
-	}
-	
 	public function getMyStatMasters()
 	{
 		$LOM = \obo\lo\LOManager::getInstance();
@@ -26,11 +11,11 @@ class Analytics extends \rocketD\db\DBEnabled
 		$RM = \obo\perms\RoleManager::getInstance();
 		if($RM->isSuperStats())
 		{
-			
+
 			$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER." > 0 AND ".\cfg_obo_LO::SUB_VER." = 0";
 			if(!($q = $this->DBM->query($qstr)))
 			{
-				return false;   
+				return false;
 			}
 			while($r = $this->DBM->fetch_obj($q))
 			{
@@ -49,7 +34,7 @@ class Analytics extends \rocketD\db\DBEnabled
 			$month = "MONTH(FROM_UNIXTIME(%)) AS month";
 			$day = "DAY(FROM_UNIXTIME(%)) AS day";
 			$hour = "HOUR(FROM_UNIXTIME(%)) AS hour";
-			
+
 			$limit = $preview ? ' LIMIT 10' : '';
 			switch($resolution)
 			{
@@ -119,14 +104,14 @@ class Analytics extends \rocketD\db\DBEnabled
 					$sql = "SELECT COUNT(DISTINCT A.attemptID) AS IMPORTS_USED, COUNT(DISTINCT A.userID) AS USERS, COUNT(DISTINCT A.InstID) AS INSTANCES, COUNT(DISTINCT A.loID) AS MASTERS $select FROM obo_log_attempts AS A JOIN obo_los AS O ON  O.aGroupID = A.qGroupID WHERE endTime > '?' AND endTime < '?' AND A.loID IN (?) AND A.linkedAttemptID > 0 ".(strlen($group) ? " GROUP BY $group" : '') . (strlen($order) ? " ORDER BY $order" : '') . $limit;
 					$q = $this->DBM->querySafe($sql, $start, $end, $los);
 					$results = $this->DBM->getAllRows($q);
-					break;	
+					break;
 				case 60: // Who created instances of these los
 					$los = implode(',', $los);
 					$select = str_replace('%', 'I.createTime', $select);
 					$sql = "SELECT U.login AS USERNAME, U.last AS LAST, U.first AS First, U.email AS EMAIL, COUNT(I.InstID) AS INSTANCES, COUNT(DISTINCT I.loID) AS UNIQUE_LOS $select FROM obo_lo_instances AS I JOIN obo_users AS U ON U.userID = I.userID WHERE I.loID IN (?) AND I.createTime > '?' AND I.createTime < '?' ".(strlen($group) ? " GROUP BY I.userID, $group" : ' GROUP BY I.userID') . (strlen($order) ? " ORDER BY $order, I.userID " : ' ORDER BY I.userID') . $limit;
 					$q = $this->DBM->querySafe($sql, $los, $start, $end);
 					$results = $this->DBM->getAllRows($q);
-					break;	
+					break;
 				case 65: // Who created the los
 					$los = implode(',', $los);
 					$select = str_replace('%', 'L.createTime', $select);
@@ -173,10 +158,9 @@ class Analytics extends \rocketD\db\DBEnabled
 				case 110:
 					break;
 			}
-			\rocketD\util\Log::profile('analytics', "'$stat','$preview',".time().",'{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'");
+			profile('analytics', "'$stat','$preview',".time().",'{$_SESSION['userID']}','$los','".round((microtime(true) - $t),5)."','".time()."'");
 			return $results;
 		}
 		return false;
 	}
-	
 }

@@ -1,24 +1,15 @@
 <?php
-/**
- * This class contains all logic pertaining to Scoring and score retrieval
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class contains all logic pertaining to Scoring and score retrieval
- * This includes creating, retrieving, and deleting of data.
- */
 namespace obo;
 class ScoreManager extends \rocketD\db\DBEnabled
 {
 	private static $instance;
-	
+
 	function __construct()
 	{
 	    $this->defaultDBM();
 	}
-	
+
 	static public function getInstance()
 	{
 		if(!isset(self::$instance))
@@ -28,7 +19,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		}
 		return self::$instance;
 	}
-	
+
 	public function submitLTIQuestion($sourceid, $tool, $score)
 	{
 		if(empty($sourceid) || (empty($score) && $score != 0)) return array(false, "Invalid sourceid");
@@ -91,13 +82,13 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		if( !($q instanceof \obo\lo\Question) || $q->itemType != \cfg_obo_Question::QTYPE_MEDIA || $q->items[0]->media[0]->itemType != 'kogneato') return array(false, "Question is not valid LTI type");
 
 		// ================================ SAVE THE SCORE ============================
-		
+
 		$score = round($score*100);
 		// Store the answer in the score table, getting the attempt data from the associated attempt table
 		// Update if this question is already answered for this attempt - we only keep the score that matters
 		$qstr = "
 		INSERT
-		INTO ".\cfg_obo_Score::TABLE." 
+		INTO ".\cfg_obo_Score::TABLE."
 		(
 			".\cfg_obo_Visit::ID.",
 			".\cfg_obo_LO::ID.",
@@ -127,7 +118,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			'?' AS ".\cfg_obo_Score::SCORE."
 		FROM ".\cfg_obo_Attempt::TABLE."
 		WHERE ".\cfg_obo_Attempt::ID." = '?'
-		
+
 		ON DUPLICATE KEY
 		UPDATE
 			".\cfg_obo_Score::TIME." = '?',
@@ -175,7 +166,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			if(!$AM->getCurrentAttemptID())
 			{
 				trace('attemptid invalid', true);
-				return false;	
+				return false;
 			}
 
 		}
@@ -189,13 +180,13 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			trace('questionID invalid', true);
 			return false; // error: invalid questionID
 		}
-		
+
 		// ---- Make sure the question is in the current attempt ----
 		$AM = \obo\AttemptsManager::getInstance();
 		$curAttemptID = $AM->getCurrentAttemptID();
-		
+
 		$details = $AM->getAttemptDetails($curAttemptID, false);
-		
+
 		if($details['attempt']->qGroupID != $qGroupID)
 		{
 			// error qgroup isnt this attempt's qgroup
@@ -223,7 +214,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				{
 					$found = true;
 				}
-				
+
 			}
 			if(!$found)
 			{
@@ -231,9 +222,9 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				trace("attemptID: $curAttemptID, qgroupID: $qGroupID, questionID: $questionID, answer: $answer {$_SESSION['userID']}", true);
 				return true;
 			}
-			
+
 		}
-			
+
 		// check answer and save score
 		$qman = \obo\lo\QuestionManager::getInstance();
 		$checkArr = $qman->checkAnswer($questionID, $answer);
@@ -250,17 +241,17 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				case \cfg_obo_Question::QTYPE_MEDIA:
 					$itemType = 'm';
 					break;
-					
+
 				default:
 					return false;
 					break;
-				
+
 			}
-			
-			
+
+
 			// Store the answer in the score table, getting the attempt data from the associated attempt table
 			// Update if this question is already answered for this attempt - we only keep the score that matters
-			$qstr = "INSERT INTO ".\cfg_obo_Score::TABLE." 
+			$qstr = "INSERT INTO ".\cfg_obo_Score::TABLE."
 			(".\cfg_obo_Visit::ID.",
 			".\cfg_obo_LO::ID.",
 			".\cfg_obo_Instance::ID.",
@@ -287,7 +278,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			'?' AS ".\cfg_obo_Score::ANSWER.",
 			'?' AS ".\cfg_obo_Score::SCORE."
 			FROM ".\cfg_obo_Attempt::TABLE." WHERE ".\cfg_obo_Attempt::ID." = '?'
-			
+
 			ON DUPLICATE KEY UPDATE ".\cfg_obo_Score::TIME." = '?', ".\cfg_obo_Answer::ID." = '?', ".\cfg_obo_Score::ANSWER."='?', ".\cfg_obo_Score::SCORE." = '?' ";
 			if( !($q = $this->DBM->querySafe($qstr, time(), $questionID, $itemType, $checkArr['answerID'], $answer, $checkArr['weight'], $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], time(), $checkArr['answerID'], $answer, $checkArr['weight'])) )
 			{
@@ -295,7 +286,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				trace(mysql_error(), true);
 				return false;
 			}
-			
+
 			// store the event in the tracking table
 			$trackingMan = \obo\log\LogManager::getInstance();
 			switch($checkArr['type'])
@@ -309,7 +300,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					$trackingMan->trackSubmitMedia($qGroupID, $questionID, $checkArr['weight']);
 					break;
 			}
-			
+
 
 			// just return true if this is assessment
 			if(!$this->isPractice($qGroupID))
@@ -329,8 +320,8 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			{
 				return false;
 			}
-		}		
-		
+		}
+
 		$qstr = "SELECT `".\cfg_obo_LO::ID."` FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_Instance::ID."`='{$GLOBALS['CURRENT_INSTANCE_DATA']["instID"]}' LIMIT 1";
 		$q = $this->DBM->query($qstr);
 		if($r = $this->DBM->fetch_obj($q)) // instance exists
@@ -345,10 +336,10 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Get all user's  scores for one instance, for class grading use
 	 *
@@ -357,7 +348,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	 * @return void
 	 * @author Ian Turgeon
 	 */
-	
+
 	public function getScoresForAllUsers($instID, $userID=0)
 	{
 		if(!is_numeric($instID) || $instID < 1)
@@ -365,7 +356,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false; // error: invalid input
 		}
 		//********************  GET ALL SCORES - REQUIRES INSTANCE PERMISSIONS  ****************************//
-			
+
 		//If they do not have permissions to write to this instance, reject the request
 		$IM = \obo\lo\InstanceManager::getInstance();
 		if(!$IM->userCanEditInstance($_SESSION['userID'], $instID))
@@ -386,7 +377,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					".\cfg_obo_Attempt::SCORE.",
 					".\cfg_obo_Attempt::END_TIME.",
 					COALESCE(".\cfg_obo_ExtraAttempt::EXTRA_COUNT.", 0) as additional_attempts
-					FROM 
+					FROM
 					(
 						SELECT
 							A.".\cfg_obo_Attempt::ID.",
@@ -395,7 +386,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 							V.".\cfg_obo_Instance::ID." as instance_id,
 							A.".\cfg_obo_Attempt::LINKED_ATTEMPT.",
 							A.".\cfg_obo_Attempt::END_TIME."
- 						FROM 
+ 						FROM
 							".\cfg_obo_Attempt::TABLE." AS A,
 							".\cfg_obo_Visit::TABLE." AS V,
 							".\cfg_obo_LO::TABLE." AS L,
@@ -448,7 +439,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			// add attempts
 			$result[$i]['attempts'][] = array('attemptID' => $r->attemptID, 'score' => $r->{\cfg_obo_Attempt::SCORE}, 'linkedAttempt' => $r->{\cfg_obo_Attempt::LINKED_ATTEMPT}, 'submitted' => $r->{\cfg_obo_Attempt::END_TIME} > 0, 'submitDate' => $r->{\cfg_obo_Attempt::END_TIME});
 		}
-		
+
 		// store in memcache
 		\rocketD\util\Cache::getInstance()->setScoresForAllUsers($instID, $result);
 		return $result;
@@ -460,7 +451,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		{
 			return false; // error: invalid input
 		}
-		
+
 		if(!is_numeric($userID) || $userID < 1)
 		{
 			return false; // error: invalid input
@@ -472,9 +463,9 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		{
 			return $scores;
 		}
-		
+
 		// TODO: fish around in memcache for this info if it exists
-		
+
 		// grab every assessment attempt for me (including unsubmitted ones!)
 		$qstr = "SELECT
 					t1.".\cfg_core_User::ID.",
@@ -483,7 +474,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					".\cfg_obo_Attempt::SCORE.",
 					".\cfg_obo_Attempt::END_TIME.",
 					COALESCE(".\cfg_obo_ExtraAttempt::EXTRA_COUNT.", 0) as additional_attempts
-					FROM 
+					FROM
 					(
 						SELECT
 							A.".\cfg_obo_Attempt::ID.",
@@ -540,9 +531,9 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			// add attempts
 			$result['attempts'][] = array('attemptID' => $r->attemptID, 'score' => $r->{\cfg_obo_Attempt::SCORE}, 'linkedAttempt' => $r->{\cfg_obo_Attempt::LINKED_ATTEMPT}, 'submitted' => $r->{\cfg_obo_Attempt::END_TIME} > 0, 'submitDate' => $r->{\cfg_obo_Attempt::END_TIME});
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->setScoresForUser($instID, $userID, $result);
-		
+
 		return $result;
 	}
 
@@ -601,8 +592,8 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	 * Get Assessment Scores
 	 * WARNING - DO NOT EXPOSE DIRECTLY TO API - NO PERMISSIONS CHECKING HERE
 	 *
-	 * @param string $instID 
-	 * @param string $userID 
+	 * @param string $instID
+	 * @param string $userID
 	 * @return void
 	 * @author Ian Turgeon
 	 */
@@ -618,67 +609,65 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		{
 			return $aGroup; // error
 		}
-			
-		$qstr = "SELECT 
-					A.".\cfg_obo_Attempt::ID.", 
-					A.".\cfg_obo_QGroup::ID.", 
-					A.".\cfg_obo_Visit::ID.", 
-					A.".\cfg_obo_Attempt::SCORE.", 
-					A.".\cfg_obo_Attempt::START_TIME.", 
+
+		$qstr = "SELECT
+					A.".\cfg_obo_Attempt::ID.",
+					A.".\cfg_obo_QGroup::ID.",
+					A.".\cfg_obo_Visit::ID.",
+					A.".\cfg_obo_Attempt::SCORE.",
+					A.".\cfg_obo_Attempt::START_TIME.",
 					A.".\cfg_obo_Attempt::END_TIME.",
 					A.".\cfg_obo_Attempt::LINKED_ATTEMPT."
-				FROM 
+				FROM
 					".\cfg_obo_Attempt::TABLE." AS A,
 					".\cfg_obo_Visit::TABLE." AS V
-				WHERE 
-					V.".\cfg_obo_Visit::ID." = A.".\cfg_obo_Visit::ID." 
-				AND 
+				WHERE
+					V.".\cfg_obo_Visit::ID." = A.".\cfg_obo_Visit::ID."
+				AND
 					V.".\cfg_obo_Instance::ID." = '?'
 				AND
 					V.".\cfg_core_User::ID." = '?'
 				AND
 					A.".\cfg_obo_Attempt::END_TIME." != 0";
-			
+
 		//echo $qstr;
-		
+
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 			$this->DBM->rollback();
-		//	echo "ERROR: getAssessmentScores";
-			error_log("ERROR: getAssessmentScores".mysql_error());
-			//exit;
+			trace("ERROR: getAssessmentScores".mysql_error(), true);
 			return false;
 		}
-		
+
 		$list = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			$list[] = $r;
 		}
-		
+
 		return $list;
 	}
-	
+
 	/**
 	 * @author Zachary Berry
-	 * 
+	 *
 	 * Returns statistical information on a given question.
 	 *
 	 * @param unknown_type $questionID
 	 */
 	public function getQuestionStatistics($questionID, $includeAllAttempts)
 	{
-		
+
 	}
 
 	/**
 	 * get student's attempt data for their own review
      * @param $instID	(number)	Instance id to retrieve score data from
-	 * @return (array)	
-	 */	
+	 * @return (array)
+	 */
 	public function getStudentInstanceAnswers($instID=0)
 	{
-		
+
 		// returns object that looks like:
 		/*
 			Array {
@@ -691,26 +680,26 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					[1] -> 'student answer for question 2 on attempt 2'
 				}
 			}
-		
-		
-		
+
+
+
 		*/
 		// look up instance id to find any attempts by current user
-		
-		
+
+
 		// current user is owner of the attempt
 
-		// get question text 
+		// get question text
 		// get submitted answer text
-		
+
 		$attempts = array();
-		
+
 		// make sure the attempt belongs to the current user
 		$qAttempt = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Attempt::TABLE." AS A, ".\cfg_obo_Visit::TABLE." AS V WHERE A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID." AND V.".\cfg_core_User::ID." = '?' AND V.".\cfg_obo_Instance::ID." = '?'", $_SESSION['userID'], $instID);
 		while($rAttempt = $this->DBM->fetch_obj($qAttempt))
 		{
 			$answers = array();
-			
+
 			// get all answers for this attempt
 			if( !($qScore = $this->DBM->querySafe("SELECT * FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID." = '?'", $rAttempt->{\cfg_obo_Attempt::ID} )) )
 			{
@@ -743,13 +732,13 @@ class ScoreManager extends \rocketD\db\DBEnabled
 					$givenAnswer = 'no answer given';
 				}
 			}
-			
+
 		}
-		
-		
+
+
 
 	}
-	
+
 	/**
 	 * build an object to store score data for deleted instances
      * @param $instID	(number)	Instance id to retrieve score data from
@@ -759,17 +748,17 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	public function buildInstanceScoresObject($instID=0)
 	{
 		$attempts = array();
-		$q = $this->DBM->querySafe("SELECT 
-						A.".\cfg_obo_Attempt::ID.", 
-						A.".\cfg_obo_QGroup::ID.", 
-						A.".\cfg_obo_Attempt::SCORE.", 
-						A.".\cfg_obo_Attempt::START_TIME.", 
+		$q = $this->DBM->querySafe("SELECT
+						A.".\cfg_obo_Attempt::ID.",
+						A.".\cfg_obo_QGroup::ID.",
+						A.".\cfg_obo_Attempt::SCORE.",
+						A.".\cfg_obo_Attempt::START_TIME.",
 						A.".\cfg_obo_Attempt::END_TIME.",
 						V.".\cfg_core_User::ID."
 						FROM ".\cfg_obo_Attempt::TABLE." AS A,
 						 ".\cfg_obo_Visit::TABLE." AS V
-						WHERE 
-						V.".\cfg_obo_Instance::ID." = '?' 
+						WHERE
+						V.".\cfg_obo_Instance::ID." = '?'
 						AND A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID."
 						ORDER BY A.".\cfg_obo_QGroup::ID.", V.".\cfg_obo_Visit::ID.", V.".\cfg_core_User::ID, $instID);
 		while($r = $this->DBM->fetch_obj($q))
@@ -819,19 +808,19 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 		//Get the scores for each individual question
-		
+
 		$qstr = "SELECT
-					".\cfg_obo_Score::ITEM_ID.", 
-					`".\cfg_obo_Score::TYPE."`, 
-					".\cfg_obo_Answer::ID.", 
-					".\cfg_obo_Score::ANSWER.", 
-					".\cfg_obo_Score::SCORE." 
-					FROM 
+					".\cfg_obo_Score::ITEM_ID.",
+					`".\cfg_obo_Score::TYPE."`,
+					".\cfg_obo_Answer::ID.",
+					".\cfg_obo_Score::ANSWER.",
+					".\cfg_obo_Score::SCORE."
+					FROM
 						".\cfg_obo_Score::TABLE."
-					WHERE 
-						".\cfg_obo_Attempt::ID." ='{$GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']}' 
+					WHERE
+						".\cfg_obo_Attempt::ID." ='{$GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']}'
 						AND ".\cfg_obo_QGroup::ID."='?' ORDER BY ".\cfg_obo_Score::ID." ASC";
-		
+
 		if( !($q = $this->DBM->querySafe($qstr, $qGroupID)) )
 		{
 			trace(mysql_error(), true);
@@ -894,7 +883,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 	}
 
 	/********************************************************************/
-	
+
 	/**
 	 * Calculates the final score for a given QuestionGroup while user is still in the attempt
 	 * @param $qgroup (number) QuestionGroup ID
@@ -910,10 +899,10 @@ class ScoreManager extends \rocketD\db\DBEnabled
 				return false;
 			}
 		}
-		
+
 		//Gets all scores from the database for this instance across all sessions
 		$qstr = "SELECT ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='{$GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']}' AND ".\cfg_obo_QGroup::ID."='?'";
-		
+
 		if( !($q = $this->DBM->querySafe($qstr, $qGroupID)) )
 		{
 			trace(mysql_error(), true);
@@ -921,18 +910,18 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			//die();
 			return false;
 		}
-		
+
 		//Get data from query and add up scores
 		$sum = 0;
 		while( $r = $this->DBM->fetch_obj($q) )
 		{
 			$sum += $r->{\cfg_obo_Score::SCORE};
 		}
-		
+
 		// get the qgroup to get it's length (quizSize may be less then the actual number of kids)
 		$qgroup = new \obo\lo\QuestionGroup();
 		$qgroup->getFromDB($this->DBM, $qGroupID, true);
-			
+
 		//Calculate score (checking for divide by zero
 		if($qgroup->quizSize != 0)
 		{
@@ -970,4 +959,3 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		return false;
 	}
 }
-?>
