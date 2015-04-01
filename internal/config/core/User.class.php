@@ -2,7 +2,7 @@
 class cfg_core_User
 {
 	const TABLE = 'obo_users';
-	
+
 	const ID = 'userID';
 	const LOGIN = 'login';
 	const AUTH_MODULE = 'auth_module';
@@ -16,4 +16,3 @@ class cfg_core_User
 	const MEDIA_QUOTA = '';
 
 }
-?>

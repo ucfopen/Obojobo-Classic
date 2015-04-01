@@ -21,9 +21,6 @@ class cfg_obo_LO
 	const NUM_PRACTICE = 'numPQuestions';
 	const NUM_ASSESSMENT = 'numAQuestions';
 	const DELETED = 'deleted';
-	
+
 	const MAP_AUTH_TABLE = 'obo_map_authors_to_lo';
-	
-	
 }
-?>

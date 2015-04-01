@@ -6,4 +6,3 @@ class cfg_obo_Answer
 	const TEXT = 'answer';
 
 }
-?>

@@ -1,34 +1,10 @@
 <?php
-/**
- * This class handles all database calls and logic pertaining to Instances
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class handles all database calls and logic pertaining to Instances
- * This includes creating, retrieving, and deleting of data.
- */
 namespace obo\lo;
 class InstanceManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
-		
-	public function __construct()
-	{
-		$this->defaultDBM();
-	}
+	use \rocketD\Singleton;
 
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
 	/**
 	 * Creates a new instance of a learning object (this is what the lo viewer will call)
 	 *
@@ -45,14 +21,14 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			{
 				return \rocketD\util\Error::getError(4);
 			}
-			
+
 			$permman = \obo\perms\PermissionsManager::getInstance();
 			if( ! $permman->getMergedPerm($loID, \cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::PUBLISH, $_SESSION['userID']) )
 			{
 				return \rocketD\util\Error::getError(4);
 			}
 		}
-		
+
 		$valid = $this->validateInstanceValues($name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport);
 		if($valid !== true)
 		{
@@ -63,7 +39,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return $valid;
 		}
-		
+
 		$userID = $_SESSION['userID'];
 
 		//check if user is a Super User
@@ -86,7 +62,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 		//Give the current user permissions to view and edit the instance
 		// TODO: move permission sql statments to permMan
-		$qstr = "INSERT 
+		$qstr = "INSERT
 					INTO `".\cfg_obo_Perm::TABLE."`
 						(
 							`".\cfg_core_User::ID."`,
@@ -110,16 +86,16 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			//erro_log("ERROR: newInstance query 2  ".mysql_error());
 			return false;
 		}
-		
+
 		// give them permissions using the new perms system
-		
+
 		$pMan = \obo\perms\PermManager::getInstance();
 		$setperms = $pMan->setPermsForUserToItem($userID, \cfg_core_Perm::TYPE_INSTANCE, $instID, \cfg_core_Perm::P_OWN, array());
 		if($setperms instanceof \rocketD\util\Error)
 		{
 			return false;
 		}
-				
+
 		return $instID;
 	}
 
@@ -190,7 +166,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE `".\cfg_obo_Instance::ID."`='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
@@ -217,7 +193,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				// $rootID = $lom->getRootId($r->{\cfg_obo_LO::ID});
 				$permman = \obo\perms\PermissionsManager::getInstance();
 				$roleMan = \obo\perms\RoleManager::getInstance();
-				
+
 				$visitMan = \obo\VisitManager::getInstance();
 				$visitMan->startInstanceView($instID, $r->{\cfg_obo_LO::ID});
 				$visitMan->createVisit($instID);
@@ -237,7 +213,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 					$lo->tracking =  $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
 					$lo->tracking->isInAttempt = $AM->getUnfinishedAttempt($lo->aGroup->qGroupID) != false;
 				}
-				
+
 				// Add in instance viewing variables
 				$lo->viewID = $visitMan->getInstanceViewKey($instID);
 				$lo->instanceData = $this->getInstanceData($instID);
@@ -255,47 +231,47 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 			else
 			{
-				
-				
+
+
 				return \rocketD\util\Error::getError(4003);
 			}
 		}
 		else
 		{
-			
-			
+
+
 			return \rocketD\util\Error::getError(4002);
 		}
 	}
-	
+
 
 	/**
 	 * Sister function to getLOMeta, gets publicly available data about an instance.
 	 *
-	 * @param string $instID 
+	 * @param string $instID
 	 * @return (LO) Meta learning object or Error
 	 * @author Ian Turgeon
 	 */
 	public function getInstanceData($instID=0, $includeDeleted=false)
 	{
-		
+
 		if( ! (\obo\util\Validator::isPosInt($instID) || is_array($instID)) )
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$return = array();
 		$permman = \obo\perms\PermissionsManager::getInstance();
-		
+
 		$roleMan = \obo\perms\RoleManager::getInstance();
-		
+
 		//--------------------------- REQUESTED ARRAY OF INSTANCES ------------------------//
 		// run through the array
 		// remove any non integers
 		// get any that we can from cache
 		if(is_array($instID))
 		{
-			
+
 			foreach($instID AS $key => $arrItem)
 			{
 				// remove non posInts from the array
@@ -306,7 +282,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				// get instance data
 				else
 				{
-					
+
 					if($curInstData = \rocketD\util\Cache::getInstance()->getInstanceData($arrItem))
 					{
 						if($roleMan->isSuperUser())
@@ -346,7 +322,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				}
 				$return[] = $curInstData; // store in return
 				return $curInstData; // store in return
-				
+
 			}
 
 			$instArr = $instID;
@@ -377,7 +353,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$iData->dbGetCourseData();
 			//\rocketD\util\Cache::getInstance()->setInstanceData($iData);
 			// get perms
-			
+
 			// Fix if the user is SU, just get merged perms
 			if($roleMan->isSuperUser())
 			{
@@ -385,7 +361,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 			$return[] = $iData;
 		}
-		
+
 		// only return one object if request was a single ID not an array
 		if(!is_array($instID))
 		{
@@ -402,16 +378,16 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	 */
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getAllInstances()
-	{		
+	{
 		$PMan = \obo\perms\PermManager::getInstance();
 		$itemPerms = $PMan->getAllItemsForUser($_SESSION['userID'], \cfg_core_Perm::TYPE_INSTANCE, true, true);
 
 		// TODO: limit what is returned based on what perm they have
 		$myInstances = array_keys($itemPerms);
-		
+
 		return $this->getInstanceData($myInstances);
 	}
-		
+
 	/**
 	 * Updates an instance
 	 * @param $instArr (Array) Array of information about the new instance (needs name, lo_id, courseID, startTime, and endTime)
@@ -436,7 +412,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				`".\cfg_obo_Instance::SCORE_IMPORT."` = '?'
 			WHERE
 				`".\cfg_obo_Instance::ID."` = '?'";
-		
+
 		//Send query to DB, checking for errors
 		// TODO:future course code: if( !($q = $this->DBM->querySafe($qstr, $name, $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID, $instID)) )
 		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $instID)) )
@@ -447,7 +423,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		}
 
 		\rocketD\util\Cache::getInstance()->clearInstanceData($instID);
-		
+
 		return true;
 	}
 
@@ -518,7 +494,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	public function deleteInstance($instID = 0)
 	{
 	    if(!\obo\util\Validator::isPosInt($instID))
@@ -530,7 +506,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(4);
 		}
-	
+
 		// Delete permission relating to that instance
 		$permman = \obo\perms\PermissionsManager::getInstance();
 		if(!$permman->removeAllPermsForItem($instID, \cfg_obo_Perm::TYPE_INSTANCE))
@@ -540,10 +516,10 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		// clean secondary permissions (shared users)
 		$pMan = \obo\perms\PermManager::getInstance();
 		$pMan->clearPermsForItem(\cfg_core_Perm::TYPE_INSTANCE, $instID);
-		
+
 		$tracking = \obo\log\LogManager::getInstance();
 		$tracking->trackDeleteInstance($instID);
-		
+
 		// mark the instance as deleted
 		$this->DBM->querySafe("UPDATE ".\cfg_obo_Instance::TABLE." SET ".\cfg_obo_Instance::DELETED." = '1' WHERE ".\cfg_obo_Instance::ID." = '?'", $instID);
 
@@ -560,16 +536,16 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return false; // error: invalid input
 		}
-		
+
 		// try cache, instanceData can find the loid by the instid
-		
+
 		if($instData = \rocketD\util\Cache::getInstance()->getInstanceData($instID))
 		{
 			return $instData->loID;
 		}
-		
+
 		$qstr = "SELECT `".\cfg_obo_LO::ID."` FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_Instance::ID."` = '?'";
-		
+
 		if(!($q = $this->DBM->querySafe($qstr,  $instID)))
 		{
 			return false;
@@ -597,9 +573,9 @@ class InstanceManager extends \rocketD\db\DBEnabled
 				$loID = implode(',', $loID);
 			}
 		}
-		
+
 		$qstr = "SELECT ".\cfg_obo_Instance::ID."  FROM `".\cfg_obo_Instance::TABLE."` WHERE `".\cfg_obo_LO::ID."` IN (?)";
-		
+
 		if( !($q = $this->DBM->querySafe($qstr, $loID)) )
 		{
 			return false;
@@ -629,12 +605,12 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isScoreMethod($scoreMethod))
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isBoolean($allowScoreImport))
 		{
 			return \rocketD\util\Error::getError(2);
@@ -661,7 +637,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 	protected function insertNewInstance($userID, $name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $originalID = 0)
 	{
 		$qstr = "INSERT INTO `".\cfg_obo_Instance::TABLE."`
-				SET 
+				SET
 					`".\cfg_obo_Instance::TITLE."`='?',
 					`".\cfg_obo_LO::ID."`='?',
 					`".\cfg_core_User::ID."`='?',
@@ -673,10 +649,10 @@ class InstanceManager extends \rocketD\db\DBEnabled
 					`".\cfg_obo_Instance::SCORE_METHOD."`='?',
 					`".\cfg_obo_Instance::SCORE_IMPORT."`='?',
 					`".\cfg_obo_Instance::ORIGINAL_ID."`='?'";
-		
+
 		//Default scoreMethod (highest)
 		if(empty($scoreMethod)) $scoreMethod = 'h';
-		
+
 		//Send query to DB, checking for errors
 		//TODO: future course code: if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course->title, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $course->courseID)))
 		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, (int)$originalID)))
@@ -685,8 +661,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		return $this->DBM->insertID;
 	}
 }
-?>

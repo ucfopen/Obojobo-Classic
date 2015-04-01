@@ -1,34 +1,10 @@
 <?php
-/**
- * This class contains all the logic having to do with media
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class contains all the logic having to do with media
- * This includes creating, retrieving, and deleting of data.
- */
 namespace obo\lo;
 class MediaManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
-	
-	function __construct()
-	{
-	  $this->defaultDBM();
-	}
+	use \rocketD\Singleton;
 
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-		
 	/**
 	 * Gets the full data for an existing media object
 	 * @param $mediaID (number) media id
@@ -41,8 +17,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		
-		
+
+
 		if($media = \rocketD\util\Cache::getInstance()->getMedia($mediaID))
 		{
 			return $media;
@@ -53,10 +29,10 @@ class MediaManager extends \rocketD\db\DBEnabled
             $this->DBM->rollback();
 			return false;
 		}
-		
+
 		$r = $this->DBM->fetch_obj($q);
-		
-		
+
+
 
 		$media = new \obo\lo\Media($r->{\cfg_obo_Media::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_Media::TITLE}, $r->{\cfg_obo_Media::TYPE}, $r->{\cfg_obo_Media::DESC}, $r->{\cfg_obo_Media::TIME}, $r->{\cfg_obo_Media::COPYRIGHT}, $r->{\cfg_obo_Media::THUMB}, $r->{\cfg_obo_Media::URL}, $r->{\cfg_obo_Media::SIZE}, $r->{\cfg_obo_Media::LENGTH}, 0, $r->{\cfg_obo_Media::WIDTH}, $r->{\cfg_obo_Media::HEIGHT}, unserialize(base64_decode($r->{\cfg_obo_Media::META})), $r->{\cfg_obo_Media::ATTRIBUTION});
 		\rocketD\util\Cache::getInstance()->setMedia($media);
@@ -83,7 +59,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			// force getLO on an array to use meta
 			$mediaArr = $optMediaIDArray;
 		}
-		
+
 		$result = array();
 		$result = $this->getMediaWithPerm('read');
 		if(count($mediaArr) > 0) // remove unwanted items
@@ -102,7 +78,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		return $result;
 	}
 
-	/** 
+	/**
 	 * Gets list of all Objects the user has a certain permission for
 	 * @param $userID (number) user id
 	 * @param $perm (string) permission (values: 'read', 'write', 'copy', 'publish', 'giveRead', 'giveWrite', 'giveCopy', 'givePublish', 'giveGlobal')
@@ -112,7 +88,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 	{
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$mediaIDs = $permMan->getItemsWithPerm(\cfg_obo_Perm::TYPE_MEDIA, $perm);
-		
+
 		$mediaArr = array();
 		if(count($mediaIDs) > 0)
 		{
@@ -126,7 +102,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 		return $mediaArr;
 	}
-	
+
 	/**
 	 * Creates a new media object in the database
 	 * @param $mediaObj (Media) media object
@@ -145,7 +121,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// if auth is set to someone that isnt you, you have to be super user
 		if(!\obo\util\Validator::isPosInt($media->auth) || $media->auth == $_SESSION['userID'])
 		{
@@ -154,29 +130,29 @@ class MediaManager extends \rocketD\db\DBEnabled
 		else
 		{
 			// to make media for someone else, you must be su
-			
+
 			$roleMan = \obo\perms\RoleManager::getInstance();
 			if(!$roleMan->isSuperUser())
 			{
 				return \rocketD\util\Error::getError(2);
 			}
 		}
-		
+
 		if( ! \obo\util\Validator::isString($media->title) )
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if( ! \obo\util\Validator::isString($media->itemType) )
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if( ! \obo\util\Validator::isString($media->copyright) )
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-	    
+
 
 	    // TODO: THIS SHOULDNT BE HARD CODED- ANY PLUGIN SHOULD BE ABLE REGISTER FOR THIS EVENT
 	    /*if($media->itemType == 'kogneato')
@@ -203,13 +179,13 @@ class MediaManager extends \rocketD\db\DBEnabled
 
 
 		$media->createTime = time();
-		$qstr = "INSERT INTO ".\cfg_obo_Media::TABLE." 
-			SET 
-				".\cfg_core_User::ID."='?', 
-				".\cfg_obo_Media::TITLE."='?', 
+		$qstr = "INSERT INTO ".\cfg_obo_Media::TABLE."
+			SET
+				".\cfg_core_User::ID."='?',
+				".\cfg_obo_Media::TITLE."='?',
 				".\cfg_obo_Media::TYPE."='?',
-				`".\cfg_obo_Media::DESC."`='?', 
-				".\cfg_obo_Media::URL."='?', 
+				`".\cfg_obo_Media::DESC."`='?',
+				".\cfg_obo_Media::URL."='?',
 				".\cfg_obo_Media::TIME."='?',
 				".\cfg_obo_Media::COPYRIGHT."='?',
 				".\cfg_obo_Media::THUMB."='?',
@@ -220,16 +196,16 @@ class MediaManager extends \rocketD\db\DBEnabled
 				".\cfg_obo_Media::META."='?',
 				".\cfg_obo_Media::ATTRIBUTION."='?'";
 		if( !($q = $this->DBM->querySafe($qstr, $media->auth, $media->title, $media->itemType,
-		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb, 
+		$media->descText, $media->url, $media->createTime , $media->copyright, $media->thumb,
 		$media->size, $media->length, $media->height, $media->width, base64_encode(serialize($media->meta)), $media->attribution)))
 		{
 		    $this->DBM->rollback();
 			return false;
 		}
-		
+
 		$media->mediaID = $this->DBM->insertID;
-		
-		
+
+
 		// uploaded asset types
 		if(in_array($media->itemType, array('pic', 'swf', 'flv', 'mp3')))
 		{
@@ -237,7 +213,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			$lastDot = strrpos($baseName, '.');
 		    $fileName = substr($baseName, 0, $lastDot);
 		    $extension = strtolower(substr($baseName, $lastDot+1));
-	    
+
 		    $hashedFile = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.md5($fileName);
 			if(file_exists($hashedFile))
 			{
@@ -249,18 +225,18 @@ class MediaManager extends \rocketD\db\DBEnabled
 				return false;
 			}
 		}
-		
+
 		$media->perms = new \obo\perms\Permissions($media->auth, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
-		
+
 		//Add owner permissions to this object for this user
 		$PM = \obo\perms\PermissionsManager::getInstance();
 		$PM->setFullPermsForItem($media->mediaID, \cfg_obo_Perm::TYPE_MEDIA);
 
 		\rocketD\util\Cache::getInstance()->setMedia($media);
-		
+
 		return $media;
 	}
-	
+
 	public function getMediaType($extension)
 	{
 		switch($extension){
@@ -280,18 +256,18 @@ class MediaManager extends \rocketD\db\DBEnabled
 				return false; //This will represent an invalid file type.
 		}
 	}
-	
+
 	public function handleFileDataUpload($fileData, $filename, $title, $description, $copyright, $length=0)
 	{
 		// TODO: Make sure file is less than or equal to max size, and a title has been sent
-		
+
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		if(!$roleMan->isLibraryUser())
 		{
 			\rocketD\util\Error::getError(4);
 			return false;
 		}
-		
+
 		//explode it by . and then combine to compare
 		$fileNameArr =  explode('.', $filename);
 		$baseName = $filename;
@@ -320,22 +296,22 @@ class MediaManager extends \rocketD\db\DBEnabled
 				// no other file types allowed
 				break;
 		}
-		
+
 		if($fileType != false)
 		{
 			$newFileLocation = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA . md5($fileName);
-			
+
 			try
 			{
-				
+
 				file_put_contents($newFileLocation, $fileData->data);
 				//$fp = fopen($newFileLocation, "w");
 				//fwrite($fp, $fileData);
 				//fclose($fp);
-				
+
 				$size = filesize($newFileLocation);
-				
-				
+
+
 				if(file_exists($newFileLocation))
 				{
 					$media = new \obo\lo\Media();
@@ -373,12 +349,12 @@ class MediaManager extends \rocketD\db\DBEnabled
 					$media->length = $length;
 
 					$result = $this->newMedia($media);
-					
+
 					if( !($result instanceof nm_los_Media) )
 					{
 						return false;
 					}
-					
+
 					return true;
 				}
 				else
@@ -393,7 +369,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	
+
 	public function handleMediaUpload($fileData, $title, $description, $copyright, $length=0)
 	{
 		// TODO: Make sure file is less than or equal to max size, and a title has been sent
@@ -415,11 +391,11 @@ class MediaManager extends \rocketD\db\DBEnabled
 		{
 			return false; // signifys failure to the upload scripts
 		}
-		
+
 		$newFileLocation = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA . md5($fileName);
-	
+
 		move_uploaded_file($fileData['tmp_name'], $newFileLocation);
-		
+
 		if(file_exists($newFileLocation))
 		{
 			$media = new \obo\lo\Media();
@@ -427,7 +403,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 			if($fileType == 'swf')
 			{
 				$swf = new \obo\lo\media\SWF($newFileLocation);
-				
+
 				$media->width = $swf->width;
 				$media->height = $swf->height;
 				$media->meta = array(
@@ -444,7 +420,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 				$media->height = $data[1];
 			}
 			@chmod($testName, 0755);
-			
+
 			$media->title = $title;
 			$media->auth = $_SESSION['userID'];
 			$media->descText = $description;
@@ -478,7 +454,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 	 */
 	public function saveMedia($mediaObj = 0)
 	{
-		
+
         if(!\obo\util\Validator::isInt($mediaObj->mediaID))
 		{
             return false;
@@ -494,31 +470,31 @@ class MediaManager extends \rocketD\db\DBEnabled
 		// check for changes to media properties
 		$serverMedia = $this->getMedia($mediaObj->mediaID);
 		if(	$serverMedia->title != $mediaObj->title || $serverMedia->descText != $mediaObj->descText ||
-			$serverMedia->copyright != $mediaObj->copyright || $serverMedia->length != $mediaObj->length || 
+			$serverMedia->copyright != $mediaObj->copyright || $serverMedia->length != $mediaObj->length ||
 			$serverMedia->height != $mediaObj->height || 	$serverMedia->width != $mediaObj->width)
 		{
-		    $qstr = "UPDATE ".\cfg_obo_Media::TABLE." SET 
-				".\cfg_obo_Media::TITLE."='?', 
-				`".\cfg_obo_Media::DESC."`='?', 
-				".\cfg_obo_Media::COPYRIGHT."='?', 
-				".\cfg_obo_Media::LENGTH."='?', 
-				".\cfg_obo_Media::HEIGHT."='?', 
-				".\cfg_obo_Media::WIDTH."='?', 
+		    $qstr = "UPDATE ".\cfg_obo_Media::TABLE." SET
+				".\cfg_obo_Media::TITLE."='?',
+				`".\cfg_obo_Media::DESC."`='?',
+				".\cfg_obo_Media::COPYRIGHT."='?',
+				".\cfg_obo_Media::LENGTH."='?',
+				".\cfg_obo_Media::HEIGHT."='?',
+				".\cfg_obo_Media::WIDTH."='?',
 				".\cfg_obo_Media::URL."='?',
 				".\cfg_obo_Media::META."='?'
 				WHERE ".\cfg_obo_Media::ID."='?' LIMIT 1";
 			if( !($q = $this->DBM->querySafe($qstr, $mediaObj->title, $mediaObj->descText, $mediaObj->copyright, $mediaObj->length, $mediaObj->height, $mediaObj->width, $mediaObj->url, base64_encode(serialize($mediaObj->meta)), $mediaObj->mediaID)))
 	        {
 			    $this->DBM->rollback();
-				return false;	
-			}   
-			
+				return false;
+			}
+
 			\rocketD\util\Cache::getInstance()->setMedia($mediaObj);
 			// clear cache for loid's containing this media
 			$los = $this->locateLOsWithMedia($mediaObj->mediaID);
 			if(is_array($los) && count($los) > 0)
 			{
-				
+
 				foreach($los AS $loID)
 				{
 					\rocketD\util\Cache::getInstance()->clearLO($loID);
@@ -529,9 +505,9 @@ class MediaManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Find any learning objects using a specific media 
+	 * Find any learning objects using a specific media
 	 *
-	 * @param string $mediaID 
+	 * @param string $mediaID
 	 * @return array 	Array of loid's
 	 * @author Ian Turgeon
 	 */
@@ -542,7 +518,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		{
             return false;
 	    }
-	
+
 		$qstr = "SELECT DISTINCT L.".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." AS L, ".\cfg_obo_Media::MAP_TABLE." AS M WHERE L.".\cfg_obo_LO::ID." = M.".\cfg_obo_LO::ID." AND M.".\cfg_obo_Media::ID." = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
@@ -550,7 +526,7 @@ class MediaManager extends \rocketD\db\DBEnabled
         	trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		$los = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
@@ -563,8 +539,8 @@ class MediaManager extends \rocketD\db\DBEnabled
 	/**
 	 * Register a media object to an LO for tracking purposes
 	 *
-	 * @param string $mediaID 
-	 * @param string $loID 
+	 * @param string $mediaID
+	 * @param string $loID
 	 * @return void
 	 * @author Ian Turgeon
 	 */
@@ -584,7 +560,7 @@ class MediaManager extends \rocketD\db\DBEnabled
         	trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -593,51 +569,51 @@ class MediaManager extends \rocketD\db\DBEnabled
 	 * @param $mediaID (number) media ID
 	 * @return (bool) True if delete was successful, False if error
 	 */
-	function deleteMedia($mediaID = 0) 
+	function deleteMedia($mediaID = 0)
 	{
 		if(!is_numeric($mediaID) || $mediaID < 1)
 		{
 			return false;
 		}
-		
+
 		//See if a map exists between this media object.
 		$qstr = "SELECT ".\cfg_obo_Media::ID." FROM ".\cfg_obo_Media::MAP_TABLE." WHERE ".\cfg_obo_Media::ID." = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
         	trace(mysql_error(), true);
-			return false;	
+			return false;
 		}
-		
+
 		//If a map exists...
 		if($this->DBM->fetch_num($q) != 0)
 		{
 			//See if we can find the LOs mapped to this media object.  If not, then the LO has been deleted but the orphan map hasn't been cleaned.
 			$los = $this->locateLOsWithMedia($mediaID);
-			
+
 			if($los === false || !(is_array($los) && count($los) == 0))
 			{
 				return false;
 			}
 		}
-		
+
 		$qstr = "SELECT * FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
         	trace(mysql_error(), true);
-			return false;	
+			return false;
 		}
-		
-		
+
+
 		$lastDot = strrpos($r->{\cfg_obo_Media::URL}, '.');
 		$extension = strtolower(substr($r->{\cfg_obo_Media::URL}, $lastDot+1));
 		$file = \AppCfg::DIR_BASE.\AppCfg::DIR_MEDIA.$r->{\cfg_obo_Media::ID}.".$extension";
-		
+
 		$r = $this->DBM->fetch_obj($q);
 		if(\obo\util\Validator::isString($extension))
 		{
-			
+
 			if(file_exists($file))
 			{
 				if(!unlink($file))
@@ -646,35 +622,34 @@ class MediaManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-        
+
 		$qstr = "DELETE FROM ".\cfg_obo_Media::TABLE." WHERE ".\cfg_obo_Media::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
-			return false;	
+			return false;
 		}
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		if(!$permMan->removeAllPermsForItem($mediaID, \cfg_obo_Perm::TYPE_MEDIA))
 		{
 		    $this->DBM->rollback();
-			return false;		
+			return false;
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->clearMedia($mediaID);
-		
+
 		return true;
 	}
-	
+
 	//@TODO: Delayed until after 1.2:
 	/*
 	public function createMediaThumbnail($byteArray)
 	{
 		$data = $byteArray->data;
 		//$data = gzuncompress($data);
-		
+
 		file_put_contents("../../media/thumbnails/createmediathumb.jpg", $data);
-		
+
 		g true;
 	}*/
 }
-?>

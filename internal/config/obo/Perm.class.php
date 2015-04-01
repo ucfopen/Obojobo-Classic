@@ -13,12 +13,9 @@ class cfg_obo_Perm
 	const G_COPY = 'giveCopy';
 	const G_USE = 'givePublish';
 	const G_GLOBAL = 'giveGlobal';
-	
+
 	const TYPE_INSTANCE = 'i';
 	const TYPE_LO = 'l';
 	const TYPE_MEDIA = 'm';
-	
-	
-	
+
 }
-?>

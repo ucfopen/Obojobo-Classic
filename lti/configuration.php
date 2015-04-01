@@ -3,15 +3,14 @@ require_once("../internal/app.php");
 
 header('Content-Type: application/xml');
 
-$title = 'Obojobo';
-$description = "UCF's Learning Object System";
-$launch_url = \AppCfg::URL_WEB.'lti/assignment.php';
-$platform = 'canvas.instructure.com';
+$title         = 'Obojobo';
+$description   = "UCF's Learning Object System";
+$launch_url    = \AppCfg::URL_WEB.'lti/assignment.php';
+$platform      = 'canvas.instructure.com';
 $privacy_level = 'public';
-$picker_url = \AppCfg::URL_WEB.'lti/picker.php';
+$picker_url    = \AppCfg::URL_WEB.'lti/picker.php';
+echo('<?xml version="1.0" encoding="UTF-8"?>')
 ?>
-<?= '<?xml version="1.0" encoding="UTF-8"?>' ?>
-
 <cartridge_basiclti_link
 	xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
 	xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
