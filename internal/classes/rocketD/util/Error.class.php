@@ -6,7 +6,7 @@
 
 /**
  * This class defines the Errors
- * It is used to 
+ * It is used to
  */
 namespace rocketD\util;
 class Error
@@ -18,7 +18,7 @@ class Error
 	{
 		$this->errorID = $id;
 		$this->message = "ERROR: ".$this->getErrorString($id).($message == '' ? '' : ' : '.$message);
-		
+
 		if($data == -1)
 		{
 	        $this->data = array_slice(debug_backtrace(), 0, \AppCfg::DEBUG_BACKTRACE);
@@ -27,16 +27,16 @@ class Error
 		{
 			$this->data = $data;
 		}
-		
+
 		$this->logError();
 	}
-	
+
 	public static function getError($type, $message='', $data=-1)
 	{
 		$e = \AppCfg::ERROR_TYPE;
 		return new $e($type, $message, $data);
 	}
-	
+
 	protected function logError()
 	{
 		if(\AppCfg::DEBUG_LOG_ERRORS)
@@ -54,7 +54,7 @@ class Error
 		}
 		unset($this->data);
 	}
-	
+
 	protected function getErrorString($id = 0)
 	{
 	    if(!is_numeric($id))
@@ -69,7 +69,7 @@ class Error
 			case 1: return "Invalid Session, User not logged in.";
 			case 2: return "Invalid input.";
 			case 3: return "Session Timeout.";
-			
+
 			/* Client Errors */
 			case 100: return "Client Side Trace.";
 			case 101: return "Client Side Error.";
@@ -77,7 +77,7 @@ class Error
 			/* Plugin Errors */
 			case 200: return "Plugin disabled or missing";
 			case 201: return "Plugin method not found";
-			
+
 			/* UserManager Errors */
 			case 1000: return "General User Manager Error.";
 			case 1001: return "Invalid input.";
@@ -87,12 +87,11 @@ class Error
 			case 1005: return "Server not able to send password change email.";
 			case 1006: return "ResetKey Expired";
 			case 1007: return "Auto Login after password reset with key failed";
-			
+
 			/* PermissionsManager Errors*/
 			case 5003: return "Cannot remove permissions for sole owner.";
-			
+
 			default: return "General Error.";
 		}
 	}
 }
-?>

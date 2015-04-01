@@ -2,7 +2,7 @@
 class cfg_obo_ComputerData
 {
 	const TABLE = 'obo_log_profile';
-	
+
 	const IP = 'ip';
 	const TIME = 'time';
 	const APP_WIDTH = 'appX';
@@ -22,4 +22,3 @@ class cfg_obo_ComputerData
 	const USER_TIME = 'userTime';
 	const USER_TIME_OFFSET = 'userTimeOffset';
 }
-?>

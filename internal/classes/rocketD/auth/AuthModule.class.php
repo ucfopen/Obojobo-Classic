@@ -228,7 +228,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 	public function validateUsername($username)
 	{
-		return false;
+		return true;
 	}
 
 	protected function validateFirstName($name)

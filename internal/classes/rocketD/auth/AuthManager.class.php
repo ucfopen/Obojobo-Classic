@@ -2,17 +2,7 @@
 namespace rocketD\auth;
 class AuthManager extends \rocketD\db\DBEnabled
 {
-	protected static $instance;
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
+	use \rocketD\Singleton;
 
 	/**
 	 * Gets a user's information from the database
@@ -552,7 +542,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return $authMods;
 	}
 
-	// TODO: add getUser
 	public function getAuthModuleForUserID($userID=false)
 	{
 		if($userID !== false)
@@ -574,7 +563,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		trace('couldnt fetch user authmod: ' . $userID, true);
 		return false;
 	}
 

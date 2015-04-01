@@ -1,28 +1,9 @@
 <?php
 namespace obo;
-/**
- * This class contains the public API for the LOS backend
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class was created so that all functionality external to the system could be accessed by instantiating a single class.  This functionality includes user management, login/logout, content management, and learning object management.
- */
 class API extends \rocketD\db\DBEnabled
 {
-
-	private static $instance;
-
-	static public function getInstance($isRemoting = false)
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass($isRemoting);
-		}
-		return self::$instance;
-	}
+	use \rocketD\Singleton;
 
 	public function __construct($isRemoting = false)
 	{
