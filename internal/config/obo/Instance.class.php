@@ -2,7 +2,7 @@
 class cfg_obo_Instance
 {
 	const TABLE = 'obo_lo_instances';
-	
+
 	const ID = 'instID';
 	const TITLE = 'name';
 	const TIME = 'createTime';
@@ -18,7 +18,4 @@ class cfg_obo_Instance
 	const DELETED = 'deleted';
 	const EXTERNAL_LINK = 'externalLink';
 	const ORIGINAL_ID = 'originalID';
-
-
 }
-?>

@@ -3,18 +3,7 @@
 namespace obo\perms;
 class RoleManager extends \rocketD\db\DBEnabled
 {
-
-	private static $instance;
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
+	use \rocketD\Singleton;
 
 	public function createRole($roleName = "")
 	{

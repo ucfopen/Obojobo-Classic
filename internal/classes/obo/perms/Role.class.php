@@ -19,11 +19,10 @@ class Role
 	const ADMINISTRATOR = 'Administrator';
 	const LIBRARY_USER = 'LibraryUser';
 	const SUPER_STATS = 'SuperStats';
-	
+
 	function __construct($roleID = 0, $name = "")
 	{
 		$this->roleID = $roleID;
 		$this->name = $name;
 	}
 }
-?>

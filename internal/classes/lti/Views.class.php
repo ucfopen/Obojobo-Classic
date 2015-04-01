@@ -42,14 +42,14 @@ class Views
 
 	static public function renderInvalidLTI($ltiData)
 	{
-		\rocketD\util\Log::profile('lti',"'invalid-lti', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'invalid-lti', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-error');
 	}
 
 	static public function renderUnexpectedError($ltiData, $errorMessage)
 	{
-		\rocketD\util\Log::profile('lti',"'unexpected-error', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$errorMessage', '".time()."'");
+		profile('lti',"'unexpected-error', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$errorMessage', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		$template->assign('errorMessage', $errorMessage);
 		static::renderTemplate($template, 'lti-error-unexpected-error');
@@ -57,7 +57,7 @@ class Views
 
 	static public function renderUnknownAssignmentError($ltiData, $isInstructor = false)
 	{
-		\rocketD\util\Log::profile('lti',"'unknown-assignment', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'unknown-assignment', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = self::createErrorTemplate($ltiData);
 		if($isInstructor)
 		{
@@ -71,28 +71,28 @@ class Views
 
 	static public function renderUnknownRoleError($ltiData)
 	{
-		\rocketD\util\Log::profile('lti',"'unknown-role', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'unknown-role', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-role');
 	}
 
 	static public function renderIncorrectRoleError($ltiData)
 	{
-		\rocketD\util\Log::profile('lti',"'incorrect-role', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".implode(',', $ltiData->roles)."', '".time()."'");
+		profile('lti',"'incorrect-role', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".implode(',', $ltiData->roles)."', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-incorrect-role');
 	}
 
 	static public function renderUnknownUserError($ltiData, $errorDetail='')
 	{
-		\rocketD\util\Log::profile('lti',"'unknown-user', '$errorDetail', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'unknown-user', '$errorDetail', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-user');
 	}
 
 	static public function renderExpiredError($ltiData)
 	{
-		\rocketD\util\Log::profile('lti',"'expired', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'expired', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-expired');
 	}
@@ -137,6 +137,6 @@ class Views
 	static public function logError($ltiData = false)
 	{
 		$session = isset($_SESSION) ? print_r($_SESSION, true) : '';
-		\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ltiData:\n".print_r($ltiData, true)."\nPOST:".print_r($_POST, true)."\nSESSION:".$session);
+		profile('lti-dump', "[".date('r')." (".time().")"."] ltiData:\n".print_r($ltiData, true)."\nPOST:".print_r($_POST, true)."\nSESSION:".$session);
 	}
 }

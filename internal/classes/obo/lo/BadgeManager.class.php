@@ -1,28 +1,9 @@
 <?php
-/**
- * This class handles logic for retrieving Credhub badge info
- * @author Zachary Berry <jbates@mail.ucf.edu>
- */
 
 namespace obo\lo;
 class BadgeManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
-
-	function __construct()
-	{
-		$this->defaultDBM();
-	}
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
+	use \rocketD\Singleton;
 
 	/**
 	 * Determines if, based on your attempt history, you should be awarded a badge
@@ -155,4 +136,3 @@ class BadgeManager extends \rocketD\db\DBEnabled
 		return $params;
 	}
 }
-?>
