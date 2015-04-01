@@ -14,16 +14,16 @@ function getInstanceDataOrRenderError($instID)
 }
 
 $ltiApi = \lti\API::getInstance();
-$ltiData = new \lti\Data($_POST);
+$ltiData = new \lti\Data($_REQUEST);
 
-\rocketD\util\Log::profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->remoteId', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 
 // make sure required instID parameter is present
-if(!isset($_GET['instID']) || !is_numeric($_GET['instID']))
+if(empty($_REQUEST['instID']) || ! is_numeric($_REQUEST['instID']))
 {
 	\lti\Views::renderUnknownAssignmentError($ltiData, $ltiData->isInstructor());
 }
-$originalInstID = $_GET['instID'];
+$originalInstID = $_REQUEST['instID'];
 
 // show error if any values are invalid
 \lti\Views::validateLtiAndRenderAnyErrors($ltiData);
@@ -67,7 +67,7 @@ else if($ltiData->isInstructor())
 
 	// show the preview:
 	$previewURL = \AppCfg::URL_WEB . 'preview/' . $loID;
-	\rocketD\util\Log::profile('lti',"'assignment-visit-redirect', '$previewURL', '".time()."'");
+	profile('lti',"'assignment-visit-redirect', '$previewURL', '".time()."'");
 	header('Location: ' . $previewURL);
 }
 else
@@ -76,6 +76,6 @@ else
 
 	// show the instance:
 	$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
-	\rocketD\util\Log::profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
+	profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
 	header('Location: ' . $viewURL);
 }

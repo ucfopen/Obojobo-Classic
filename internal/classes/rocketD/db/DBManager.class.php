@@ -3,7 +3,8 @@ namespace rocketD\db;
 
 class DBManager
 {
-	static $instance;
+	use \rocketD\Singleton;
+
 	private $transactionNestLevel = 0;
 	private $transactionOnRollBack = false;
 	private $connections = array();
@@ -25,16 +26,6 @@ class DBManager
 					break;
 			}
 		}
-	}
-
-	static public function getInstance($conData = false)
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass($conData);
-		}
-		return self::$instance;
 	}
 
 	static function getConnection($conData = false)

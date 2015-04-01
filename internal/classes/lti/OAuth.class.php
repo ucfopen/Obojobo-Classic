@@ -129,19 +129,19 @@ class OAuth
 			if(!$fp)
 			{
 				// No way to contact server, so write it in the log!
-				\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Can't Send Data:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
+				profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: Can't Send Data:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
 				continue; // Stop this attempt, try again
 			}
 
 			if($response = @stream_get_contents($fp)) break; //Success
 
 			// This attempt didn't work - log the error and try again
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
+			profile('lti-dump', "[".date('r')." (".time().")"."] ATTEMPT $attemptCount FAIL: OAUTH no Response:\nBody:".print_r($body, true)."\nLast Error:".print_r(error_get_last(), true));
 		}
 
 		if(!$response)
 		{
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] OUT OF ATTEMPTS");
+			profile('lti-dump', "[".date('r')." (".time().")"."] OUT OF ATTEMPTS");
 			return false;
 		}
 
@@ -150,7 +150,7 @@ class OAuth
 		$xml = simplexml_load_string($response);
 		if(!$xml)
 		{
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Unable to read XML:\n".print_r($response, true)."\nBody:".print_r($body, true));
+			profile('lti-dump', "[".date('r')." (".time().")"."] Unable to read XML:\n".print_r($response, true)."\nBody:".print_r($body, true));
 			return false;
 		}
 
@@ -164,7 +164,7 @@ class OAuth
 		if(!$result['success'])
 		{
 			$result['error'] = $xml->imsx_POXHeader->imsx_POXResponseHeaderInfo->imsx_statusInfo->imsx_description;
-			\rocketD\util\Log::profile('lti-dump', "[".date('r')." (".time().")"."] Result Error:\n".print_r($response, true)."\nBody:".print_r($body, true));
+			profile('lti-dump', "[".date('r')." (".time().")"."] Result Error:\n".print_r($response, true)."\nBody:".print_r($body, true));
 		}
 
 		return $result;

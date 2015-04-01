@@ -1,12 +1,5 @@
 <?php
-/**
- * This class defines the data type for Locks
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class defines the data type for Locks
- */
 namespace obo;
 class Lock
 {
@@ -23,4 +16,3 @@ class Lock
 		$this->unlockTime = $unlockTime;
 	}
 }
-?>

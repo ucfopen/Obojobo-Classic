@@ -1,0 +1,35 @@
+{
+    "name": "ucf_cdl/obojobo",
+    "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "~1.13",
+        "obojobo/ucfauth": "*"
+    },
+    "config": {
+        "vendor-dir": "internal/vendor"
+    },
+    "authors": [
+        {
+            "name": "Ian Turgeon",
+            "email": "iturgeon@gmail.com"
+        },
+        {
+            "name": "Zach Berry",
+            "email": "zachberry@gmail.com"
+        },
+        {
+            "name": "Luis Estrada",
+            "email": "luisestrada115@gmail.com"
+        },
+        {
+            "name": "Jacob Bates",
+            "email": "jacob.bates@gmail.com"
+        }
+    ]
+}

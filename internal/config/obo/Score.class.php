@@ -9,4 +9,3 @@ class cfg_obo_Score
 	const SCORE = 'score';
 	const TIME = 'createTime';
 }
-?>
