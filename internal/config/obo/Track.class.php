@@ -8,7 +8,7 @@ class cfg_obo_Track
 	const A = 'valueA';
 	const B = 'valueB';
 	const C = 'valueC';
-	
+
 	const TO = 'valueA';
 	const IN = 'valueB';
 	const QID = 'valueA';
@@ -16,4 +16,3 @@ class cfg_obo_Track
 	const SCORE = 'valueB';
 
 }
-?>

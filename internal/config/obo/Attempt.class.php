@@ -9,4 +9,3 @@ class cfg_obo_Attempt
 	const LINKED_ATTEMPT = 'linkedAttemptID';
 	const ORDER = 'qOrder';
 }
-?>

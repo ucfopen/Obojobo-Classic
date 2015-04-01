@@ -1,18 +1,11 @@
 <?php
 
-//require_once(dirname(__FILE__) . "/../internal/app.php");
-
-//$IM = \obo\lo\InstanceManager::getInstance();
-//$IM->duplicateInstance_systemOnly('666');
-//exit();
-//
-
 $_SESSION = array();
 
 function createTestCase($customParams, $endpoint, $user = false, $passbackUrl = false)
 {
-	$key = \AppCfg::LTI_CANVAS_KEY;
-	$secret = \AppCfg::LTI_CANVAS_SECRET;
+	$key = \AppCfg::LTI_OAUTH_KEY;
+	$secret = \AppCfg::LTI_OAUTH_SECRET;
 
 	$baseParams = array(
 		'resource_link_id'     => 'test-resource',
@@ -53,13 +46,13 @@ function createNewRandomUser()
 	return new rocketD\auth\User(0, $login, $first, $last, 'T', $email);
 }
 
-$ltiUrl = \AppCfg::URL_WEB.'/lti';
-$pickerUrl = $ltiUrl.'/picker.php';
-$assignmentUrl = $ltiUrl.'/assignment.php';
-$validateUrl = $ltiUrl.'/test/validate';
+$ltiUrl           = \AppCfg::URL_WEB.'/lti';
+$pickerUrl        = $ltiUrl.'/picker.php';
+$assignmentUrl    = $ltiUrl.'/assignment.php';
+$validateUrl      = $ltiUrl.'/test/validate';
 $gradePassbackUrl = $ltiUrl.'/lti-test-return.php';
-$launchReturnUrl = $ltiUrl.'/return.php';
-$copiedPickerUrl = $assignmentUrl.'?instID=666'; //@TODO <- Don't hardcode an instanceID here
+$launchReturnUrl  = $ltiUrl.'/return.php';
+$copiedPickerUrl  = $assignmentUrl.'?instID=666'; //@TODO <- Don't hardcode an instanceID here
 
 // As Instructor
 $instructor = createTestCase(array('roles' => 'Instructor'), $pickerUrl, getAdminUser());

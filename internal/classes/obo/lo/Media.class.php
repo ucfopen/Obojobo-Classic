@@ -1,13 +1,5 @@
 <?php
-/**
- * This class defines the Media data type
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
 
-/**
- * This class defines the Media data type
- * It is used simply for representing data in memory, and has no methods.
- */
 namespace obo\lo;
 class Media
 {
@@ -49,7 +41,7 @@ class Media
 			$this->attribution = $mediaObj['attribution'];
         }
         else
-        {	
+        {
 			$this->mediaID = $mediaID;
 			$this->auth = $auth;
 			$this->title = $title;
@@ -69,4 +61,3 @@ class Media
         }
 	}
 }
-?>

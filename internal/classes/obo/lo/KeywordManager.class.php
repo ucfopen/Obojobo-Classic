@@ -1,12 +1,6 @@
 <?php
 /**
  * This class handles all database calls and logic pertaining to Keywords
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
-
-/**
- * This class handles all database calls and logic pertaining to Keywords
  * This includes creating, retrieving, and deleting of data.
  *
  * Item types:
@@ -19,22 +13,7 @@
 namespace obo\lo;
 class KeywordManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
-	
-	function __construct()
-	{
-		$this->defaultDBM();
-	}
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}	
+	use \rocketD\Singleton;
 	/**
 	 * Gathers all keywords associated with a given item
 	 * @param $itmid (number) item id
@@ -89,7 +68,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			    $qstr .= ',';
 		}
 		$qstr .= '))';
-		
+
 		//Gather up everything
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype)))
 		{
@@ -98,7 +77,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		    //die();
 			return false;
 		}
-		
+
 		if(!($r = $this->DBM->fetch_obj($q)))
 		    return false;
 		$itmarr = array();
@@ -106,18 +85,18 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		{
 			$itmarr[] = $r->{\cfg_obo_LO::ID};
 		} while($r = $this->DBM->fetch_obj($q));
-		
+
 		//Order the array by how often each id number occurs (from high to low)
 		$itmarr = array_count_values($itmarr);	//count number of occurrences
 		arsort($itmarr);						//order from high to low
 		$itmarr = array_keys($itmarr);			//get the values back in order
-		
+
 		//Return the Array of ids
 		return $itmarr;
 	}
 
 	/**
-	 * Checks to see if a keyword already exists 
+	 * Checks to see if a keyword already exists
 	 * @param $keyname (string) keyword
 	 * @return (Keyword) keyword object if exists
 	 * @return (bool) FALSE if keyword does not exist
@@ -131,7 +110,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		if( $r = $this->DBM->fetch_obj($q) )
 		{
 			return new \obo\lo\Keyword($r->{\cfg_obo_Keyword::ID}, $r->{\cfg_obo_Keyword::NAME});
@@ -141,9 +120,9 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Creates a new keyword if that keyword does not exist already 
+	 * Creates a new keyword if that keyword does not exist already
 	 * @param $keyname (string) keyword
 	 * @return (Keyword) keyword object
 	 */
@@ -151,13 +130,13 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	{
 		if($keyname == '')
 		{
-		    return false;		
+		    return false;
 		}
 		$key = $this->keywordExists($keyname);
-		
+
 		//Make keyword lowercase
 		$keyname = strtolower($keyname);
-		
+
 		//If the keyword does not exist, create a new one
 		if( $key == false )
 		{
@@ -167,7 +146,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			{
 				$this->DBM->rollback();
 				trace(mysql_error(), true);
-				return false;	
+				return false;
 			}
 			unset($key);
 			$key = new \obo\lo\Keyword($this->DBM->insertID, $keyname);
@@ -176,7 +155,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Checks to see if the keyword is already linked 
+	 * Checks to see if the keyword is already linked
 	 * @param $keyid (number) keyword ID
 	 * @param $itmid (number) Item ID
 	 * @param $itmtype (string) Item type (see table at top of source)
@@ -188,7 +167,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		{
 		    return false;
 		}
-		    
+
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_LO::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $keyid, $itmid, $itmtype)))
 		{
@@ -208,7 +187,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Links keywords to the item from an array of keyword strings 
+	 * Links keywords to the item from an array of keyword strings
 	 * @param $keyArr (Array<string>) array of keyword strings
 	 * @param $itmid (number) Item ID
 	 * @param $itmtype (string) Item type (see table at top of source)
@@ -231,7 +210,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Links a keyword to an item 
+	 * Links a keyword to an item
 	 * @param $keyid (number) keyword ID
 	 * @param $itmid (number) Item ID
 	 * @param $itmtype (string) Item type (see table at top of source)
@@ -253,7 +232,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 				$this->DBM->rollback();
 				trace(mysql_error(), true);
 				//die();
-				return false;	
+				return false;
 			}
 			return true;
 		}
@@ -264,7 +243,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Unlinks a keyword from an item 
+	 * Unlinks a keyword from an item
 	 * @param $keyid (number) keyword ID
 	 * @param $itmid (number) Item ID
 	 * @param $itmtype (string) Item type (see table at top of source)
@@ -282,13 +261,13 @@ class KeywordManager extends \rocketD\db\DBEnabled
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
-			return false;	
+			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Unlinks a keyword from an item 
+	 * Unlinks a keyword from an item
 	 * @param $keyid (number) keyword ID
 	 * @param $itmid (number) Item ID
 	 * @param $itmtype (string) Item type (see table at top of source)
@@ -308,14 +287,14 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			//die();
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public function deleteUnusedKeywords()
 	{
 		$qstr = "DELETE FROM ".\cfg_obo_Keyword::TABLE." WHERE ".\cfg_obo_Keyword::ID." NOT IN (SELECT ".\cfg_obo_Keyword::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE.")";
-		
+
 		if(!($q = $this->DBM->query($qstr)))
 		{
             $this->DBM->rollback();
@@ -323,8 +302,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
             //die();
 			return false;
 		}
-		
+
 		return true;
 	}
 }
-?>
