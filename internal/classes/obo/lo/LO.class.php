@@ -1,13 +1,5 @@
 <?php
-/**
- * This is the class that defines the Learning Object data type
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
 
-/**
- * This is the class that defines the Learning Object data type
- * It is used simply for representing data in memory, and has no methods.
- */
 namespace obo\lo;
 class LO
 {
@@ -15,7 +7,7 @@ class LO
 	const MASTER = 'master';
 	//@TODO: Change the name of this to 'copy'
 	const DERIVATIVE = 'derivative';
-	
+
 	public $loID;				//Number:  database id
 	public $title;			//String:  title of the package
 	public $languageID;			//String:  ISO code for language
@@ -31,13 +23,13 @@ class LO
 	public $createTime;			//Number:  date package was created
 	public $copyright;		//String:
 	public $pages;			//Array:  of Page objects
-	public $pGroup;			//QuestionGroup:  
+	public $pGroup;			//QuestionGroup:
 	public $aGroup;			//QuestionGroup:
 	public $keywords;		//Array:  of Keyword objects
 	public $perms;			//Permissions object:  merged from global and user
 	public $summary;		//Summary object, contains content counts for pages & questions for use in Meta and instance calls
 	public $isMaster;
-	
+
 	function __construct($loID=0, $title='', $languageID='', $notesID='', $objID='', $learnTime=0, $version=0, $subVersion=0, $rootID=0, $parentID=0, $createTime=0, $copyright='', $pages=array(), $pGroup=0, $aGroup=0, $keywords=Array(), $perms=0)
 	{
 		$this->loID = $loID;
@@ -58,7 +50,7 @@ class LO
 		$this->keywords = $keywords;
 		$this->perms = $perms;
 	}
-	
+
 	public function dbGetFull($DBM, $loID, $getMeta=false)
 	{
 		// whitelist input
@@ -72,9 +64,9 @@ class LO
 			\rocketD\util\Error::getError(2);
 			return false;
 		}
-		
+
 		$oboCache = \rocketD\util\Cache::getInstance();
-		
+
 		// full isnt in cache, try to get meta
 		if($getMeta)
 		{
@@ -88,23 +80,23 @@ class LO
 		{
 			// try to get from cache
 			if($lo = $oboCache->getLO($loID))
-			{				
+			{
 				$this->becomeCachedLO($lo);
 				return true;
 			}
 		}
-		
+
 		// if not, build and cache it
 		$q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='?' LIMIT 1", $loID);
 		if($r = $DBM->fetch_obj($q))
 		{
-			// no cache found, retrieve the lo 
+			// no cache found, retrieve the lo
 			$this->__construct((int)$r->{\cfg_obo_LO::ID}, $r->{\cfg_obo_LO::TITLE}, (int)$r->{\cfg_obo_Language::ID}, 0, 0, (int)$r->{\cfg_obo_LO::LEARN_TIME}, (int)$r->{\cfg_obo_LO::VER}, (int)$r->{\cfg_obo_LO::SUB_VER}, (int)$r->{\cfg_obo_LO::ROOT_LO}, (int)$r->{\cfg_obo_LO::PARENT_LO}, (int)$r->{\cfg_obo_LO::TIME}, $r->{\cfg_obo_LO::COPYRIGHT});
-			
+
 			// set rootID if its zero (stored as zero when the rootID is the current loID)
 			if($this->rootID == 0) $this->rootID = $this->loID;
 			if($this->rootID == $this->loID) $this->isMaster = true;
-			
+
 			if($getMeta == false)
 			{
 				// drop in a shell for the aGroup and pGroup IDs (need to put the id's in the cache so we can build the full aGroup and pGroup seperately)
@@ -119,7 +111,7 @@ class LO
 				$pGroup->getFromDB($DBM, $r->{\cfg_obo_LO::PGROUP}, true);
 				$aGroup = new \obo\lo\QuestionGroup();
 				$aGroup->getFromDb($DBM, $r->{\cfg_obo_LO::AGROUP}, true);
-				
+
 				// put page structures into this object after caching
 				$this->pages = $pages;
 				$this->pGroup = $pGroup;
@@ -139,7 +131,7 @@ class LO
 
 			$this->notes = $r->{\cfg_obo_LO::NOTES};
 			$this->objective = $r->{\cfg_obo_LO::OBJECTIVE};
-			
+
 			//TODO: Get the actual names of authors
 			if($getMeta == false)
 			{
@@ -149,7 +141,7 @@ class LO
 			{
 				$oboCache->setLOMeta($loID, $this);
 			}
-			
+
 			// get perms
 			$permman = \obo\perms\PermissionsManager::getInstance();
 			$this->perms = $permman->getMergedPerms((int)$this->rootID, \cfg_obo_Perm::TYPE_LO);
@@ -158,11 +150,11 @@ class LO
 		trace('unable to locate LO: ' . $loID, true);
 		return false;
 	}
-	
+
 	public function dbGetMeta($DBM, $loID)
 	{
 		if($this->dbGetFull($DBM, $loID, true))
-		{			
+		{
 			unset($this->aGroup);
 			unset($this->pGroup);
 			unset($this->notesID);
@@ -172,7 +164,7 @@ class LO
 		}
 		return false;
 	}
-	
+
 	public function dbGetContent($DBM, $loID)
 	{
 		if($this->dbGetFull($DBM, $loID))
@@ -181,8 +173,8 @@ class LO
 			return true;
 		}
 		return false;
-	}	
-	
+	}
+
 	public function dbGetInstance($DBM, $loID)
 	{
 		if($this->dbGetFull($DBM, $loID))
@@ -199,7 +191,7 @@ class LO
 		}
 		return false;
 	}
-	
+
 	protected function becomeCachedLO($lo)
 	{
 		foreach($lo AS $key => &$value)
@@ -213,13 +205,13 @@ class LO
 			$permman = \obo\perms\PermissionsManager::getInstance();
 			$this->perms = $permman->getMergedPerms((int)$this->rootID, \cfg_obo_Perm::TYPE_LO, $_SESSION['userID']);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Save a learning object to the database, supports saving a new draft, revision draft, a master, or a derivative
 	 *
-	 * @param string $DBM 
+	 * @param string $DBM
 	 * @param string $saveType	The type of lo being saved, options are "newDraft", "revisionDraft", "master", and "derivative"
 	 * @return void
 	 * @author Ian Turgeon
@@ -229,7 +221,7 @@ class LO
 		switch($saveType)
 		{
 			case self::DRAFT:
-			
+
 				/************************** NEW DRAFT **********************
 				 * rootID is set to it's own loID
 				 * parentID is set to zero - it has no parent
@@ -242,7 +234,7 @@ class LO
 					$success = $this->dbStore($DBM);
 					return $success;
 				}
-				
+
 				/*************************** DRAFT REVISION OF MASTER *****************
 				 * rootID is carried over from the item it is a revision of - it should always point to the lowest revision of the current full version, X.1
 				 * parentID is the loID of the previous full version if there is one. 1.0 has none, 1.1 points at 1.0, 2.0 points at 1.0, 2.1 points at 2.0
@@ -254,13 +246,13 @@ class LO
 					$this->rootID = 0;
 					$this->loID = 0;
 					$success = $this->dbStore($DBM);
-					
+
 					// copy the permissions from the master object to the new draft
 					$PM = \obo\perms\PermissionsManager::getInstance();
 					$PM->copyPermsToItem($this->parentID, $this->loID, \cfg_obo_Perm::TYPE_LO);
 					//Need to remove global perms (if this is version X.1 of a library object)
 					$PM->removeUserPerms($this->rootID, \cfg_obo_Perm::TYPE_LO, 0);
-					
+
 					return $success;
 				}
 
@@ -276,7 +268,7 @@ class LO
 					return $success;
 				}
 				break;
-				
+
 			case self::MASTER: 				// TODO: see if we can utilize dbStore for most of this?
 				/*************************** MASTER *************************
 				 * rootID is it's own loID - NOTE: in the database we store rootID as 0, which implies it is the same as the loID
@@ -285,11 +277,11 @@ class LO
 				 * saving a master converts the latest draft to a master object, no changes can be saved at the same time, save a draft first if needed
 				 ************************************************************/
 				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
-				
+
 				if($this->isValidMaster() !== true) return \rocketD\util\Error::getError(2); // Validate
-				
+
 				$rootDraftLoID = ($this->rootID == 0 ? $this->loID : $this->rootID); // store the rootID for later use - if root is zero - this is the root
-				
+
 				/********* CHECK FOR PR-EXISTING DESIRED VERSION **********/
 				/* (make sure the desired X.0 version doesnt already exist by checking for LO's with a parentID of my current rootID) */
 				$qstr = "SELECT * FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER." = '?' AND ".\cfg_obo_LO::SUB_VER." = '0' AND ".\cfg_obo_LO::PARENT_LO." = '?'";
@@ -298,18 +290,18 @@ class LO
 				{
 					return \rocketD\util\Error::getError(6005); // Master version already exists
 				}
-				
+
 				//************** SET MASTER REQUIREMENTS ************/
 				$this->isMaster = true;
 				$this->version = $this->version + 1;
 				$this->subVersion = 0;
-				
+
 				// 1.0 has no parent !!! UNLESS its a deriviative (see create derivative)
 				if($this->version == 1)
 				{
 					$this->parentID = 0;
 				}
-				
+
 				/************** CREATE NEW MASTER LO RECORD ***************/
 				$qstr ="INSERT INTO ".\cfg_obo_LO::TABLE." (".\cfg_obo_LO::MASTER.", ".\cfg_obo_LO::TITLE.", ".\cfg_obo_Language::ID.", ".\cfg_obo_LO::NOTES.", ".\cfg_obo_LO::OBJECTIVE.", ".\cfg_obo_LO::LEARN_TIME.", ".\cfg_obo_LO::PGROUP.", ".\cfg_obo_LO::AGROUP.", ".\cfg_obo_LO::VER.", ".\cfg_obo_LO::SUB_VER.", ".\cfg_obo_LO::ROOT_LO.", ".\cfg_obo_LO::PARENT_LO.", ".\cfg_obo_LO::TIME.", ".\cfg_obo_LO::COPYRIGHT.", ".\cfg_obo_LO::NUM_PAGES.", ".\cfg_obo_LO::NUM_PRACTICE.", ".\cfg_obo_LO::NUM_ASSESSMENT.")
 											SELECT 1 AS ".\cfg_obo_LO::MASTER.", ".\cfg_obo_LO::TITLE.", ".\cfg_obo_Language::ID.", ".\cfg_obo_LO::NOTES.", ".\cfg_obo_LO::OBJECTIVE.", ".\cfg_obo_LO::LEARN_TIME.", ".\cfg_obo_LO::PGROUP.", ".\cfg_obo_LO::AGROUP.", $this->version AS ".\cfg_obo_LO::VER.", $this->subVersion AS ".\cfg_obo_LO::SUB_VER.", 0 AS ".\cfg_obo_LO::ROOT_LO.", $this->parentID AS ".\cfg_obo_LO::PARENT_LO.", ".time()." AS ".\cfg_obo_LO::TIME.", ".\cfg_obo_LO::COPYRIGHT.", ".\cfg_obo_LO::NUM_PAGES.", ".\cfg_obo_LO::NUM_PRACTICE.", ".\cfg_obo_LO::NUM_ASSESSMENT." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID." = '?'";
@@ -320,7 +312,7 @@ class LO
 					return false;
 				}
 				$this->loID = $DBM->insertID;
-				
+
 				/********* ASSOCIATE PAGES *************/
 				if(is_array($this->pages))
 				{
@@ -330,7 +322,7 @@ class LO
 						$pageman->mapPageToLO($this->loID, $page->pageID, $orderIndex); // map this page
 					}
 				}
-				
+
 				/********* ASSOCIATE KEYWORDS *************/
 				$KM = \obo\lo\KeywordManager::getInstance();
 				foreach($this->keywords AS $tag)
@@ -340,27 +332,27 @@ class LO
 						$KM->linkKeyword($newTag->keywordID, $this->loID, \cfg_obo_Perm::TYPE_LO);
 					}
 				}
-				
+
 				/******** MOVE PERMISSIONS **********/
 				$PM = \obo\perms\PermissionsManager::getInstance();
 				$PM->movePermsToItem($rootDraftLoID, $this->loID, \cfg_obo_Perm::TYPE_LO); // MUST BE BEFORE destroyDrafts
-				
+
 				/********* REMOVE DRAFTS *************/
 				$this->destroyDrafts($DBM, $rootDraftLoID, $this->loID); // note - MUST BE AFTER MOVE PERMS - this will delete perms if not run AFTER move perms!!!!!!!
-				
+
 				/************* KEEP TRACK OF MEDIA USED IN LO *******************/
 				$this->associateMediaUsedInLO();
 
 				\rocketD\util\Cache::getInstance()->clearLO($this->loID); // delete the cache
-				
+
 				break;
-				
+
 			case self::DERIVATIVE:
 				/*************************** DERIVATIVE *********************
 				 * rootID is it's own loID
 				 * parentID is the loID of the item it is a derivative of
 				 ***********************************************************/
-				
+
 				$this->dbGetFull($DBM, $this->loID);// masters must come from the database
 				//if($this->subVersion != 0 || $this->isValidMaster(true) !== true) return \rocketD\util\Error::getError(2); // Validate
 
@@ -379,18 +371,18 @@ class LO
 				$this->version = 0; // reset
 				$this->subVersion = 1; // reset
 				$this->rootID = 0; // mark as a new LO
-				
+
 				$this->dbStore($DBM);
-				
+
 				break;
-				
+
 			default:
 				return false;
 				break;
 		}
 		return $this->loID;
 	}
-	
+
 	/**
 	 * Internal function that associates all the media used in this LO in the database
 	 *
@@ -417,12 +409,12 @@ class LO
 			}
 		}
 	}
-	
+
 	/**
 	 * Remove drafts when publishing a master, Note that this does not remove orphaned qGroups, questions, or pages.
 	 * This function cannot delete MASTER versions, only drafts
-	 * @param string $DBM 
-	 * @param string $delRootID 
+	 * @param string $DBM
+	 * @param string $delRootID
 	 * @param string $newLoID - if you are deleting drafts to replace them with a master, set this value to the new master's loid, it is used to re-associate authors
 	 * @return boolean success
 	 * @author Ian Turgeon
@@ -448,8 +440,8 @@ class LO
 		{
 			//Generate a string of draft numbers SQL can use
 			$draftstr = implode(',', $drafts);  // 1,3,5,7,9...
-			
-			
+
+
 			//**************** ASSOCIATE ALL DRAFT AUTHORS WITH NEW MASTER ***************************
 			if($newLoID > 0)
 			{
@@ -460,7 +452,7 @@ class LO
 					return false;
 				}
 			}
-			
+
 			//************** DELETE DRAFTS *************************
 			$qstr = "DELETE FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
@@ -468,8 +460,8 @@ class LO
                 $DBM->rollback();
 				return false;
 			}
-			
-			
+
+
 			//************** DELETE MEDIA MAPPING *********************
 			$qstr = "DELETE FROM ".\cfg_obo_Media::MAP_TABLE." WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
@@ -477,16 +469,16 @@ class LO
                 $DBM->rollback();
 				return false;
 			}
-			
-			
+
+
 			//************** DELETE PERMISSIONS MAPPING *********************
 			$PM = \obo\perms\PermissionsManager::getInstance();
 			foreach($drafts AS $draftID)
 			{
 				$PM->removeAllPermsForItem($draftID, \cfg_obo_Perm::TYPE_LO);
 			}
-			
-			
+
+
 			//************** DELETE PAGE MAPPING *********************
 			$qstr = "DELETE FROM obo_map_pages_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
@@ -494,7 +486,7 @@ class LO
                 $DBM->rollback();
 				return false;
 			}
-			
+
 			//************** DELETE ORPHANED PAGES *******************
 			$qstr = "DELETE P.* FROM  ".\cfg_obo_Page::TABLE." AS P
 			LEFT JOIN ".\cfg_obo_Page::MAP_TABLE." AS M
@@ -505,8 +497,8 @@ class LO
 	            $DBM->rollback();
 				return false;
 			}
-			
-			
+
+
 			//************** DELETE KEYWORD MAPPINGS *******************
 			$qstr = "DELETE FROM obo_map_keywords_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
@@ -526,13 +518,13 @@ class LO
 				$DBM->rollback();
 				return false;
 			}
-			
-			
+
+
 		}
 		return true;
 	}
-	
-	
+
+
 	public function isValidMaster($isDerivative=false)
 	{
 		// id must already exist
@@ -540,7 +532,7 @@ class LO
 		{
 			trace('invalid loid');
 			return false;
-		} 
+		}
 		// must have a title
 		if(!(\obo\util\Validator::isString($this->title)))
 		{
@@ -604,15 +596,15 @@ class LO
 	private function dbStore($DBM)
 	{
 		/**
-		 * TODO: if the loid is set, update the lo 
+		 * TODO: if the loid is set, update the lo
 		 * ROOTID of 0 means its a brand new learning object
-		 * 
+		 *
 		 */
-		
-		// LoID is dirtied when saving a new draft, draft revision, derivative, or new master 
+
+		// LoID is dirtied when saving a new draft, draft revision, derivative, or new master
 		if($this->loID == 0)
 		{
-			
+
 			/********** CHECK QUESTION GROUPS *********/
 			// New question groups if needed
 			// qgm will check to see if the qGroupID is dirty and create if needed
@@ -620,7 +612,7 @@ class LO
 			$qgm = \obo\lo\QuestionGroupManager::getInstance();
 			$qgm->newGroup($this->pGroup); // the referenced objects ids will be updated if needed
 			$qgm->newGroup($this->aGroup);
-			
+
 			//********* Build Summary Object **************/
 			// count the number of questions taking question alternates into account
 			// Note that questionIndex = 0 if there are no alternates, then they count up
@@ -639,14 +631,14 @@ class LO
 				}
 			}
 			$assessmentSize = count($groupedQuestionArray) + $ungroupedQuestionCount;
-			
+
 			$this->summary = array(
 				'contentSize' => count($this->pages),
 				'practiceSize' => count($this->pGroup->kids),
 				'assessmentSize' => $assessmentSize
 			);
-			
-			
+
+
 			/********** UPDATE LO **********************/
 			$qstr = "INSERT INTO ".\cfg_obo_LO::TABLE." SET `".\cfg_obo_LO::TITLE."` = '?', `".\cfg_obo_Language::ID."` = '?',`".\cfg_obo_LO::NOTES."` = '?', `".\cfg_obo_LO::OBJECTIVE."` = '?', `".\cfg_obo_LO::LEARN_TIME."` = '?', `".\cfg_obo_LO::PGROUP."` = '?', `".\cfg_obo_LO::AGROUP."` = '?', `".\cfg_obo_LO::VER."` = '?', `".\cfg_obo_LO::SUB_VER."` = '?', `".\cfg_obo_LO::ROOT_LO."` = '?', `".\cfg_obo_LO::PARENT_LO."` = '?', `".\cfg_obo_LO::TIME."` = UNIX_TIMESTAMP(), `".\cfg_obo_LO::COPYRIGHT."` = '?',  ".\cfg_obo_LO::NUM_PAGES." = '?', ".\cfg_obo_LO::NUM_PRACTICE." = '?', ".\cfg_obo_LO::NUM_ASSESSMENT." = '?'";
 			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright, $this->summary['contentSize'], $this->summary['practiceSize'], $this->summary['assessmentSize']);
@@ -656,12 +648,12 @@ class LO
 				$DBM->rollback();
 				return false;
 			}
-			
+
 			/************ UPDATE OBJECT IN MEMORY **********/
 			$this->loID = $DBM->insertID;
 			if($this->rootID == 0) $this->rootID = $this->loID; // rootID is 0 for masters in the database, but needs to be set for the clients
-			
-			
+
+
 			/********* CHECK PAGES *************/
 			// We Needed the loID before mapping these pages
 			if(is_array($this->pages))
@@ -673,17 +665,17 @@ class LO
 					$pageman->mapPageToLO($this->loID, $page->pageID, $orderIndex); // map this page
 				}
 			}
-			
+
 			/******** SET PERMISSIONS ON THE ROOT OBJECT **********/
 			if($this->rootID == $this->loID)
 			{
 				$PM = \obo\perms\PermissionsManager::getInstance();
 				$PM->setFullPermsForItem($this->loID, \cfg_obo_Perm::TYPE_LO);
-				
+
 				$this->perms = new \obo\perms\Permissions($_SESSION['userID'], 1,1,1,1,1,1,1,1,1);
-				
+
 			}
-			
+
 			/************* ADD KEYWORDS *******************/
 			$KM = \obo\lo\KeywordManager::getInstance();
 			if(is_array($this->keywords) && count($this->keywords) > 0 )
@@ -694,16 +686,14 @@ class LO
 					{
 						$KM->linkKeyword($newTag->keywordID, $this->loID, 'l');
 					}
-					
+
 				}
 			}
-			
+
 			/************* KEEP TRACK OF MEDIA USED IN LO *******************/
 			$this->associateMediaUsedInLO();
 			return true;
 		}
 	}
-	
-}
 
-?>
+}

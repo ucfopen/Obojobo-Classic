@@ -10,21 +10,21 @@ class LOSystem extends \rocketD\db\DBEnabled
 		$return = $this->DBM->querySafe("UPDATE IGNORE $tableName $qSuffex");
 		return $return;
 	}
-	
+
 	public function mergeUsers($userIDFrom, $userIDTo)
 	{
-		
+
 		$RM = \obo\perms\RoleManager::getInstance();
 		if($RM->isSuperUser())
 		{
 			$this->defaultDBM();
 			// TODO: make sure they are su
-			
+
 			$AM = \rocketD\auth\AuthManager::getInstance();
-		
+
 			$fromUser = $AM->fetchUserByID($userIDFrom);
 			$toUser = $AM->fetchUserByID($userIDTo);
-			
+
 			if( !($fromUser instanceof \rocketD\auth\User) || !($toUser instanceof \rocketD\auth\User) )
 			{
 				return \rocketD\util\Error::getError(2);
@@ -47,7 +47,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Visit::TABLE, $q2);
 			$success = $success && $this->_mergeUsersUpdate(\cfg_obo_Perm::TABLE, $q2);
 
-			
+
 			if(!$success)
 			{
 				$this->DBM->rollBack();
@@ -56,7 +56,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 			{
 				$this->DBM->commit();
 				// clear all cache
-				
+
 				\rocketD\util\Cache::getInstance()->clearAllCache();
 				// remove old user
 				$AM->removeUser($userIDFrom);
@@ -65,9 +65,8 @@ class LOSystem extends \rocketD\db\DBEnabled
 			}
 			return $success;
 		}
-       
+
         return \rocketD\util\Error::getError(4);
 	}
-	
+
 }
-?>

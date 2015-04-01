@@ -1,74 +1,76 @@
 <?php
-//namespace RD;
 require_once('config/cfgLocal.php'); // local config
-
-/*
-
-	*** set up global functions and dynamic settings ***
-
-*/
-
-// set the error log file
-ini_set('error_log', \AppCfg::DIR_BASE.\AppCfg::DIR_LOGS.'php_errors_'. date('m_d_y', time()) .'.txt');
-
-
-ini_set('display_errors',0);
-ini_set('log_errors',1);
 spl_autoload_register('classAutoLoader');
+require_once('vendor/autoload.php');
 define ("CONFIG_ROOT", dirname(__FILE__) . '/config/');
 
-function trace($arg, $force=0, $incbacklog=0)
+// Setup the global logger
+use Monolog\Logger;
+use Monolog\Registry;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\ErrorHandler;
+use Monolog\Formatter\LineFormatter;
+
+$app = new Logger('app');
+$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/obojobo', 30);
+$handler->setFormatter(new LineFormatter(null, null, true, true));
+$app->pushHandler($handler);
+ErrorHandler::register($app); // catch error_log and other php errors
+Registry::addLogger($app);
+
+function trace($arg, $force=0)
 {
-	\rocketD\util\Log::trace($arg, $force, $incbacklog+1);
+	if (is_object($arg) || is_array($arg))
+	{
+		$arg = var_export($arg, true);
+	}
+	$level = $force ? Logger::INFO : Logger::DEBUG;
+	Registry::app()->addRecord($level, $arg);
+}
+
+function profile($name, $stuff)
+{
+	if ( ! Registry::hasLogger($name))
+	{
+		$logger = new Logger($name);
+		$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/profile-'.$name, 30, Logger::INFO);
+		$handler->setFormatter(new LineFormatter("[%datetime%]: %message%\n", null, false, true));
+		$logger->pushHandler($handler);
+		Registry::addLogger($logger);
+	}
+
+	Registry::$name()->addInfo($stuff);
 }
 
 function classAutoLoader($className)
 {
-	
-
 	// classname is using namespaces
-	if(strpos($className , '\\') !== false)
+	if (strpos($className , '\\') !== false)
 	{
-		
 		$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES  . str_replace('\\', '/', $className) . '.class.php';
 	}
 	// classname is using old nm_class package notation
 	else
 	{
 		$prefix = substr($className, 0, 4);
-		switch($prefix)
+		switch ($prefix)
 		{
-			case 'plg_': // look in the plugin dir EX: plugin_UCFCourses_UCFCoursesAPI.class.php
-				// convert plugins_pluginName_ClassName to plugins/pluginName/classes/ClassName.class.php
+			// TODO: move these into vendor and manage via composer
+			case 'plg_': // convert plg_pluginName_ClassName to plugins/pluginName/classes/ClassName.class.php
 				$pkgs = explode("_", $className);
-				$file = \AppCfg::DIR_BASE . \AppCfg::DIR_PLUGIN.$pkgs[1].'/classes/';
-				unset($pkgs[0]);
-				unset($pkgs[1]);
-				$file = $file . implode('/', $pkgs) . '.class.php';
+				$package = $pkgs[1];
+				unset($pkgs[0], $pkgs[1]);
+				$file = \AppCfg::DIR_BASE.\AppCfg::DIR_PLUGIN.$package.'/classes/'.implode('/', $pkgs).'.class.php';
 				break;
+
 			case 'cfg_': // look in the config dir EX: config_plugin_UCFCourses
-				$file = substr($className, 4);
-				$file = CONFIG_ROOT . '/' .str_replace('_', '/', $file) . '.class.php';
+				$file = CONFIG_ROOT . '/' .str_replace('_', '/', substr($className, 4)) . '.class.php';
 				break;
+
 			default: // Look in the app classes dir EX: \rocketD\auth\AuthModule
-				// log the class that wasn't found
-				if( ! preg_match('/^Smarty/', $className)) error_log($className);
 				$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES . str_replace('_', '/', $className) . '.class.php';
 		}
 	}
-	// try to include
-	if(!@include($file))
-	{
-		// log error on failure
-		if(\AppCfg::DEBUG_MODE == true)
-		{
-			@$dt = debug_backtrace(3);
-			error_log('autoload failed to load class "'. basename($className). " file $file");
-			if(count($dt) > 3)
-			{
-				error_log(' -> referenced from ' . basename($dt[2]['file']) . '#' . $dt[2]['line'] . ' -> ' . $dt[2]['function']);
-			}
-		}
-	}
+
+	@include($file);
 }
-?>

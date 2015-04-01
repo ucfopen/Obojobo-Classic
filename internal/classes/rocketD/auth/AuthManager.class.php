@@ -2,17 +2,7 @@
 namespace rocketD\auth;
 class AuthManager extends \rocketD\db\DBEnabled
 {
-	protected static $instance;
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
+	use \rocketD\Singleton;
 
 	/**
 	 * Gets a user's information from the database
@@ -81,15 +71,15 @@ class AuthManager extends \rocketD\db\DBEnabled
 	//function login($userName='', $pwd='')
 	public function login($userName, $password)
 	{
-		$userName = trim($userName);
-		$password = trim($password);
-		if($this->authenticate(array('userName' => $userName, 'password' => $password)))
+		$requestVars = [
+			'userName' => trim($userName),
+			'password' => trim($password)
+		];
+
+		if ($this->authenticate($requestVars))
 		{
-			if($_SESSION['passed'] === true)
+			if ($_SESSION['passed'] === true)
 			{
-				//TODO: add this back in
-				//$trackingMan = \obo\log\LogManager::getInstance();
-				//$trackingMan->trackLoggedIn();
 				return true;
 			}
 			else
@@ -552,7 +542,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return $authMods;
 	}
 
-	// TODO: add getUser
 	public function getAuthModuleForUserID($userID=false)
 	{
 		if($userID !== false)
@@ -574,7 +563,6 @@ class AuthManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		trace('couldnt fetch user authmod: ' . $userID, true);
 		return false;
 	}
 
