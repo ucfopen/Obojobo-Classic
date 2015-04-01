@@ -1,20 +1,11 @@
 <?php
-/**
- * This class defines the QuestionGroup data type.
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
 
-/**
- * This class defines the QuestionGroup data type, 
- * which contains a set of Questions and represents a Quiz.
- * It is used simply for representing data in memory, and has no methods.
- */
 namespace obo\lo;
 class QuestionGroup
 {
 	public $qGroupID;				//Number:
 	public $userID;			//Number:
-	public $rand;			//Boolean: 
+	public $rand;			//Boolean:
 	public $allowAlts;			//Boolean:
 	public $altMethod;		//Enum: 'r' or 'k'
 	public $kids;			//Array: Questions
@@ -29,14 +20,14 @@ class QuestionGroup
 		$this->altMethod = $altMethod;
 		$this->kids = $kids;
 	}
-	
+
 	private function calculateQuizSize()
 	{
 		if($this->quizSize > 0)
 		{
 			return $this->quizSize;
 		}
-		
+
 		$size = 0;
 		if(is_array($this->kids))
 		{
@@ -69,7 +60,7 @@ class QuestionGroup
 		return $size;
 	}
 
-	
+
 	public function getFromDB($DBM, $qGroupID, $includeKids = true)
 	{
 
@@ -82,7 +73,7 @@ class QuestionGroup
 		{
 			return false;
 		}
-		
+
 		if( ($qgroup = \rocketD\util\Cache::getInstance()->getQGroup($qGroupID) ) && is_array($qgroup))
 		{
 			// copy data to this object
@@ -91,13 +82,13 @@ class QuestionGroup
 				$this->$key = $value;
 			}
 			return true;
-		}		
-		
+		}
+
 		//Get Question Group data
 		$q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_QGroup::TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' LIMIT 1", $qGroupID);
 		$r = $DBM->fetch_obj($q);
 		$this->__construct($r->{\cfg_obo_QGroup::ID}, $r->{\cfg_core_User::ID}, $r->{\cfg_obo_QGroup::TITLE}, $r->{\cfg_obo_QGroup::RAND}, $r->{\cfg_obo_QGroup::ALTS}, $r->{\cfg_obo_QGroup::ALT_TYPE}, Array());
-		
+
 		if($includeKids)
 		{
 			//Gather questions/groups into an Array from mapping table
@@ -121,20 +112,19 @@ class QuestionGroup
 					}
 					$question->questionIndex = $r2['questionIndex'];
 				}
-				
+
 				//Push to group:
 				$this->kids[] = $question;
 
 			}
 			$this->quizSize = $this->calculateQuizSize();
-			
+
 			\rocketD\util\Cache::getInstance()->setQGroup($qGroupID, $this);
 		}
-		
 
-		
+
+
 		return true;
 	}
-	
+
 }
-?>

@@ -31,7 +31,7 @@ namespace obo\perms;
 class PermissionsManager extends \rocketD\db\DBEnabled
 {
 	private static $instance;
-	
+
 	function __construct()
 	{
 	    $this->defaultDBM();
@@ -46,7 +46,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return self::$instance;
 	}
-	
+
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getPermsForItem($itemID = 0, $itemType = 'l')
 	{
@@ -62,16 +62,16 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 		$perms = array();
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			$perms[] = $r;
-		}	
+		}
 		return $perms;
 	}
 	/**
-	 * Performs validation specific to getting the global permissions for an item 
+	 * Performs validation specific to getting the global permissions for an item
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @return (Permissions) global permissions object for item requested
@@ -90,7 +90,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Performs validation specific to getting the user permissions for an item 
+	 * Performs validation specific to getting the user permissions for an item
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @param $optUserID (number) ID of user to find permissions for
@@ -108,13 +108,13 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return $this->getPerms($itemID, $itemType, $optUserID);
 		}
 	}
-	
+
 	/**
 	 * Reuses existing permissions, assigning them to a new item.  The permissions will no longer be associated with the previous item
 	 *
-	 * @param string $oldItemID 
-	 * @param string $newItemID 
-	 * @param string $itemType 
+	 * @param string $oldItemID
+	 * @param string $newItemID
+	 * @param string $itemType
 	 * @return void
 	 * @author Ian Turgeon
 	 */
@@ -131,13 +131,13 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		$qstr = "UPDATE ".\cfg_obo_Perm::TABLE." SET ".\cfg_obo_Perm::ITEM." = '?' WHERE ".\cfg_obo_Perm::ITEM." = '?' AND ".\cfg_obo_Perm::TYPE." = '?' ";
 		return $this->DBM->querySafe($qstr, $newItemID, $oldItemID, $itemType);
 	}
-	
+
 	/**
 	 * Duplicate permissions from one object to another.  The original item's permissions will be unchanged.
 	 *
-	 * @param string $oldItemID 
-	 * @param string $newItemID 
-	 * @param string $itemType 
+	 * @param string $oldItemID
+	 * @param string $newItemID
+	 * @param string $itemType
 	 * @return void
 	 * @author Ian Turgeon
 	 */
@@ -186,7 +186,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Gets Global or User permissions for an item (use getUserPerms or getGlobalPerms instead)
 	 * @param $itemID (number) Database item id
@@ -198,7 +198,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	private function getPerms($itemID=0, $itemType='l', $optUserID=0)
 	{
-		//Do type checking 
+		//Do type checking
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
 			return false;
@@ -208,15 +208,15 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$optUserID = 0;
 		}
 		$itemType = mysql_real_escape_string($itemType);
-		// 
+		//
 		// if($permObj = \rocketD\util\Cache::getInstance()->getPerms($itemID, $itemType, $optUserID))
 		// {
 		// 	return $permObj;
 		// }
-		
-		$q = $this->DBM->querySafe("SELECT * FROM `".\cfg_obo_Perm::TABLE."` WHERE 
-			".\cfg_core_User::ID."='?' AND 
-			".\cfg_obo_Perm::ITEM."='?' AND 
+
+		$q = $this->DBM->querySafe("SELECT * FROM `".\cfg_obo_Perm::TABLE."` WHERE
+			".\cfg_core_User::ID."='?' AND
+			".\cfg_obo_Perm::ITEM."='?' AND
 			`".\cfg_obo_Perm::TYPE."`='?' LIMIT 1", $optUserID, $itemID, $itemType);
 
 		if($r = $this->DBM->fetch_obj($q))
@@ -234,7 +234,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 				$r->{\cfg_obo_Perm::G_GLOBAL});
 
 			//\rocketD\util\Cache::getInstance()->setPerms($itemID, $itemType, $optUserID, $permObj);
-			
+
 			return $permObj;
 		}
 		else
@@ -242,7 +242,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Merges global and user permissions together for specified user
 	 * @param $itemID (number) Database item id
@@ -271,7 +271,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 			$userPerms = $this->getPerms($itemID, $itemType, $optUserID);	//User perms
 		}
-		
+
 		if($permObj == false && $userPerms == false) // both are false for some reason
 		{
 			$permObj = new \obo\perms\Permissions();
@@ -288,10 +288,10 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 			$permObj = $this->mergePermObjects($permObj, $userPerms);
 		}
-		
+
 		return $permObj;
 	}
-	
+
 	public function mergePermObjects($permA, $permB)
 	{
 		$permObj = new \obo\perms\Permissions(
@@ -306,22 +306,22 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			($permA->givePublish || $permB->givePublish) ? 1 : 0,
 			($permA->giveGlobal || $permB->giveGlobal) ? 1 : 0
 		);
-		
+
 		return $permObj;
 	}
-	
+
 	/**
 	 * Returns ids of all items of a certain type given certain permissions in order from the newest to oldest
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @param $perm (string) Perm type.  Refer to table at top of source.
 	 * @return (Array<number>) Array of item IDs
-	 * 
+	 *
 	 */
 	public function getItemsWithPerm($itemType='l', $perm='read', $ignoreGlobal=false, $ignoreCurrentUser=false)
 	{
 		$itemType = substr($itemType,0,1);	//Make sure $itemType is only one char long
 		$itemArr = array();
-		
+
 		$userID = $ignoreCurrentUser ? 0 : $_SESSION['userID'];
 
 		$roleMan = \obo\perms\RoleManager::getInstance();
@@ -337,14 +337,14 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			else  $qstr = "SELECT ".\cfg_obo_Perm::ITEM." FROM `".\cfg_obo_Perm::TABLE."` WHERE ".\cfg_core_User::ID." IN ('?','0') AND	`".\cfg_obo_Perm::TYPE."`='?' AND `?`='1'";
 			$q = $this->DBM->querySafe($qstr, $userID, $itemType, $perm);
 		}
-		
+
 		while( $r = $this->DBM->fetch_obj($q))
 		{
 			$itemArr[] = $r->{\cfg_obo_Perm::ITEM};
 		}
 		return array_reverse(array_values(array_unique($itemArr)));
 	}
-	
+
 	/**
 	 * Gets the merged permission specified by $perm for an item
 	 * @param $itemID (number) Database item id
@@ -357,9 +357,9 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	{
 		return ($this->getUserPerm($itemID, $itemType, $perm, $optUserID) || $this->getGlobalPerm($itemID, $itemType, $perm))  ? 1 : 0;
 	}
-	
+
 	/**
-	 * Gets only the user permission specified by $perm 
+	 * Gets only the user permission specified by $perm
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @param $perm (string) Perm type.  Refer to table at top of source.
@@ -377,9 +377,9 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Gets only the global permission specified by $perm 
+	 * Gets only the global permission specified by $perm
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @param $perm (string) Perm type.  Refer to table at top of source.
@@ -389,9 +389,9 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	{
 		return $this->getPerm($itemID, $itemType, $perm, 0);
 	}
-	
+
 	/**
-	 * Gets only the permissions specified by $perm (use getGlobalPerm or getUserPerm) 
+	 * Gets only the permissions specified by $perm (use getGlobalPerm or getUserPerm)
 	 * @param $itemID (number) Database item id
 	 * @param $itemType (string) Item type.  Refer to table at top of source.
 	 * @param $perm (string) Perm type.  Refer to table at top of source.
@@ -404,7 +404,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		$itemType = substr($itemType,0,1);	//Make sure $itemType is only one char long
 		if(is_numeric($itemID) && is_numeric($optUserID) && $itemID > 0)
 		{
-			$q = $this->DBM->querySafe("SELECT `{$perm}` FROM ".\cfg_obo_Perm::TABLE." WHERE 
+			$q = $this->DBM->querySafe("SELECT `{$perm}` FROM ".\cfg_obo_Perm::TABLE." WHERE
 				".\cfg_core_User::ID."='?' AND
 				".\cfg_obo_Perm::ITEM."='?' AND
 				`".\cfg_obo_Perm::TYPE."`='?' AND
@@ -417,8 +417,8 @@ class PermissionsManager extends \rocketD\db\DBEnabled
             return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Gets all the users with the specified perm, for an item
 	 * @param $itemID (number) Database item id
@@ -446,10 +446,10 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			{
 				array_push($userArr, array(
 					'userID' => $r->{\cfg_core_User::ID},
-					'user_name' => $userMan->getName($r->{\cfg_core_User::ID}) 
+					'user_name' => $userMan->getName($r->{\cfg_core_User::ID})
 				));
 			}
-			
+
 			return $userArr;
 		}
 		else
@@ -457,7 +457,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sets global permissions for a specified item
 	 * @param $itemID (number) Database item id
@@ -468,7 +468,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	public function setGlobalPerms($itemID=0, $itemType='l', $permObj)
 	{
 		$userID = $_SESSION['userID'];
-
 
 		if(\obo\perms\RoleManager::getInstance()->isSuperUser() || ($itemID != 0 && $this->getUserPerm($itemID, $itemType, 'giveGlobal', $userID)))
 		{
@@ -500,11 +499,11 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	{
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
-	       
+
+
 	        return \rocketD\util\Error::getError(2);
 		}
-		
+
 		foreach($permObjects as $permObj)
 		{
 			$res = $this->setPerms($itemID, $itemType, new \obo\perms\Permissions($permObj));
@@ -512,18 +511,18 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	// TODO: remove this OR removeUsersPerms....
 	public function removeUserPerms($itemID=0, $itemType='l', $userID = -1)
 	{
 		if(! \obo\util\Validator::isPosInt($itemID, true) )
 		{
-			
-	       
+
+
 	        return \rocketD\util\Error::getError(2);
 		}
 		//check if user had permissions to this first.
-	    $qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."!='?' AND 
+	    $qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."!='?' AND
 	    			`".\cfg_obo_Perm::READ."`='1' AND `".\cfg_obo_Perm::WRITE."`='1' AND ".\cfg_obo_Perm::COPY."='1' AND ".\cfg_obo_Perm::PUBLISH."='1' AND ".\cfg_obo_Perm::G_READ."='1' AND
 	    			".\cfg_obo_Perm::G_WRITE."='1' AND ".\cfg_obo_Perm::G_COPY."='1' AND ".\cfg_obo_Perm::G_USE."='1'";
 		if(!($q = $this->DBM->querySafe($qstr, $itemID, $itemType, $userID)))
@@ -532,8 +531,8 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		if(!($r = $this->DBM->fetch_obj($q)))
 		{
-			
-	       
+
+
 	        return \rocketD\util\Error::getError(5003);
 		}
 		$qstr = "DELETE FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."='?'";
@@ -542,18 +541,16 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		//
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $userID);
 		return true;
 	}
-	
+
 	public function removeAllPermsForItem($itemID, $itemType)
 	{
 		if(! \obo\util\Validator::isPosInt($itemID) )
 		{
-	        return \rocketD\util\Error::getError(2);
+			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$q = "DELETE FROM ".\cfg_obo_Perm::TABLE." WHERE `".\cfg_obo_Perm::ITEM."`='?' AND `".\cfg_obo_Perm::TYPE."`='?'";
 		if(!($q = $this->DBM->querySafe($q, $itemID, $itemType)))
 		{
@@ -562,11 +559,12 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
-	public function removeAllPermsForUser($userID = -1){
+
+	public function removeAllPermsForUser($userID = -1)
+	{
 		if($userID == 0 || $userID == -1)
 		{
-			return false;	
+			return false;
 		}
 		$qstr = "DELETE FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_core_User::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $userID)))
@@ -576,7 +574,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	public function removeUsersPerms($userIDs, $itemID=0, $itemType='l')
 	{
 		if($itemID == 0 || !is_array($userIDs))
@@ -589,7 +587,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Sets user permissions for a specified item
 	 * @param $itemID (number) Database item id
@@ -597,7 +595,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	 * @param $permObj (Permissions) new user permissions for item
 	 * @return (bool) True if successful, False if not successful or error
 	 */
-	
+
 	// TODO: make sure the user can never call this directly
 	public function setFullPermsForItem($itemID, $itemType)
 	{
@@ -608,9 +606,9 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		else
 		{
 			$userID = $_SESSION['userID'];
-			
+
 			$qstr = "INSERT INTO
-			 `".\cfg_obo_Perm::TABLE."` 
+			 `".\cfg_obo_Perm::TABLE."`
 			(
 				`".\cfg_core_User::ID."`,
 				`".\cfg_obo_Perm::ITEM."`,
@@ -630,14 +628,13 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			{
 				trace(mysql_error(), true);
 				$this->DBM->rollback();
-				//die();
 				return false;
 			}
-			
+
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Adds/changes permissions for $permObj->userID for the $itmid specified
 	 * @param $itemID (number) Database item id
@@ -656,7 +653,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		$giveCopy = $this->getMergedPerm($itemID, $itemType, 'giveCopy', $userID);
 		$giveUse = $this->getMergedPerm($itemID, $itemType, 'givePublish', $userID);
 		$giveGlobal = $this->getMergedPerm($itemID, $itemType, 'giveGlobal', $userID);
-		
+
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		if($roleMan->isSuperUser())
 		{
@@ -666,8 +663,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$giveUse = 1;
 			$giveGlobal = 1;
 		}
-		
-		
+
 		//See if the user has ANY permissions to be giving permissions
 		if(!($giveRead || $giveWrite || $giveCopy || $giveUse))
 		{
@@ -675,13 +671,13 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 
 		$qstr = "DELETE FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_core_User::ID."='?' AND ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?'";
-		
+
 		if(!($q = $this->DBM->querySafe($qstr, $permObj->userID, $itemID, $itemType)))
 		{
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 		// TODO: need to do querySafe all all this randomness :(
 		//For each permission, test to see if the user has permission to change each permission
 		$qstr = "INSERT INTO ".\cfg_obo_Perm::TABLE." SET ".\cfg_core_User::ID."='?', ".\cfg_obo_Perm::ITEM."='?', `".\cfg_obo_Perm::TYPE."`='?', ";
@@ -700,12 +696,10 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		
-		
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
+
 		return true;
 	}
-	
+
 	/**
 	 * Checks to see if perms exist
 	 * @param $itemID (number) Database item id
@@ -716,16 +710,15 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	 */
 	public function hasPerms($userID, $itemID, $itemType)
 	{
-		$qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE 
+		$qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE
 					".\cfg_obo_Perm::UIT."='?' AND
 					".\cfg_obo_Perm::ITEM."='?' AND
 					`".\cfg_obo_Perm::TYPE."`='?' LIMIT 1";
-		
+
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $itemID, $itemType)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
-			//die();
 			return false;
 		}
 		if(!($r = $this->DBM->fetch_obj($q)))
@@ -734,7 +727,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Updates user permissions for a specified item
 	 * @param $itemID (number) Database item id
@@ -753,17 +746,17 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			return $this->updatePerms($itemID, $itemType, $permObj);
 		}
 	}
-	
+
 	private function updatePerms($itemID = 0, $itemType = 'l', $permObj)
 	{
 		$userID = $_SESSION['userID'];
-		
+
 		$giveRead = 1;$this->getMergedPerm($itemID, $itemType, 'giveRead', $userID);
 		$giveWrite = 1;$this->getMergedPerm($itemID, $itemType, 'giveWrite', $userID);
 		$giveCopy = 1;$this->getMergedPerm($itemID, $itemType, 'giveCopy', $userID);
 		$giveUse = 1;$this->getMergedPerm($itemID, $itemType, 'givePublish', $userID);
 		$giveGlobal = 1;$this->getMergedPerm($itemID, $itemType, 'giveGlobal', $userID);
-		
+
 		//See if the user has ANY permissions to be giving permissions
 		if(!($giveRead || $giveWrite || $giveCopy || $giveUse))
 		{
@@ -783,58 +776,13 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		if($giveGlobal){ $qstr .= "`giveGlobal`='{$permObj->giveGlobal}', "; }else{ $qstr .= "`giveGlobal`='0', "; }
 		$qstr .= "`allow_req`='0' WHERE `userID`='?' AND `itemID`='?' AND `itemType`='?' LIMIT 1";
 
-		//return $qstr;
-
 		if(!($q = $this->DBM->querySafe($qstr, $permObj->userID, $itemID, $itemType)))
 		{
 			$this->DBM->rollback();
 			return false;
 		}
-		// clear cache
-		//
-		//\rocketD\util\Cache::getInstance()->clearPerms($itemID, $itemType, $permObj->userID);
+
 		return true;
 	}
-	/*
 
-	 
-	private function setPerms($itemID=0, $itemType='l', $permObj){
-		$userID = $_SESSION['userID'];
-
-		$giveRead = $this->getMergedPerm($itemID, $itemType, 'giveRead', $userID);
-		$giveWrite = $this->getMergedPerm($itemID, $itemType, 'giveWrite', $userID);
-		$giveCopy = $this->getMergedPerm($itemID, $itemType, 'giveCopy', $userID);
-		$giveUse = $this->getMergedPerm($itemID, $itemType, 'givePublish', $userID);
-		$giveGlobal = $this->getMergedPerm($itemID, $itemType, 'giveGlobal', $userID);
-		
-		//See if the user has ANY permissions to be giving permissions
-		if(!($giveRead || $giveWrite || $giveCopy || $giveUse)){
-			return false;
-		}
-	
-		//For each permission, test to see if the user has permission to change each permission
-		$qstr = "INSERT INTO ".self::mapping." SET userID='{$permObj->userID}', itemID='{$itemID}', itemType='{$itemType}', ";
-		if($giveRead){ $qstr .= "`read`='{$permObj->read}', "; }else{ $qstr .= "`read`='0', "; }
-		if($giveWrite){ $qstr .= "`write`='{$permObj->write}', "; }else{ $qstr .= "`write`='0', "; }
-		if($giveCopy){ $qstr .= "`copy`='{$permObj->copy}', "; }else{ $qstr .= "`copy`='0', "; }
-		if($giveUse){ $qstr .= "`publish`='{$permObj->publish}', "; }else{ $qstr .= "`publish`='0', "; }
-		if($giveRead){ $qstr .= "giveRead='{$permObj->giveRead}', "; }else{ $qstr .= "giveRead='0', "; }
-		if($giveWrite){ $qstr .= "giveWrite='{$permObj->giveWrite}', "; }else{ $qstr .= "giveWrite='0', "; }
-		if($giveCopy){ $qstr .= "giveCopy='{$permObj->giveCopy}', "; }else{ $qstr .= "giveCopy='0', "; }
-		if($giveUse){ $qstr .= "givePublish='{$permObj->givePublish}', "; }else{ $qstr .= "givePublish='0', "; }
-		if($giveGlobal){ $qstr .= "giveGlobal='{$permObj->giveGlobal}', "; }else{ $qstr .= "giveGlobal='0', "; }
-		$qstr .= "allow_req='0'";
-		
-		print $qstr;
-
-		if( !($q = $this->DBM->query($qstr)) ){
-			$error = mysql_error();
-			$this->DBM->rollback();
-			die($error.'<br />'.$qstr);
-		}
-		
-		return true;
-	}
-	*/
 }
-?>

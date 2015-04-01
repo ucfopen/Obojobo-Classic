@@ -20,7 +20,6 @@ class Data
 	public $first;
 	public $fullName;
 	public $roles;
-	public $remoteId;
 	public $username;
 	public $isSelectorMode;
 	public $returnUrl;
@@ -40,8 +39,7 @@ class Data
 		$this->last           = static::get($data, 'lis_person_name_family');
 		$this->first          = static::get($data, 'lis_person_name_given');
 		$this->fullName       = static::get($data, 'lis_person_name_full');
-		$this->remoteId       = static::get($data, \AppCfg::LTI_CANVAS_REMOTE_IDENTIFIER_FIELD);
-		$this->username       = static::get($data, \AppCfg::LTI_CANVAS_REMOTE_USERNAME_FIELD);
+		$this->username       = static::get($data, \AppCfg::LTI_REMOTE_USERNAME_FIELD);
 		$this->timestamp      = static::get($data, 'oauth_timestamp');
 		$this->contextId      = static::get($data, 'context_id');
 		$this->contextTitle   = static::get($data, 'context_title', 'Unknown Course');
@@ -52,7 +50,7 @@ class Data
 
 	public function hasValidUserData()
 	{
-		return $this->isTestUser() || (!empty($this->remoteId) && !empty($this->username) && !empty($this->consumer));
+		return $this->isTestUser() || (!empty($this->username) && !empty($this->consumer));
 	}
 
 	public function isTestUser()

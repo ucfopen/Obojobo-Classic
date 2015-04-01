@@ -2,23 +2,8 @@
 namespace obo\util;
 class NotificationManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
+	use \rocketD\Singleton;
 
-	public function __construct()
-	{
-		$this->defaultDBM();
-	}
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
 	public function sendCriticalError($subject, $message)
 	{
 		$this->mail('i@ucf.edu,z@ucf.edu', '[OBO ERROR]: ' . $subject, $message);
@@ -28,14 +13,14 @@ class NotificationManager extends \rocketD\db\DBEnabled
 	{
 		return mail($to, $subject, $body, $headers);
 	}
-	
+
 	public function sendScoreNotice($instData, $studentID, $extraAttempts, $scores, $score)
 	{
 		// get student info
 		$AM = \rocketD\auth\AuthManager::getInstance();
 		$student = $AM->fetchUserByID($studentID);
 		$boundry = '-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_';
-		
+
 		// load up email template
 		if ($smarty = \rocketD\util\Template::getInstance())
 		{
@@ -47,7 +32,7 @@ class NotificationManager extends \rocketD\db\DBEnabled
 			$smarty->assign('loEnd', $instData->endTime);
 			$smarty->assign('loScoreMethod', $instData->scoreMethod);
 			$smarty->assign('attemptsRemaining', $instData->attemptCount + $extraAttempts - count($scores));
-			
+
 			$smarty->assign('imgDir', \AppCfg::URL_WEB . \AppCfg::DIR_ASSETS . 'images/score-confirmation/');
 			$smarty->assign('finalScore', $score);
 			$smarty->assign('attempts', array_reverse($scores));
@@ -82,10 +67,8 @@ class NotificationManager extends \rocketD\db\DBEnabled
 			}
 		}
 
-		\rocketD\util\Log::profile('email', "'$studentID','$student->email','$score','" . ($sent ? '1' : '0' ). "'");
+		profile('email', "'$studentID','$student->email','$score','" . ($sent ? '1' : '0' ). "'");
 
 		return $sent;
 	}
 }
-
-?>

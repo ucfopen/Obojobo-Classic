@@ -2,18 +2,8 @@
 namespace rocketD\plugin;
 class PluginManager
 {
-	private static $instance;
-	
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
+	use \rocketD\Singleton;
+
 	public function pluginInstalled($pluginName, $includeNonCorePlugins = false)
 	{
 		if(strpos(\AppCfg::CORE_PLUGINS, $pluginName) !== false)
@@ -34,7 +24,7 @@ class PluginManager
 		trace("plugin missing: $pluginName - installed: " . \AppCfg::CORE_PLUGINS, true);
 		return false;
 	}
-	
+
 	protected function getAPI($pluginName)
 	{
 		// make sure the plugin is enabled
@@ -54,7 +44,7 @@ class PluginManager
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Call a plugin method using it's API
 	 *
@@ -69,7 +59,7 @@ class PluginManager
 	{
 		if( $pluginAPI = $this->getAPI($plugin))
 		{
-			
+
 			if(method_exists($pluginAPI, $method))
 			{
 				// check to see if the function is whitelisted or bypass
@@ -82,11 +72,11 @@ class PluginManager
 						return \rocketD\util\Error::getError(201);
 					}
 				}
-		
+
 				// call the api function
 				if(!is_array($args)) $args = array($args); // if the argument is just one value, make it an array with the value as the first item
 				return call_user_func_array(array($pluginAPI, $method), $args);
-		
+
 			}
 			return \rocketD\util\Error::getError(201);
 		}
@@ -94,4 +84,3 @@ class PluginManager
 	}
 
 }
-?>
