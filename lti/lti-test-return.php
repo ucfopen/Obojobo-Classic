@@ -1,6 +1,6 @@
 <?php
 /*
-This file can handle lti score messages from the lti test interface.
+This file can handle outbound lti score messages from the lti test interface.
  */
 require_once("../internal/app.php");
 
@@ -10,13 +10,12 @@ $authHeaders = $headers['Authorization'];
 $authHeaders = str_replace('OAuth ', '', $authHeaders);
 $authHeaders = explode(',', $authHeaders);
 $oauthData   = array();
+
 foreach($authHeaders as $authHeader)
 {
 	$authHeader = explode('=', $authHeader);
 	$oauthData[$authHeader[0]] = str_replace('"', '', urldecode($authHeader[1]));
 }
-
-$body = file_get_contents("php://input");
 
 // shove the oauth header info into the post, since the OAuth classes rely on that
 foreach($oauthData as $oauthKey => $oauthValue)
@@ -28,7 +27,7 @@ $ltiData = new \lti\Data($_POST);
 
 $valid = false;
 // validate the oauth signature
-if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_CANVAS_KEY, \AppCfg::LTI_CANVAS_SECRET, \AppCfg::LTI_CANVAS_TIMEOUT) === true)
+if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI_OAUTH_SECRET, \AppCfg::LTI_OAUTH_TIMEOUT) === true)
 {
 	// process the incoming data
 	$body     = @file_get_contents('php://input');
@@ -56,4 +55,4 @@ $response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-rep
 header('Content-Type: application/xml');
 echo $response;
 
-\rocketD\util\Log::profile('lti-score', "'".time()."',self(test)','$sourceid','$score','$description','$success'");
+profile('lti-score', "'".time()."',self(test)','$sourceid','$score','$description','$success'");

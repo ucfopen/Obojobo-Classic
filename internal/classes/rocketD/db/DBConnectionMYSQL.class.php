@@ -2,7 +2,7 @@
 namespace rocketD\db;
 class DBConnectionMYSQL extends DBConnection
 {
-	
+
 	public function db_connect()
 	{
 		// dont connect if already connected
@@ -22,7 +22,7 @@ class DBConnectionMYSQL extends DBConnection
 		}
 		return false;
 	}
-		
+
 	public function db_select($db_name='')
 	{
 		$return = @mysql_select_db($db_name, $this->connData->connID);
@@ -40,7 +40,7 @@ class DBConnectionMYSQL extends DBConnection
 		$this->insertID = @mysql_insert_id($this->connData->connID);
 		return $return;
 	}
-	
+
 	public function queryTrace($query)
 	{
 		trace($query);
@@ -51,7 +51,7 @@ class DBConnectionMYSQL extends DBConnection
 	{
 		$this->query('START TRANSACTION');
 	}
-	
+
 	public function rollBack()
 	{
 		$this->query('ROLLBACK');
@@ -85,7 +85,7 @@ class DBConnectionMYSQL extends DBConnection
 
 	public function querySafe($query)
 	{
-		$args  = func_get_args(); 
+		$args  = func_get_args();
 		if(count($args) > 1)
 		{
 		  $query = array_shift($args); // remove first argument and save it as the query
@@ -96,10 +96,10 @@ class DBConnectionMYSQL extends DBConnection
 		}
 		return $this->query($query);
 	}
-	
+
 	public function querySafeTrace($query)
 	{
-		$args  = func_get_args(); 
+		$args  = func_get_args();
 		if(count($args) > 1)
 		{
 		  $query = array_shift($args); // remove first argument and save it as the query
@@ -111,8 +111,8 @@ class DBConnectionMYSQL extends DBConnection
 		trace($query);
 		return $this->query($query);
 	}
-	
-	
+
+
 	public function affected_rows()
 	{
 		return @mysql_affected_rows($this->connData->connID);
@@ -181,4 +181,3 @@ class DBConnectionMYSQL extends DBConnection
 		return $rows;
 	}
 }
-?>

@@ -16,6 +16,4 @@ class cfg_core_Role
 
 	// Custom Roles
 
-
 }
-?>

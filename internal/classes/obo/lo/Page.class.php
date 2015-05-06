@@ -1,21 +1,12 @@
 <?php
-/**
- * This class defines the Page data type
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
 
-/**
- * This class defines the Page data type.
- * A Page can contain many PageItems.
- * It is used simply for representing data in memory, and has no methods.
- */
 namespace obo\lo;
 class Page
 {
 	const SECTION_CONTENT = 1;
 	const SECTION_PRACTICE = 2;
 	const SECTION_ASSESSMENT = 3;
-	
+
 	public $pageID;				//Number:  database id
 	public $title;			//String:  formal title of the page
 	public $userID;			//User:  creator of page
@@ -36,4 +27,3 @@ class Page
 		$this->questionID = $questionID;
 	}
 }
-?>
