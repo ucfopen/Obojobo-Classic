@@ -2,7 +2,7 @@
 namespace rocketD\db;
 class DBConnectionOCI8 extends DBConnection
 {
-	
+
 	public function db_connect($host='', $user='', $pw='', $type='oci8')
 	{
 		// dont connect if already connected
@@ -20,9 +20,9 @@ class DBConnectionOCI8 extends DBConnection
 			}
 		}
 		trace('could not connect to OCI8 Database');
-		return false;		
+		return false;
 	}
-	
+
 	public function db_select($db_name='')
 	{
 		//@mysql_select_db($db_name);
@@ -38,11 +38,11 @@ class DBConnectionOCI8 extends DBConnection
 		}
 		return $stid;
 	}
-	
+
 	/**
 	Can pass oracle resources returnd from parse() (oci_parse) or just string queries which will be auto-parsed
 	**/
-	
+
 	public function query($query)
 	{
 		// $query is a string, not a resource returned from oci_parse
@@ -67,7 +67,7 @@ class DBConnectionOCI8 extends DBConnection
 	public function startTransaction(){
 		$this->query('START TRANSACTION');
 	}
-	
+
 	public function rollBack(){
 		$this->query('ROLLBACK');
 	}
@@ -99,7 +99,7 @@ class DBConnectionOCI8 extends DBConnection
 	   }
 	   return $value;
 	}
-	
+
 	public function querySafe($query)
 	{
 	  $args  = func_get_args();
@@ -149,7 +149,7 @@ class DBConnectionOCI8 extends DBConnection
 		{
 			trace(oci_error($res));
 		}
-		return $row;		
+		return $row;
 	}
 
 	// quickly fetch a single row in object format
@@ -165,7 +165,7 @@ class DBConnectionOCI8 extends DBConnection
 		$q = $this->query($query);
 		return $this->fetch_assoc($q);
 	}
-		
+
 	// quickly fetch a single row in array format
 	public function qfetch_array($query)
 	{
@@ -173,4 +173,3 @@ class DBConnectionOCI8 extends DBConnection
 		return $this->fetch_array($query);
 	}
 }
-?>

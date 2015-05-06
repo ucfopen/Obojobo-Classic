@@ -56,4 +56,4 @@ $response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-rep
 
 header('Content-Type: application/xml');
 echo $response;
-\rocketD\util\Log::profile('lti-score', "'".time()."',materia','$sourceid','$score','$description','$success'");
+profile('lti-score', "'".time()."',materia','$sourceid','$score','$description','$success'");

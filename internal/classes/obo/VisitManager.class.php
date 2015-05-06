@@ -1,15 +1,5 @@
 <?php
-/**
- * This class contains all logic for handling LO Visits
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class contains all logic for handling LO Visits
- * In this case, a visit is a unique record of when a user viewed an LO instance.
- * All scores and statistics for this login session are recorded under this LO visit.
- * When a user views an instance, a visit is created.  When the user logs out, the visit is closed.
- */
 namespace obo;
 class VisitManager extends \rocketD\db\DBEnabled
 {
@@ -24,29 +14,29 @@ class VisitManager extends \rocketD\db\DBEnabled
 		}
 		return self::$instance;
 	}
-	
+
 	/**
 	 * Creates a new session for a given instance
 	 * @param $instID (number) Instance ID
 	 */
 	public function createVisit($instID = 0)
 	{
-		
+
 		// log the visit in the database
-		$qstr = "INSERT INTO ".\cfg_obo_Visit::TABLE." 
-			SET 
+		$qstr = "INSERT INTO ".\cfg_obo_Visit::TABLE."
+			SET
 			`".\cfg_core_User::ID."` = '?',
 			`".\cfg_obo_Visit::TIME."` = UNIX_TIMESTAMP(),
 			`".\cfg_obo_Visit::IP."` = '?',
 			`".\cfg_obo_Instance::ID."` = '?',
 			`".\cfg_obo_LO::ID."` = (SELECT ".\cfg_obo_LO::ID." from ".\cfg_obo_Instance::TABLE." WHERE ".\cfg_obo_Instance::ID." = '?')";
-		
+
 		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $_SERVER['REMOTE_ADDR'], $instID, $instID)))
 		{
 			trace(mysql_error(), true);
 			$this->DBM->rollback();
 			return false;
-		}		
+		}
 		// locate the correct session
 		if(is_array($_SESSION['OPEN_INSTANCE_DATA']))
 		{
@@ -59,7 +49,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		$trackingMan = \obo\log\LogManager::getInstance();
 		$trackingMan->trackVisit();
 	}
@@ -80,7 +70,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 			$visitID = $this->getCurrentVisitID();
 		}
 		$qstr = "SELECT * FROM ".\cfg_obo_Visit::TABLE." WHERE ".\cfg_obo_Visit::ID."='?' LIMIT 1";
-		
+
 		if( !($q = $this->DBM->querySafe($qstr, $visitID)) )
 		{
 			trace(mysql_error(), true);
@@ -96,7 +86,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 	}
-	
+
 	public function getCurrentVisitID()
 	{
 		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
@@ -110,12 +100,12 @@ class VisitManager extends \rocketD\db\DBEnabled
     {
         if(!is_numeric($instID) || $instID < 1)
 		{
-			
-			
+
+
 			return \rocketD\util\Error::getError(1);
 		}
 		//check to see if the instance exists
-		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE `".\cfg_obo_Instance::ID."`='?' LIMIT 1";		
+		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE `".\cfg_obo_Instance::ID."`='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
 		    trace(mysql_error(), true);
@@ -143,16 +133,16 @@ class VisitManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		return false;
     }
 
-	
+
 	public function getInstanceViewKey($instID)
 	{
 		return $_SESSION['OPEN_INSTANCE_DATA'][$instID]['VIEW_KEY'];
 	}
-	
+
 	public function getInstIDFromViewKey($viewKey)
 	{
 		if(is_array($_SESSION['OPEN_INSTANCE_DATA']))
@@ -162,14 +152,14 @@ class VisitManager extends \rocketD\db\DBEnabled
 				if($inst_data['VIEW_KEY'] == $viewKey) return $instID;
 			}
 		}
-		
+
 		trace('couldnt find view key', true);
 		\rocketD\util\Error::getError(4005);
 		trace($_SESSION, true);
 		trace($_REQUEST, true);
 		return false;
 	}
-	
+
 	public function registerCurrentViewKey($viewKey)
 	{
 		$instID = $this->getInstIDFromViewKey($viewKey);
@@ -182,19 +172,19 @@ class VisitManager extends \rocketD\db\DBEnabled
 		}
 		return false;
 	}
-	
+
 	public function getCurrentViewKeyInstID()
 	{
 		return $GLOBALS['CURRENT_INSTANCE_DATA']['instID'];
 	}
-	
+
 	public function startInstanceView($instID, $loID)
 	{
 		if(!is_array($_SESSION['OPEN_INSTANCE_DATA']))
 		{
 			$_SESSION['OPEN_INSTANCE_DATA'] = array();
 		}
-		
+
 		if(!is_array($_SESSION['OPEN_INSTANCE_DATA'][$instID]))
 		{
 			$_SESSION['OPEN_INSTANCE_DATA'][$instID] = array('instID' => $instID, 'VIEW_KEY' => -1, 'attemptID' => -1, 'visitID' => -1, 'loID' => $loID);
@@ -204,13 +194,13 @@ class VisitManager extends \rocketD\db\DBEnabled
 		// place this view in the current data slot
 		$GLOBALS['CURRENT_INSTANCE_DATA'] = $_SESSION['OPEN_INSTANCE_DATA'][$instID];
 	}
-	
+
 	public function calculateVisitTimes()
 	{
 		$LM = \obo\log\LogManager::getInstance();
 		$count = 0;
-		$time = time() - 21600; 
-		
+		$time = time() - 21600;
+
 		// get all the visits that have not been calculated yet AND are over 6 hours old
 		$sql = "SELECT * FROM ".\cfg_obo_Visit::TABLE." WHERE ".\cfg_obo_Visit::TIME_OVERVIEW." IS NULL AND ".\cfg_obo_Visit::TIME." < $time LIMIT 100";
 		$q = $this->DBM->query($sql);
@@ -219,7 +209,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 			$visit = $r;
 			$track = $LM->getInteractionLogByVisit($visit->{\cfg_obo_Visit::ID}, true);
 			$visitUpdated = false;
-			
+
 			if(is_array($track))
 			{
 				foreach($track['visitLog'] AS $vLog)
@@ -242,4 +232,3 @@ class VisitManager extends \rocketD\db\DBEnabled
 		return $count;
 	}
 }
-?>

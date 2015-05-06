@@ -3,31 +3,21 @@
 
 	ACL Model
 	The perms system is additive, meaning perms can only be added, not removed by any given permisssion.  by default no permissions exist
-	
+
 	Items: Each Item of a specific item type has permissions, this would allow items to essentially have permissions for every user
-	
+
 	Groups: Each User Group or Role is given blanket permissions.  this allows certain roles to gain access to items
-	
+
 	Users Mapped to Groups: Each user can be given ther permissions from a group.
-	
+
 	Users Mapped to Items: Each user can have permissions for specific items.  This allows multiple people to own an item
 
 */
 namespace obo\perms;
 class PermManager extends \rocketD\perms\PermManager
 {
-	private static $instance; // singleton instance reference
-	
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
+	use \rocketD\Singleton;
+
 	public function getAllItemIDs($itemType)
 	{
 		$ids = array();
@@ -59,8 +49,7 @@ class PermManager extends \rocketD\perms\PermManager
 				break;
 		}
 		return $ids;
-		
+
 	}
 
 }
-?>

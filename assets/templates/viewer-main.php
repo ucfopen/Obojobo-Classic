@@ -16,7 +16,7 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 
 	<!-- GOOGLE FONTS -->
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
-	
+
 	<!-- DEV JAVASCRIPT LIBRARIES -->
 	<script type="text/javascript" src="/assets/js/jquery.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
@@ -112,17 +112,18 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 			__oldBrowser = true;
 		}
 	}
-	
+
 	// Polyfills:
 	Modernizr.load({
 		test: Modernizr.multiplebgs,
 		nope: '/assets/css/multiplebgfix.css'
 	});
-	
+
 	// disable logs by defualt
 	debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
 
 	// global variables from the config
+	// @TODO these are optional and shouldnt be requried!
 	_materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
 	_webUrl = '<?php echo \AppCfg::URL_WEB; ?>';
 	_credhubUrl = '<?php echo \AppCfg::CREDHUB_URL; ?>';
@@ -150,10 +151,10 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 	function correctTime()
 	{
 		// calculate client/server time difference
-		var now = new Date(); 
+		var now = new Date();
 		var clientUTCDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 		var serverUTCDate = new Date('<?php $time = date_create('now', timezone_open('UTC')); echo $time->format("D, d M Y G:i:s"); ?>');
-		
+
 		var clientUTCTimestamp = clientUTCDate.getTime();
 		var serverUTCTimestamp = serverUTCDate.getTime();
 

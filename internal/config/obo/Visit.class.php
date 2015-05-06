@@ -9,6 +9,4 @@ class cfg_obo_Visit
 	const TIME_CONTENT = 'contentTime';
 	const TIME_PRACTICE = 'practiceTime';
 	const TIME_ASSESSMENT = 'assessmentTime';
-
 }
-?>

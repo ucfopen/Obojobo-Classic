@@ -1,10 +1,10 @@
 <?php
 namespace rocketD\util;
 // Memcache singleton object
-abstract class Cache 
+abstract class Cache
 {
 	static private $instance = NULL;
-	
+
 
 	static public function getInstance()
 	{
@@ -15,13 +15,9 @@ abstract class Cache
 		}
 		return self::$instance;
 	}
-	
+
 	abstract public function doRateLimit($ip);
 	abstract public function setModUCFExternalUser($username, $userData);
 	abstract public function clearAllUsers();
 	abstract public function clearAllCache();
-	//abstract public function getModUCFExternalUser($username);
-	//abstract public function getAuthModClassForUser($userID);
-	//	public function setAuthModClassForUser($userID, $class);
 }
-?>
