@@ -1,12 +1,5 @@
 <?php
-/**
- * This is the class that defines the Answer data type
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
-/**
- * This is the class that defines the Answer data type.
- * It is used simply for representing data in memory, and has no methods.
- */
+
 namespace obo\lo;
 class Answer
 {
@@ -25,4 +18,3 @@ class Answer
 		$this->feedback = $feedback;
 	}
 }
-?>

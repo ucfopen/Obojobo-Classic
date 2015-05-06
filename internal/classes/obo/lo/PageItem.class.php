@@ -1,13 +1,5 @@
 <?php
-/**
- * This class defines the PageItem data type.
- * @author Jacob Bates <jbates@mail.ucf.edu>
- */
 
-/**
- * This class defines the PageItem data type.
- * It is used simply for representing data in memory, and has no methods.
- */
 namespace obo\lo;
 class PageItem
 {
@@ -18,7 +10,7 @@ class PageItem
 	public $media;
 	public $advancedEdit;
 	public $options;
-	
+
 	function __construct($pageItemID=0, $component='', $data='', $media=Array(), $advancedEdit=0, $options=NULL)
 	{
 		$this->pageItemID = $pageItemID;
@@ -30,4 +22,3 @@ class PageItem
 		$this->options = $options;
 	}
 }
-?>

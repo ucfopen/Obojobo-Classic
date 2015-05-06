@@ -1,8 +1,9 @@
 <?php
 namespace rocketD\auth;
+
 class ModInternal extends AuthModule
 {
-	protected static $instance;
+	use \rocketD\Singleton;
 
 	const OPT_ENFORCE_RESET = true;
 	// TODO: put password change time into the authmod
@@ -14,31 +15,6 @@ class ModInternal extends AuthModule
 	const RESET_KEY = 'resetKey';
 	const RESET_TIME = 'resetTime';
 
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-
-	public function fetchUserByID($userID = 0)
-	{
-		return parent::fetchUserByID($userID);
-	}
-
-	public function getAllUsers()
-	{
-		return parent::getAllUsers();
-	}
-
-	public function recordExistsForID($userID=0)
-	{
-		return parent::recordExistsForID($userID);
-	}
-
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
@@ -47,14 +23,12 @@ class ModInternal extends AuthModule
 			$this->defaultDBM();
 			if(!$this->DBM->connected)
 			{
-				trace('not connected', true);
-				return false;
+				return array('success' => false, 'error' => 'DB not available');
 			}
 			$this->DBM->startTransaction();
 			$result = parent::createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
-			if($result['success'] == true)
+			if($result['success'] && ! empty($result['userID']))
 			{
-				trace('core user created');
 				// password required before this, no need to check
 				if(!$this->addRecord($result['userID'], $userName, $optionalVars['MD5Pass']))
 				{
@@ -68,13 +42,12 @@ class ModInternal extends AuthModule
 			else
 			{
 				$this->DBM->rollBack();
-				trace(print_r($result, true), true);
-				return $result;
+				trace($result, true);
+				return array('success' => false, 'error' => '');
 			}
 		}
 		else
 		{
-			trace(print_r($valid, true), true);
 			return array('success' => false, 'error' => $valid);
 		}
 	}
@@ -162,37 +135,22 @@ class ModInternal extends AuthModule
 	 **/
 	public function authenticate($requestVars)
 	{
-		// security first, check request vars for valid data
-		// check for required vars
-		// require userName
-		//
 		$success = false;
-		if($this->validateUsername($requestVars['userName']) !== true)
+		$validUsername = ! empty($requestVars['password']) && $this->validateUsername($requestVars['userName']);
+		$validPassword = ! empty($requestVars['password']) && $this->validatePassword($requestVars['password']);
+
+		if ($validUsername && $validPassword)
 		{
-			$success = false;
-		}
-		// requre password
-		elseif($this->validatePassword($requestVars['password']) !== true)
-		{
-			$success = false;
-		}
-		// begin authentication, lookup user id by username
-		elseif($userID = $this->getUIDforUsername($requestVars['userName']))
-		{
-			// fetch the user
-			if($tmpUser = $this->fetchUserByID($userID))
+			$user = $this->fetchUserByLogin($requestVars['userName']);
+
+			if ($user && $this->verifyPassword($user, $requestVars['password']))
 			{
-				// verify the password
-				if($this->verifyPassword($tmpUser, $requestVars['password']))
-				{
-					// login
-					$this->storeLogin($tmpUser->userID);
-					$this->internalUser = $tmpUser;
-					$success = true;
-				}
+				$this->storeLogin($user);
+				$success = true;
 			}
 		}
-		\rocketD\util\Log::profile('login', "'".$requestVars['userName']."','internal','0','".($success?'1':'0')."'");
+
+		profile('login', "'{$requestVars['userName']}','obo-internal','0','".($success?'1':'0')."'");
 		return $success;
 	}
 
@@ -204,7 +162,7 @@ class ModInternal extends AuthModule
 	 **/
 	public function verifyPassword($user, $password)
 	{
-		$user->verified = false; // reset user verified flag
+		$success = false;
 
 		// if password isnt md5, md5 it
 		if( ! \obo\util\Validator::isMD5($password))
@@ -220,10 +178,10 @@ class ModInternal extends AuthModule
 		$dbPw   = $this->getMetaField($user->userID, 'password');
 		if (md5($dbSalt.$password) === $dbPw)
 		{
-			$user->verified = true;
+			$success = true;
 		}
 
-		return $user->verified;
+		return $success;
 	}
 
 	protected function addRecord($userID, $userName, $password)
@@ -273,16 +231,19 @@ class ModInternal extends AuthModule
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($username) > self::MAX_USERNAME_LENGTH)
 		{
-			return 'User name maximum length is 255 characters.';
+			trace("User name maximum length is {self::MAX_USERNAME_LENGTH} characters.", 1);
+			return false;
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($username) < self::MIN_USERNAME_LENGTH)
 		{
-			return 'User name minimum length is 2 characters.';
+			trace("User name minimum length is {self::MIN_USERNAME_LENGTH} characters.", 1);
+			return false;
 		}
-		if(preg_match("/^~{1}[[:alnum:]]{".self::MIN_USERNAME_LENGTH.",".self::MAX_USERNAME_LENGTH."}$/i", $username) == false)
+		if(preg_match(\AppCfg::AUTH_INTERNAL_USERNAME_MATCH, $username) == false)
 		{
-			return 'User name can only contain alpha numeric characters (in addition to the tilda).';
+			trace('User name can only contain alpha numeric characters (in addition to the tilda).', 1);
+			return false;
 		}
 		return true;
 	}
@@ -317,6 +278,12 @@ class ModInternal extends AuthModule
 		if(!$this->validateUID($userID)) return false;
 
 		$this->defaultDBM();
+
+		// no password? create a random one
+		if(empty($newPassword))
+		{
+			$newPassword = $this->createSalt();
+		}
 
 		// if password isnt md5, md5 it
 		if( !\obo\util\Validator::isMD5($newPassword) )
@@ -518,4 +485,6 @@ class ModInternal extends AuthModule
 		}
 		return false;
 	}
+
+	public function syncExternalUser($userName) {}
 }

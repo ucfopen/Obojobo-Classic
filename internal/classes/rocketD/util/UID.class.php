@@ -7,4 +7,3 @@ class UID
 		return uniqid(rand(), true);
 	}
 }
-?>
