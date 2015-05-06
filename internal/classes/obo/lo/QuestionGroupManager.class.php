@@ -3,7 +3,7 @@
  * This class contains all logic pertaining to QuestionGroups
  * @author Jacob Bates <jbates@mail.ucf.edu>
  * @author Luis Estrada <lestrada@mail.ucf.edu>
- * 
+ *
  * map_qgroup child types:
  * 'q' = question
  * 'm' = media
@@ -12,7 +12,7 @@
 /**
  * This class contains all logic pertaining to QuestionGroups
  * This includes creating, retrieving, and deleting of data.
- * 
+ *
  * map_qgroup child types:
  * 'q' = question
  * 'm' = media
@@ -21,23 +21,8 @@ namespace obo\lo;
 class QuestionGroupManager extends \rocketD\db\DBEnabled
 {
 
-	private static $instance;
-	
-	function __construct()
-	{
-		$this->defaultDBM();
-	}
-	
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
+	use \rocketD\Singleton;
+
 	/**
 	 * Gets an entire QuestionGroup from the database, including all questions in it
 	 * @param $gid (number) QuestionGroup ID
@@ -53,14 +38,14 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 	}
 
 	/**
-	 * Creates a new QuestionGroup entry and returns the id of the newly created entry. 
+	 * Creates a new QuestionGroup entry and returns the id of the newly created entry.
 	 * @param $qgroup (QuestionGroup) New QuestionGroup data
 	 * @return (QuestionGroup) The new QuestionGroup including the new ID
 	 */
 		// TODO: remove this
 	public function newGroup($qgroup = '')
 	{
-		
+
 		if(!($qgroup instanceof \obo\lo\QuestionGroup))
 		{
 	        return false;
@@ -77,7 +62,7 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 		$qgroup->qGroupID = $this->DBM->insertID;
 
 		//Fill in the mapping table for the questions in the group, creating new questions as needed
@@ -91,7 +76,7 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 
 		return true;
 	}
-	
+
 	public function mapQuestionToGroup($qgroupID, $questionID, $index, $altIndex=0)
 	{
 		// map the question to the qgroup
@@ -101,7 +86,7 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 			$this->DBM->rollback();
 			return false;
 		}
-		
+
 
 		// store alternate mapping if set
 		if($altIndex > 0)
@@ -116,14 +101,4 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 		return true;
 	}
 
-	
-	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
-	// private function mapQuestion($qgid, $cid, $ctype, $corder)
-
-	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
-	// public function getQuizSize($qGroupID)
-	
-	// NOT USED - CHECK REPO FOR PREVIOUS IMPLIMENTATION
-	//public function delGroup($qgid = 0){}
 }
-?>

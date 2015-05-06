@@ -1,33 +1,10 @@
 <?php
-/**
- * This class handles all logic for Learning Objects
- * @author Jacob Bates <jbates@mail.ucf.edu>
- * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
 
-/**
- * This class handles all logic for Learning Objects.  This includes creating, retrieving, and deleting of data.
- */
 namespace obo\lo;
 class LOManager extends \rocketD\db\DBEnabled
 {
-	private static $instance;
+	use \rocketD\Singleton;
 
-	function __construct()
-	{
-		$this->defaultDBM();
-	}
-
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
 	/**
 	 * Gets the root id of a learning object
 	 * @param $loID (number) Learning Object ID
@@ -50,8 +27,8 @@ class LOManager extends \rocketD\db\DBEnabled
 		if($r->{\cfg_obo_LO::ROOT_LO} == 0) return $loID; // 0 means the loID is the same as the rootID
 		else return $r->{\cfg_obo_LO::ROOT_LO};
 	}
-	
-	
+
+
 	public function addToLibrary($loID=0, $allowDerivative=0)
 	{
 
@@ -75,12 +52,12 @@ class LOManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		if(!\obo\util\Validator::isPosInt($loID) )
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 
 		// check to see if the learning object is a master
 		$lo = new \obo\lo\LO();
@@ -89,9 +66,9 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
 
-		
+
+
 		// set permissions
 		$this->DBM->startTransaction();
 		$permObj = new \obo\perms\Permissions(0, 1, 0, ($allowDerivative ? 1 : 0), 1, 0, 0, 0, 0, 1);
@@ -103,16 +80,16 @@ class LOManager extends \rocketD\db\DBEnabled
 	}
 	/**
 	 * NOTE: Scheme for parent and root links:
-	 * 
+	 *
 	 * When you create a new draft, a X.1 draft is created.  This has a root that points to itself,
 	 * and a parent that points back to (X-1).0.  The X.1 draft is the start of a new master version.
-	 * 
+	 *
 	 * X.2, X.3, etc will have a parent of 0, since this parent is ignored.
 	 * The roots of X.2, X.3, etc will point to X.1.
-	 * 
+	 *
 	 * When you create a master, the drafts will compress and the new (X+1).0 version will take
 	 * the root and parent values of the most recent draft.
-	 * 
+	 *
 	 * Master objects have roots that point to themselves.
 	 *
 	 * @param unknown_type $loID
@@ -131,12 +108,12 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2); // invalid input, doesnt exist
 		}
-	
+
 		// check permissions
 		// Required: (LibraryUser & write perm, ContentCreator & write perm, or SuperUser)
 		$roleMan = \obo\perms\RoleManager::getInstance();
-		if($roleMan->isSuperUser() == false) 
-		{   
+		if($roleMan->isSuperUser() == false)
+		{
 			$permMan = \obo\perms\PermissionsManager::getInstance();
 			if($roleMan->isLibraryUser() == false && $roleMan->isContentCreator() == false)
 			{
@@ -148,21 +125,21 @@ class LOManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(4); // inadiquite permsissions
 			}
 		}
-		
+
 		//******** Permisssion requirements Passed *************
-		
+
 		$lo = new \obo\lo\LO($loID);
 		$saved = $lo->saveAs($this->DBM, 'master');
 		if(is_int($saved) && $saved > 0 )
 		{
 			return $saved;
 		}
-		
+
 		// TODO: return the id of the new lo
 		return false;
 	}
-	
-	
+
+
 
 	/**
 	 * Saves a new draft (even if the learning object is a new rootID) and returns the new id number.
@@ -189,7 +166,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			}
 		}
 		//******** Permisssion requirements Passed *************
-				
+
 		// check for locks
 		$lockMan = \obo\LockManager::getInstance();
 		if($lo->loID > 0)
@@ -200,7 +177,7 @@ class LOManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(3002); // LO is Locked
 			}
 		}
-		
+
 		if($lo->saveAs($this->DBM, \obo\lo\LO::DRAFT))
 		{
 			return $lo;
@@ -209,9 +186,9 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		
+
 	}
-	
+
 	public function createDerivative($loID)
 	{
 		if(! \obo\util\Validator::isPosInt($loID))
@@ -220,9 +197,9 @@ class LOManager extends \rocketD\db\DBEnabled
 		}
 
 		$roleMan = \obo\perms\RoleManager::getInstance();
-		
+
 		//**** Check permissions ****//
-		
+
 		//check if user is a Super User
 		if(!$roleMan->isSuperUser())
 		{
@@ -235,8 +212,8 @@ class LOManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(4);
 			}
 		}
-		
-		
+
+
 		$lo = new \obo\lo\LO($loID);
 		if($lo->saveAs($this->DBM, \obo\lo\LO::DERIVATIVE))
 		{
@@ -245,14 +222,14 @@ class LOManager extends \rocketD\db\DBEnabled
 
 		return \rocketD\util\Error::getError(2); // lo must be a master but isnt
 	}
-	
+
 	public function removeFromLibrary($loID)
 	{
 		if(!\obo\util\Validator::isPosInt($loID))
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		//check to see if the current user has permissions to remove the lo from the library
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		if(!$roleMan->isSuperUser())
@@ -273,7 +250,7 @@ class LOManager extends \rocketD\db\DBEnabled
 				}
 			}
 		}
-		
+
 		if($lo = $this->getLO($loID))
 		{
 			$permMan = \obo\perms\PermissionsManager::getInstance();
@@ -284,8 +261,8 @@ class LOManager extends \rocketD\db\DBEnabled
 			}
 			return false;
 		}
-		
-		
+
+
 		return \rocketD\util\Error::getError(2);
 	}
 
@@ -293,7 +270,7 @@ class LOManager extends \rocketD\db\DBEnabled
 	 * Delete a learning object
 	 * -Must either be SU or have write perms to delete
 	 * -Will fail if there are any instances
-	 * -Will not fail if there are any derivatives 
+	 * -Will not fail if there are any derivatives
 	 * -Will not fail if there are any revisions
 	 * -Actually deletes lo, supporting pages etc will be deleted later
 	 * @param $loID (LO) learning object id
@@ -313,7 +290,7 @@ class LOManager extends \rocketD\db\DBEnabled
 				return \rocketD\util\Error::getError(4);
 			}
 			$lo = $this->getLO($loID);
-			
+
 			$perms = $permMan->getMergedPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO);
 			if($perms instanceof \obo\perms\Permissions)
 			{
@@ -328,7 +305,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			$lo = $this->getLO($loID);
 		}
-		
+
 		//User is trying to delete a Master (1.0, 2.0 3.0) check for existing instances
 		if( $lo->rootID == $loID && $lo->subVersion == 0)
 		{
@@ -355,8 +332,8 @@ class LOManager extends \rocketD\db\DBEnabled
 			return $lo->destroyDrafts($this->DBM, $lo->rootID);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Gets minimum to full information about an LO
 	 * @param $loID (number) learning object id
@@ -391,7 +368,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			$loArr = array();
 			$loArr[] = $loIDArrOrInt;
 		}
-		
+
 		// check for rights to see the lo
 		$roleMan = \obo\perms\RoleManager::getInstance();
 		// NOTE: requesting an array forces this request to meta mode, so permissions do not need to be checked by iterating the array
@@ -452,7 +429,7 @@ class LOManager extends \rocketD\db\DBEnabled
 	 * @param $suid (Number) the user id of user is sharing the lo to
 	 * @param $permObj (Permissions) the permissions object
 	 * @return (bool) TRUE if share was succesful, FALSE otherwise
-	 * 
+	 *
 	 * TODO: develop a way to keep going if the user does not have complete access to the media,
 	 * maybe return an array of the media that was not able to be updated with the new perms
 	 */
@@ -465,7 +442,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		}
 
 		$permMan = \obo\perms\PermissionsManager::getInstance();
-		
+
 		if($permMan->hasPerms($_SESSION['userID'], $loID, \cfg_obo_Perm::TYPE_LO))
 		{
 			if($permMan->hasPerms($permObj->userID, $loID, \cfg_obo_Perm::TYPE_LO))
@@ -484,7 +461,7 @@ class LOManager extends \rocketD\db\DBEnabled
 					return false;
 				}
 			}
-				
+
 			return true;
 		}
 		trace('insufficient perms to share', true);
@@ -503,7 +480,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			trace('invalid input', true);
 			return false;
 		}
-		
+
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER."='0' AND ".\cfg_obo_LO::ROOT_LO."=(SELECT ".\cfg_obo_LO::ROOT_LO." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='?' LIMIT 1) ORDER BY ".\cfg_obo_LO::VER." DESC LIMIT 1";
 		$q = $this->DBM->querySafe($qstr, $loID);
 
@@ -550,7 +527,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='".$loID."' AND ".\cfg_obo_LO::SUB_VER." = 0 ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 			if(!($q = $this->DBM->query($qstr)))
 			{
-				return false;   
+				return false;
 			}
 			if($r = $this->DBM->fetch_obj($q))
 			{
@@ -559,14 +536,14 @@ class LOManager extends \rocketD\db\DBEnabled
 		}
 		return $loArr;
 	}
-	
+
 	public function getMyObjects()
 	{
 		$drafts = $this->getMyDrafts();
 		$masters = $this->getMyMasters();
 		return array_merge( $drafts, $masters );
 	}
-	
+
 	public function getPublicMasters()
 	{
 		$permman = \obo\perms\PermissionsManager::getInstance();
@@ -578,7 +555,7 @@ class LOManager extends \rocketD\db\DBEnabled
 			if($lo instanceof \obo\lo\LO)
 			{
 				$lo->globalPerms = $permman->getGlobalPerms($lo->rootID, \cfg_obo_Perm::TYPE_LO); // add in globalPerms
-				$loArr[] = $lo; 
+				$loArr[] = $lo;
 			}
 		}
 		return $loArr;
@@ -601,7 +578,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ROOT_LO."='?' ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
 		$q = $this->DBM->querySafe($qstr, $rootID);
 
-		// return 
+		// return
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			return $this->getLO($r->{\cfg_obo_LO::ID}, $amount);
@@ -625,7 +602,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$qstr = "SELECT ".\cfg_obo_LO::ROOT_LO." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='?'";
 		$q = $this->DBM->querySafe($qstr, $loID);
 		if($r = $this->DBM->fetch_obj($q))
@@ -643,7 +620,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		trace('Unable to find LO: ' . $loID, true);
 		return false;
 	}
-	
+
 	/**
 	 * Gets a list of all drafts for a given root id
 	 * @param $rootID (number) root learning object id
@@ -657,7 +634,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
-	
+
 		$ret = array();
 
 		$q = $this->DBM->querySafe("SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ROOT_LO."='?' ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC", $rootID);
@@ -687,21 +664,21 @@ class LOManager extends \rocketD\db\DBEnabled
 		{
 		   $loArr[] = $this->getLatestWholeVersion($loID, 'meta');
 		}
-		
+
 		return $loArr;
 	}
 
 	public function getAssessmentID($loID)
 	{
 		$qstr = "SELECT ".\cfg_obo_LO::AGROUP." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID." = '?'";
-		
+
 		if(!($q = $this->DBM->querySafe($qstr, $loID)))
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
 			return false;
 		}
-		
+
 		if($r = $this->DBM->fetch_obj($q))
 		{
 			return $r->{\cfg_obo_LO::AGROUP};
@@ -710,4 +687,3 @@ class LOManager extends \rocketD\db\DBEnabled
 		return false;
 	}
 }
-?>

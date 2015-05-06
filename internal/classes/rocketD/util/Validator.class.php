@@ -53,17 +53,17 @@ class Validator
     {
 		return self::isInt($var) && ($zero ? $var >= 0: $var > 0);
     }
-	
+
 	static function isBoolean($var)
 	{
 		return $var === true || $var === false;
 	}
-	
+
 	static function isPermItemType($type)
 	{
 		return $type == \cfg_core_Perm::TYPE_INSTANCE || $type == \cfg_core_Perm::TYPE_LO || $type == \cfg_core_Perm::ßTYPE_MEDIA;
 	}
-	
+
 	static function isPerm2($perm)
 	{
 		// use relection to get a list of all class constants
@@ -71,35 +71,34 @@ class Validator
 		$consts = array_values($oClass->getConstants());
 		return in_array($perm, $consts);
 	}
-	
+
 	static function isString($var)
 	{
 		return is_string($var) && strlen($var) > 0;
 	}
-	
+
 	static function isMD5($var)
 	{
 		return (bool) preg_match("/^[[:alnum:]]{32}$/i", $var);
 	}
-	
+
 	static function isSHA1($var)
 	{
 		return (bool) preg_match("/^[[:alnum:]]{40}$/i", $var);
 	}
-	
+
 	static function isOneOrZero($num)
 	{
 	    return self::isInt($num) && ($num == 0 || $num == 1);
 	}
-	
+
 	static function isEmail($email)
 	{
 	    return self::isString($email);
 	}
-	
+
 	static function isPhoneNumber($phoneNum)
 	{
 	    return self::isString($phoneNum);
 	}
 }
-?>

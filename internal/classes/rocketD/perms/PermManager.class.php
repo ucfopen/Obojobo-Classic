@@ -3,42 +3,26 @@
 
 	ACL Model
 	The perms system is additive, meaning perms can only be added, not removed by any given permisssion.  by default no permissions exist
-	
+
 	Items: Each Item of a specific item type has permissions, this would allow items to essentially have permissions for every user
-	
+
 	Groups: Each User Group or Role is given blanket permissions.  this allows certain roles to gain access to items
-	
+
 	Users Mapped to Groups: Each user can be given ther permissions from a group.
-	
+
 	Users Mapped to Items: Each user can have permissions for specific items.  This allows multiple people to own an item
 
 */
 namespace RocketD\perms;
 abstract class PermManager extends \rocketD\db\DBEnabled
 {
-	private static $instance; // singleton instance reference
-	
-	static public function getInstance()
-	{
-		if(!isset(self::$instance))
-		{
-			$selfClass = __CLASS__;
-			self::$instance = new $selfClass();
-		}
-		return self::$instance;
-	}
-	
-	public function __construct()
-	{
-		$this->defaultDBM();
-	}
-	
+
 	abstract public function getAllItemIDs($itemType);
-	
+
 	public function getAllGroupsForUser($userID = 0)
 	{
 		$groupIDs = array();
-		$qstr = 	"SELECT R.".\cfg_core_Role::ID.", R.".\cfg_core_Role::ROLE." 
+		$qstr = 	"SELECT R.".\cfg_core_Role::ID.", R.".\cfg_core_Role::ROLE."
 			 FROM ".\cfg_core_Role::MAP_USER_TABLE." AS M, ".\cfg_core_Role::TABLE." AS R
 			WHERE M.".\cfg_core_User::ID."='?' AND M.".\cfg_core_Role::ID." = R.".\cfg_core_Role::ID."";
 		// return logged in user's roles if id is 0 or less, non su users can only use this method
@@ -48,7 +32,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			{
 				return false;
 			}
-			
+
 			while($r = $this->DBM->fetch_obj($q))
 			{
 				$groupIDs[] = $r;
@@ -57,46 +41,29 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		// su can return a anyone's roles
 		else
 		{
-			// TODO: add this back
-			// if($this->isSuperUser())
-			// {	
-			// 	if(!($q = $this->DBM->querySafe($qstr, $userID)))
-			// 	{
-			// 		trace(mysql_error(), true);
-			// 		return false;
-			// 	}
-			// 	
-			// 	while($r = $this->DBM->fetch_obj($q))
-			// 	{
-			// 		$groupIDs[] = $r;
-			// 	}
-			// }
-			// else
-			// {
-				trace(' not super user.', true);
-				return false;
-			//}
+			trace(' not super user.', true);
+			return false;
 		}
 		return $groupIDs;
 	}
-		
+
 	public function getAllItemsForUser($userID, $itemType, $includeGroupRights=true, $includeSessionRights=false)
 	{
 		/** Validate Input **/
-		
+
 		if(!\obo\util\Validator::isPosInt($userID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
 		$allItems = array();
-		
+
 		if($includeGroupRights)
 		{
 			// first get user's roles, they may have rights based on their roles
@@ -152,21 +119,21 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 
 		return $allItems;
 	}
-	
+
 
 	public function getAllUsersIDsForItem($itemType, $itemID, $includeGroupRights=false)
 	{
 		/** Validate Input **/
-		
+
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
 		// TODO: enable group rights option, this would need to find users that are in groups that have rights to this item
@@ -186,37 +153,37 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 			// note, the perms may be redundant if there is more then one entry in the database with the same perms
 			$users[$r->{\cfg_core_User::ID}][] = $r->{\cfg_core_Perm::PERM};
 		}
-		
+
 		return $users;
 	}
-	
+
 	public function getPermsForUserToItem($userID, $itemType, $itemID)
 	{
 		/** Validate Input **/
-		
+
 		if(!\obo\util\Validator::isPosInt($userID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if($perms = \rocketD\util\Cache::getInstance()->getPermsForUserToItem($userID, $itemType, $itemID))
 		{
 			return $perms;
 		}
-		
+
 		$perms = array();
 		$query = "SELECT ".\cfg_core_Perm::PERM." FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." ='0' AND ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_User::ID." = '?'";
 		$q = $this->DBM->querySafe($query, $itemType, $itemID, $userID);
@@ -224,9 +191,9 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		{
 			$perms[] = $r[\cfg_core_Perm::PERM];
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->setPermsFOrUserToItem($userID, $itemType, $itemID, $perms);
-		
+
 		// merge in any session perms:
 		$sessionPerms = $this->getSessionPermsForUserToItem($userID, $itemType, $itemID);
 		if($sessionPerms)
@@ -235,71 +202,71 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		}
 
 		return $perms;
-		
+
 	}
 	public function setPermsForUserToItem($userID, $itemType, $itemID, $addPerms, $remPerms)
 	{
 		/** Validate Input **/
-		
+
 		if(!\obo\util\Validator::isPosInt($userID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
 
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($addPerms) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($remPerms) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Role::ID." ='0', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_User::ID." = '?', ".\cfg_core_Perm::ITEM." = '?', ".\cfg_core_Perm::TYPE." = '?'";
 		foreach($addPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $perm, $userID, $itemID, $itemType);
 		}
-		
+
 		$query = "DELETE FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." = 0 AND ".\cfg_core_Perm::PERM." = '?' AND ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_Perm::TYPE." = '?'";
 		foreach($remPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $perm, $userID, $itemID, $itemType);
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->clearPermsFOrUserToItem($userID, $itemType, $itemID);
 		return true;
 	}
-	
+
 	public function getGlobalPermsForGroups($groupIDs)
 	{
-		
+
 		if($this->_validateGroupArray($groupIDs) == false)
 		{
-			
-			
+
+
 			return \rocketD\util\Error::getError(2);
 		}
 		$perms = array();
-		
+
 		foreach($groupIDs AS $groupID)
 		{
 			/** Get From Cache **/
@@ -327,71 +294,71 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		}
 		else
 		{
-			return $perms; 
+			return $perms;
 		}
 	}
-	
+
 	public function setGlobalPermsForGroup($groupID, $addPerms, $remPerms)
 	{
-		
+
 		if(!\obo\util\Validator::isPosInt($groupID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($addPerms, true) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($remPerms, true) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Role::ID." = '?', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_User::ID." ='0', ".\cfg_core_Perm::ITEM." ='0', ".\cfg_core_Perm::TYPE." ='0'";
 		foreach($addPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $groupID, $perm);
 		}
-		
+
 		$query = "DELETE FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." = '?' AND ".\cfg_core_Perm::PERM." = '?' AND ".\cfg_core_User::ID." ='0' AND ".\cfg_core_Perm::ITEM." ='0' AND ".\cfg_core_Perm::TYPE." ='0'";
 		foreach($remPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $groupID, $perm);
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->clearPermsForGroup($groupID);
 		return true;
 	}
-	
+
 	public function getPermsForItem($itemType, $itemID)
 	{
-		
+
 		/** Validate Input **/
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		/** Get From Cache **/
 		if($perms = \rocketD\util\Cache::getInstance()->getPermsForItem($itemType, $itemID))
 		{
 			return $perms;
 		}
-		
+
 		/** Get From DB **/
 		$perms = array();
 		$query = "SELECT ".\cfg_core_Perm::PERM." FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_User::ID." ='0' AND ".\cfg_core_Role::ID." ='0'";
@@ -400,58 +367,58 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		{
 			$perms[] = $r[\cfg_core_Perm::PERM];
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->setPermsForItem($itemType, $itemID, $perms);
 		return $perms;
 	}
 	public function setPermsForItem($itemType, $itemID, $addPerms, $remPerms)
 	{
-		
+
 		/** Validate Input **/
 		if(!\obo\util\Validator::isPermItemType($itemType))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		if(!\obo\util\Validator::isPosInt($itemID))
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($addPerms) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// allow non array input, but convert it to an array so we can deal with it easily
 		if($this->_validatePermArray($remPerms) == false)
 		{
-			
+
 			return \rocketD\util\Error::getError(2);
 		}
-		
+
 		// add perms
 		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Perm::TYPE." = '?', ".\cfg_core_Perm::ITEM." = '?', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_Role::ID." ='0'";
 		foreach($addPerms AS $perm)
 		{
 			$this->DBM->querySafe($query, $itemType, $itemID, $perm);
 		}
-		
+
 		// remove perms
 		$query = "DELETE FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_Perm::PERM." = '?' AND ".\cfg_core_Role::ID." ='0' ";
 		foreach($remPerms AS $perm)
 		{
 			$this->DBM->querySafe($query, $itemType, $itemID, $perm);
 		}
-		
+
 		\rocketD\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
 		return true;
 	}
-	
+
 	protected function _validatePermArray(&$perms, $allowGroupPerms=false)
 	{
 		// allow non array input, but convert it to an array so we can deal with it easily
@@ -472,7 +439,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		}
 		return true;
 	}
-	
+
 	protected function _validateGroupArray(&$groups)
 	{
 		// allow non array input, but convert it to an array so we can deal with it easily
@@ -591,7 +558,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 	}
 
 	public function getPermsForUserToItemCombined($userID, $itemType, $itemID){}
-	
+
 	public function clearPermsForItem($itemType, $itemID)
 	{
 		// TODO: user must be logged in and be someone who can delete things, maybe user should have delete rights to the item?
@@ -599,11 +566,10 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		$query = "DELETE FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?' ";
 		$this->DBM->querySafe($query, $itemType, $itemID);
 
-		
+
 		\rocketD\util\Cache::getInstance()->clearPermsForItem($itemType, $itemID);
-		
+
 	}
 	public function clearPermsForGroup($groupID){}
 	public function clearPermsForUser($userID){}
 }
-?>

@@ -7,7 +7,7 @@ class Semester
 	public $year;
 	public $startTime;
 	public $endTime;
-	
+
 	public function __construct($semesterID=0, $name='', $year=0, $startTime=0, $endTime=0)
 	{
 		if(is_object($semesterID))
@@ -28,5 +28,3 @@ class Semester
 		}
 	}
 }
-
-?>

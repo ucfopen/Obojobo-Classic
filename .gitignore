@@ -48,3 +48,6 @@ internal/DELETEME/tests/*
 
 # ignore smarty template complied directory
 internal/templates/compiled/*
+
+# ignore the composer directory
+internal/vendor/
