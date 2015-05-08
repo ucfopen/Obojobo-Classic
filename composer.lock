@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "hash": "cd5a657d8e7dc252a9fe858396560c74",
@@ -81,11 +81,11 @@
         },
         {
             "name": "obojobo/ucfauth",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git",
-                "reference": "ab594fc8a4244e3a7d8b47c934395564d711e4f1"
+                "reference": "f3a4d35edadd14e32bdaa2f231a39a42b525c5b3"
             },
             "require": {
                 "php": ">=5.4.0"
@@ -103,7 +103,7 @@
                 }
             ],
             "description": "UCF Nid and SSO authentication modules",
-            "time": "2015-04-01 20:59:04"
+            "time": "2015-05-07 21:52:37"
         },
         {
             "name": "psr/log",
