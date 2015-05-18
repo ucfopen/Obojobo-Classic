@@ -38,8 +38,8 @@
     "extra": {
         "wordpress-install-dir": "wp",
         "installer-paths" : {
-            "wp2/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
-            "wp2/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+            "wp/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "wp/wp-content/themes/{$name}/": ["type:wordpress-theme"]
         }
     },
     "config": {
