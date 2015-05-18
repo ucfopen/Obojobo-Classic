@@ -3,6 +3,8 @@ namespace lti;
 
 class Views
 {
+
+	// @TODO For a class named View, this method is doing too much
 	static public function validateLtiAndRenderAnyErrors($ltiData)
 	{
 		$ltiApi = \lti\API::getInstance();
@@ -42,6 +44,7 @@ class Views
 
 	static public function renderInvalidLTI($ltiData)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'invalid-lti', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-error');
@@ -49,6 +52,7 @@ class Views
 
 	static public function renderUnexpectedError($ltiData, $errorMessage)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'unexpected-error', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '$errorMessage', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		$template->assign('errorMessage', $errorMessage);
@@ -57,6 +61,7 @@ class Views
 
 	static public function renderUnknownAssignmentError($ltiData, $isInstructor = false)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'unknown-assignment', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = self::createErrorTemplate($ltiData);
 		if($isInstructor)
@@ -71,6 +76,7 @@ class Views
 
 	static public function renderUnknownRoleError($ltiData)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'unknown-role', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-role');
@@ -78,6 +84,7 @@ class Views
 
 	static public function renderIncorrectRoleError($ltiData)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'incorrect-role', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".implode(',', $ltiData->roles)."', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-incorrect-role');
@@ -85,6 +92,7 @@ class Views
 
 	static public function renderUnknownUserError($ltiData, $errorDetail='')
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'unknown-user', '$errorDetail', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-user');
@@ -92,6 +100,7 @@ class Views
 
 	static public function renderExpiredError($ltiData)
 	{
+		\lti\Views::logError($ltiData);
 		profile('lti',"'expired', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-expired');
@@ -134,6 +143,7 @@ class Views
 		exit();
 	}
 
+	// @TODO MOVE THIS
 	static public function logError($ltiData = false)
 	{
 		$session = isset($_SESSION) ? print_r($_SESSION, true) : '';
