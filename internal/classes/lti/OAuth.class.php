@@ -49,6 +49,7 @@ class OAuth
 			return $e;
 		}
 
+		\lti\Views::logError($ltiData);
 		return false;
 	}
 
