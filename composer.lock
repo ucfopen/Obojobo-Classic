@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "073a79ade470dc0c54b82ea3e429dd76",
+    "hash": "2fa7e919d346819f094f01ac7cc16a24",
     "packages": [
         {
             "name": "composer/installers",
@@ -258,11 +258,11 @@
         },
         {
             "name": "obojobo-themes/obojobo",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "source": {
                 "type": "git",
                 "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-theme-obojobo.git",
-                "reference": "051bb9584c9b3b5b4dead3f4f1440841639d70c0"
+                "reference": "8744b3c513bba7918f10cfbafcc090759152e4f1"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -278,7 +278,7 @@
                     "email": "zachberry@gmail.com"
                 }
             ],
-            "time": "2015-05-18 20:34:37"
+            "time": "2015-05-18 21:08:10"
         },
         {
             "name": "obojobo/obo-stats",
