@@ -23,15 +23,15 @@ switch($_GET['function'])
 				header("Content-Type: application/download");
 				header("Content-Disposition: attachment; filename=\"{$_GET['filename']}.csv\"");
 				echo "User ID,Last Name,First Name,MI,Score,Date Updated\r\n";
-				
+
 				usort($scores, "compareFunction");
-				
+
 				foreach ($scores as $user)
 				{
 					$score = getCountedScore($user['attempts'], $_GET['method']);
 					if($score != -1) echo $UM->getUserName($user['userID']).','.$user['user']['last'].','.$user['user']['first'].','.$user['user']['mi'].','.$score['score'].','.date('m/d/Y G:i:s',$score['date'])."\r\n";
 				}
-				
+
 				exit();
 			}
 		}
@@ -66,7 +66,7 @@ switch($_GET['function'])
 
 					$fullName = $user->last.', '.$user->first;
 
-					if($score != -1) echo '"'.$fullName.'","","'.$user->login.'","","","'.$score['score'].'","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
+					if($score != -1) echo '"'.$fullName.'","","'.$user->login.'","","","'.$score['score'].'%","'.date('m/d/Y G:i:s',$score['date']).'"'."\r\n";
 				}
 
 				exit();
@@ -108,7 +108,7 @@ function compareFunction($a, $b)
 {
 	$n1 = $a['user']['last'].$a['user']['first'].$a['user']['mi'];
 	$n2 = $b['user']['last'].$b['user']['first'].$b['user']['mi'];
-	
+
 	return strcmp($n1, $n2);
 }
 
@@ -121,7 +121,7 @@ function getCountedScore($scores, $method)
 		if($scoreData['submitted']) $attempts[] = $scoreData;
 	}
 	if(count($attempts) == 0) return -1;
-	
+
 	switch($method)
 	{
 		case 'h': //Highest:
@@ -148,7 +148,7 @@ function getCountedScore($scores, $method)
 			return array('score' => $total/count($scores), 'date' => $attempts[count($attempts)-1]['submitDate']);
 		case 'r': //Recent:
 			// return the last score and date
-			return array('score' => $attempts[count($attempts)-1]['score'], 'date' => $attempts[count($attempts)-1]['submitDate']);  
+			return array('score' => $attempts[count($attempts)-1]['score'], 'date' => $attempts[count($attempts)-1]['submitDate']);
 	}
 	exit();
 }
