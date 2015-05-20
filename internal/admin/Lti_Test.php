@@ -31,7 +31,7 @@ function createTestCase($customParams, $endpoint, $user = false, $passbackUrl = 
 function getAdminUser()
 {
 	$AM = \rocketD\auth\AuthManager::getInstance();
-	return $AM->fetchUserByID(6661);
+	return $AM->fetchUserByID(81384);
 }
 
 function createNewRandomUser()
