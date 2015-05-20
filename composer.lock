@@ -4,8 +4,185 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cd5a657d8e7dc252a9fe858396560c74",
+    "hash": "2fa7e919d346819f094f01ac7cc16a24",
     "packages": [
+        {
+            "name": "composer/installers",
+            "version": "v1.0.21",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/installers.git",
+                "reference": "d64e23fce42a4063d63262b19b8e7c0f3b5e4c45"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/installers/zipball/d64e23fce42a4063d63262b19b8e7c0f3b5e4c45",
+                "reference": "d64e23fce42a4063d63262b19b8e7c0f3b5e4c45",
+                "shasum": ""
+            },
+            "replace": {
+                "roundcube/plugin-installer": "*",
+                "shama/baton": "*"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev",
+                "phpunit/phpunit": "4.1.*"
+            },
+            "type": "composer-installer",
+            "extra": {
+                "class": "Composer\\Installers\\Installer",
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Composer\\Installers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Robinson Young",
+                    "email": "kyle@dontkry.com",
+                    "homepage": "https://github.com/shama"
+                }
+            ],
+            "description": "A multi-framework Composer library installer",
+            "homepage": "http://composer.github.com/installers/",
+            "keywords": [
+                "Craft",
+                "Dolibarr",
+                "Hurad",
+                "MODX Evo",
+                "OXID",
+                "SMF",
+                "Thelia",
+                "WolfCMS",
+                "agl",
+                "aimeos",
+                "annotatecms",
+                "bitrix",
+                "cakephp",
+                "chef",
+                "codeigniter",
+                "concrete5",
+                "croogo",
+                "dokuwiki",
+                "drupal",
+                "elgg",
+                "fuelphp",
+                "grav",
+                "installer",
+                "joomla",
+                "kohana",
+                "laravel",
+                "lithium",
+                "magento",
+                "mako",
+                "mediawiki",
+                "modulework",
+                "moodle",
+                "phpbb",
+                "piwik",
+                "ppi",
+                "puppet",
+                "roundcube",
+                "shopware",
+                "silverstripe",
+                "symfony",
+                "typo3",
+                "wordpress",
+                "zend",
+                "zikula"
+            ],
+            "time": "2015-02-18 17:17:01"
+        },
+        {
+            "name": "johnpbloch/wordpress",
+            "version": "4.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/johnpbloch/wordpress.git",
+                "reference": "998358f3b7a2c75caae11ff3c79e514951aac7f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/998358f3b7a2c75caae11ff3c79e514951aac7f6",
+                "reference": "998358f3b7a2c75caae11ff3c79e514951aac7f6",
+                "shasum": ""
+            },
+            "require": {
+                "johnpbloch/wordpress-core-installer": "~0.2",
+                "php": ">=5.3.2"
+            },
+            "type": "wordpress-core",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "WordPress Community",
+                    "homepage": "http://wordpress.org/about/"
+                }
+            ],
+            "description": "WordPress is web software you can use to create a beautiful website or blog.",
+            "homepage": "http://wordpress.org/",
+            "keywords": [
+                "blog",
+                "cms"
+            ],
+            "time": "2015-05-07 01:46:09"
+        },
+        {
+            "name": "johnpbloch/wordpress-core-installer",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/johnpbloch/wordpress-core-installer.git",
+                "reference": "a4c08e91be99e858c7778c2f52a4d73820147c2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress-core-installer/zipball/a4c08e91be99e858c7778c2f52a4d73820147c2e",
+                "reference": "a4c08e91be99e858c7778c2f52a4d73820147c2e",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "1.0.0"
+            },
+            "conflict": {
+                "composer/installers": "<1.0.6"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "johnpbloch\\Composer\\WordPressCorePlugin"
+            },
+            "autoload": {
+                "psr-0": {
+                    "johnpbloch\\Composer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "John P. Bloch",
+                    "email": "me@johnpbloch.com"
+                }
+            ],
+            "description": "A custom installer to handle deploying WordPress with composer",
+            "time": "2013-09-09 15:04:54"
+        },
         {
             "name": "monolog/monolog",
             "version": "1.13.1",
@@ -80,12 +257,80 @@
             "time": "2015-03-09 09:58:04"
         },
         {
+            "name": "obojobo-themes/obojobo",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-theme-obojobo.git",
+                "reference": "8744b3c513bba7918f10cfbafcc090759152e4f1"
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-theme",
+            "authors": [
+                {
+                    "name": "Ian Turgeon",
+                    "email": "iturgeon@gmail.com"
+                },
+                {
+                    "name": "Zach Berry",
+                    "email": "zachberry@gmail.com"
+                }
+            ],
+            "time": "2015-05-18 21:08:10"
+        },
+        {
+            "name": "obojobo/obo-stats",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-obojobo-stats.git",
+                "reference": "2ca89ffde47485cf1a2f3f14f19258cc099a7046"
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "authors": [
+                {
+                    "name": "Ian Turgeon",
+                    "email": "iturgeon@gmail.com"
+                },
+                {
+                    "name": "Zach Berry",
+                    "email": "zachberry@gmail.com"
+                }
+            ],
+            "time": "2015-05-18 20:03:23"
+        },
+        {
+            "name": "obojobo/rocketD",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-rocketd-auth.git",
+                "reference": "ce8d30ced0c96242ade22a29cb7f52a6b13bf240"
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "authors": [
+                {
+                    "name": "Ian Turgeon",
+                    "email": "iturgeon@gmail.com"
+                }
+            ],
+            "time": "2015-05-18 20:20:11"
+        },
+        {
             "name": "obojobo/ucfauth",
-            "version": "0.0.3",
+            "version": "0.0.4",
             "source": {
                 "type": "git",
                 "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git",
-                "reference": "f3a4d35edadd14e32bdaa2f231a39a42b525c5b3"
+                "reference": "d4b9aadc224e22808e4e9b2896384e48d69a9df8"
             },
             "require": {
                 "php": ">=5.4.0"
@@ -103,7 +348,7 @@
                 }
             ],
             "description": "UCF Nid and SSO authentication modules",
-            "time": "2015-05-07 21:52:37"
+            "time": "2015-05-08 17:41:35"
         },
         {
             "name": "psr/log",
@@ -142,6 +387,66 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "wpackagist-plugin/page-list",
+            "version": "5.0",
+            "source": {
+                "type": "svn",
+                "url": "http://plugins.svn.wordpress.org/page-list/",
+                "reference": "tags/5.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/page-list.5.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/page-list/"
+        },
+        {
+            "name": "wpackagist-plugin/table-of-contents-plus",
+            "version": 1505,
+            "source": {
+                "type": "svn",
+                "url": "http://plugins.svn.wordpress.org/table-of-contents-plus/",
+                "reference": "tags/1505"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/table-of-contents-plus.1505.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/table-of-contents-plus/"
+        },
+        {
+            "name": "wpackagist-plugin/wordpress-importer",
+            "version": "0.6.1",
+            "source": {
+                "type": "svn",
+                "url": "http://plugins.svn.wordpress.org/wordpress-importer/",
+                "reference": "tags/0.6.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wordpress-importer.0.6.1.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/wordpress-importer/"
         }
     ],
     "packages-dev": [],
@@ -150,6 +455,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.4"
+    },
     "platform-dev": []
 }

@@ -3,13 +3,44 @@
     "minimum-stability": "stable",
     "repositories": [
         {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        },
+        {
             "type": "git",
             "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git"
+        },
+        {
+            "type": "git",
+            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-obojobo-stats.git"
+        },
+        {
+            "type": "git",
+            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-rocketd-auth.git"
+        },
+        {
+            "type": "git",
+            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-theme-obojobo.git"
         }
     ],
     "require": {
+        "php": ">=5.4",
         "monolog/monolog": "~1.13",
-        "obojobo/ucfauth": "*"
+        "obojobo/ucfauth": "*",
+        "johnpbloch/wordpress": "4.2.2",
+        "obojobo/obo-stats": "*",
+        "obojobo/rocketD": "*",
+        "obojobo-themes/obojobo": "*",
+        "wpackagist-plugin/table-of-contents-plus": "1505",
+        "wpackagist-plugin/page-list": "5.0",
+        "wpackagist-plugin/wordpress-importer": "0.6.1"
+    },
+    "extra": {
+        "wordpress-install-dir": "wp",
+        "installer-paths" : {
+            "wp/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "wp/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+        }
     },
     "config": {
         "vendor-dir": "internal/vendor"
