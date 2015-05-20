@@ -149,21 +149,42 @@ class AppCfgDefault
 
 	// Define Idle Time Logout in seconds
 	const AUTH_TIMEOUT = 1800; // 30 minute timeout
-	//const AUTH_TIMEOUT = 1; // 30 minute timeout
 	const AUTH_TIMEOUT_REMOTING = 240; // 4 minute timeout
-	//const AUTH_TIMEOUT_REMOTING = 1; // 4 minute timeout
+
+	// add in camma seperated class names of authentication plugins to us
+	const AUTH_PLUGINS = '\rocketD\auth\ModLTI,\rocketD\auth\ModInternal';
 
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
+	const AUTH_INTERNAL_USERNAME_MATCH = "/^[a-zA-Z0-9\~_]+$/i";
 
 	//--------------------   PLUGINS   -----------------------//
-	// add in camma seperated class names of authentication plugins to us
-	const AUTH_PLUGINS = '\rocketD\auth\ModInternal';
 
 	// add in camma seperated names of plugins from the internal/plugins/ directory
 	const CORE_PLUGINS = '';
+	const GOOGLE_ANALYTICS_ID = '';
 
-	//-----------------   PLUGIN SETTINGS   -----------------//
-	// Never set true in production, [true, false]
-	// const UCF_AUTH_BYPASS_PASSWORDS = false;
+	// REQUIRED MATERIA LTI (using materia in obojobo via lti)
+	const MATERIA_LTI_URL = 'https://materia.qa.cdl.ucf.edu/lti/assignment';
+	const MATERIA_LTI_PICKER_URL = 'https://materia.qa.cdl.ucf.edu/lti/picker';
+	const MATERIA_LTI_SECRET  = 'secret';
+	const MATERIA_LTI_KEY  = 'key';
+	const MATERIA_LTI_TIMELIMIT = 3600; // OAUTH TIME LIMIT - 1 hr
+
+
+	// REQUIRED MODLTI (using obojobo in something else as an lti)
+	const LTI_LAUNCH_PRESENTATION_RETURN_URL = 'lti/return.php';
+	const LTI_EXTERNAL_AUTHMOD = '\Ucfauth\NID';
+	const LTI_OAUTH_KEY = 'key';
+	const LTI_OAUTH_SECRET = 'secret';
+	const LTI_OAUTH_TIMEOUT = 3600;
+	const LTI_REMOTE_USERNAME_FIELD = 'lis_person_sourcedid';
+	const LTI_CREATE_USER_IF_MISSING = true;
+	const LTI_USE_ROLE = true;
+
+	// REQUIRED CREDHUB @TODO - these shouldnt be required
+	const CREDHUB_KEY = 'qa-key';
+	const CREDHUB_SECRET = 'secret';
+	const CREDHUB_URL = 'https://badges.qa.online.ucf.edu/api/badges/award';
+	const CREDHUB_TIMEOUT = 1800000;
 }
