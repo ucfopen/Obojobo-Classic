@@ -21,6 +21,8 @@ class API extends \rocketD\db\DBEnabled
 
 		$success = $AM->authenticate(array('userName' => $ltiData->username, 'validLti' => true, 'ltiData' => $ltiData));
 
+		if ( ! $success) \lti\Views::logError($ltiData);
+
 		return $success;
 	}
 
