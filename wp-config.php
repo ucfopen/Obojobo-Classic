@@ -67,14 +67,14 @@ define('FS_METHOD', 'direct');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         ':UkH*J)D_ke}Nw< bKhW*Gk6OJA-CT]3i/9.exT1R55`y;f5wT3x*:!b7LO`RX8,');
-define('SECURE_AUTH_KEY',  'DdYeK7qPXvt:x}Hf`I](p8p~VQ{N})}A3eSNj2.,Db7rN{7@y`* N|}b;vbF%P9i');
-define('LOGGED_IN_KEY',    'wfK[Uz%!J1XJ4@pg(JA<i_Typ> M/7IPi5 VX_/^lRpkJ0e=`+=_kLw|-za^;3y@');
-define('NONCE_KEY',        '/]=*>HLHqGwow%zQP#AFFhlCHvMl}UIoD]iX*<c4jvWcCE} nzm[+[7 {uKwwvmu');
-define('AUTH_SALT',        's]Pk`epML[MeFU7r21*M/ NRbus(EM)5qccznyEVVSqQ4^0dR?+Zc(fw`JGr{O]C');
-define('SECURE_AUTH_SALT', 'x63o?V2t<h5RM~)3&AINQ4}|ic3|by9ZxUY?W4V(i.{s4?0=bC 2~3.F8_P=a;.|');
-define('LOGGED_IN_SALT',   'lNz|zi 3z3xgRU;? |,u*sG1dhKReF9;=4;rKVt<Ql$y{o}#o3j7e%9vPPc{-]e|');
-define('NONCE_SALT',       'q4oI@:*nJ>2OLx@Cs(o)xFsRCWlog/@&)@fO+=&g!:sm]doP9GiW.Lshec]L>*lF');
+define('AUTH_KEY',         AppCfg::WP_AUTH_KEY);
+define('SECURE_AUTH_KEY',  AppCfg::WP_SECURE_AUTH_KEY);
+define('LOGGED_IN_KEY',    AppCfg::WP_LOGGED_IN_KEY);
+define('NONCE_KEY',        AppCfg::WP_NONCE_KEY);
+define('AUTH_SALT',        AppCfg::WP_AUTH_SALT);
+define('SECURE_AUTH_SALT', AppCfg::WP_SECURE_AUTH_SALT);
+define('LOGGED_IN_SALT',   AppCfg::WP_LOGGED_IN_SALT);
+define('NONCE_SALT',       AppCfg::WP_NONCE_SALT);
 
 /**#@-*/
 
