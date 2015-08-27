@@ -187,4 +187,25 @@ class AppCfgDefault
 	const CREDHUB_SECRET = 'secret';
 	const CREDHUB_URL = 'https://badges.qa.online.ucf.edu/api/badges/award';
 	const CREDHUB_TIMEOUT = 1800000;
+
+	static $SAML_CONFIG = array(
+		'sp' => array (
+			'entityId' => 'https://kogneatotest.cdl.ucf.edu/saml/metadata',
+			'assertionConsumerService' => array (
+				'url' => 'https://kogneatotest.cdl.ucf.edu/saml/acs',
+				'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+			),
+			'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+			'x509cert' => 'PUBLIC_KEY_HERE',
+			'privateKey' => 'PRIVATE_KEY_HERE',
+		),
+		'idp' => array (
+			'entityId' => 'https://idp.cc.ucf.edu/idp/shibboleth',
+			'singleSignOnService' => array (
+				'url' => 'https://idp.cc.ucf.edu/idp/profile/SAML2/Redirect/SSO',
+				'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+			),
+			'x509cert' => 'PUBLIC_KEY_HERE'
+		),
+	);
 }
