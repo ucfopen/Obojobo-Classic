@@ -124,6 +124,7 @@ function initLoginScreen()
 			<header id="login-header">
 				<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
 
+				<?php if (isset($course)) { ?>
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
 
 				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
@@ -133,7 +134,13 @@ function initLoginScreen()
 			<form id="login-form" class="overview-details " method="post">
 				<h1>Login to Begin</h1>
 				<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
+				
 				<ul>
+					<?php
+					$loginDest = "with UCF";
+					if (isset($_REQUEST['bypass'])) {
+					    $loginDest = "to Obojobo";
+					?>
 					<li>
 						<label for="username">UCF NID</label><br>
 						<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
@@ -142,8 +149,9 @@ function initLoginScreen()
 						<label for="password">Password</label><br>
 						<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
 					</li>
+					<?php } ?>
 					<li>
-						<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3">
+					<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login <?= $loginDest ?>" tabindex="3">
 					</li>
 				</ul>
 				<ul class="foot">
