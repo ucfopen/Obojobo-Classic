@@ -152,24 +152,34 @@ body
 
 	#login-page #login-form #signInSubmit
 	{
+		position: relative;
+		top: 13px;
+		margin: auto;
 		display: block;
-		width: 82px;
-		height: 30px;
 		cursor: pointer;
 		font-family: "lato",Arial;
-		background: url('/assets/images/viewer/login_button.png');
-		border: none;
 		font-weight: bold;
-		font-size: 12pt;
-		color: #303030;
-		text-shadow: #c2c2c2 1px 1px 1px;
+		font-size: 16pt;
+		color: #fff;
+		text-shadow: #333 1px 1px 1px;
+		border: solid 1px #999;
+		border-radius: 4px;
 		border-image: initial;
+		padding: 12px;
+		background: rgb(175,199,220); /* Old browsers */
+		background: -moz-linear-gradient(top, rgba(175,199,220,1) 0%, rgba(113,152,180,1) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(175,199,220,1)), color-stop(100%,rgba(113,152,180,1))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top, rgba(175,199,220,1) 0%,rgba(113,152,180,1) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top, rgba(175,199,220,1) 0%,rgba(113,152,180,1) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top, rgba(175,199,220,1) 0%,rgba(113,152,180,1) 100%); /* IE10+ */
+		background: linear-gradient(to bottom, rgba(175,199,220,1) 0%,rgba(113,152,180,1) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#afc7dc', endColorstr='#7198b4',GradientType=0 ); /* IE6-9 */
 	}
 
 	#login-page #login-form h1
 	{
 		text-align: center;
-		color: #86273d;
+		color: #000;
 		font-weight: 900;
 		font-size: 1.6em;
 	}
