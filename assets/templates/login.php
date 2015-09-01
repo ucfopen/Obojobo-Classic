@@ -126,6 +126,7 @@ function initLoginScreen()
 
 				<?php if (isset($course)) { ?>
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
+				<?php } ?>
 
 				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
 				<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3>
@@ -151,7 +152,7 @@ function initLoginScreen()
 					</li>
 					<?php } ?>
 					<li>
-					<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login <?= $loginDest ?>" tabindex="3">
+					<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3">
 					</li>
 				</ul>
 				<ul class="foot">
