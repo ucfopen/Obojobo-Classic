@@ -26,7 +26,7 @@
 		{$message}
 		<h3>Technical Support</h3>
 		<dl>
-			<dt>Online@UCF Support</dt> <dd><a target="_blank" href="http://learn.ucf.edu/support/">http://learn.ucf.edu/support/</a></dd>
+			<dt>Online@UCF Support</dt> <dd><a target="_blank" href="http://online.ucf.edu/support/">http://online.ucf.edu/support/</a></dd>
 			<dt>Email</dt> <dd><a href="mailto:onlinesupport@ucf.edu">onlinesupport@ucf.edu</a></dd>
 			<dt>Phone</dt> <dd>(407) 823-0407</dd>
 		</dl>
