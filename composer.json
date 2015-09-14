@@ -27,11 +27,11 @@
         "php": ">=5.4",
         "monolog/monolog": "~1.13",
         "obojobo/ucfauth": "*",
-        "johnpbloch/wordpress": "4.2.4",
+        "johnpbloch/wordpress": "4.3.0",
         "obojobo/obo-stats": "*",
         "obojobo/rocketD": "*",
         "obojobo-themes/obojobo": "*",
-        "wpackagist-plugin/table-of-contents-plus": "1507",
+        "wpackagist-plugin/table-of-contents-plus": "1509",
         "wpackagist-plugin/page-list": "5.1",
         "wpackagist-plugin/wordpress-importer": "0.6.1"
     },
