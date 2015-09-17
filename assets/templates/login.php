@@ -128,14 +128,16 @@ function initLoginScreen()
 				<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
 				<?php } ?>
 
+				<?php if(isset($_REQUEST['loID']) || ($startTime > 0 && $endTime > 0)) { ?>
 				<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
 				<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3>
+				<?php } ?>
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">
 				<h1>Login to Begin</h1>
 				<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
-				
+
 				<ul>
 					<?php
 					$loginDest = "with UCF";
