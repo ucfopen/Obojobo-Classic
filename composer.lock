@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f1d1484fd24d9ff52b28dd65aec23302",
-    "content-hash": "0b3fd4cfded47d1fadba4a04f2d6fa30",
+    "hash": "6e6103a9837af2b4d46c761f497f5aa7",
     "packages": [
         {
             "name": "composer/installers",
@@ -268,7 +267,7 @@
             "version": "0.0.2",
             "source": {
                 "type": "git",
-                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-theme-obojobo.git",
+                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git",
                 "reference": "8744b3c513bba7918f10cfbafcc090759152e4f1"
             },
             "require": {
@@ -292,7 +291,7 @@
             "version": "0.0.2",
             "source": {
                 "type": "git",
-                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-obojobo-stats.git",
+                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git",
                 "reference": "2ca89ffde47485cf1a2f3f14f19258cc099a7046"
             },
             "require": {
@@ -316,7 +315,7 @@
             "version": "0.0.1",
             "source": {
                 "type": "git",
-                "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-rocketd-auth.git",
+                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git",
                 "reference": "ce8d30ced0c96242ade22a29cb7f52a6b13bf240"
             },
             "require": {
@@ -336,7 +335,7 @@
             "version": "0.0.7",
             "source": {
                 "type": "git",
-                "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git",
+                "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
                 "reference": "e89d35db884193e4b7296b221dca1bd15330cf02"
             },
             "require": {
