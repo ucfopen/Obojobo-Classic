@@ -8,19 +8,19 @@
         },
         {
             "type": "git",
-            "url": "git@clu.cdl.ucf.edu:obojobo/ucfauth.git"
+            "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git"
         },
         {
             "type": "git",
-            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-obojobo-stats.git"
+            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-plugin-rocketd-auth.git"
+            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@clu.cdl.ucf.edu:obojobo/wordpress-theme-obojobo.git"
+            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git"
         }
     ],
     "require": {
