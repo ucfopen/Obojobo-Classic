@@ -2,19 +2,7 @@
 require_once("internal/app.php");
 $API = \obo\API::getInstance();
 
-// ================ LOGIN OR CHECK EXISTING LOGIN ===========================
-if( isset($_REQUEST['username']) && isset($_REQUEST['password']) )
-{
-  $loggedIn = $API->doLogin($_REQUEST['username'],  $_REQUEST['password']);
-  if($loggedIn !== true)
-  {
-    $notice = 'Invalid Login';
-  }
-}
-else
-{
-  $loggedIn = $API->getSessionValid();
-}
+require("login.php");
 
 // ================= CHECK FOR REQUIRED ROLE =======================
 
@@ -91,5 +79,5 @@ else
   }
 
   // =============== RENDER LOGIN TEMPLATE ========================
-  include("assets/templates/login.php");
+  include('assets/templates/login.php');
 }
