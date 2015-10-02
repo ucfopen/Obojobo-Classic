@@ -1,10 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6e6103a9837af2b4d46c761f497f5aa7",
+    "hash": "7bbe1140ddff7a7aa58f98b0617f2cb9",
+    "content-hash": "56150ece0ec31c6015225a164e28a819",
     "packages": [
         {
             "name": "composer/installers",
@@ -332,14 +333,15 @@
         },
         {
             "name": "obojobo/ucfauth",
-            "version": "0.0.7",
+            "version": "0.0.8",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
-                "reference": "e89d35db884193e4b7296b221dca1bd15330cf02"
+                "reference": "0fa9cd1fb36ded976c13e1c34185b6c7b1b9910f"
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.4.0",
+                "ucfcdl/php-saml": "master-dev"
             },
             "type": "library",
             "autoload": {
@@ -354,7 +356,7 @@
                 }
             ],
             "description": "UCF Nid and SSO authentication modules",
-            "time": "2015-09-14 17:09:31"
+            "time": "2015-10-02 21:11:31"
         },
         {
             "name": "psr/log",
@@ -393,6 +395,54 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "ucfcdl/php-saml",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ucfcdl/php-saml.git",
+                "reference": "3ea2095e1c9526adb80ee0da7f09a0648a6836d5"
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "1.1.0",
+                "phploc/phploc": "*",
+                "satooshi/php-coveralls": "dev-master",
+                "sebastian/phpcpd": "*",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "suggest": {
+                "ext-gettext": "Install gettext and php5-gettext libs to handle translations",
+                "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
+                "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "extlib/xmlseclibs",
+                    "lib/Saml",
+                    "lib/Saml2"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "OneLogin PHP SAML Toolkit",
+            "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
+            "keywords": [
+                "onelogin",
+                "saml",
+                "saml2"
+            ],
+            "support": {
+                "email": "sixto.garcia@onelogin.com",
+                "issues": "https://github.com/onelogin/php-saml/issues",
+                "source": "https://github.com/onelogin/php-saml/"
+            },
+            "time": "2015-10-02 19:20:12"
         },
         {
             "name": "wpackagist-plugin/page-list",
@@ -458,7 +508,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "ucfcdl/php-saml": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
