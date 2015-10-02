@@ -15,6 +15,8 @@ class ModInternal extends AuthModule
 	const RESET_KEY = 'resetKey';
 	const RESET_TIME = 'resetTime';
 
+	public static AUTH_MOD_NAME = 'rocketD\auth\ModInternal';
+
 	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
 	{
 		$valid = $this->checkRegisterPossible($userName, $fName, $lName, $mName, $email, $optionalVars);
