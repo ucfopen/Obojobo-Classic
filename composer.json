@@ -30,7 +30,7 @@
     "require": {
         "php": ">=5.4",
         "ucfcdl/php-saml": "master-dev",
-        "obojobo/ucfauth": "1.0.0-alpha.1",
+        "obojobo/ucfauth": "1.0.0-alpha.2",
         "monolog/monolog": "~1.13",
         "johnpbloch/wordpress": "4.3.0",
         "obojobo/obo-stats": "*",
