@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7bbe1140ddff7a7aa58f98b0617f2cb9",
-    "content-hash": "56150ece0ec31c6015225a164e28a819",
+    "hash": "0dcd38c9f9c143d815b53a2163fe08c9",
+    "content-hash": "d72fb9a20fc47c9279f4c67a0acd5664",
     "packages": [
         {
             "name": "composer/installers",
@@ -333,11 +333,11 @@
         },
         {
             "name": "obojobo/ucfauth",
-            "version": "0.0.9",
+            "version": "1.0.0-alpha.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
-                "reference": "2c8a9574f764a6ad559326b20b170e3d8503160b"
+                "reference": "d4ff7232b6ac64c5e5b385c262a8e42b9a7f0562"
             },
             "require": {
                 "php": ">=5.4.0",
@@ -509,7 +509,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ucfcdl/php-saml": 20
+        "ucfcdl/php-saml": 20,
+        "obojobo/ucfauth": 15
     },
     "prefer-stable": false,
     "prefer-lowest": false,
