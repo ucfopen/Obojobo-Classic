@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0dcd38c9f9c143d815b53a2163fe08c9",
-    "content-hash": "d72fb9a20fc47c9279f4c67a0acd5664",
+    "hash": "1d05e86f7d50d0ee35c1baae713eaa89",
+    "content-hash": "aa6c4583ad4cac7b6fdc8874ddc7368e",
     "packages": [
         {
             "name": "composer/installers",
@@ -333,11 +333,11 @@
         },
         {
             "name": "obojobo/ucfauth",
-            "version": "1.0.0-alpha.1",
+            "version": "1.0.0-alpha.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
-                "reference": "d4ff7232b6ac64c5e5b385c262a8e42b9a7f0562"
+                "reference": "a65ea5aab2522017d1bea1c7a96fe85fc38aa749"
             },
             "require": {
                 "php": ">=5.4.0",
@@ -356,7 +356,7 @@
                 }
             ],
             "description": "UCF Nid and SSO authentication modules",
-            "time": "2015-10-02 21:41:30"
+            "time": "2015-10-07 20:37:18"
         },
         {
             "name": "psr/log",
