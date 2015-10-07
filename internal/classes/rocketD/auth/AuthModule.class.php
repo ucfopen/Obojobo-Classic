@@ -113,7 +113,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				return false;
 			}
 
-			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, static::$AUTH_MOD_NAME));
+			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, static::$AUTH_MOD_NAME);
 			if($r = $this->DBM->fetch_obj($q))
 			{
 				// store in memcache
