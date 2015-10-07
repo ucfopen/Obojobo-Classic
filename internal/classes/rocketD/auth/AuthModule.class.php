@@ -8,7 +8,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	const COL_PW_RESET_DATE = 'resetPasswordDate';
 	const CAN_CHANGE_PW = false; // override this!
 
-	public static AUTH_MOD_NAME = 'rocketD\auth\AuthModule';
+	public static $AUTH_MOD_NAME = 'rocketD\auth\AuthModule';
 
 	abstract public function authenticate($requestVars);
 	abstract public function isPasswordCurrent($userID);
@@ -44,7 +44,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 		//Fetch user data
 		$qstr = "SELECT * FROM  ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' and ".\cfg_core_User::AUTH_MODULE." = '?' ";
-		$q = $this->DBM->querySafe($qstr ,$userID, static::AUTH_MOD_NAME);
+		$q = $this->DBM->querySafe($qstr ,$userID, static::$AUTH_MOD_NAME);
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
 
 		//store in memcache
@@ -113,7 +113,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				return false;
 			}
 
-			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, static::AUTH_MOD_NAME));
+			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, static::$AUTH_MOD_NAME));
 			if($r = $this->DBM->fetch_obj($q))
 			{
 				// store in memcache
