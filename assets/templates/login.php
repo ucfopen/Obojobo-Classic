@@ -106,7 +106,7 @@ function initLoginScreen()
 	$("label").inFieldLabels();
 
 	<?php
-	if($startTime > 0 && $endTime > 0)
+	if(! empty($startTime) && ! empty($endTime) && $startTime > 0 && $endTime > 0)
 	{
 		?>
 		var startTime = new Date(<?php echo $startTime * 1000; ?>);
