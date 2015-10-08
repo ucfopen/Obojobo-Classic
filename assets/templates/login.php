@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<?php
+$hasTime = ! empty($startTime) && ! empty($endTime) && $startTime > 0 && $endTime > 0;
+?><!DOCTYPE html>
 <html>
 <head>
 <title><?php echo $title; ?> | Obojobo Learning Object</title>
@@ -105,7 +107,7 @@ function initLoginScreen()
 {
 	$("label").inFieldLabels();
 
-	<?php if(! empty($startTime) && ! empty($endTime) && $startTime > 0 && $endTime > 0) : ?>
+	<?php if($hasTime) : ?>
 		var startTime = new Date(<?php echo $startTime * 1000; ?>);
 		var endTime = new Date(<?php echo $endTime * 1000; ?>);
 		$('#start-time').html('Begins: <em>' + startTime.format('mm/dd/yy') + '</em> at <em>' + startTime.format('h:MM TT') + '</em>');
@@ -120,11 +122,11 @@ function initLoginScreen()
 			<header id="login-header">
 				<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
 
-				<?php if (isset($course)) : ?>
+				<?php if (isset($course)): ?>
 					<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
-				<?php endif ?>
+				<?php endif; ?>
 
-				<?php if(isset($_REQUEST['loID']) || ($startTime > 0 && $endTime > 0)) : ?>
+				<?php if(isset($_REQUEST['loID']) || $hasTime) : ?>
 					<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
 					<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3>
 				<?php endif ?>
