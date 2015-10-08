@@ -1,8 +1,6 @@
 <?php
 // TODO: see if we can move this stuff into the SAML auth mod
 
-// $loggedIn = $API->getSessionValid();
-
 // ================ LOGIN OR CHECK EXISTING LOGIN ===========================
 //  cmdweblogin = login submit form, SAMLResponse = we just came back from SAML
 if (isset($_REQUEST['cmdweblogin']) || isset($_REQUEST['SAMLResponse']))

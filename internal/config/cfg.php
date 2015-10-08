@@ -187,4 +187,5 @@ class AppCfgDefault
 	const CREDHUB_SECRET = 'secret';
 	const CREDHUB_URL = 'https://badges.qa.online.ucf.edu/api/badges/award';
 	const CREDHUB_TIMEOUT = 1800000;
+
 }
