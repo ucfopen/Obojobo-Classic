@@ -69,7 +69,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		$this->defaultDBM();
 		$users = array();
-		$q = $this->DBM->query("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::AUTH_MODULE." = '".get_class($this)."'");
+		$q = $this->DBM->query("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::AUTH_MODULE." = '".static::$AUTH_MOD_NAME."'");
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			if($newUser = $this->fetchUserByID($r->{\cfg_core_User::ID}))
@@ -192,10 +192,10 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	 **/
 	protected function storeLogin($user)
 	{
-		if ( ! $this->validateUID($user->userID))
+		if ( ! ($user instanceof \rocketD\auth\User) || ! $this->validateUID($user->userID))
 		{
 			trace('userID not valid', true);
-			return void;
+			return;
 		}
 
 		if ( ! session_id())
@@ -219,7 +219,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		if(!$this->validateUID($userID)) return false;
 		$this->defaultDBM();
-		$q = $this->DBM->querySafe("SELECT * FROM ". \cfg_core_User::TABLE ." WHERE ". \cfg_core_User::ID ."='?' AND ".\cfg_core_User::AUTH_MODULE." = '?'", $userID, get_class($this));
+		$q = $this->DBM->querySafe("SELECT * FROM ". \cfg_core_User::TABLE ." WHERE ". \cfg_core_User::ID ."='?' AND ".\cfg_core_User::AUTH_MODULE." = '?'", $userID, static::$AUTH_MOD_NAME);
 		return $this->DBM->fetch_num($q) > 0;
 	}
 

@@ -78,7 +78,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 
 		if ($this->authenticate($requestVars))
 		{
-			if ($_SESSION['passed'] === true)
+			if ( !empty($_SESSION['passed']) && $_SESSION['passed'] === true)
 			{
 				return true;
 			}
@@ -369,7 +369,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		if($authMod = $this->getAuthModuleForUserID($_SESSION['userID']))
 		{
 			// does the authmod allow changing passwords?
-			if(constant(get_class($authMod) . '::CAN_CHANGE_PW') == false) return false;
+			if(constant($authMod::$AUTH_MOD_NAME . '::CAN_CHANGE_PW') == false) return false;
 			// is the old pass valid
 			if($authMod->validatePassword($oldpass) !== true) return false;
 			// is the new pass valid
@@ -434,6 +434,8 @@ class AuthManager extends \rocketD\db\DBEnabled
 				// attempt to authenticate each in order
 				if($authMod->authenticate($requestVars))
 				{
+					if (empty($_SESSION)) continue;
+
 					// keep record of the authmod used
 					if($_SESSION['passed'] === true)
 					{
@@ -558,7 +560,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 				if($authMod->recordExistsForID($userID))
 				{
 					// store in memcache
-					\rocketD\util\Cache::getInstance()->setAuthModClassForUser($userID, get_class($authMod) );
+					\rocketD\util\Cache::getInstance()->setAuthModClassForUser($userID, $authMod::$AUTH_MOD_NAME );
 					return $authMod;
 				}
 			}

@@ -102,26 +102,24 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function getUser($username = false )
 	{
-		if($this->getSessionValid())
+		if ( ! $this->getSessionValid())
 		{
-			$UM = \rocketD\auth\AuthManager::getInstance();
-			if($username === false)
-			{
-				$result = $UM->fetchUserByID($_SESSION['userID']);
-			}
-			else
-			{
-				$RM = \obo\perms\RoleManager::getInstance();
-				if($RM->isAdministrator())
-				{
-					$result = $UM->fetchUserByUserName($username);
-				}
+			return \rocketD\util\Error::getError(1);
+		}
 
-			}
+		$UM = \rocketD\auth\AuthManager::getInstance();
+
+		if($username === false)
+		{
+			$result = $UM->fetchUserByID($_SESSION['userID']);
 		}
 		else
 		{
-			$result = \rocketD\util\Error::getError(1);
+			if(\obo\perms\RoleManager::getInstance()->isAdministrator())
+			{
+				$result = $UM->fetchUserByUserName($username);
+			}
+
 		}
 		return $result;
 	}
