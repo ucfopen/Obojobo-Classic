@@ -337,7 +337,7 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
-                "reference": "5858c98baffaf96d9c7862ee616d458d5a4caf2a"
+                "reference": "cc7a916c368b67ca5a81a1a23006b82d7f47976b"
             },
             "require": {
                 "php": ">=5.4.0",
