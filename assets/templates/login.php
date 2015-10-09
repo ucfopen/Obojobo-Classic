@@ -123,11 +123,12 @@ function initLoginScreen()
 			<header id="login-header">
 				<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
 
-				<?php if (isset($course)) : ?>
+				<?php if (isset($course)): ?>
 					<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
-				<?php endif ?>
+				<?php endif; ?>
 
-				<?php if(isset($_REQUEST['loID']) || $hasTime : ?>
+				<?php if(isset($_REQUEST['loID']) || $hasTime) : ?>
+
 					<h3 id="start-time">Begins: <em>Date Here</em> at <em>Time Here</em></h3>
 					<h3 id="end-time">Closes: <em>Date Here</em> at <em>Time Here</em></h3>
 				<?php endif ?>
