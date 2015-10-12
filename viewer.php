@@ -1,8 +1,8 @@
 <?php
 require_once("internal/app.php");
-$API = \obo\API::getInstance();
-
 require("login.php");
+
+$API = \obo\API::getInstance();
 
 // ================= CHECK FOR REQUIRED ROLE =======================
 
@@ -30,6 +30,7 @@ else
 
   // ================ PREPARE VARS FOR THE TEMPLATE ================
 
+  $title = 'Obojobo';
   // Instance requested - student mode
   if(isset($_REQUEST['instID']))
   {

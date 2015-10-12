@@ -9,6 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 }
 else
 {
-	$loggedIn = $API->getSessionValid();
+	$loggedIn = \obo\API::getInstance()->getSessionValid();
 }
 
