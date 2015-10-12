@@ -6,10 +6,8 @@
 
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-$api = \obo\API::getInstance();
-
 // try loggin in using the current auth modules
-$api->doLogin('', '');
+\rocketD\auth\AuthManager::getInstance()->login('', '');
 
 // 307 Temporary Redirect
 header("Location: /sso/portal/academic-integrity-modules.php", true, 307);
