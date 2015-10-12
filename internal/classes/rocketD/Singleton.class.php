@@ -3,14 +3,15 @@ namespace rocketD;
 
 trait Singleton
 {
-	protected static $instance;
+	private static $instance;
 
-	final public static function getInstance()
+	public static function getInstance()
 	{
-		return isset(static::$instance) ? static::$instance : static::$instance = new static;
+		static $instance;
+		return isset($instance) ? $instance : $instance = new static;
 	}
 
-	final private function __wakeup() {}
+	private function __wakeup() {}
 
-	final private function __clone() {}
+	private function __clone() {}
 }
