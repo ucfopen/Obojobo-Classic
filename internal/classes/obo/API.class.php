@@ -64,19 +64,6 @@ class API extends \rocketD\db\DBEnabled
 
 	/**** Login Functions ****/
 
-	/**
-	 * Logs user into system
-	 * @param $userID (string) user login name
-	 * @param $pwd (string) hashed password
-	 * @return (bool) true if login successful, false if not
-	 */
-	// security check: Ian Turgeon 2008-05-06 - PASS ( followed down all the way to nm_los_AuthModule)
-	public function doLogin($uname, $pwd)
-	{
-		$UM = \rocketD\auth\AuthManager::getInstance();
-		return $UM->login($uname, $pwd);
-	}
-
 	public function doPluginCall($plugin, $method, $args = -1)
 	{
 		$PM = \rocketD\plugin\PluginManager::getInstance();

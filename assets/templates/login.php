@@ -149,6 +149,7 @@ function initLoginScreen()
 							<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
 						</li>
 					<?php endif ?>
+
 					<li>
 						<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3">
 					</li>
