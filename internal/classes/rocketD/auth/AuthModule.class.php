@@ -34,21 +34,13 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 			trace('userID not valid', true);
 			return false;
 		}
-		//check memcache
-		if($user = \rocketD\util\Cache::getInstance()->getUserByID($userID))
-		{
-			return $user;
-		}
 
 		$this->defaultDBM();
-
 		//Fetch user data
 		$qstr = "SELECT * FROM  ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' and ".\cfg_core_User::AUTH_MODULE." = '?' ";
 		$q = $this->DBM->querySafe($qstr ,$userID, static::$AUTH_MOD_NAME);
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
 
-		//store in memcache
-		\rocketD\util\Cache::getInstance()->setUserByID($userID, $return);
 		return $return;
 	}
 
