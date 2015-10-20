@@ -1,4 +1,5 @@
-<?
+<?php
+
 namespace lti;
 
 class API extends \rocketD\db\DBEnabled
