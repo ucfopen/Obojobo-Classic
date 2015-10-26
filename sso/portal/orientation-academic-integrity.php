@@ -7,7 +7,7 @@
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
 // try loggin in using the current auth modules
-\rocketD\auth\AuthManager::getInstance()->login('', '');
+\rocketD\auth\AuthManager::getInstance()->login('', '', ['requires_ucf_account' => false]);
 
 // 307 Temporary Redirect
 header("Location: /sso/portal/academic-integrity-modules.php", true, 307);

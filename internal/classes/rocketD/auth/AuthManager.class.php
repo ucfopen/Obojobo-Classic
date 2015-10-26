@@ -69,12 +69,20 @@ class AuthManager extends \rocketD\db\DBEnabled
 	 * @todo Change this to a better hashing scheme
 	 */
 	//function login($userName='', $pwd='')
-	public function login($userName, $password)
+	public function login($userName, $password, $extra_vars = null)
 	{
-		$requestVars = [
-			'userName' => trim($userName),
-			'password' => trim($password)
-		];
+
+		if ( empty($extra_vars) || ! is_array($extra_vars))
+		{
+			$requestVars = []
+		}
+		else
+		{
+			$requestVars = $extra_vars;
+		}
+
+		$requestVars['userName'] = trim($userName);
+		$requestVars['password'] = trim($password);
 
 		if ($this->authenticate($requestVars))
 		{
