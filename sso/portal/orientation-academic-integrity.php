@@ -1,13 +1,27 @@
 <?php
-// This little masterpiece redirects the single sign on links coming out of the UCF portal to
-// another page so that the sso variables aren't in the url.  Yea, sending a POST request
-// would be a better idea but getting CS&T to update code in Peoplesoft pagelets is a little
-// like watching babies invent the wheel.  So, we'll do it instead.  STAY AGILE!
+// This page deals with outbound pagelet links. It'll show a login screen and redirect people to the module page after they are logged in
 
 require_once(dirname(__FILE__)."/../../internal/app.php");
 
-// try loggin in using the current auth modules
-\rocketD\auth\AuthManager::getInstance()->login('', '', ['requires_ucf_account' => false]);
+// when the user hit's the login button
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
+{
+	$username = isset($_REQUEST['username']) ? $_REQUEST['username'] : '';
+	$password = isset($_REQUEST['password']) ? $_REQUEST['password'] : '';
+	$loggedIn = \rocketD\auth\AuthManager::getInstance()->login($username, $password, ['force_check_idp' => false]);
+	$notice = 'Invalid Login';
+}
+else
+{
+	$loggedIn = \obo\API::getInstance()->getSessionValid();
+}
 
-// 307 Temporary Redirect
-header("Location: /sso/portal/academic-integrity-modules.php", true, 307);
+if ($loggedIn)
+{
+	header("Location: /sso/portal/academic-integrity-modules.php", true, 307);
+	exit();
+}
+
+// show the login screen
+$title = "Academic Integrety Modules";
+require(dirname(__FILE__)."/../../assets/templates/login.php");

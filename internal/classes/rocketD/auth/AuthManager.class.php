@@ -74,7 +74,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 
 		if ( empty($extra_vars) || ! is_array($extra_vars))
 		{
-			$requestVars = []
+			$requestVars = [];
 		}
 		else
 		{
