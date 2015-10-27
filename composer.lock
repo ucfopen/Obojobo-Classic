@@ -333,11 +333,11 @@
         },
         {
             "name": "obojobo/ucfauth",
-            "version": "1.0.5",
+            "version": "1.0.6",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
-                "reference": "19378f8fabfa866983c70178470b4a6ac2c9faaf"
+                "reference": "c00fa88df605a38ab2a375d594e0ccc5ee21ff94"
             },
             "require": {
                 "php": ">=5.4.0",
@@ -356,7 +356,7 @@
                 }
             ],
             "description": "UCF Nid and SSO authentication modules",
-            "time": "2015-10-26 19:23:24"
+            "time": "2015-10-27 16:48:18"
         },
         {
             "name": "psr/log",
