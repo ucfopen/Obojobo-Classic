@@ -9,10 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	$username = isset($_REQUEST['username']) ? $_REQUEST['username'] : '';
 	$password = isset($_REQUEST['password']) ? $_REQUEST['password'] : '';
 	$loggedIn = \rocketD\auth\AuthManager::getInstance()->login($username, $password, ['force_check_idp' => false]);
-	$notice = 'Invalid Login';
+	$notice   = 'Invalid Login';
 }
 else
 {
+	if ($_REQUEST['ucf_id'])
+	{
+		$loggedIn = \rocketD\auth\AuthManager::getInstance()->login('','');
+	}
+
 	$loggedIn = \obo\API::getInstance()->getSessionValid();
 }
 
