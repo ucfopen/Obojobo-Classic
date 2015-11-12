@@ -23,5 +23,5 @@ if ($loggedIn)
 }
 
 // show the login screen
-$title = "Academic Integrety Modules";
+$title = "Academic Integrity Modules";
 require(dirname(__FILE__)."/../../assets/templates/login.php");
