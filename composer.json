@@ -32,13 +32,14 @@
         "ucfcdl/php-saml": "master-dev",
         "obojobo/ucfauth": "1.0.12",
         "monolog/monolog": "~1.13",
-        "johnpbloch/wordpress": "4.3.1",
-        "obojobo/obo-stats": "*",
-        "obojobo/rocketD": "*",
-        "obojobo-themes/obojobo": "*",
+        "johnpbloch/wordpress": "4.4.0",
+        "obojobo/obo-stats": "0.0.2",
+        "obojobo/rocketD": "0.0.2",
+        "obojobo-themes/obojobo": "0.0.2",
         "wpackagist-plugin/table-of-contents-plus": "1509",
         "wpackagist-plugin/page-list": "5.1",
-        "wpackagist-plugin/wordpress-importer": "0.6.1"
+        "wpackagist-plugin/wordpress-importer": "0.6.1",
+        "wpackagist-plugin/w3-total-cache": "0.9.4.1"
     },
     "extra": {
         "wordpress-install-dir": "wp",
