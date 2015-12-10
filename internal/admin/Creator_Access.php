@@ -53,7 +53,7 @@ echo "<thead><tr><th>userID</th><th>login</th><th>first</th><th>last</th></tr></
 $users = $API->getUsersInRole(cfg_obo_Role::CONTENT_CREATOR);
 foreach($users AS $user)
 {
-	echo "<tr><td>$user->userID</td><td>$user->login</td><td>$user->first</td><td>$user->last</td></tr>";
+	echo "<tr><td>$user['userID']</td><td>$user['login']</td><td>$user['first']</td><td>$user['last']</td></tr>";
 }
 echo "</tbody></table>";
 
