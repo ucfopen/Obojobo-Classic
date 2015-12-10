@@ -119,96 +119,33 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 	public function getUsersInRole($roleid = 0)
 	{
-		if(!$this->isLibraryUser() && !$this->isAdministrator())
+		if(!$this->isLibraryUser() && !$this->isAdministrator()) return false;
+
+		if(!is_array($roleid)) $roleid = [$roleid];
+
+		if(count($roleid) < 1) return false;
+
+		foreach ($roleid as $key => $value)
 		{
-			return false;
-		}
-		// if the roleID ISNT an array of ids
-		if(!is_array($roleid))
-		{
-			// check memcache for the list of user indexes
-
-			$usersIndexes = \rocketD\util\Cache::getInstance()->getUsersInRole($roleid);
-
-			// no cache, get the list of indexes to cache
-			if(!is_array($usersIndexes))
-			{
-				$qstr = "SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_obo_Role::ID."='?'";
-
-				if(!($q = $this->DBM->querySafe($qstr, $roleid)))
-				{
-					trace(mysql_error(), true);
-					return false;
-				}
-
-				$usersIndexes = array();
-
-				// build array so we can cache the indexes in memory instead of all of the user objects redundantly
-				while($r = $this->DBM->fetch_obj($q))
-				{
-					$usersIndexes[] = $r->{\cfg_core_User::ID};
-				}
-				// store in memcache
-				\rocketD\util\Cache::getInstance()->setUsersInRole($roleid, $usersIndexes);
-			}
-			$users = array();
-			if(is_array($usersIndexes))
-			{
-				$userMan = \rocketD\auth\AuthManager::getInstance();
-				foreach($usersIndexes AS $userID)
-				{
-					if($user = $userMan->fetchUserByID($userID))
-					{
-						$users[] = $user;
-					}
-				}
-			}
-			return $users;
+			if(!is_numeric($value)) return false;
 		}
 
-		if(is_array($roleid) && count($roleid) > 0)
+		$cacheKey = implode(',',  $roleid);
+		$users = \rocketD\util\Cache::getInstance()->getUsersInRole($cacheKey);
+		// no cache, get the list of indexes to cache
+		if(!is_array($users))
 		{
-			$cacheKey = implode(',',  $roleid);
-			// check memcache for the list of user indexes
-
-			$usersIndexes = \rocketD\util\Cache::getInstance()->getUsersInRole($cacheKey);
-
-			// no cache, get the list of indexes to cache
-			if(!is_array($usersIndexes))
+			$qstr = "SELECT U.userID, login, first, last, mi FROM obo_users AS U, obo_map_roles_to_user AS M WHERE U.userID = M.userID AND M.roleID IN (?) GROUP BY U.userID";
+			if(!($q = $this->DBM->querySafe($qstr, $cacheKey)))
 			{
-				$qstr = "SELECT DISTINCT ".\cfg_core_User::ID." FROM ".\cfg_obo_Role::MAP_USER_TABLE." WHERE ".\cfg_obo_Role::ID." IN (?)";
-				if(!($q = $this->DBM->querySafe($qstr, $cacheKey)))
-				{
-					trace(mysql_error(), true);
-					return false;
-				}
-
-				$usersIndexes = array();
-
-				// build array so we can cache the indexes in memory instead of all of the user objects redundantly
-				while($r = $this->DBM->fetch_obj($q))
-				{
-					$usersIndexes[] = $r->{\cfg_core_User::ID};
-				}
-				// store in memcache
-				\rocketD\util\Cache::getInstance()->setUsersInRole($cacheKey, $usersIndexes);
+				trace(mysql_error(), true);
+				return false;
 			}
-			$users = array();
-			if(is_array($usersIndexes))
-			{
-				$userMan = \rocketD\auth\AuthManager::getInstance();
-				foreach($usersIndexes AS $userID)
-				{
-					if($user = $userMan->fetchUserByID($userID))
-					{
-						$users[] = $user;
-					}
-				}
-			}
-
-			return $users;
+			$users = $this->DBM->getAllRows($q, 'assoc');
+			\rocketD\util\Cache::getInstance()->setUsersInRole($cacheKey, $users);
 		}
-		return false;
+
+		return $users;
 	}
 
 	// TODO: remove
