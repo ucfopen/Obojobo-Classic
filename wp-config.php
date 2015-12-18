@@ -39,8 +39,8 @@ define('DB_CHARSET', 'utf8');
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
 
-/** ALLOW WP TO UPDATE ITSELF  **/
-define('FS_METHOD', 'direct');
+// Block outbound communication from wordpress
+define( 'WP_HTTP_BLOCK_EXTERNAL', TRUE );
 
 /**#@+
  * Authentication Unique Keys and Salts.
