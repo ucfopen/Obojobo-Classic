@@ -42,6 +42,9 @@ define('DB_COLLATE', '');
 // Block outbound communication from wordpress
 define( 'WP_HTTP_BLOCK_EXTERNAL', TRUE );
 
+// disable the wp cron - we really don't need it
+define('DISABLE_WP_CRON', true);
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *
