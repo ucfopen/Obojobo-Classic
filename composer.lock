@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f0ee1336618d7b6981745926b286cacd",
-    "content-hash": "1ed93e76d0ba0dc1f2d2b72b8f50bd98",
+    "hash": "9ff83f6b9197233797e2f8bc317d5d83",
+    "content-hash": "6bdf423caef8e225daac89e1a9351dcb",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.0.22",
+            "version": "v1.0.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "bd9b14f094c89c8b5804a4e41edeb7853bb85046"
+                "reference": "6213d900e92647831f7a406d5c530ea1f3d4360e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/bd9b14f094c89c8b5804a4e41edeb7853bb85046",
-                "reference": "bd9b14f094c89c8b5804a4e41edeb7853bb85046",
+                "url": "https://api.github.com/repos/composer/installers/zipball/6213d900e92647831f7a406d5c530ea1f3d4360e",
+                "reference": "6213d900e92647831f7a406d5c530ea1f3d4360e",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "1.0.0"
+                "composer-plugin-api": "^1.0"
             },
             "replace": {
                 "roundcube/plugin-installer": "*",
@@ -103,20 +103,20 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2015-10-29 23:28:48"
+            "time": "2016-01-27 12:54:22"
         },
         {
             "name": "johnpbloch/wordpress",
-            "version": "4.4",
+            "version": "4.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/johnpbloch/wordpress.git",
-                "reference": "ad70e5cf518b697eed94f558ca6c88e5cc87e65b"
+                "reference": "fe9320de0793602084c600e22c0c5e0bb601a264"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/ad70e5cf518b697eed94f558ca6c88e5cc87e65b",
-                "reference": "ad70e5cf518b697eed94f558ca6c88e5cc87e65b",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/fe9320de0793602084c600e22c0c5e0bb601a264",
+                "reference": "fe9320de0793602084c600e22c0c5e0bb601a264",
                 "shasum": ""
             },
             "require": {
@@ -140,7 +140,7 @@
                 "blog",
                 "cms"
             ],
-            "time": "2015-12-08 23:46:14"
+            "time": "2016-02-02 17:16:14"
         },
         {
             "name": "johnpbloch/wordpress-core-installer",
@@ -192,16 +192,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.17.2",
+            "version": "1.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24"
+                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
-                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
+                "reference": "a5f2734e8c16f3aa21b3da09715d10e15b4d2d45",
                 "shasum": ""
             },
             "require": {
@@ -230,6 +230,7 @@
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
                 "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "raven/raven": "Allow sending log messages to a Sentry server",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
@@ -239,7 +240,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.16.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -265,15 +266,15 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2015-10-14 12:51:02"
+            "time": "2016-03-13 16:08:35"
         },
         {
             "name": "obojobo-themes/obojobo",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git",
-                "reference": "8744b3c513bba7918f10cfbafcc090759152e4f1"
+                "reference": "0454e705e626234ec4e6785913a3edb78bd463a1"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -289,7 +290,7 @@
                     "email": "zachberry@gmail.com"
                 }
             ],
-            "time": "2015-05-18 21:08:10"
+            "time": "2016-03-18 19:31:48"
         },
         {
             "name": "obojobo/obo-stats",
@@ -470,15 +471,15 @@
         },
         {
             "name": "wpackagist-plugin/table-of-contents-plus",
-            "version": 1509,
+            "version": 1601,
             "source": {
                 "type": "svn",
                 "url": "http://plugins.svn.wordpress.org/table-of-contents-plus/",
-                "reference": "tags/1509"
+                "reference": "tags/1601"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/table-of-contents-plus.1509.zip",
+                "url": "https://downloads.wordpress.org/plugin/table-of-contents-plus.1601.zip",
                 "reference": null,
                 "shasum": null
             },
