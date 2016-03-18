@@ -2,11 +2,8 @@
 <html>
 <head>
 <title></title>
-<?php
-// =========================== DEV AND TEST ENVIRONMENTS =============================
-if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
-{
-	?>
+
+<?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 
 	<!-- DEV OBOJOBO CSS -->
 	<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
@@ -37,51 +34,16 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 	<script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
 	<script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
 	<script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
-	<?php
-	if(defined('\AppCfg::GOOGLE_ANALYTICS_ID'))
-	{
-		echo "<script type='text/javascript'>
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '".\AppCfg::GOOGLE_ANALYTICS_ID."']);
 
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();</script>";
-	}
-}
-// =========================== PRODUCTION ENVIRONMENT =============================
-else
-{
-	?>
+<?php else: ?>
 
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css&f=themes/default.css,tipTip.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="/min/b=assets/css&f=themes/default.css,tipTip.css" media="screen" />
+	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+	<script type="text/javascript" src="/min/b=assets/js&f=jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
-<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
-
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-
-<script type="text/javascript" src="/min/b=assets/js&f=
-jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
-
-	<?php
-	if(defined('\AppCfg::GOOGLE_ANALYTICS_ID'))
-	{
-		echo "<script type='text/javascript'>
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '".\AppCfg::GOOGLE_ANALYTICS_ID."']);
-
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();</script>";
-	}
-}
-?>
+<?php endif; ?>
 
 <!-- BEGIN IE CONDITIONALS: -->
 <!--[if lte IE 7]>
@@ -231,6 +193,19 @@ jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-d
 		}
 	}
 </script>
+<?php if(defined('\AppCfg::GOOGLE_ANALYTICS_ID')): ?>
+	<script type='text/javascript'>
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', '<?php echo \AppCfg::GOOGLE_ANALYTICS_ID; ?>']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	</script>
+<?php endif ?>
 </head>
 <body>
 </body>
