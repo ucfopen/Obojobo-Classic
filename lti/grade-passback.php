@@ -2,10 +2,27 @@
 require_once("../internal/app.php");
 
 // Fallback code to handle empty POST:
-if(empty($_POST) && function_exists('apache_request_headers'))
+if(empty($_POST))
 {
+	# process headers if apache isn't around
+	if ( ! function_exists('apache_request_headers'))
+	{
+		$headers = '';
+		foreach ($_SERVER as $name => $value)
+		{
+			if (subst($name, 0, 5) == 'HTTP_')
+			{
+				$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+			}
+		}
+	}
+	else
+	{
+		# just use apache's request headers
+		$headers = apache_request_headers();
+	}
+
 	// grab the oauth information:
-	$headers     = apache_request_headers();
 	$authHeaders = $headers['Authorization'];
 	$authHeaders = str_replace('OAuth ', '', $authHeaders);
 	$authHeaders = explode(',', $authHeaders);
