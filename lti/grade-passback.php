@@ -7,7 +7,7 @@ if(empty($_POST))
 	# process headers if apache isn't around
 	if ( ! function_exists('apache_request_headers'))
 	{
-		$headers = '';
+		$headers = [];
 		foreach ($_SERVER as $name => $value)
 		{
 			if (substr($name, 0, 5) == 'HTTP_')
