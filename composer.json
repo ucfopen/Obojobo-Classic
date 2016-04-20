@@ -4,7 +4,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "http://wpackagist.org"
+            "url": "https://wpackagist.org"
         },
         {
             "type": "git",
@@ -30,7 +30,7 @@
     "require": {
         "php": ">=5.4",
         "ucfcdl/php-saml": "master-dev",
-        "obojobo/ucfauth": "1.0.14",
+        "obojobo/ucfauth": "1.1.0",
         "monolog/monolog": "~1.13",
         "johnpbloch/wordpress": "4.4.2",
         "obojobo/obo-stats": "0.0.2",
