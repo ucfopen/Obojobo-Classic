@@ -6,10 +6,10 @@
 <?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 
 	<!-- DEV OBOJOBO CSS -->
-	<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" />
 
 	<!-- DEV LIBRARY CSS -->
-	<link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" />
 
 	<!-- GOOGLE FONTS -->
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
