@@ -14,15 +14,15 @@ class ModLTI extends AuthModule
 		if ($userNameIsValid && ! empty($requestVars['validLti']) && ! empty($requestVars['ltiData']))
 		{
 			$ltiData = $requestVars['ltiData'];
-			$authMod = $this->getRelatedAuthMod();
 			// let the external system have a chance to find  this user
 			$this->syncExternalUser($ltiData->username);
 
 			// get the user
-			$user = $authMod->fetchUserByLogin($ltiData->username);
+			$user = $this->fetchUserByLogin($ltiData->username);
 
 			if ( ! $user && \AppCfg::LTI_CREATE_USER_IF_MISSING)
 			{
+				$authMod = $this->getRelatedAuthMod();
 				$result = $authMod->createNewUser($ltiData->username, $ltiData->first, $ltiData->last, '', $ltiData->email);
 				$user = $this->fetchUserByLogin($ltiData->username);
 			}
