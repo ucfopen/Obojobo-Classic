@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti-error.css">
 
 	  <!-- GOOGLE FONTS -->
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
 	<!--[if lt IE 9]>
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
