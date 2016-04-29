@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti.css">
 
 	  <!-- GOOGLE FONTS -->
-	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 	<script src="/assets/js/jquery.js"></script>
 	<script src="/assets/js/lti/jquery-ui-1.10.0.custom"></script>
