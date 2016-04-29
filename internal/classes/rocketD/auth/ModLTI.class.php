@@ -24,7 +24,7 @@ class ModLTI extends AuthModule
 			if ( ! $user && \AppCfg::LTI_CREATE_USER_IF_MISSING)
 			{
 				$result = $authMod->createNewUser($ltiData->username, $ltiData->first, $ltiData->last, '', $ltiData->email);
-				$user = parent::fetchUserByLogin($ltiData->username);
+				$user = $this->fetchUserByLogin($ltiData->username);
 			}
 
 			if ($user instanceof \rocketD\auth\User)
