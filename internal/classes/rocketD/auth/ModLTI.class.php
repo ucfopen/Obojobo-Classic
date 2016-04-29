@@ -4,6 +4,8 @@ class ModLTI extends AuthModule
 {
 	use \rocketD\Singleton;
 
+	public static $AUTH_MOD_NAME = \AppCfg::LTI_EXTERNAL_AUTHMOD;
+
 	public function authenticate($requestVars)
 	{
 		$success = false;
@@ -14,10 +16,10 @@ class ModLTI extends AuthModule
 			$ltiData = $requestVars['ltiData'];
 			$authMod = $this->getRelatedAuthMod();
 			// let the external system have a chance to find  this user
-			$this->syncExternalUser($requestVars['userName']);
+			$this->syncExternalUser($ltiData->username);
 
 			// get the user
-			$user = $authMod->fetchUserByLogin($requestVars['userName']);
+			$user = $authMod->fetchUserByLogin($ltiData->username);
 
 			if ( ! $user && \AppCfg::LTI_CREATE_USER_IF_MISSING)
 			{
@@ -37,7 +39,7 @@ class ModLTI extends AuthModule
 					\obo\perms\RoleManager::getInstance()->addUsersToRoles_SystemOnly([$user->userID], [\obo\perms\Role::CONTENT_CREATOR]);
 				}
 			}
-			profile('login', "'{$requestVars['userName']}','lti','0','".($success?'1':'0')."'");
+			profile('login', "'{$ltiData->username}','lti','0','".($success?'1':'0')."'");
 		}
 		return $success;
 	}

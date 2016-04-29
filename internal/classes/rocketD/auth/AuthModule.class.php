@@ -38,7 +38,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 		$this->defaultDBM();
 		//Fetch user data
 		$qstr = "SELECT * FROM  ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' and ".\cfg_core_User::AUTH_MODULE." = '?' ";
-		$q = $this->DBM->querySafe($qstr ,$userID, static::$AUTH_MOD_NAME);
+		$q = $this->DBM->querySafe($qstr ,$userID, trim(static::$AUTH_MOD_NAME, " \t\n\r\0\x0B\\"));
 		$return = $this->buildUserFromQueryResult($this->DBM->fetch_obj($q));
 
 		return $return;
@@ -61,7 +61,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		$this->defaultDBM();
 		$users = array();
-		$q = $this->DBM->query("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::AUTH_MODULE." = '".static::$AUTH_MOD_NAME."'");
+		$q = $this->DBM->query("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::AUTH_MODULE." = '". trim(static::$AUTH_MOD_NAME, " \t\n\r\0\x0B\\")."'");
 		while($r = $this->DBM->fetch_obj($q))
 		{
 			if($newUser = $this->fetchUserByID($r->{\cfg_core_User::ID}))
@@ -105,7 +105,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				return false;
 			}
 
-			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, static::$AUTH_MOD_NAME);
+			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM " . \cfg_core_User::TABLE . " WHERE ". \cfg_core_User::LOGIN . "='?' AND ". \cfg_core_User::AUTH_MODULE." = '?' LIMIT 1", $username, trim(static::$AUTH_MOD_NAME, " \t\n\r\0\x0B\\"));
 			if($r = $this->DBM->fetch_obj($q))
 			{
 				// store in memcache
@@ -211,7 +211,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 	{
 		if(!$this->validateUID($userID)) return false;
 		$this->defaultDBM();
-		$q = $this->DBM->querySafe("SELECT * FROM ". \cfg_core_User::TABLE ." WHERE ". \cfg_core_User::ID ."='?' AND ".\cfg_core_User::AUTH_MODULE." = '?'", $userID, static::$AUTH_MOD_NAME);
+		$q = $this->DBM->querySafe("SELECT * FROM ". \cfg_core_User::TABLE ." WHERE ". \cfg_core_User::ID ."='?' AND ".\cfg_core_User::AUTH_MODULE." = '?'", $userID, trim(static::$AUTH_MOD_NAME, " \t\n\r\0\x0B\\"));
 		return $this->DBM->fetch_num($q) > 0;
 	}
 
