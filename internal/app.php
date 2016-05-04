@@ -12,7 +12,7 @@ use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 
 $app = new Logger('app');
-$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/obojobo', 30);
+$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/obojobo', 0);
 $handler->setFormatter(new LineFormatter(null, null, true, true));
 $app->pushHandler($handler);
 ErrorHandler::register($app); // catch error_log and other php errors
@@ -33,7 +33,7 @@ function profile($name, $stuff)
 	if ( ! Registry::hasLogger($name))
 	{
 		$logger = new Logger($name);
-		$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/profile-'.$name, 30, Logger::INFO);
+		$handler = new RotatingFileHandler(\AppCfg::DIR_BASE.'internal/logs/profile-'.$name, 0, Logger::INFO);
 		$handler->setFormatter(new LineFormatter("[%datetime%]: %message%\n", null, false, true));
 		$logger->pushHandler($handler);
 		Registry::addLogger($logger);
