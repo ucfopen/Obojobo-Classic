@@ -43,7 +43,7 @@ else
         if(!$ltiApi->getAssessmentSessionData($_REQUEST['instID']))
         {
           // No session data for LTI - Either they got logged out or they accessed the instance directly.
-          header('Location: ' . \AppCfg::URL_WEB . 'error/no-access');
+          header('Location: ' . \AppCfg::URL_WEB . 'error/no-access.html');
           exit();
         }
       }
