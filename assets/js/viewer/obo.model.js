@@ -340,7 +340,7 @@ obo.model = function()
 				case 4006:
 					//var externalSystemName = getExternalSystemName();
 					//killPage("You cannot access this instance directly since it is being used in an external system. Please log into the external system instead.");
-					window.location = obo.util.getWebURL() + 'error/no-access';
+					window.location = obo.util.getWebURL() + 'error/no-access.html';
 					break;
 				default:
 					view.displayError(response);
