@@ -31,7 +31,7 @@
         "php": ">=5.4",
         "ucfcdl/php-saml": "master-dev",
         "obojobo/ucfauth": "1.1.0",
-        "monolog/monolog": "~1.13",
+        "monolog/monolog": "1.18.2",
         "johnpbloch/wordpress": "4.4.2",
         "obojobo/obo-stats": "0.0.2",
         "obojobo/rocketD": "0.0.2",
