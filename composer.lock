@@ -343,7 +343,7 @@
             "version": "1.1.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:ucfcdl/Obojobo-UCFAuth.git",
+                "url": "git@clu.cdl.ucf.edu:obojobo/Obojobo-UCFAuth.git",
                 "reference": "b684ab320433e800951b250b1cc1ccfed568adcf"
             },
             "require": {
