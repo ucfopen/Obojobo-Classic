@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8eb5541749366331ad20187b9a2f8b2b",
-    "content-hash": "04c3933e0e7c45d93c0e9fcb6e4d4555",
+    "hash": "5e0fd6e798d4d38bc1cbe946048ea79b",
+    "content-hash": "b7276f1549a7965fc31f7a00b5822157",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.0.25",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e"
+                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
-                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
+                "url": "https://api.github.com/repos/composer/installers/zipball/a3595c5272a6f247228abb20076ed27321e4aae9",
+                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9",
                 "shasum": ""
             },
             "require": {
@@ -65,6 +65,7 @@
                 "MODX Evo",
                 "Mautic",
                 "OXID",
+                "RadPHP",
                 "SMF",
                 "Thelia",
                 "WolfCMS",
@@ -80,6 +81,7 @@
                 "dokuwiki",
                 "drupal",
                 "elgg",
+                "expressionengine",
                 "fuelphp",
                 "grav",
                 "installer",
@@ -105,7 +107,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2016-04-13 19:46:30"
+            "time": "2016-07-05 06:18:20"
         },
         {
             "name": "johnpbloch/wordpress",
@@ -268,7 +270,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-04-12 18:29:35"
+            "time": "2016-04-02 13:12:58"
         },
         {
             "name": "obojobo-themes/obojobo",
@@ -339,33 +341,6 @@
             "time": "2015-12-10 20:30:37"
         },
         {
-            "name": "obojobo/ucfauth",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "git@clu.cdl.ucf.edu:obojobo/Obojobo-UCFAuth.git",
-                "reference": "b684ab320433e800951b250b1cc1ccfed568adcf"
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "ucfcdl/php-saml": "master-dev"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Ucfauth\\": "src/Ucfauth"
-                }
-            },
-            "authors": [
-                {
-                    "name": "iturgeon",
-                    "email": "iturgeon@gmail.com"
-                }
-            ],
-            "description": "UCF Nid and SSO authentication modules",
-            "time": "2016-04-20 18:49:36"
-        },
-        {
             "name": "psr/log",
             "version": "1.0.0",
             "source": {
@@ -404,54 +379,6 @@
             "time": "2012-12-21 11:40:51"
         },
         {
-            "name": "ucfcdl/php-saml",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ucfcdl/php-saml.git",
-                "reference": "3ea2095e1c9526adb80ee0da7f09a0648a6836d5"
-            },
-            "require": {
-                "php": ">=5.3.2"
-            },
-            "require-dev": {
-                "pdepend/pdepend": "1.1.0",
-                "phploc/phploc": "*",
-                "satooshi/php-coveralls": "dev-master",
-                "sebastian/phpcpd": "*",
-                "squizlabs/php_codesniffer": "*"
-            },
-            "suggest": {
-                "ext-gettext": "Install gettext and php5-gettext libs to handle translations",
-                "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
-                "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "extlib/xmlseclibs",
-                    "lib/Saml",
-                    "lib/Saml2"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "OneLogin PHP SAML Toolkit",
-            "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
-            "keywords": [
-                "onelogin",
-                "saml",
-                "saml2"
-            ],
-            "support": {
-                "email": "sixto.garcia@onelogin.com",
-                "issues": "https://github.com/onelogin/php-saml/issues",
-                "source": "https://github.com/onelogin/php-saml/"
-            },
-            "time": "2015-10-02 19:20:12"
-        },
-        {
             "name": "wpackagist-plugin/page-list",
             "version": "5.1",
             "source": {
@@ -461,8 +388,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/page-list.zip",
-                "reference": "tags/5.1",
+                "url": "https://downloads.wordpress.org/plugin/page-list.5.1.zip",
+                "reference": null,
                 "shasum": null
             },
             "require": {
@@ -482,7 +409,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://downloads.wordpress.org/plugin/table-of-contents-plus.1601.zip",
-                "reference": "tags/1601",
+                "reference": null,
                 "shasum": null
             },
             "require": {
@@ -502,26 +429,6 @@
             "dist": {
                 "type": "zip",
                 "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.4.1.zip",
-                "reference": "tags/0.9.4.1",
-                "shasum": null
-            },
-            "require": {
-                "composer/installers": "~1.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/w3-total-cache/"
-        },
-        {
-            "name": "wpackagist-plugin/wordpress-importer",
-            "version": "0.6.2",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/wordpress-importer/",
-                "reference": "tags/0.6.2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-importer.0.6.2.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -529,15 +436,13 @@
                 "composer/installers": "~1.0"
             },
             "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/wordpress-importer/"
+            "homepage": "https://wordpress.org/plugins/w3-total-cache/"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ucfcdl/php-saml": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

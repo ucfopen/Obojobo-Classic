@@ -36,3 +36,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 # END WordPress
 </IfModule>
+
+# Deny access internal dir
+<Files internal/*>
+    deny from all
+</Files>
