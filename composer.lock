@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5e0fd6e798d4d38bc1cbe946048ea79b",
-    "content-hash": "b7276f1549a7965fc31f7a00b5822157",
+    "hash": "eccd8ab5e3415efe92ed703bf05ab167",
+    "content-hash": "99621e6949bc5caf6d92f0a7f9fd7113",
     "packages": [
         {
             "name": "composer/installers",
@@ -379,6 +379,54 @@
             "time": "2012-12-21 11:40:51"
         },
         {
+            "name": "ucfcdl/php-saml",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ucfcdl/php-saml.git",
+                "reference": "3ea2095e1c9526adb80ee0da7f09a0648a6836d5"
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "1.1.0",
+                "phploc/phploc": "*",
+                "satooshi/php-coveralls": "dev-master",
+                "sebastian/phpcpd": "*",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "suggest": {
+                "ext-gettext": "Install gettext and php5-gettext libs to handle translations",
+                "ext-mcrypt": "Install mcrypt and php5-mcrypt libs in order to support encryption",
+                "lib-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "extlib/xmlseclibs",
+                    "lib/Saml",
+                    "lib/Saml2"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "OneLogin PHP SAML Toolkit",
+            "homepage": "https://onelogin.zendesk.com/hc/en-us/sections/200245634-SAML-Toolkits",
+            "keywords": [
+                "onelogin",
+                "saml",
+                "saml2"
+            ],
+            "support": {
+                "email": "sixto.garcia@onelogin.com",
+                "issues": "https://github.com/onelogin/php-saml/issues",
+                "source": "https://github.com/onelogin/php-saml/"
+            },
+            "time": "2015-10-02 19:20:12"
+        },
+        {
             "name": "wpackagist-plugin/page-list",
             "version": "5.1",
             "source": {
@@ -389,7 +437,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://downloads.wordpress.org/plugin/page-list.5.1.zip",
-                "reference": null,
+                "reference": "tags/5.1",
                 "shasum": null
             },
             "require": {
@@ -409,7 +457,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://downloads.wordpress.org/plugin/table-of-contents-plus.1601.zip",
-                "reference": null,
+                "reference": "tags/1601",
                 "shasum": null
             },
             "require": {
@@ -429,7 +477,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.4.1.zip",
-                "reference": null,
+                "reference": "tags/0.9.4.1",
                 "shasum": null
             },
             "require": {
@@ -442,7 +490,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "ucfcdl/php-saml": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
