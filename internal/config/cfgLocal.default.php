@@ -4,8 +4,8 @@ require_once('cfg.php'); // default config
 class AppCfg extends AppCfgDefault
 {
 	// --- DIRECTORYS & PATHS ---
-	const DIR_BASE = 'C:/full/disk/path/to/app/'; // Define Base Directory [ full path EX:  /www/obobjobo/ ]
-	const URL_WEB = 'http://your/root/obojobourl/'; // Define the web directory for the base of GS [root inclusive at starting slash: /obojobo/]
+	const DIR_BASE = '/var/www/obojobo/'; // Define Base Directory [ full path EX:  /www/obobjobo/ ]
+	const URL_WEB = 'https://your/root/obojobourl/'; // Define the web directory for the base of GS [root inclusive at starting slash: /obojobo/]
 
 	// --- Main App DB Connection ---
 	const DB_HOST = '';
@@ -21,18 +21,11 @@ class AppCfg extends AppCfgDefault
 	const DB_WP_NAME = '';
 	const DB_WP_TYPE = ''; // either mysql or oci8
 
-	// --- UCF AUTH DB Connection ---
-	// const UCF_DB_HOST = '192.168.44.44';
-	// const UCF_DB_USER = 'root';
-	// const UCF_DB_PASS = 'root';
-	// const UCF_DB_NAME = 'externalauth_dev';
-	// const UCF_DB_TYPE = 'mysql'; // either mysql or oci8
-
 	// const GOOGLE_ANALYTICS_ID = '';
 
 	// --- REQUIRED MATERIA LTI (using materia in obojobo via lti) ---
-	// const MATERIA_LTI_URL = 'https://materia.qa.cdl.ucf.edu/lti/assignment';
-	// const MATERIA_LTI_PICKER_URL = 'https://materia.qa.cdl.ucf.edu/lti/picker';
+	// const MATERIA_LTI_URL = 'https://materia.school.edu/lti/assignment';
+	// const MATERIA_LTI_PICKER_URL = 'https://materia.school.edu/lti/picker';
 	// const MATERIA_LTI_SECRET  = 'secret';
 	// const MATERIA_LTI_KEY  = 'key';
 	// const MATERIA_LTI_TIMELIMIT = 3600; // OAUTH TIME LIMIT - 1 hr
@@ -50,7 +43,7 @@ class AppCfg extends AppCfgDefault
 	// --- REQUIRED CREDHUB @TODO - these shouldnt be required ---
 	// const CREDHUB_KEY = 'qa-key';
 	// const CREDHUB_SECRET = 'secret';
-	// const CREDHUB_URL = 'https://badges.qa.online.ucf.edu/api/badges/award';
+	// const CREDHUB_URL = 'https://badges.school.edu/api/badges/award';
 	// const CREDHUB_TIMEOUT = 1800000;
 
 
