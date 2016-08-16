@@ -6,10 +6,8 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
 <head>
 	<meta charset="utf-8" />
-	<title>Title</title>
+	<title>Pick a Learning Object</title>
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti.css">
-
-	  <!-- GOOGLE FONTS -->
 	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
 	<script src="/assets/js/jquery.js"></script>
@@ -189,9 +187,9 @@
 	</div>
 
 	<script type="text/javascript">
-		window.__ltiToken         = '{$ltiToken}';
-		window.__returnUrl        = '{$returnUrl}';
-		window.__webUrl           = '{$webUrl}';
+		window.__ltiToken  = '{$ltiToken}';
+		window.__returnUrl = '{$returnUrl}';
+		window.__webUrl    = '{$webUrl}';
 	</script>
 	<script type="text/javascript" src="/assets/js/lti.js"></script>
 </body>

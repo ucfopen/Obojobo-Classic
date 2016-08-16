@@ -65,7 +65,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	</status_url>
 
 	<materia_lti_url>
-		<![CDATA[<?php echo \AppCfg::URL_WEB.'assets/materia.php'; ?>]]>
+		<![CDATA[<?php echo \AppCfg::URL_WEB.'assets/materia_lti_picker.php'; ?>]]>
 	</materia_lti_url>
 
 	<updates_url>
@@ -93,11 +93,11 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
 	</twitter_proxy_url>
 
 	<pro_account_form_url>
-		<![CDATA[<?php echo \AppCfg::URL_ACCOUNT_FORM; ?>]]>
+		<![CDATA[]]>
 	</pro_account_form_url>
 
 	<pro_account_formID>
-		<![CDATA[<?php echo \AppCfg::ACCOUNT_FORM_ID; ?>]]>
+		<![CDATA[]]>
 	</pro_account_formID>
 
 	<student_guide_url>

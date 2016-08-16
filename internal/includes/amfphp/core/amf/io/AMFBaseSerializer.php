@@ -84,26 +84,7 @@ class AMFBaseSerializer {
 			$this->writeUTF($body->responseTarget); //  write null, haven't found another use for this
 			$tempBuf = $this->outBuffer;
 			$this->outBuffer = "";
-			
-			// //check to see if we cached the results
-			// $isCachable = in_array($body->methodName, array('getInstances','getMedia','getLibraryLOs'));
-			// //$isCachable = false;
-			// 
-			// $cacheName = 'amfphp'. $body->className . $body->methodName. $_SESSION['userID'];
-			// if($isCachable && $return = \rocketD\util\Cache::getInstance()->get($cacheName))
-			// {
-			// 	$this->outBuffer = preg_replace('/(correlationId..)(.{36})/', '${1}'.$body->getResults()->correlationId, $return);
-			// }
-			// else
-			// {
-
-			    $this->writeData($body->getResults());
-			// }
-			// if($isCachable)
-			// {
-			// 	\rocketD\util\Cache::getInstance()->set($cacheName, $this->outBuffer, false, 3600);
-			// }
-		
+		    $this->writeData($body->getResults());
 			$tempBuf2 = $this->outBuffer;
 			$this->outBuffer = $tempBuf;
 			$this->writeLong(strlen($tempBuf2));

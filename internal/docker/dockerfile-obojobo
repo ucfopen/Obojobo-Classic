@@ -1,0 +1,26 @@
+FROM php:5.6.19-fpm-alpine
+MAINTAINER Ian Turgeon
+
+RUN apk --no-cache add \
+	git \
+	libjpeg-turbo-dev\
+	libmcrypt-dev \
+	libpng-dev \
+	libxml2-dev
+
+# PECL Libraries
+RUN docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
+	&& pecl install memcache \
+	&& docker-php-ext-enable memcache \
+	&& docker-php-ext-install \
+	bcmath \
+	gd \
+	mbstring \
+	mcrypt \
+	mysql \
+	mysqlnd \
+	xml \
+	&& rm -rf /usr/src/php
+
+# Make sure composer is installed globally
+RUN ash -c "curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer"

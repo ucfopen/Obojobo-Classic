@@ -26,6 +26,3 @@ $return =  $mediaMan->handleMediaUpload($_FILES['Filedata'], $_GET['t'], $_GET['
 if($return == true) echo 0; // return success
 else if($return == false) echo 1000; // return other error
 else echo $return; // return the filedata error
-
-
-?>

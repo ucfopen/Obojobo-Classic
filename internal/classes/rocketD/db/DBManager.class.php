@@ -110,6 +110,16 @@ class DBManager
 					}
 				}
 				break;
+			case 'mysqli':
+				$newConn = new DBConnectionMYSQLI($conObj);
+				if($newConn->checkRequirements())
+				{
+					if(!$newConn->db_connect())
+					{
+						trace('couldnt connect to mySQLi', true);
+					}
+				}
+				break;
 			default :
 				trace('DBManager4 createNewConnection call, no matching connection type defined.', true);
 				break;

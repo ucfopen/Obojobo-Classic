@@ -6,13 +6,13 @@ Obojobo is not open source. If you have access to this repository, your license 
 
 # Requirements
 
-* PHP 5.6
+* PHP 5.6 (with the following extensions)
  * gd
  * mbstring
  * mycrypt
  * mysqlnd
  * opcache
- * pdo
+ * mysql
  * pecl-memcache
  * pecl-oauth
  * xml
@@ -31,20 +31,36 @@ Obojobo is not open source. If you have access to this repository, your license 
  * internal/logs
  * internal/media
  * internal/templates/compiled
-6. Set up php ini
- * `date.timezone`
- * `short_open_tag` - we used to need this but I believe it's no longer required
- * `session.save_handler` to 'memcache'
- * `session.save_path` to speed up sessions, use memcache by setting a value to something like: `tcp://localhost:11211?persistent=1&weight=1&timeout=1&retry_interval=15`
- * `security.limit_extensions` to `.php` especially if your using nginx
+6. Set up php ini. See `internal/docker/php.ini`
+ * `date.timezone` to `America/New_York` or whatever's appropriate for you
+ * `session.save_handler` to 'memcached'
+ * `session.save_path` to `localhost:11211`
 7. Set a few php-fpm options
  * user = nginx
  * group = nginx
-8. Set up your Nginx config. See `internal/config/nginx.sample.conf`
-9. Create your obojobo database, user, and tables defined in `internal/config/tables.sql`
+ * `security.limit_extensions` to `.php`
+8. Set up your Nginx config. See `internal/docker/nginx.conf`
+9. Create your obojobo database, user, and tables defined in `internal/docker/tables.sql`
+10. Create your wordpress database and worpress specific mysql user.  See `internal/docker/wordpress_db.sql`
 10. Add a cron to run every 15 minutes `php /var/www/obojobo/internal/includes/cron15minute.php >> /var/log/cron.log 2>&1`
 11. Copy `/internal/config/cfgLocal.default.php` to `/internal/config/cfgLocal.php`
-12. Customize your cfgLocal.php settings
+12. Test site by visiting [http://localhost/repository](http://localhost/repository)
+
+# Setup
+
+1. Seed Wordpress database
+2. Seed Obojobo database
+3. Set up an admin user
+
+## Database
+There are 2 databases, one for Wordpress, and one for Obojobo.  For enhanced security, it's worth keeping them in separate databases.
+
+# Customization
+
+## Wordpress Themes
+
+## Login Modules
+
 
 # Administration
 TBD

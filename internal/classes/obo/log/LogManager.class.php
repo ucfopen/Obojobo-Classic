@@ -135,17 +135,8 @@ class LogManager extends \rocketD\db\DBEnabled
 
 	public function getInteractionLogByVisit($visitID=0)
 	{
-		// must be user, instance owner, or SU
-
-		// if($tracking = \rocketD\util\Cache::getInstance()->getInteractionsByVisit($visitID))
-		// {
-		// 	return $tracking;
-		// }
-
 		$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Visit::ID." = '?' ORDER BY ".\cfg_obo_Track::TIME;
 		$return = $this->getInteractionLogs($this->DBM->querySafe($trackQ, $visitID));
-
-		// \rocketD\util\Cache::getInstance()->setInteractionsByVisit($visitID, $return);
 
 		return $return;
 	}
