@@ -1,7 +1,7 @@
 <?php
 /**
  *******
- ****** DO NOT EDIT THIS CONFIG ::: edit config_local.php to override these values or add custom values
+ ****** DO NOT EDIT THIS CONFIG ::: edit cfgLocal.php to override these values or add custom values
  *******
 */
 class AppCfgDefault
@@ -88,22 +88,13 @@ class AppCfgDefault
 	// Define location of the Known Issues page
 	const URL_KNOWN_ISSUES = 'about/knownIssues.html';
 
-	// Define location of the Pro account request form
-	const URL_ACCOUNT_FORM = 'https://formmanager.ucf.edu/formsubmit.cfm';
-
 	// Define the relative location for the remoting gateway
 	const AMF_GATEWAY  = 'api/amf.php';
 
 	// Define the json gateway location
 	const JSON_GATEWAY = 'api/json.php';
 
-	// Define the Form Manager form ID
-	const ACCOUNT_FORM_ID = '27373';
-
 	//--------------------   ERRORS   -----------------------//
-	// Mail Error File Name
-	const ERROR_FILE = 'php_errors';
-
 	// Define Debug [true, false]
 	const DEBUG_MODE = false;
 
@@ -154,6 +145,9 @@ class AppCfgDefault
 	// add in camma seperated class names of authentication plugins to us
 	const AUTH_PLUGINS = '\rocketD\auth\ModLTI,\rocketD\auth\ModInternal';
 
+	// which login template from /assets/templates should we show on all login pages
+	const LOGIN_TEMPLATE = 'login-default.php';
+
 	// Define Password timelimit in seconds for a password to be valid before needing to be changed
 	const AUTH_PW_LIFE = 5184000; // 60 days
 	const AUTH_INTERNAL_USERNAME_MATCH = "/^[a-zA-Z0-9\~_]+$/i";
@@ -165,8 +159,8 @@ class AppCfgDefault
 	const GOOGLE_ANALYTICS_ID = '';
 
 	// REQUIRED MATERIA LTI (using materia in obojobo via lti)
-	const MATERIA_LTI_URL = 'https://materia.qa.cdl.ucf.edu/lti/assignment';
-	const MATERIA_LTI_PICKER_URL = 'https://materia.qa.cdl.ucf.edu/lti/picker';
+	const MATERIA_LTI_URL = 'https://materia.school.edu/lti/assignment';
+	const MATERIA_LTI_PICKER_URL = 'https://materia.school.edu/lti/picker';
 	const MATERIA_LTI_SECRET  = 'secret';
 	const MATERIA_LTI_KEY  = 'key';
 	const MATERIA_LTI_TIMELIMIT = 3600; // OAUTH TIME LIMIT - 1 hr
@@ -174,7 +168,7 @@ class AppCfgDefault
 
 	// REQUIRED MODLTI (using obojobo in something else as an lti)
 	const LTI_LAUNCH_PRESENTATION_RETURN_URL = 'lti/return.php';
-	const LTI_EXTERNAL_AUTHMOD = '\Ucfauth\NID';
+	const LTI_EXTERNAL_AUTHMOD = '\rocketD\auth\ModInternal';
 	const LTI_OAUTH_KEY = 'key';
 	const LTI_OAUTH_SECRET = 'secret';
 	const LTI_OAUTH_TIMEOUT = 3600;
@@ -183,9 +177,9 @@ class AppCfgDefault
 	const LTI_USE_ROLE = true;
 
 	// REQUIRED CREDHUB @TODO - these shouldnt be required
-	const CREDHUB_KEY = 'qa-key';
+	const CREDHUB_KEY = 'key';
 	const CREDHUB_SECRET = 'secret';
-	const CREDHUB_URL = 'https://badges.qa.online.ucf.edu/api/badges/award';
+	const CREDHUB_URL = 'https://badges.school.edu/api/badges/award';
 	const CREDHUB_TIMEOUT = 1800000;
 
 }

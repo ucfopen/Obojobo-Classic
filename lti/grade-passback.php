@@ -72,5 +72,5 @@ $smarty->assign('success', $success);
 $response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-replaceResult-response.tpl');
 
 header('Content-Type: application/xml');
-echo $response;
+echo($response);
 profile('lti-score', "'".time()."',materia','$sourceid','$score','$description','$success'");

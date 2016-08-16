@@ -140,14 +140,7 @@ body
 	/* Order matters with this and the above style*/
 	#login-page #login-form label
 	{
-		z-index: 2000;
-		top: 7px;
-		left: 11px;
-		color: #000;
-		cursor: text;
-		opacity: 0.6;
-		font: normal 14px Verdana;
-		font-family: Verdana, sans, sans-serif;
+		display:none;
 	}
 
 	#login-page #login-form #signInSubmit

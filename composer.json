@@ -33,7 +33,8 @@
         "obojobo-themes/obojobo": "0.0.3",
         "wpackagist-plugin/table-of-contents-plus": "1601",
         "wpackagist-plugin/page-list": "5.1",
-        "wpackagist-plugin/w3-total-cache": "0.9.4.1"
+        "wpackagist-plugin/w3-total-cache": "0.9.4.1",
+        "mrclay/minify": "2.3.0"
     },
     "extra": {
         "wordpress-install-dir": "wp",

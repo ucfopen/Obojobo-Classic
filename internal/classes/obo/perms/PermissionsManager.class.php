@@ -208,11 +208,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 			$optUserID = 0;
 		}
 		$itemType = mysql_real_escape_string($itemType);
-		//
-		// if($permObj = \rocketD\util\Cache::getInstance()->getPerms($itemID, $itemType, $optUserID))
-		// {
-		// 	return $permObj;
-		// }
 
 		$q = $this->DBM->querySafe("SELECT * FROM `".\cfg_obo_Perm::TABLE."` WHERE
 			".\cfg_core_User::ID."='?' AND
@@ -232,8 +227,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 				$r->{\cfg_obo_Perm::G_COPY},
 				$r->{\cfg_obo_Perm::G_USE},
 				$r->{\cfg_obo_Perm::G_GLOBAL});
-
-			//\rocketD\util\Cache::getInstance()->setPerms($itemID, $itemType, $optUserID, $permObj);
 
 			return $permObj;
 		}

@@ -54,9 +54,6 @@ if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI
 	$score    = (string) $xml->imsx_POXBody->replaceResultRequest->resultRecord->result->resultScore->textString;
 	$outMsgId = uniqid();
 
-	//$sm = \obo\ScoreManager::getInstance();
-	//list($valid, $description) = $sm->submitLTIQuestion($sourceid, 'materia', $score);
-	//
 	$valid = true;
 }
 
@@ -70,6 +67,6 @@ $smarty->assign('success', $success);
 $response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-replaceResult-response.tpl');
 
 header('Content-Type: application/xml');
-echo $response;
+echo($response);
 
 profile('lti-score', "'".time()."',self(test)','$sourceid','$score','$description','$success'");
