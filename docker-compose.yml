@@ -1,0 +1,40 @@
+version: '2'
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./internal/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    links:
+      - phpfpm
+
+  phpfpm:
+    build:
+      context: .
+      dockerfile: internal/docker/dockerfile-obojobo
+    volumes:
+      - ./:/var/www/html:rw
+      - ./internal/docker/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
+      # - ./internal/docker/php-extensions-runtime.ini:/usr/local/etc/php/conf.d/php-extensions-runtime.ini:ro
+    links:
+      - mysql
+      - memcached
+
+  mysql:
+    image: mysql:5.5.47
+    environment:
+      - MYSQL_ROOT_PASSWORD=drRoots
+      - MYSQL_USER=obojobo_user
+      - MYSQL_PASSWORD=obojobo_pass
+      - MYSQL_DATABASE=obojobo
+    ports:
+     - "3306:3306" # allow mysql access from the host - use /etc/hosts to set mysql to your docker-machine ip
+    volumes:
+      - "./internal/docker/tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql"
+      - "./internal/docker/wordpress_db.sql:/docker-entrypoint-initdb.d/02_create_tables.sql"
+
+  memcached:
+    image: memcached:1.4.27-alpine

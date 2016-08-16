@@ -41,7 +41,7 @@ function clearAssociatedInstance()
 
 	if ( ! $ltiData)
 	{
-		echo false;
+		echo(false);
 		return;
 	}
 
@@ -51,11 +51,11 @@ function clearAssociatedInstance()
 
 	if ($success instanceof \rocketD\util\Error || !$success)
 	{
-		echo json_encode(createResponse(false));
+		echo(json_encode(createResponse(false)));
 	}
 	else
 	{
-		echo json_encode(createResponse(true, getInstanceData($selectedInstId)));
+		echo(json_encode(createResponse(true, getInstanceData($selectedInstId))));
 	}
 }
 
@@ -79,22 +79,20 @@ function createNewExternallyLinkedInstance()
 	$selectedInstId = $API->createInstance($instanceName, $selectedLoId, $courseName, 0, 0, $attempts, $scoreMethod, $allowScoreImport);
 	if ($selectedInstId instanceof \rocketD\util\Error || !is_int($selectedInstId))
 	{
-		echo false;
+		echo(false);
 		return;
 	}
 
 	$success = $ltiApi->updateExternalLinkForInstance($selectedInstId, $ltiData);
 	if($success instanceof \rocketD\util\Error || !$success)
 	{
-		echo json_encode(createResponse(false));
+		echo(json_encode(createResponse(false)));
 	}
 	else
 	{
 		//@TODO - what happens here if instanceData is false?
-		echo json_encode(createResponse(true, getInstanceData($selectedInstId)));
+		echo(json_encode(createResponse(true, getInstanceData($selectedInstId))));
 	}
-
-	//echo json_encode(createResponse(true, getInstanceData($selectedInstId)));
 }
 
 function getInstanceData($instID)
