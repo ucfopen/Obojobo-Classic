@@ -4,21 +4,28 @@ Obojobo is a Learning Module Management System
 # License
 Obojobo is not open source. If you have access to this repository, your license are goverend by the agreement you signed with UCF.
 
+# Quick Development Setup with Docker Compose
+For local development, testing, and as a reference for the architecture setup, we have a Docker environment to get you up and running quickly.
+Download [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker) and run `docker-compose up`
+
+
 # Requirements
 
 * PHP 5.6 (with the following extensions)
  * gd
  * mbstring
  * mycrypt
+ * mysql
  * mysqlnd
  * opcache
- * mysql
  * pecl-memcache
  * pecl-oauth
  * xml
 * Memcached
+* libjpeg (for php gd)
+* libpng (for php gd)
 * Nginx (we prefer Nginx, but Apache will work)
-* MySQL 5.6 database
+* MySQL 5.5, 5.6 database
 * Unique Domain or sub domain (obojobo.yourschool.edu)
 
 # Install
@@ -33,7 +40,7 @@ Obojobo is not open source. If you have access to this repository, your license 
  * internal/templates/compiled
 6. Set up php ini. See `internal/docker/php.ini`
  * `date.timezone` to `America/New_York` or whatever's appropriate for you
- * `session.save_handler` to 'memcached'
+ * `session.save_handler` to 'memcache'
  * `session.save_path` to `localhost:11211`
 7. Set a few php-fpm options
  * user = nginx

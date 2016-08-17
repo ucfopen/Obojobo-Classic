@@ -8,7 +8,7 @@ RUN apk --no-cache add \
 	libpng-dev \
 	libxml2-dev
 
-# PECL Libraries
+# PECL Libraries and php extensions
 RUN docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
 	&& pecl install memcache \
 	&& docker-php-ext-enable memcache \

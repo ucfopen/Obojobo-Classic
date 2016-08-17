@@ -1,3 +1,5 @@
+USE obojobo;
+
 CREATE TABLE `obo_badges` (
   `loID` bigint(255) NOT NULL,
   `badgeID` bigint(255) NOT NULL,
@@ -64,32 +66,7 @@ CREATE TABLE `obo_lo_media` (
   PRIMARY KEY (`mediaID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `obo_lo_media_copy` (
-  `mediaID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
-  `userID` bigint(255) unsigned NOT NULL DEFAULT '0',
-  `title` varchar(128) NOT NULL,
-  `itemType` varchar(10) NOT NULL,
-  `meta` blob NOT NULL,
-  `descText` varchar(255) NOT NULL,
-  `createTime` int(25) unsigned NOT NULL DEFAULT '0',
-  `copyright` varchar(255) NOT NULL,
-  `thumb` bigint(255) NOT NULL,
-  `url` varchar(255) NOT NULL DEFAULT '',
-  `size` int(10) unsigned NOT NULL,
-  `length` float unsigned NOT NULL,
-  `height` int(4) unsigned NOT NULL DEFAULT '0',
-  `width` int(4) unsigned NOT NULL DEFAULT '0',
-  `attribution` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`mediaID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 CREATE TABLE `obo_lo_pages` (
-  `pageID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
-  `pageData` blob NOT NULL,
-  PRIMARY KEY (`pageID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE TABLE `obo_lo_pages_copy` (
   `pageID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
   `pageData` blob NOT NULL,
   PRIMARY KEY (`pageID`)
@@ -129,28 +106,6 @@ CREATE TABLE `obo_log_attempts` (
   KEY `visit_id` (`visitID`),
   KEY `uid` (`userID`),
   KEY `loID` (`loID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE TABLE `obo_log_profile` (
-  `userID` bigint(255) NOT NULL,
-  `ip` varchar(20) NOT NULL,
-  `time` int(25) unsigned NOT NULL,
-  `appX` smallint(5) unsigned NOT NULL,
-  `appY` smallint(5) unsigned NOT NULL,
-  `hasAccessibility` tinyint(1) NOT NULL,
-  `isDebugger` tinyint(1) NOT NULL,
-  `language` tinytext NOT NULL,
-  `localFileReadDisable` tinyint(1) NOT NULL,
-  `manufacturer` tinytext NOT NULL,
-  `os` tinytext NOT NULL,
-  `playerType` tinytext NOT NULL,
-  `screenResolutionX` smallint(5) unsigned NOT NULL,
-  `screenResolutionY` smallint(5) unsigned NOT NULL,
-  `version` tinytext NOT NULL,
-  `HTTP_REFERER` text NOT NULL,
-  `HTTP_USER_AGENT` text NOT NULL,
-  `userTime` int(32) NOT NULL,
-  `userTimeOffset` tinyint(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `obo_log_qscores` (
@@ -349,19 +304,6 @@ CREATE TABLE `obo_map_roles_to_user` (
   `roleID` bigint(255) unsigned NOT NULL,
   UNIQUE KEY `role_id` (`roleID`,`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE TABLE `obo_semesters` (
-  `semesterID` bigint(255) unsigned NOT NULL AUTO_INCREMENT,
-  `semester` varchar(255) NOT NULL,
-  `year` int(4) NOT NULL,
-  `startTime` int(11) NOT NULL,
-  `endTime` int(11) NOT NULL,
-  PRIMARY KEY (`semesterID`),
-  KEY `Semester` (`semester`),
-  KEY `Year` (`year`),
-  KEY `StartTime` (`startTime`),
-  KEY `EndTime` (`endTime`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=COMPACT;
 
 CREATE TABLE `obo_system_temp` (
   `name` varchar(255) NOT NULL,
