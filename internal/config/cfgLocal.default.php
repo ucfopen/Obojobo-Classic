@@ -34,10 +34,4 @@ class AppCfg extends AppCfgDefault
 	const WP_SECURE_AUTH_SALT = '';
 	const WP_LOGGED_IN_SALT   = '';
 	const WP_NONCE_SALT       = '';
-
-	// SAML
-	const SAML_USERNAME = '';
-	const SAML_FIRST = '';
-	const SAML_LAST = '';
-	const SAML_ROLES = '';
 }
