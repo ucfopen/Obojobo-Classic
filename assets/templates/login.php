@@ -135,31 +135,8 @@ function initLoginScreen()
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">
-				<h1>Login to Begin</h1>
-				<?php if(isset($notice)) echo '<p class="login-notice">'.$notice.'</p>'; ?>
 
-				<ul>
-					<?php if (isset($_REQUEST['bypass'])) : ?>
-						<li>
-							<label for="username">UCF NID</label><br>
-							<input type="text" id="username" name="username" value="" title="UCF NID" tabindex="1">
-						</li>
-						<li>
-							<label for="password">Password</label><br>
-							<input type="password" id="password" name="password" value="" title="Password" tabindex="2">
-						</li>
-					<?php endif ?>
-
-					<li>
-						<input type="submit" id="signInSubmit" name="cmdweblogin" value="Login" tabindex="3">
-					</li>
-				</ul>
-
-				<ul class="foot">
-					<li><a href="https://my.ucf.edu/nid.html">Lookup NID</a></li>
-					<li><a href="http://mynid.ucf.edu/">Reset Password</a></li>
-					<li><a href="/help">Help</a></li>
-				</ul>
+			<?= include(\AppCfg::LOGIN_TEMPLATE); ?>
 
 			</form>
 		</div>

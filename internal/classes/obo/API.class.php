@@ -1389,21 +1389,10 @@ class API extends \rocketD\db\DBEnabled
 	}
 
 
-	// TODO: validation
+	// TODO: remove, no longer used
 	public function trackComputerData($data)
 	{
-		if($this->getSessionValid())
-		{
-			$this->DBM->startTransaction();
-			$compDataMan = \obo\log\ComputerDataManager::getInstance();
-			$result = $compDataMan->addComputerData($data);
-			$this->DBM->commit();
-		}
-		else
-		{
-			$result = \rocketD\util\Error::getError(1);
-		}
-		return $result;
+		return true;
 	}
 
 

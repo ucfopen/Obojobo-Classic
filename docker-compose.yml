@@ -17,8 +17,8 @@ services:
       dockerfile: internal/docker/dockerfile-obojobo
     volumes:
       - ./:/var/www/html:rw
+      - ./internal/config/cfgLocal.docker.php:/var/www/html/internal/config/cfgLocal.php:rw
       - ./internal/docker/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
-      # - ./internal/docker/php-extensions-runtime.ini:/usr/local/etc/php/conf.d/php-extensions-runtime.ini:ro
     links:
       - mysql
       - memcached
@@ -31,10 +31,13 @@ services:
       - MYSQL_PASSWORD=obojobo_pass
       - MYSQL_DATABASE=obojobo
     ports:
-     - "3306:3306" # allow mysql access from the host - use /etc/hosts to set mysql to your docker-machine ip
+    - "3306:3306" # allow mysql access from the host
     volumes:
-      - "./internal/docker/tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql"
-      - "./internal/docker/wordpress_db.sql:/docker-entrypoint-initdb.d/02_create_tables.sql"
+      - "./internal/docker/obojobo_tables.sql:/docker-entrypoint-initdb.d/01.sql"
+      - "./internal/docker/obojobo_sampledata.sql:/docker-entrypoint-initdb.d/02.sql"
+      - "./internal/docker/wordpress_db.sql:/docker-entrypoint-initdb.d/03.sql"
+      - "./internal/docker/wordpress_tables.sql:/docker-entrypoint-initdb.d/04.sql"
+      - "./internal/docker/wordpress_data.sql:/docker-entrypoint-initdb.d/05.sql"
 
   memcached:
     image: memcached:1.4.27-alpine
