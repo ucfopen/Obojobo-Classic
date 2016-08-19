@@ -21,7 +21,6 @@ exec("php ".__DIR__."/generate_password.php {$r->userID} $password --return-quer
 
 foreach ($queries as $query)
 {
-	echo("running query:");
 	$q = $DBM->query($query);
 }
 
