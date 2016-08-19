@@ -663,7 +663,7 @@ LOCK TABLES `wp_users` WRITE;
 
 INSERT INTO `wp_users` (`ID`, `user_login`, `user_pass`, `user_nicename`, `user_email`, `user_url`, `user_registered`, `user_activation_key`, `user_status`, `display_name`)
 VALUES
-	(2,'obojobo_wordpress','$P$Bm18WjtQvSrj6LlTAtv6uLRH.h5ZGZ1','wp_admin','newmedia@mail.ucf.edu','','2011-05-14 01:38:18','',0,'WP Admin');
+	(2,'obojobo_admin', MD5(RAND()),'wp_admin','example@mail.com','','2011-05-14 01:38:18','',0,'Obojobo Admin');
 
 /*!40000 ALTER TABLE `wp_users` ENABLE KEYS */;
 UNLOCK TABLES;
