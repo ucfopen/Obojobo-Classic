@@ -4,13 +4,23 @@ Obojobo is a Learning Module Management System
 # License
 Obojobo is not open source. If you have access to this repository, your license are goverend by the agreement you signed with UCF.
 
-# Quick Development Setup with Docker Compose
+# Quick Start with Docker
 For local development, testing, and as a reference for the architecture setup, we have a Docker environment to get you up and running quickly.
-Download [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker) and run `docker-compose up`
+
+The docker-compose setup will automatically set up the server containers, seed the database, and get everything up and running.
+
+1. Install [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker)
+2. Run `docker-compose up` in the obojobo directory
+3. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to reset the obojobo_admin user's password
 
 
 # Requirements
-
+* Unique domain or sub domain (obojobo.yourschool.edu)
+* libjpeg
+* libpng
+* Nginx (Apache can work too)
+* MySQL 5.5 or 5.6 database
+* Memcached
 * PHP 5.6 (with the following extensions)
  * gd
  * mbstring
@@ -21,46 +31,57 @@ Download [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker) 
  * pecl-memcache
  * pecl-oauth
  * xml
-* Memcached
-* libjpeg (for php gd)
-* libpng (for php gd)
-* Nginx (we prefer Nginx, but Apache will work)
-* MySQL 5.5 or 5.6 database
-* Unique Domain or sub domain (obojobo.yourschool.edu)
+* Install PHP Composer via https://getcomposer.org/download
 
-# Install
 
-1. Install all the required yum/apt-get packages listed above
-2. Clone the main Obojobo repository to a web directory `git clone git@github.com:ucfcdl/Obojobo.git /var/www/obojobo`
-3. Install composer (locally or globally) with instructions from https://getcomposer.org/download
-4. In the root app directory run `composer install` (w/ global composer) or `php composer.phar install` (w/ local composer)
-5. Make sure these directories are writable by the webserver's user (in our case, the nginx user)
- * internal/logs
- * internal/media
- * internal/templates/compiled
-6. Set up php ini. See `internal/docker/php.ini`
- * `date.timezone` to `America/New_York` or whatever's appropriate for you
- * `session.save_handler` to 'memcache'
- * `session.save_path` to `localhost:11211`
-7. Set a few php-fpm options
+# Production Install
+## PHP Setup
+
+1. Set a few php-fpm options (typically located in /etc/php-fpm.conf or /etc/php-fpm.d/*.conf)
  * user = nginx
  * group = nginx
  * `security.limit_extensions` to `.php`
-8. Set up your Nginx config. See `internal/docker/nginx.conf`
-9. Create your obojobo database, user, and tables defined in `internal/docker/tables.sql`
-10. Create your wordpress database and worpress specific mysql user.  See `internal/docker/wordpress_db.sql`
-10. Add a cron to run every 15 minutes `php /var/www/obojobo/internal/includes/cron15minute.php >> /var/log/cron.log 2>&1`
-11. Copy `/internal/config/cfgLocal.default.php` to `/internal/config/cfgLocal.php`
-12. Test site by visiting [http://localhost/repository](http://localhost/repository)
+2. Configure your php.ini settings. (typically located in /etc/php5/php.ini or nearby)
+ * set `date.timezone` to `America/New_York` or whatever's appropriate
+ * set `session.save_handler` to 'memcache'
+ * set `session.save_path` to `localhost:11211` (should be whatever your memcache server is running)
 
-# Setup
+## NGINX Setup
+We have a handful of url routing settings unique to Obojobo that need to be configured into the webserver.
 
-1. Seed Wordpress database
-2. Seed Obojobo database
-3. Set up an admin user
+1. Set up your Nginx config, typically located in /etc/nginx/nginx.conf or /etc/nginx/conf.d/*.conf
+2. Use the rules set in `internal/docker/nginx.conf` as a reference. Note the docker example is setup so that obojobo is the only site.
 
-## Database
-There are 2 databases, one for Wordpress, and one for Obojobo.  For enhanced security, it's worth keeping them in separate databases.
+## Create Databases
+Keeping separate users for wordpress and obojobo tables helps to somewhat isolate data and permissions.
+
+1. Create 2 mysql users
+  * `obojobo_user`
+  * `obojobo_wp_user`
+2. Create 2 mysql databases
+  * `obojobo`
+  * `obojobo_wordpress`
+1. Create tables and default data
+  * `internal/docker/01_obojobo_tables.sql`
+  * `internal/docker/02_obojobo_sampledata.sql`
+  * `internal/docker/03_wordpress_tables.sql`
+  * `internal/docker/04_wordpress_data.sql`
+
+## Set up Obojobo
+1. Git clone Obojobo `git clone git@github.com:ucfcdl/Obojobo.git`, preferably to a directory like `/var/www/obojobo`
+2. Install composer libraries: In the root app directory run `composer install` or `php composer.phar install`
+3. Make sure the following directories are writable by phpfpm's user.
+ * internal/logs
+ * internal/media
+ * internal/templates/compiled
+4. Copy `/internal/config/cfgLocal.default.php` to `/internal/config/cfgLocal.php` and customize
+
+## Configure
+
+1. Run through the options in cfgLocal.php for database connection info, paths, and hosts.
+
+
+
 
 # Customization
 
