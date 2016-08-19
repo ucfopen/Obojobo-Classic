@@ -1,5 +1,6 @@
 <?php
-require_once('config/cfgLocal.php'); // local config
+include_once('config/cfgLocal.php'); // local config
+if ( ! class_exists('AppCfg')) exit('Error: Obojobo cfgLocal invalid or missing.');
 spl_autoload_register('classAutoLoader');
 require_once('vendor/autoload.php');
 define ("CONFIG_ROOT", dirname(__FILE__) . '/config/');

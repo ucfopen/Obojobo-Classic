@@ -21,7 +21,9 @@
 define('WP_CACHE', true);
 
 // OBOJOBO configuration
-require_once(__DIR__.'/internal/config/cfgLocal.php'); // local config
+include_once(__DIR__.'/internal/config/cfgLocal.php'); // local config
+if ( ! class_exists('AppCfg')) exit('Error: Obojobo cfgLocal invalid or missing.');
+
 define('DB_NAME', AppCfg::DB_WP_NAME);
 
 /** MySQL database username */
