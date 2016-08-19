@@ -25,7 +25,7 @@ Download [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker) 
 * libjpeg (for php gd)
 * libpng (for php gd)
 * Nginx (we prefer Nginx, but Apache will work)
-* MySQL 5.5, 5.6 database
+* MySQL 5.5 or 5.6 database
 * Unique Domain or sub domain (obojobo.yourschool.edu)
 
 # Install

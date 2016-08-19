@@ -154,8 +154,8 @@ LOCK TABLES `obo_user_meta` WRITE;
 INSERT INTO `obo_user_meta` (`userID`, `meta`, `value`)
 VALUES
 	(1,'lastPassChange','1517308716'),
-	(1,'password','6ddee229b8d9ed03d1cb8d38ccf52bd5'),
-	(1,'salt','0e38efda23c1109feb6a8d3ece0b3a75');
+	(1,'password',''),
+	(1,'salt','ffff');
 
 /*!40000 ALTER TABLE `obo_user_meta` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -180,7 +180,7 @@ LOCK TABLES `obo_users` WRITE;
 
 INSERT INTO `obo_users` (`userID`, `login`, `auth_module`, `first`, `last`, `mi`, `email`, `createTime`, `lastLogin`, `sessionID`, `overrideAuthModRole`)
 VALUES
-	(1,'~su','rocketD\\auth\\ModInternal','UCF','CDL','','mail@example.com',1134416800,1471472838,'','0');
+	(1,'obojobo_admin','rocketD\\auth\\ModInternal','Obojobo','Admin','','mail@example.com',1134416800,1471472838,'','0');
 
 /*!40000 ALTER TABLE `obo_users` ENABLE KEYS */;
 UNLOCK TABLES;
