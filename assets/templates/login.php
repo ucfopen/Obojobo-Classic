@@ -135,9 +135,7 @@ function initLoginScreen()
 			</header>
 
 			<form id="login-form" class="overview-details " method="post">
-
-			<?= include(\AppCfg::LOGIN_TEMPLATE); ?>
-
+				<?php include(\AppCfg::LOGIN_TEMPLATE); ?>
 			</form>
 		</div>
 
