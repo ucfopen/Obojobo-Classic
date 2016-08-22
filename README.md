@@ -10,8 +10,10 @@ For local development, testing, and as a reference for the architecture setup, w
 The docker-compose setup will automatically set up the server containers, seed the database, and get everything up and running.
 
 1. Install [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker)
-2. Run `docker-compose up` in the obojobo directory
-3. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to reset the obojobo_admin user's password
+2. Install PHP Composer via https://getcomposer.org/download
+3. Run `composer install` - if you have git permission issues, [configure your github ssh keys](https://help.github.com/articles/generating-an-ssh-key/)
+4. Run `docker-compose up`
+5. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to generate the obojobo_admin user's password
 
 
 # Requirements
