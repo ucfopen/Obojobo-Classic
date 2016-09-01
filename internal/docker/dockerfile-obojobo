@@ -10,6 +10,7 @@ RUN apk --no-cache add \
 
 # PECL Libraries and php extensions
 RUN docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
+	&& pecl install oauth-1.2.3 \
 	&& pecl install memcache \
 	&& docker-php-ext-enable memcache \
 	&& docker-php-ext-install \

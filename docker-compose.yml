@@ -19,6 +19,7 @@ services:
       - ./:/var/www/html:rw
       - ./internal/config/cfgLocal.docker.php:/var/www/html/internal/config/cfgLocal.php:rw
       - ./internal/docker/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
+      - ./internal/docker/php-extensions.ini:/usr/local/etc/php/conf.d/php-extensions.ini:ro
     links:
       - mysql
       - memcached
