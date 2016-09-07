@@ -81,15 +81,12 @@
 		nope: '/assets/css/multiplebgfix.css'
 	});
 
-	// disable logs by defualt
-	debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
+	// global variables
+	<?php foreach ($globalJSVars as $key => $value) : ?>
+		<?= $key ?> = <?= (is_numeric($value) ? $value : "'$value'") ?>;
+	<?php endforeach ?>
 
-	// global variables from the config
-	// @TODO these are optional and shouldnt be requried!
-	_materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
-	_webUrl = '<?php echo \AppCfg::URL_WEB; ?>';
-	_credhubUrl = '<?php echo \AppCfg::CREDHUB_URL; ?>';
-	_credhubTimeout = parseInt('<?php echo \AppCfg::CREDHUB_TIMEOUT; ?>', 10);
+	debug.setLevel(<?= (\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0) ?>);
 
 	$(function() {
 		if(typeof __oldBrowser !== 'undefined' && __oldBrowser === true)
@@ -138,8 +135,8 @@
 		correctTime();
 
 		var params = {
-				loID:'<?php echo(isset($_REQUEST["loID"]) ? $_REQUEST["loID"] : ''); ?>',
-				instID:'<?php echo(isset($_REQUEST["instID"]) ? $_REQUEST["instID"] : ''); ?>'
+				loID:'<?= (isset($loID) ? $loID : ''); ?>',
+				instID:'<?= (isset($instID) ? $instID : ''); ?>'
 			};
 
 		obo.model.init(obo.view, {});
@@ -196,7 +193,7 @@
 <?php if(defined('\AppCfg::GOOGLE_ANALYTICS_ID')): ?>
 	<script type='text/javascript'>
 	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', '<?php echo \AppCfg::GOOGLE_ANALYTICS_ID; ?>']);
+	_gaq.push(['_setAccount', '<?= \AppCfg::GOOGLE_ANALYTICS_ID ?>']);
 	_gaq.push(['_trackPageview']);
 
 	(function() {

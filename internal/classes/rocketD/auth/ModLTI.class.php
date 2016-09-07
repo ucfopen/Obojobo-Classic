@@ -6,6 +6,20 @@ class ModLTI extends AuthModule
 
 	public static $AUTH_MOD_NAME = \AppCfg::LTI_EXTERNAL_AUTHMOD;
 
+	// Make sure fetchUserByLogin uses the relatedAuthMod
+	public function fetchUserByLogin($login)
+	{
+		$authMod = $this->getRelatedAuthMod();
+		return $authMod->fetchUserByLogin($login);
+	}
+
+	// Make sure createNewUser uses the relatedAuthMod
+	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
+	{
+		$authMod = $this->getRelatedAuthMod();
+		return $authMod->createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
+	}
+
 	public function authenticate($requestVars)
 	{
 		$success = false;
@@ -22,8 +36,7 @@ class ModLTI extends AuthModule
 
 			if ( ! $user && \AppCfg::LTI_CREATE_USER_IF_MISSING)
 			{
-				$authMod = $this->getRelatedAuthMod();
-				$result = $authMod->createNewUser($ltiData->username, $ltiData->first, $ltiData->last, '', $ltiData->email);
+				$result = $this->createNewUser($ltiData->username, $ltiData->first, $ltiData->last, '', $ltiData->email);
 				$user = $this->fetchUserByLogin($ltiData->username);
 			}
 
@@ -68,15 +81,14 @@ class ModLTI extends AuthModule
 		return true;
 	}
 
-	//
-	public function verifyPassword($user, $password) {}
-	protected function addRecord($userID, $userName, $password) {}
-	public function updateRecord($userID, $userName, $password) {}
-	public function validatePassword($pass) {}
-	public function removeRecord($userID) {}
-	public function dbSetPassword($userID, $newPassword) {}
-	public function requestPasswordReset($username, $email, $returnURL) {}
-	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey) {}
-	public function changePasswordWithKey($username, $key, $newpass) {}
+	public function verifyPassword($user, $password) { throw new \Exception("Method not implemented"); }
+	protected function addRecord($userID, $userName, $password) { throw new \Exception("Method not implemented"); }
+	public function updateRecord($userID, $userName, $password) { throw new \Exception("Method not implemented"); }
+	public function validatePassword($pass) { throw new \Exception("Method not implemented"); }
+	public function removeRecord($userID) { throw new \Exception("Method not implemented"); }
+	public function dbSetPassword($userID, $newPassword) { throw new \Exception("Method not implemented"); }
+	public function requestPasswordReset($username, $email, $returnURL) { throw new \Exception("Method not implemented"); }
+	protected function sendPasswordResetEmail($sendTo, $returnURL, $resetKey) { throw new \Exception("Method not implemented"); }
+	public function changePasswordWithKey($username, $key, $newpass) { throw new \Exception("Method not implemented"); }
 
 }

@@ -233,13 +233,13 @@ class ModInternal extends AuthModule
 		// make sure the string length is less then 255, our usernames aren't that long
 		if(strlen($username) > self::MAX_USERNAME_LENGTH)
 		{
-			trace("User name maximum length is {self::MAX_USERNAME_LENGTH} characters.", 1);
+			trace("User name maximum length is ".self::MAX_USERNAME_LENGTH." characters.", 1);
 			return false;
 		}
 		// make sure the username is atleast 2 characters
 		if(strlen($username) < self::MIN_USERNAME_LENGTH)
 		{
-			trace("User name minimum length is {self::MIN_USERNAME_LENGTH} characters.", 1);
+			trace("User name minimum length is ".self::MIN_USERNAME_LENGTH." characters.", 1);
 			return false;
 		}
 		if(preg_match(\AppCfg::AUTH_INTERNAL_USERNAME_MATCH, $username) == false)

@@ -8,8 +8,6 @@ class Views
 	// @TODO For a class named View, this method is doing too much
 	static public function validateLtiAndRenderAnyErrors($ltiData)
 	{
-		$ltiApi = \lti\API::getInstance();
-
 		$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI_OAUTH_SECRET, \AppCfg::LTI_OAUTH_TIMEOUT);
 		if($valid instanceof \OAuthException)
 		{
@@ -32,7 +30,7 @@ class Views
 			static::renderUnknownUserError($ltiData, 'invalid-user-data');
 		}
 
-		if(!$ltiApi->updateAndAuthenticateUser($ltiData))
+		if(!\lti\API::updateAndAuthenticateUser($ltiData))
 		{
 			static::renderUnknownUserError($ltiData, 'unable-to-update-and-authenticate');
 		}

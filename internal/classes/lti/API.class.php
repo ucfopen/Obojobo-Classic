@@ -2,13 +2,125 @@
 
 namespace lti;
 
-class API extends \rocketD\db\DBEnabled
+class API
 {
-	use \rocketD\Singleton;
-
 	const LTI_SESSION_TOKEN_ID_PREFIX = 'ltiToken';
+	static protected $DBM_reference;
 
-	public function updateAndAuthenticateUser($ltiData)
+	protected static function DBM()
+	{
+		if(!isset(static::$DBM_reference))
+		{
+			$DBE = new \rocketD\db\DBEnabled();
+			static::$DBM_reference = $DBE->DBM;
+		}
+
+		return static::$DBM_reference;
+	}
+
+	public static function handleLtiLaunch()
+	{
+
+		$ltiData = new \lti\Data($_REQUEST);
+
+		profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+
+		// ================ VALIDATE REQUIREMENTS ================
+
+		if(empty($_REQUEST['instID']) || ! is_numeric($_REQUEST['instID']))
+		{
+			\lti\Views::renderUnknownAssignmentError($ltiData, $ltiData->isInstructor());
+		}
+		$originalInstID = $_REQUEST['instID'];
+
+		// show error if any values are invalid
+		\lti\Views::validateLtiAndRenderAnyErrors($ltiData);
+
+		// ================ CHECK & CREATE LTI ASSOCIATION ================
+
+		// link the lti resource id with an instance and duplicate the instance if required
+		$resp = static::createLtiAssociationIfNeeded($originalInstID, $ltiData);
+		if(!$resp || !is_numeric($resp))
+		{
+			$msg = ($resp instanceof \obo\util\Error) ? $resp->message : 'Unexpected error creating LTI association.';
+			\lti\Views::renderUnexpectedError($ltiData, $msg);
+		}
+
+		// looks good, resp should be an instID
+		$instID = $resp;
+
+		// ================ RENDER OR REDIRECT DEPENDING ON LTI LAUNCH ROLE ================
+
+		if($ltiData->isTestUser())
+		{
+			$instanceData = getInstanceDataOrRenderError($instID);
+			static::initAssessmentSession($instID, $ltiData);
+			profile('lti', "'assignment-visit-testuser', '$instID', '".time()."'");
+			// test user shows a special page
+			\lti\Views::renderTestUserConfirmPage($instanceData);
+			exit();
+		}
+
+		if($ltiData->isInstructor())
+		{
+			$instanceData = getInstanceDataOrRenderError($instID);
+			$loID = $instanceData->loID;
+
+			// We want to store in some additional permissions info in
+			// the session so this gives the instructor a way to be
+			// able to view the instance in Obojobo
+			if(!empty($ltiData->username))
+			{
+				$AM = \rocketD\auth\AuthManager::getInstance();
+				$user = $AM->fetchUserByUserName($ltiData->username);
+
+				$PM = \obo\perms\PermManager::getInstance();
+				$PM->setSessionPermsForUserToItem($user->userID, \cfg_core_Perm::TYPE_INSTANCE, $instID, array(20));
+			}
+
+			// redirect to preview
+			$previewURL = \AppCfg::URL_WEB . 'preview/' . $loID;
+			profile('lti',"'assignment-visit-redirect', '$previewURL', '".time()."'");
+			header('Location: ' . $previewURL);
+			exit();
+		}
+
+		// Everyone else
+		static::initAssessmentSession($instID, $ltiData);
+
+		// redirect to student view
+		$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
+		profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
+
+		return $instID;
+	}
+
+	public static function getInstanceDataOrRenderError($instID, $ltiData)
+	{
+		$API = \obo\API::getInstance();
+		$instanceData = $API->getInstanceData($instID);
+		if(!$instanceData || !isset($instanceData->instID))
+		{
+			\lti\Views::renderUnknownAssignmentError($ltiData, true);
+		}
+
+		return $instanceData;
+	}
+
+	public static function hasLtiLaunchData(Array $data)
+	{
+		$required = ['lti_message_type','lti_version','oauth_consumer_key','resource_link_id'];
+		foreach ($required as $value)
+		{
+			if(!array_key_exists($value, $data))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static function updateAndAuthenticateUser($ltiData)
 	{
 
 		// If this is the test user we don't want to create a new
@@ -31,14 +143,14 @@ class API extends \rocketD\db\DBEnabled
 	 * Saves the lti data into the session and creates a Hash to identify it
 	 * @return string LTI Instance Token Hash (a random sha1 string)
 	 */
-	public function storeLtiData($ltiData)
+	public static function storeLtiData($ltiData)
 	{
-		if(!$this->startSession())
+		if(!static::startSession())
 		{
 			return false;
 		}
 
-		$tokenId = $this->generateLtiToken();
+		$tokenId = static::generateLtiToken();
 
 		// We serialize the ltiData class instance so other session_start calls
 		// don't have to do load ltiData
@@ -47,9 +159,9 @@ class API extends \rocketD\db\DBEnabled
 		return $tokenId;
 	}
 
-	public function restoreLtiData($tokenId)
+	public static function restoreLtiData($tokenId)
 	{
-		if(!$this->startSession())
+		if(!static::startSession())
 		{
 			return false;
 		}
@@ -63,10 +175,10 @@ class API extends \rocketD\db\DBEnabled
 		return unserialize($_SESSION[$fullToken]);
 	}
 
-	public function createLtiAssociationIfNeeded($originalInstID, $ltiData)
+	public static function createLtiAssociationIfNeeded($originalInstID, $ltiData)
 	{
 		$API = \obo\API::getInstance();
-		$assocations = $this->getAssociationsForOriginalItemId($originalInstID);
+		$assocations = static::getAssociationsForOriginalItemId($originalInstID);
 		$duplicateCreated = false;
 
 		$anyAssociationsFoundWithCurrentResourceLink = isset($assocations[$ltiData->resourceId]);
@@ -102,10 +214,10 @@ class API extends \rocketD\db\DBEnabled
 			|| !$instanceSupportsExternalLink
 			// OR we don't have any lti associations with this assignment (resource link)
 			// BUT we found an association that already exists for the target instance
-			|| (!$anyAssociationsFoundWithCurrentResourceLink && $this->isInstIDInAssociationTable($targetInstId))
+			|| (!$anyAssociationsFoundWithCurrentResourceLink && static::isInstIDInAssociationTable($targetInstId))
 		)
 		{
-			$targetInstId = $this->duplicateInstance($originalInstID, $ltiData);
+			$targetInstId = static::duplicateInstance($originalInstID, $ltiData);
 			if(!$targetInstId || !is_numeric($targetInstId) || $targetInstId instanceof \rocketD\util\Error)
 			{
 				return \obo\util\Error::getError(8003);
@@ -121,7 +233,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			profile('lti',"'insert-association','$originalInstID','$targetInstId','$ltiData->resourceId','$ltiData->contextTitle','$anyAssociationsFoundWithCurrentResourceLink','$anyAssociationsFoundWithOriginalInst','$instanceSupportsExternalLink','$duplicateCreated' '".time()."'");
 
-			if($this->insertAssociation($originalInstID, $ltiData, $targetInstId) !== 1)
+			if(static::insertAssociation($originalInstID, $ltiData, $targetInstId) !== 1)
 			{
 				return \obo\util\Error::getError(8001);
 			}
@@ -130,7 +242,7 @@ class API extends \rocketD\db\DBEnabled
 		return $targetInstId;
 	}
 
-	public function duplicateInstance($originalInstId, $ltiData)
+	public static function duplicateInstance($originalInstId, $ltiData)
 	{
 		// First, duplicate the instance
 		$IM = \obo\lo\InstanceManager::getInstance();
@@ -143,144 +255,50 @@ class API extends \rocketD\db\DBEnabled
 		}
 
 		// Set the 'external link' property of the new instance
-		$success = $this->updateExternalLinkForInstance($newInstId, $ltiData);
+		$success = static::updateExternalLinkForInstance($newInstId, $ltiData);
 		if(!$success)
 		{
 			return \obo\util\Error::getError(8001); // unable to set/update assoc
 		}
 
-		// Set a new assocation for this instance
-		/*$success = $this->setOrUpdateLtiInstanceAssociation($newInstId, $originalInstID, $ltiData);
-		if(!$success || $success instanceof \obo\util\Error)
-		{
-			return false;
-		}*/
-
 		return $newInstId;
 	}
 
-	public function updateExternalLinkForInstance($instID, $ltiData)
+	public static function updateExternalLinkForInstance($instID, $ltiData)
 	{
 		$IM = \obo\lo\InstanceManager::getInstance();
 		return $IM->updateInstanceExternalLink($instID, $ltiData->consumer);
 	}
 
-	protected function isInstIDInAssociationTable($itemId)
+	public static function initAssessmentSession($instID, $ltiData)
 	{
-		$qstr = "	SELECT * FROM obo_lti
-					WHERE item_id = '?'
-					ORDER BY created_at DESC
-					LIMIT 1";
-
-		if(!($q = $this->DBM->querySafe($qstr, $itemId)))
-		{
-			return \obo\util\Error::getError(2);
-		}
-
-		return $this->DBM->affected_rows() > 0;
+		$_SESSION["lti.{$instID}.consumer"]       = $ltiData->consumer;
+		$_SESSION["lti.{$instID}.outcomeUrl"]     = $ltiData->serviceUrl;
+		$_SESSION["lti.{$instID}.resourceLinkId"] = $ltiData->resourceId;
+		$_SESSION["lti.{$instID}.sourceId"]       = $ltiData->sourceId;
 	}
 
-
-	// Builds an array of data from the lti association table BY RESOURCE_LINK
-	// In the case where there are multiple LTI associations for a resource_link
-	// the newest one is returned.
-	// Multiple associations for the same link can occur when a user changes
-	// the instance linked to the resource
-	protected function getAssociationsForOriginalItemId($originalItemId)
+	public static function getAssessmentSessionData($instID)
 	{
-		$qstr = "	SELECT * FROM obo_lti
-					WHERE original_item_id = '?'
-					ORDER BY created_at ASC";
-
-		if(!($q = $this->DBM->querySafe($qstr, $originalItemId)))
-		{
-			return \obo\util\Error::getError(2);
-		}
-
-		$links = array();
-		while($r = $this->DBM->fetch_obj($q))
-		{
-			$links[$r->resource_link] = $r;
-		}
-
-		return $links;
-	}
-
-	protected function getLtiInstanceAssociation($originalInstID, $ltiData)
-	{
-		// This query will only get the most recent record:
-		$qstr = "	SELECT * FROM obo_lti
-					WHERE original_item_id = '?'
-					AND context_id = '?'
-					ORDER BY created_at DESC
-					LIMIT 1";
-
-		//if(!($q = $this->DBM->querySafe($qstr, $ltiData->contextId, $ltiData->consumerId)))
-		if(!($q = $this->DBM->querySafe($qstr, $originalInstID, $ltiData->contextId)))
-		{
-			return \obo\util\Error::getError(2);
-		}
-
-		if(!($r = $this->DBM->fetch_obj($q)))
-		{
-			return false; // no association found
-		}
-
-		return $r;
-	}
-
-	public function initAssessmentSession($instID, $ltiData)
-	{
-		return $this->setAssessmentSessionData($instID, $ltiData);
-	}
-
-	public function getAssessmentSessionData($instID)
-	{
-		if(	isset($_SESSION["lti.$instID.consumer"]) &&
-			isset($_SESSION["lti.$instID.outcomeUrl"]) &&
-			isset($_SESSION["lti.$instID.resourceLinkId"]) &&
-			isset($_SESSION["lti.$instID.sourceId"])
+		trace($_SESSION);
+		if(	isset($_SESSION["lti.{$instID}.consumer"]) &&
+			isset($_SESSION["lti.{$instID}.outcomeUrl"]) &&
+			isset($_SESSION["lti.{$instID}.resourceLinkId"]) &&
+			isset($_SESSION["lti.{$instID}.sourceId"])
 		)
 		{
 			return array(
-				"consumer"       => $_SESSION["lti.$instID.consumer"],
-				"outcomeUrl"     => $_SESSION["lti.$instID.outcomeUrl"],
-				"resourceLinkId" => $_SESSION["lti.$instID.resourceLinkId"],
-				"sourceId"       => $_SESSION["lti.$instID.sourceId"],
+				"consumer"       => $_SESSION["lti.{$instID}.consumer"],
+				"outcomeUrl"     => $_SESSION["lti.{$instID}.outcomeUrl"],
+				"resourceLinkId" => $_SESSION["lti.{$instID}.resourceLinkId"],
+				"sourceId"       => $_SESSION["lti.{$instID}.sourceId"],
 			);
 		}
 
 		return false;
 	}
 
-	public function getInstanceDataForLti($ltiData)
-	{
-		// find details about the association
-		$associationData = $this->getLtiInstanceAssociation($ltiData);
-		if($associationData instanceof \obo\util\Error || !$associationData)
-		{
-			return false;
-		}
-
-		// verify that this is a valid instance
-		$API = \obo\API::getInstance();
-		$instanceData = $API->getInstanceData($associationData->item_id);
-		if(!$instanceData || !isset($instanceData->instID))
-		{
-			profile('lti',"'missing-instance','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
-			return false;
-		}
-
-		if ($instanceData->externalLink == '')
-		{
-			profile('lti',"'no-longer-associated','$associationData->item_id', '$ltiData->contextTitle', '$ltiData->resourceId', '".time()."'");
-			return false;
-		}
-
-		return $instanceData;
-	}
-
-	public function sendScore($score, $instID, $sourceID, $serviceUrl, $secret)
+	public static function sendScore($score, $instID, $sourceID, $serviceUrl, $secret)
 	{
 		if(!($score >= 0) || empty($instID) || empty($sourceID) || empty($serviceUrl) || empty($secret))
 		{
@@ -319,8 +337,71 @@ class API extends \rocketD\db\DBEnabled
 		return $success;
 	}
 
+	protected static function isInstIDInAssociationTable($itemId)
+	{
+		$qstr = "	SELECT * FROM obo_lti
+					WHERE item_id = '?'
+					ORDER BY created_at DESC
+					LIMIT 1";
+
+		if(!($q = static::DBM()->querySafe($qstr, $itemId)))
+		{
+			return \obo\util\Error::getError(2);
+		}
+
+		return static::DBM()->affected_rows() > 0;
+	}
+
+
+	// Builds an array of data from the lti association table BY RESOURCE_LINK
+	// In the case where there are multiple LTI associations for a resource_link
+	// the newest one is returned.
+	// Multiple associations for the same link can occur when a user changes
+	// the instance linked to the resource
+	protected static function getAssociationsForOriginalItemId($originalItemId)
+	{
+		$qstr = "	SELECT * FROM obo_lti
+					WHERE original_item_id = '?'
+					ORDER BY created_at ASC";
+
+		if(!($q = static::DBM()->querySafe($qstr, $originalItemId)))
+		{
+			return \obo\util\Error::getError(2);
+		}
+
+		$links = array();
+		while($r = static::DBM()->fetch_obj($q))
+		{
+			$links[$r->resource_link] = $r;
+		}
+
+		return $links;
+	}
+
+	protected static function getLtiInstanceAssociation($originalInstID, $ltiData)
+	{
+		// This query will only get the most recent record:
+		$qstr = "	SELECT * FROM obo_lti
+					WHERE original_item_id = '?'
+					AND context_id = '?'
+					ORDER BY created_at DESC
+					LIMIT 1";
+
+		if(!($q = static::DBM()->querySafe($qstr, $originalInstID, $ltiData->contextId)))
+		{
+			return \obo\util\Error::getError(2);
+		}
+
+		if(!($r = static::DBM()->fetch_obj($q)))
+		{
+			return false; // no association found
+		}
+
+		return $r;
+	}
+
 	// Uses the Obojobo way to start the session by utilizing getSessionValid.
-	protected function startSession()
+	protected static function startSession()
 	{
 		// This will start/restore the session we want
 		$API = \obo\API::getInstance();
@@ -333,7 +414,7 @@ class API extends \rocketD\db\DBEnabled
 		return true;
 	}
 
-	protected function insertAssociation($originalInstId, $ltiData, $newInstId = false)
+	protected static function insertAssociation($originalInstId, $ltiData, $newInstId = false)
 	{
 		$newInstId = $newInstId ? $newInstId : $originalInstId;
 
@@ -350,7 +431,7 @@ class API extends \rocketD\db\DBEnabled
 					`context_title` = '?',
 					`created_at` = '?'";
 
-		if(!($q = $this->DBM->querySafe(
+		if(!($q = static::DBM()->querySafe(
 			$qstr,
 			$newInstId,
 			$originalInstId,
@@ -367,18 +448,10 @@ class API extends \rocketD\db\DBEnabled
 			return \obo\util\Error::getError(2);
 		}
 
-		return $this->DBM->affected_rows();
+		return static::DBM()->affected_rows();
 	}
 
-	protected function setAssessmentSessionData($instID, $ltiData)
-	{
-		$_SESSION["lti.$instID.consumer"]       = $ltiData->consumer;
-		$_SESSION["lti.$instID.outcomeUrl"]     = $ltiData->serviceUrl;
-		$_SESSION["lti.$instID.resourceLinkId"] = $ltiData->resourceId;
-		$_SESSION["lti.$instID.sourceId"]       = $ltiData->sourceId;
-	}
-
-	protected function generateLtiToken()
+	protected static function generateLtiToken()
 	{
 		return str_replace('.', '', uniqid('', true));
 	}
