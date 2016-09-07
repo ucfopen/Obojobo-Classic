@@ -138,13 +138,10 @@ obo.view = function()
 		$('.copyright-year').html(d.format('yyyy'));
 
 		// listen for history events
-		if(Modernizr.history)
-		{
-			window.onpopstate = function(event) {
-				preventUpdateHistoryOnNextRender = true;
-				gotoPageFromURL();
-			};
-		}
+		window.onpopstate = function(event) {
+			preventUpdateHistoryOnNextRender = true;
+			gotoPageFromURL();
+		};
 		
 		// Live events:
 		$(document).on('click', '.next-section-button', function(event) {
@@ -1810,18 +1807,15 @@ obo.view = function()
 	// browers that don't support it simply don't modify the history.
 	var updateHistory = function(replaceState)
 	{
-		if(Modernizr.history)
+		var newURL = baseURL + '#' + getHashURL();
+		if(replaceState === true)
 		{
-			var newURL = baseURL + '#' + getHashURL();
-			if(replaceState === true)
-			{
-				history.replaceState(null, null, newURL);
-			}
-			// only push if we're not adding a duplicate url to the stack:
-			else
-			{
-				history.pushState(null, null, baseURL + '#' + getHashURL());
-			}
+			history.replaceState(null, null, newURL);
+		}
+		// only push if we're not adding a duplicate url to the stack:
+		else
+		{
+			history.pushState(null, null, baseURL + '#' + getHashURL());
 		}
 	};
 	

@@ -12,7 +12,6 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 	?>
 	<!-- DEV JAVASCRIPT LIBRARIES -->
 	<script type="text/javascript" src="/assets/js/jquery.js"></script>
-	<script type="text/javascript" src="/assets/js/modernizr.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.infieldlabel.js"></script>
 	<script type="text/javascript" src="/assets/js/date.format.js"></script>
 
@@ -34,7 +33,6 @@ else
 
 <script type="text/javascript" src="/min/b=assets/js&amp;f=
 jquery.js,
-modernizr.js,
 jquery.infieldlabel.js,
 date.format.js"></script>
 

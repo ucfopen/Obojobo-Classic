@@ -17,7 +17,6 @@
 	<!-- DEV JAVASCRIPT LIBRARIES -->
 	<script type="text/javascript" src="/assets/js/jquery.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
-	<script type="text/javascript" src="/assets/js/modernizr.js"></script>
 	<script type="text/javascript" src="/assets/js/date.format.js"></script>
 	<script type="text/javascript" src="/assets/js/swfobject.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.tipTip.js"></script>
@@ -41,7 +40,7 @@
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-	<script type="text/javascript" src="/min/b=assets/js&f=jquery-ui-1.8.18.custom.min.js,modernizr.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
+	<script type="text/javascript" src="/min/b=assets/js&f=jquery-ui-1.8.18.custom.min.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
 <?php endif; ?>
 
@@ -75,11 +74,6 @@
 		}
 	}
 
-	// Polyfills:
-	Modernizr.load({
-		test: Modernizr.multiplebgs,
-		nope: '/assets/css/multiplebgfix.css'
-	});
 
 	// disable logs by defualt
 	debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
