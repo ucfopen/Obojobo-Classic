@@ -1,5 +1,15 @@
 <?php
 require_once('internal/app.php');
+
+// ================= CHECK FOR LTI LAUNCH DATA =======================
+
+if(!isset($_REQUEST['loID']) && \lti\API::hasLtiLaunchData($_REQUEST))
+{
+	// Change behavior to LTI launch
+	$instID = \lti\API::handleLtiLaunch();
+}
+
+// Not an LTI, behave like a normal view/preview
 require('internal/includes/login.php');
 
 $API = \obo\API::getInstance();
@@ -17,16 +27,24 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 }
 
 // ================ DISPLAY OUTPUT =================================
-// logged in, show the viewer
 if($loggedIn === true)
 {
+	// prepare template variables
+	$instID = isset($instID) ? $instID : filter_input(INPUT_GET, 'instID', FILTER_VALIDATE_INT);
+	$loID = filter_input(INPUT_GET, 'loID', FILTER_VALIDATE_INT);
+	$globalJSVars = [
+		'_materiaLtiUrl'  => \AppCfg::MATERIA_LTI_URL,
+		'_webUrl'         => \AppCfg::URL_WEB,
+		'_credhubUrl'     => \AppCfg::CREDHUB_URL,
+		'_credhubTimeout' => (int) \AppCfg::CREDHUB_TIMEOUT,
+	];
+	// logged in, show the viewer
 	header('X-UA-Compatible: IE=edge');
 	include('assets/templates/viewer-main.php');
 }
-
-// not logged in, show login screen
 else
 {
+	// not logged in, show login screen
 
 	// ================ PREPARE VARS FOR THE TEMPLATE ================
 
@@ -39,8 +57,7 @@ else
 			// Reject access if this is attempted direct access to an LTI instance:
 			if(!empty($instData->externalLink))
 			{
-				$ltiApi = \lti\API::getInstance();
-				if(!$ltiApi->getAssessmentSessionData($_REQUEST['instID']))
+				if(!\lti\API::getAssessmentSessionData($_REQUEST['instID']))
 				{
 					// No session data for LTI - Either they got logged out or they accessed the instance directly.
 					header('Location: ' . \AppCfg::URL_WEB . 'error/no-access.html');
