@@ -7,7 +7,6 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Obojobo LTI Error - {$errorTitle}</title>
-	<!-- <link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" media="screen" /> -->
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti-error.css">
 
 	  <!-- GOOGLE FONTS -->
