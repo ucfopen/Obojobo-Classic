@@ -178,8 +178,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			// Verify that this is not direct access to an externally linked instance
 			if(!empty($r->{\cfg_obo_Instance::EXTERNAL_LINK}))
 			{
-				$ltiApi = \lti\API::getInstance();
-				if(!$ltiApi->getAssessmentSessionData($instID))
+				if(!\lti\API::getAssessmentSessionData($instID))
 				{
 					return \rocketD\util\Error::getError(4006);
 				}

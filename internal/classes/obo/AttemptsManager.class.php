@@ -679,8 +679,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		{
 			// Send the score via LTI
 			//@TODO: Check to make sure session variables are set
-			$ltiApi = \lti\API::getInstance();
-			$assessmentData = $ltiApi->getAssessmentSessionData($instData->instID);
+			$assessmentData = \lti\API::getAssessmentSessionData($instData->instID);
 			if(!$assessmentData)
 			{
 				profile('lti',"'cant-find-assessment-session-data', {$_SESSION["userID"]}, '$submittableScore', '".time()."'");
@@ -689,7 +688,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			else
 			{
 				$secret  = \AppCfg::LTI_OAUTH_SECRET;
-				$success = $ltiApi->sendScore($submittableScore, $instData->instID, $assessmentData['sourceId'], $assessmentData['outcomeUrl'], $secret);
+				$success = \lti\API::sendScore($submittableScore, $instData->instID, $assessmentData['sourceId'], $assessmentData['outcomeUrl'], $secret);
 
 				if(!$success)
 				{
