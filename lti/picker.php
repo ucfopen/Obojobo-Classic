@@ -13,7 +13,6 @@ else
 
 function beginPickerSession()
 {
-	$ltiApi  = \lti\API::getInstance();
 	$ltiData = new \lti\Data($_POST);
 
 	\lti\Views::validateLtiAndRenderAnyErrors($ltiData);
@@ -23,7 +22,7 @@ function beginPickerSession()
 		\lti\Views::renderIncorrectRoleError($ltiData);
 	}
 
-	$ltiInstanceToken = $ltiApi->storeLtiData($ltiData);
+	$ltiInstanceToken = \lti\API::storeLtiData($ltiData);
 	if (!$ltiInstanceToken)
 	{
 		\lti\Views::renderUnexpectedError($ltiData, "Couldn't store LTI token in session");
@@ -34,10 +33,9 @@ function beginPickerSession()
 
 function clearAssociatedInstance()
 {
-	$ltiApi           = \lti\API::getInstance();
 	$selectedInstId   = $_POST['selectedInstId'];
 	$ltiInstanceToken = $_POST['ltiInstanceToken'];
-	$ltiData          = $ltiApi->restoreLtiData($ltiInstanceToken);
+	$ltiData          = \lti\API::restoreLtiData($ltiInstanceToken);
 
 	if ( ! $ltiData)
 	{
@@ -68,8 +66,7 @@ function createNewExternallyLinkedInstance()
 	$scoreMethod      = $_POST['scoreMethod'];
 	$allowScoreImport = $_POST['allowScoreImport'] === 'true';
 
-	$ltiApi           = \lti\API::getInstance();
-	$ltiData          = $ltiApi->restoreLtiData($ltiInstanceToken);
+	$ltiData          = \lti\API::restoreLtiData($ltiInstanceToken);
 
 	$courseName       = $ltiData->contextTitle;
 
@@ -83,7 +80,7 @@ function createNewExternallyLinkedInstance()
 		return;
 	}
 
-	$success = $ltiApi->updateExternalLinkForInstance($selectedInstId, $ltiData);
+	$success = \lti\API::updateExternalLinkForInstance($selectedInstId, $ltiData);
 	if($success instanceof \rocketD\util\Error || !$success)
 	{
 		echo(json_encode(createResponse(false)));

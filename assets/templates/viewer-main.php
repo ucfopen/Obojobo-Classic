@@ -6,41 +6,43 @@
 <?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 
 	<!-- DEV OBOJOBO CSS -->
-	<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" />
+	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" />
 
 	<!-- DEV LIBRARY CSS -->
-	<link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" />
+	<link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery.tiptip/1.3/tipTip.min.css" />
 
 	<!-- GOOGLE FONTS -->
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
 	<!-- DEV JAVASCRIPT LIBRARIES -->
-	<script type="text/javascript" src="/assets/js/jquery.js"></script>
-	<script type="text/javascript" src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
-	<script type="text/javascript" src="/assets/js/date.format.js"></script>
-	<script type="text/javascript" src="/assets/js/swfobject.js"></script>
-	<script type="text/javascript" src="/assets/js/jquery.tipTip.js"></script>
-	<script type="text/javascript" src="/assets/js/ba-debug.js"></script>
-	<script type="text/javascript" src="/assets/js/jquery.idletimer.js"></script>
-	<script type="text/javascript" src="/assets/js/jquery.idletimeout.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/qa-form.jquery.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/assets/js/jquery-ui-1.8.18.custom.min.js"></script>
+	<script src="/assets/js/date.format.js"></script>
+	<script src="/assets/js/swfobject.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tiptip/1.3/jquery.tipTip.minified.js"></script>
+	<script src="/assets/js/ba-debug.js"></script>
+	<script src="/assets/js/jquery.idletimer.js"></script>
+	<script src="/assets/js/jquery.idletimeout.js"></script>
+	<script src="/assets/js/viewer/qa-form.jquery.js"></script>
 
 	<!-- DEV OBOJOBO LIBRARIES -->
-	<script type="text/javascript" src="/assets/js/viewer/obo.util.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.view.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.remote.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.model.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.media.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.dialog.js"></script>
-	<script type="text/javascript" src="/assets/js/viewer/obo.captivate.js"></script>
+	<script src="/assets/js/viewer/obo.util.js"></script>
+	<script src="/assets/js/viewer/obo.view.js"></script>
+	<script src="/assets/js/viewer/obo.remote.js"></script>
+	<script src="/assets/js/viewer/obo.model.js"></script>
+	<script src="/assets/js/viewer/obo.media.js"></script>
+	<script src="/assets/js/viewer/obo.dialog.js"></script>
+	<script src="/assets/js/viewer/obo.captivate.js"></script>
 
 <?php else: ?>
 
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tiptip/1.3/jquery.tipTip.minified.js"></script>
 	<link type="text/css" rel="stylesheet" href="/min/b=assets/css&f=themes/default.css,tipTip.css" media="screen" />
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-	<script type="text/javascript" src="/min/b=assets/js&f=jquery-ui-1.8.18.custom.min.js,date.format.js,jquery.tipTip.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+	<script src="/min/b=assets/js&f=jquery-ui-1.8.18.custom.min.js,date.format.js,ba-debug.js,jquery.idletimer.js,jquery.idletimeout.js,viewer/qa-form.jquery.js,viewer/obo.util.js,viewer/obo.view.js,viewer/obo.remote.js,viewer/obo.model.js,viewer/obo.media.js,viewer/obo.dialog.js,viewer/obo.captivate.js"></script>
 
 <?php endif; ?>
 
@@ -75,15 +77,12 @@
 	}
 
 
-	// disable logs by defualt
-	debug.setLevel(<?php echo \AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0 ; ?>);
+	// global variables
+	<?php foreach ($globalJSVars as $key => $value) : ?>
+		<?= $key ?> = <?= (is_numeric($value) ? $value : "'$value'") ?>;
+	<?php endforeach ?>
 
-	// global variables from the config
-	// @TODO these are optional and shouldnt be requried!
-	_materiaLtiUrl = '<?php echo \AppCfg::MATERIA_LTI_URL; ?>';
-	_webUrl = '<?php echo \AppCfg::URL_WEB; ?>';
-	_credhubUrl = '<?php echo \AppCfg::CREDHUB_URL; ?>';
-	_credhubTimeout = parseInt('<?php echo \AppCfg::CREDHUB_TIMEOUT; ?>', 10);
+	debug.setLevel(<?= (\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV ? 5 : 0) ?>);
 
 	$(function() {
 		if(typeof __oldBrowser !== 'undefined' && __oldBrowser === true)
@@ -132,8 +131,8 @@
 		correctTime();
 
 		var params = {
-				loID:'<?php echo(isset($_REQUEST["loID"]) ? $_REQUEST["loID"] : ''); ?>',
-				instID:'<?php echo(isset($_REQUEST["instID"]) ? $_REQUEST["instID"] : ''); ?>'
+				loID:'<?= (isset($loID) ? $loID : ''); ?>',
+				instID:'<?= (isset($instID) ? $instID : ''); ?>'
 			};
 
 		obo.model.init(obo.view, {});
@@ -187,19 +186,7 @@
 		}
 	}
 </script>
-<?php if(defined('\AppCfg::GOOGLE_ANALYTICS_ID')): ?>
-	<script type='text/javascript'>
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', '<?php echo \AppCfg::GOOGLE_ANALYTICS_ID; ?>']);
-	_gaq.push(['_trackPageview']);
-
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
-	</script>
-<?php endif ?>
+<?php include(\AppCfg::DIR_BASE . 'assets/templates/google_analytics.php'); ?>
 </head>
 <body>
 </body>

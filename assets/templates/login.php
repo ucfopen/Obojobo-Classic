@@ -5,15 +5,10 @@ $time = empty($title) ? '' : $title;
 <html>
 <head>
 <title><?php echo $title; ?> | Obojobo Learning Object</title>
-<?php
-// =========================== DEV AND TEST ENVIRONMENTS =============================
-if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
-{
-	?>
+<?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 	<!-- DEV JAVASCRIPT LIBRARIES -->
-	<script type="text/javascript" src="/assets/js/jquery.js"></script>
-	<script type="text/javascript" src="/assets/js/jquery.infieldlabel.js"></script>
-	<script type="text/javascript" src="/assets/js/date.format.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/assets/js/date.format.js"></script>
 
 	<!-- DEV OBOJOBO CSS -->
 	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" media="screen">
@@ -24,24 +19,14 @@ if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV)
 	<!-- GOOGLE FONTS -->
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
-  <?php
-}
-// =========================== PRODUCTION ENVIRONMENT =============================
-else
-{
-  ?>
+<?php else: ?>
 
-<script type="text/javascript" src="/min/b=assets/js&amp;f=
-jquery.js,
-jquery.infieldlabel.js,
-date.format.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/min/b=assets/js&amp;f=date.format.js"></script>
+	<link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
+	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
-<link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
-<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
-
-  <?php
-}
-?>
+<?php endif; ?>
 
 
 <!-- BEGIN IE CONDITIONALS: -->
@@ -57,7 +42,7 @@ date.format.js"></script>
 
 <style type="text/css">.__oldBrowser { background: #eeeeee; }</style>
 
-<script type="text/javascript">
+<script>
 // Guess if they have an old browser
 // We check for IE <= 7 up in the IE conditionals.
 // We assume Chrome is up to date
@@ -104,8 +89,6 @@ $('document').ready(function()
 
 function initLoginScreen()
 {
-	$("label").inFieldLabels();
-
 	<?php if($hasTime) : ?>
 		var startTime = new Date(<?php echo $startTime * 1000; ?>);
 		var endTime = new Date(<?php echo $endTime * 1000; ?>);
@@ -147,18 +130,6 @@ function initLoginScreen()
 			<p></p>
 		</div>
 	</footer>
-	<?php if(defined('\AppCfg::GOOGLE_ANALYTICS_ID')): ?>
-		<script type='text/javascript'>
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '<?php echo \AppCfg::GOOGLE_ANALYTICS_ID; ?>']);
-		_gaq.push(['_trackPageview']);
-
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-		</script>
-	<?php endif ?>
+<?php include(\AppCfg::DIR_BASE . 'assets/templates/google_analytics.php'); ?>
 </body>
 </html>

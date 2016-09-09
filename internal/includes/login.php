@@ -1,5 +1,4 @@
 <?php
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
 	$username = isset($_REQUEST['username']) ? $_REQUEST['username'] : '';
@@ -11,4 +10,3 @@ else
 {
 	$loggedIn = \obo\API::getInstance()->getSessionValid();
 }
-

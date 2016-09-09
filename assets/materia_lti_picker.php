@@ -41,7 +41,7 @@ if(!is_array($results)) exit('There was an error, please try again later.');
 <html>
 <head>
 	<title>Select a Widget for use in Obojobo</title>
-	<script src="js/jquery.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		$(function() {
 			$('#form').submit();
