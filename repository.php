@@ -16,9 +16,9 @@ if ( !$loggedIn)
 <title>Repository | Obojobo&#8482;</title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 
-<script type='text/javascript' src='/wp/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
+<script src='/wp/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
 
-<script type='text/javascript' src='/wp/wp-includes/js/swfobject.js?ver=2.2'></script>
+<script src='/wp/wp-includes/js/swfobject.js?ver=2.2'></script>
 
 <style type="text/css" media="screen">
 	html, body{
@@ -28,18 +28,18 @@ if ( !$loggedIn)
 		height:100%;
 	}
 </style>
-<script type="text/javascript">
+<script>
 	var SWF_URL = "Repository_2_1_7.swf";
 
 	// START PREVENT CLOSE
 	window.onbeforeunload = confirmExit;
 
 	 function thisMovie(movieName) {
-			 if (navigator.appName.indexOf("Microsoft") != -1) {
-					 return window[movieName];
-			 } else {
-					 return document[movieName];
-			 }
+			if (navigator.appName.indexOf("Microsoft") != -1) {
+					return window[movieName];
+			} else {
+					return document[movieName];
+			}
 	 }
 
 	function confirmExit(){
@@ -50,7 +50,7 @@ if ( !$loggedIn)
 	}
 	// END PREVENT CLOSE
 </script>
-<script type="text/javascript" defer="defer">
+<script defer="defer">
 	// SWFOBJECT
 	var flashvars = new Object();
 	flashvars.view = "";
@@ -69,19 +69,7 @@ if ( !$loggedIn)
 
 	swfobject.embedSWF( "/assets/flash/" + SWF_URL, "flexApp", "100%", "100%", "10",  "/assets/flash/expressInstall.swf", flashvars, params, attributes);
 </script>
-<?php if(defined('\AppCfg::GOOGLE_ANALYTICS_ID')): ?>
-	<script type='text/javascript'>
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', '<?php echo \AppCfg::GOOGLE_ANALYTICS_ID; ?>']);
-	_gaq.push(['_trackPageview']);
-
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
-	</script>
-<?php endif ?>
+<?php include(\AppCfg::DIR_BASE . 'assets/templates/google_analytics.php'); ?>
 </head>
 <body >
 	<div id="flexApp">
@@ -93,6 +81,5 @@ if ( !$loggedIn)
 			<div style="clear:both;"></div>
 		</div>
 	</div>
-	<script type='text/javascript' src='/wp/wp-includes/js/admin-bar.js?ver=20111130'></script>
 </body>
 </html>
