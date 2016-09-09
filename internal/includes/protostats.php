@@ -1,4 +1,4 @@
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
 	<script src="/assets/js/jquery.tablesorter.min.js"></script>
 	<!--script src="/assets/js/jquery.tablesorter.pager.js"></script-->
