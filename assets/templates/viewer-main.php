@@ -6,7 +6,7 @@
 <?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 
 	<!-- DEV OBOJOBO CSS -->
-	<link type="text/css" rel="stylesheet" href="/min/b=assets/css/themes&f=default.css" />
+	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" />
 
 	<!-- DEV LIBRARY CSS -->
 	<link type="text/css" rel="stylesheet" href="/assets/css/tipTip.css" />
