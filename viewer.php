@@ -17,7 +17,7 @@ else
 
 $API = \obo\API::getInstance();
 
-// ================= CHECK FOR REQUIRED ROLE =======================
+// ================= CHECK FOR REQUIRED ROLE TO SEE PREVIEW =======================
 
 if($loggedIn === true && isset($_REQUEST['loID']))
 {
@@ -30,9 +30,11 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 }
 
 // ================ DISPLAY OUTPUT =================================
+
 if($loggedIn === true)
 {
-	// prepare template variables
+	// logged in, show the viewer
+
 	$instID = isset($instID) ? $instID : filter_input(INPUT_GET, 'instID', FILTER_VALIDATE_INT);
 	$loID = filter_input(INPUT_GET, 'loID', FILTER_VALIDATE_INT);
 	$globalJSVars = [

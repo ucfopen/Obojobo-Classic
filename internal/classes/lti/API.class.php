@@ -61,6 +61,8 @@ class API
 			exit();
 		}
 
+		// does the lti role indicate this is an instructor?
+		// this overrides their state in the local obojobo database!
 		if($ltiData->isInstructor())
 		{
 			$instanceData = getInstanceDataOrRenderError($instID);
@@ -91,6 +93,13 @@ class API
 		// redirect to student view
 		$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
 		profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
+
+		if($isntID != $originalInstID)
+		{
+			// we need the url to match the new instance - redirect now
+			header('Location: ' . $viewURL);
+			exit()
+		}
 
 		return $instID;
 	}
@@ -280,7 +289,6 @@ class API
 
 	public static function getAssessmentSessionData($instID)
 	{
-		trace($_SESSION);
 		if(	isset($_SESSION["lti.{$instID}.consumer"]) &&
 			isset($_SESSION["lti.{$instID}.outcomeUrl"]) &&
 			isset($_SESSION["lti.{$instID}.resourceLinkId"]) &&
