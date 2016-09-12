@@ -7,10 +7,13 @@ if(!isset($_REQUEST['loID']) && \lti\API::hasLtiLaunchData($_REQUEST))
 {
 	// Change behavior to LTI launch
 	$instID = \lti\API::handleLtiLaunch();
+	$loggedIn = \obo\API::getInstance()->getSessionValid();
 }
-
-// Not an LTI, behave like a normal view/preview
-require('internal/includes/login.php');
+else
+{
+	// Not an LTI, behave like a normal view/preview
+	require('internal/includes/login.php');
+}
 
 $API = \obo\API::getInstance();
 
