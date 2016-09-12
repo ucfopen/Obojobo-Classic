@@ -43,15 +43,13 @@ if($loggedIn === true)
 		'_credhubUrl'     => \AppCfg::CREDHUB_URL,
 		'_credhubTimeout' => (int) \AppCfg::CREDHUB_TIMEOUT,
 	];
-	// logged in, show the viewer
+
 	header('X-UA-Compatible: IE=edge');
-	include('assets/templates/viewer-main.php');
+	include('assets/templates/viewer.php');
 }
 else
 {
 	// not logged in, show login screen
-
-	// ================ PREPARE VARS FOR THE TEMPLATE ================
 
 	$title = 'Obojobo';
 	// Instance requested - student mode
