@@ -98,7 +98,7 @@ class API
 		{
 			// we need the url to match the new instance - redirect now
 			header('Location: ' . $viewURL);
-			exit()
+			exit();
 		}
 
 		return $instID;
