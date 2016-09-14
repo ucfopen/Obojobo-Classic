@@ -94,7 +94,7 @@ class API
 		$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
 		profile('lti',"'lti-launch-redirect-student', '$viewURL', '".time()."'");
 
-		if($isntID != $originalInstID)
+		if($instID != $originalInstID)
 		{
 			// we need the url to match the new instance - redirect now
 			header('Location: ' . $viewURL);
