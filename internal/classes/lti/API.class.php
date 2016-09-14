@@ -106,8 +106,7 @@ class API
 
 	public static function getInstanceDataOrRenderError($instID, $ltiData)
 	{
-		$API = \obo\API::getInstance();
-		$instanceData = $API->getInstanceData($instID);
+		$instanceData = \obo\API::getInstance()->getInstanceData($instID);
 		if(!$instanceData || !isset($instanceData->instID))
 		{
 			\lti\Views::renderUnknownAssignmentError($ltiData, true);
