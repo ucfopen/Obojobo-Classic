@@ -185,7 +185,6 @@ class API
 
 	public static function createLtiAssociationIfNeeded($originalInstID, $ltiData)
 	{
-		$API = \obo\API::getInstance();
 		$assocations = static::getAssociationsForOriginalItemId($originalInstID);
 		$duplicateCreated = false;
 
@@ -193,7 +192,7 @@ class API
 		$targetInstId = $anyAssociationsFoundWithCurrentResourceLink ? $assocations[$ltiData->resourceId]->item_id : $originalInstID;
 		$anyAssociationsFoundWithOriginalInst = count($assocations) > 0;
 
-		$instanceData = $API->getInstanceData($targetInstId);
+		$instanceData = \obo\API::getInstance()->getInstanceData($targetInstId);
 		$instanceSupportsExternalLink = isset($instanceData->externalLink) && $instanceData->externalLink == $ltiData->consumer;
 
 		// Edge case: We need to check to see if the targetInstance doesnt exist.
@@ -411,8 +410,7 @@ class API
 	protected static function startSession()
 	{
 		// This will start/restore the session we want
-		$API = \obo\API::getInstance();
-		$getSessionValidResult = $API->getSessionValid();
+		$getSessionValidResult = \obo\API::getInstance()->getSessionValid();
 		if(!$getSessionValidResult || $getSessionValidResult instanceof \RocketD\util\Error)
 		{
 			return false;
