@@ -23,7 +23,7 @@ class API
 
 		$ltiData = new \lti\Data($_REQUEST);
 
-		profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'lti-launch', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".implode(',', $ltiData->roles)."', '".time()."'");
 
 		// ================ VALIDATE REQUIREMENTS ================
 
@@ -53,9 +53,9 @@ class API
 
 		if($ltiData->isTestUser())
 		{
-			$instanceData = getInstanceDataOrRenderError($instID);
+			$instanceData = static::getInstanceDataOrRenderError($instID);
 			static::initAssessmentSession($instID, $ltiData);
-			profile('lti', "'assignment-visit-testuser', '$instID', '".time()."'");
+			profile('lti', "'lti-launch-testuser', '$instID', '".time()."'");
 			// test user shows a special page
 			\lti\Views::renderTestUserConfirmPage($instanceData);
 			exit();
@@ -65,7 +65,7 @@ class API
 		// this overrides their state in the local obojobo database!
 		if($ltiData->isInstructor())
 		{
-			$instanceData = getInstanceDataOrRenderError($instID);
+			$instanceData = static::getInstanceDataOrRenderError($instID);
 			$loID = $instanceData->loID;
 
 			// We want to store in some additional permissions info in
@@ -82,7 +82,7 @@ class API
 
 			// redirect to preview
 			$previewURL = \AppCfg::URL_WEB . 'preview/' . $loID;
-			profile('lti',"'assignment-visit-redirect', '$previewURL', '".time()."'");
+			profile('lti',"'lti-launch-redirect-instructor', '$previewURL', '".time()."'");
 			header('Location: ' . $previewURL);
 			exit();
 		}
@@ -92,7 +92,7 @@ class API
 
 		// redirect to student view
 		$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
-		profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
+		profile('lti',"'lti-launch-redirect-student', '$viewURL', '".time()."'");
 
 		if($isntID != $originalInstID)
 		{
