@@ -16,9 +16,24 @@ class OAuth
 		if($_REQUEST['oauth_timestamp'] >= (time() - \lti\OAuth::$timeout)) throw new Exception("Authorization signature is too old.");
 		if($_REQUEST['oauth_consumer_key'] !== $key) throw new Exception("Authorization signature failure.");
 
+		// OK, so OAUTH IS FUN
+		// nginx has a redirect from /view/222 to /viewer.php?instID=222
+		// OAUTH uses all get and post params for a signature
+		// SO, inbound messages from canvas do not contain an instID variable
+		// BUT when we get them here, it looks like we have an instID variable
+		// by default - oauth includes this, and builds a signature, and we don't match what canvas sends.
+		// SO, let's fix that just in case
+		$filtered_params = $_REQUEST;
+		// if instID= is in the request, it's an old lti/assignment.php?instID= url
+		// new REQUEST_URI's will be /view/333
+		if(strpos($_SERVER['REQUEST_URI'], 'instID=') == false)
+		{
+			unset($filtered_params['instID']);
+		}
+
 		$hmcsha1   = new \Eher\OAuth\HmacSha1();
 		$consumer  = new \Eher\OAuth\Consumer($key, $secret);
-		$request   = \Eher\OAuth\Request::from_request();
+		$request   = \Eher\OAuth\Request::from_request(null, null, $filtered_params);
 		$signature = $request->build_signature($hmcsha1, $consumer, false);
 
 		if($signature !== $_REQUEST['oauth_signature']) throw new Exception("Authorization signatures don't match.");
