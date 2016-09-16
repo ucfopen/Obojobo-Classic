@@ -60,7 +60,7 @@ class OAuth
 		$params   = array_merge($params, $oauthParams);
 		$hmcsha1  = new \Eher\OAuth\HmacSha1();
 		$consumer = new \Eher\OAuth\Consumer('', $secret);
-		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint );
+		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint);
 		foreach($params as $key => $val)
 		{
 			$request->set_parameter($key, $val, false);
@@ -80,7 +80,7 @@ class OAuth
 		$bodyHash = base64_encode(sha1($body, TRUE)); // build body hash
 		$hmcsha1  = new \Eher\OAuth\HmacSha1();
 		$consumer = new \Eher\OAuth\Consumer('', $secret);
-		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', ['oauth_body_hash' => $bodyHash]);
+		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint, ['oauth_body_hash' => $bodyHash]);
 		$request->sign_request($hmcsha1, $consumer, '');
 
 		$response = false;
