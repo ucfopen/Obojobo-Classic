@@ -30,7 +30,6 @@ class Data
 
 	public function __construct($data)
 	{
-		$this->oauthNonce     = static::get($data, 'oauth_nonce');
 		$this->sourceId       = static::get($data, 'lis_result_sourcedid');
 		$this->serviceUrl     = static::get($data, 'lis_outcome_service_url');
 		$this->resourceId     = static::get($data, 'resource_link_id');

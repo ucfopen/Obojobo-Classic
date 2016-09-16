@@ -10,7 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="/assets/css/lti.css">
 	<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
 
-	<script src="/assets/js/jquery.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script src="/assets/js/lti/jquery-ui-1.10.3.custom.js"></script>
 	<script src="/assets/js/ba-debug.js"></script>
 	<script src="/assets/js/viewer/obo.util.js"></script>

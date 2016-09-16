@@ -8,19 +8,16 @@ class Views
 	// @TODO For a class named View, this method is doing too much
 	static public function validateLtiAndRenderAnyErrors($ltiData)
 	{
-		$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI_OAUTH_SECRET, \AppCfg::LTI_OAUTH_TIMEOUT);
-		if($valid instanceof \OAuthException)
+		try
 		{
-			if($valid->getCode() === OAUTH_TOKEN_EXPIRED)
-			{
-				static::renderExpiredError($ltiData);
-			}
-			else
-			{
-				static::renderUnexpectedError($ltiData, $valid->getMessage());
-			}
+			$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::LTI_OAUTH_KEY, \AppCfg::LTI_OAUTH_SECRET, \AppCfg::LTI_OAUTH_TIMEOUT);
 		}
-		else if(!$valid)
+		catch (\lti\Exception $e)
+		{
+			static::renderUnexpectedError($ltiData, $e->getMessage());
+		}
+
+		if(!$valid)
 		{
 			static::renderInvalidLTI($ltiData);
 		}
@@ -95,14 +92,6 @@ class Views
 		profile('lti',"'unknown-user', '$errorDetail', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 		$template = static::createErrorTemplate($ltiData);
 		static::renderTemplate($template, 'lti-error-unknown-user');
-	}
-
-	static public function renderExpiredError($ltiData)
-	{
-		\lti\Views::logError($ltiData);
-		profile('lti',"'expired', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
-		$template = static::createErrorTemplate($ltiData);
-		static::renderTemplate($template, 'lti-error-expired');
 	}
 
 	static public function renderPicker($ltiInstanceToken, $returnUrl)

@@ -23,7 +23,7 @@ class API
 
 		$ltiData = new \lti\Data($_REQUEST);
 
-		profile('lti',"'assignment-visit', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+		profile('lti',"'lti-launch', '$_SERVER[REQUEST_URI]', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".implode(',', $ltiData->roles)."', '".time()."'");
 
 		// ================ VALIDATE REQUIREMENTS ================
 
@@ -53,17 +53,19 @@ class API
 
 		if($ltiData->isTestUser())
 		{
-			$instanceData = getInstanceDataOrRenderError($instID);
+			$instanceData = static::getInstanceDataOrRenderError($instID);
 			static::initAssessmentSession($instID, $ltiData);
-			profile('lti', "'assignment-visit-testuser', '$instID', '".time()."'");
+			profile('lti', "'lti-launch-testuser', '$instID', '".time()."'");
 			// test user shows a special page
 			\lti\Views::renderTestUserConfirmPage($instanceData);
 			exit();
 		}
 
+		// does the lti role indicate this is an instructor?
+		// this overrides their state in the local obojobo database!
 		if($ltiData->isInstructor())
 		{
-			$instanceData = getInstanceDataOrRenderError($instID);
+			$instanceData = static::getInstanceDataOrRenderError($instID);
 			$loID = $instanceData->loID;
 
 			// We want to store in some additional permissions info in
@@ -80,7 +82,7 @@ class API
 
 			// redirect to preview
 			$previewURL = \AppCfg::URL_WEB . 'preview/' . $loID;
-			profile('lti',"'assignment-visit-redirect', '$previewURL', '".time()."'");
+			profile('lti',"'lti-launch-redirect-instructor', '$previewURL', '".time()."'");
 			header('Location: ' . $previewURL);
 			exit();
 		}
@@ -90,15 +92,21 @@ class API
 
 		// redirect to student view
 		$viewURL = \AppCfg::URL_WEB . 'view/' . $instID;
-		profile('lti',"'assignment-visit-redirect', '$viewURL', '".time()."'");
+		profile('lti',"'lti-launch-redirect-student', '$viewURL', '".time()."'");
+
+		if($instID != $originalInstID)
+		{
+			// we need the url to match the new instance - redirect now
+			header('Location: ' . $viewURL);
+			exit();
+		}
 
 		return $instID;
 	}
 
 	public static function getInstanceDataOrRenderError($instID, $ltiData)
 	{
-		$API = \obo\API::getInstance();
-		$instanceData = $API->getInstanceData($instID);
+		$instanceData = \obo\API::getInstance()->getInstanceData($instID);
 		if(!$instanceData || !isset($instanceData->instID))
 		{
 			\lti\Views::renderUnknownAssignmentError($ltiData, true);
@@ -177,7 +185,6 @@ class API
 
 	public static function createLtiAssociationIfNeeded($originalInstID, $ltiData)
 	{
-		$API = \obo\API::getInstance();
 		$assocations = static::getAssociationsForOriginalItemId($originalInstID);
 		$duplicateCreated = false;
 
@@ -185,7 +192,7 @@ class API
 		$targetInstId = $anyAssociationsFoundWithCurrentResourceLink ? $assocations[$ltiData->resourceId]->item_id : $originalInstID;
 		$anyAssociationsFoundWithOriginalInst = count($assocations) > 0;
 
-		$instanceData = $API->getInstanceData($targetInstId);
+		$instanceData = \obo\API::getInstance()->getInstanceData($targetInstId);
 		$instanceSupportsExternalLink = isset($instanceData->externalLink) && $instanceData->externalLink == $ltiData->consumer;
 
 		// Edge case: We need to check to see if the targetInstance doesnt exist.
@@ -280,7 +287,6 @@ class API
 
 	public static function getAssessmentSessionData($instID)
 	{
-		trace($_SESSION);
 		if(	isset($_SESSION["lti.{$instID}.consumer"]) &&
 			isset($_SESSION["lti.{$instID}.outcomeUrl"]) &&
 			isset($_SESSION["lti.{$instID}.resourceLinkId"]) &&
@@ -404,8 +410,7 @@ class API
 	protected static function startSession()
 	{
 		// This will start/restore the session we want
-		$API = \obo\API::getInstance();
-		$getSessionValidResult = $API->getSessionValid();
+		$getSessionValidResult = \obo\API::getInstance()->getSessionValid();
 		if(!$getSessionValidResult || $getSessionValidResult instanceof \RocketD\util\Error)
 		{
 			return false;

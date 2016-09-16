@@ -380,7 +380,7 @@ obo.lti = function()
 			var instID = response.body.instID;
 			if(typeof __returnUrl !== 'undefined' && __returnUrl !== null && __returnUrl !== '')
 			{
-				var widgetURL = __webUrl + 'lti/assignment.php?instID=' + instID;
+				var widgetURL = __webUrl + 'view/' + instID;
 				var pendingCreateInstanceSuccessResponse = ltiUrl === 'pending';
 				ltiUrl = __returnUrl + '?embed_type=basic_lti&url=' + encodeURI(widgetURL);
 				if(pendingCreateInstanceSuccessResponse)

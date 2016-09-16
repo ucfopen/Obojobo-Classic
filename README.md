@@ -29,10 +29,8 @@ The docker-compose setup will automatically set up the server containers, seed t
  * mycrypt
  * mysql
  * mysqlnd
- * oauth
  * opcache
  * pecl-memcache
- * pecl-oauth
  * xml
 * Install PHP Composer via https://getcomposer.org/download
 

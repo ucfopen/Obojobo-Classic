@@ -9,6 +9,7 @@ $launch_url    = \AppCfg::URL_WEB.'lti/assignment.php';
 $platform      = 'canvas.instructure.com';
 $privacy_level = 'public';
 $picker_url    = \AppCfg::URL_WEB.'lti/picker.php';
+$domain        = parse_url(\AppCfg::URL_WEB)['host'];
 echo('<?xml version="1.0" encoding="UTF-8"?>')
 ?>
 <cartridge_basiclti_link
@@ -22,6 +23,7 @@ echo('<?xml version="1.0" encoding="UTF-8"?>')
 	<blti:description><?= $description ?></blti:description>
 	<blti:launch_url><?= $launch_url ?></blti:launch_url>
 	<blti:extensions platform="<?= $platform ?>">
+		<lticm:property name="domain"><?= $domain ?></lticm:property>
 		<lticm:property name="tool_id">grade_passback</lticm:property>
 		<lticm:property name="privacy_level"><?= $privacy_level ?></lticm:property>
 			<lticm:options name="resource_selection">

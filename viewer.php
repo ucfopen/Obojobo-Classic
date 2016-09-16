@@ -7,14 +7,17 @@ if(!isset($_REQUEST['loID']) && \lti\API::hasLtiLaunchData($_REQUEST))
 {
 	// Change behavior to LTI launch
 	$instID = \lti\API::handleLtiLaunch();
+	$loggedIn = \obo\API::getInstance()->getSessionValid();
 }
-
-// Not an LTI, behave like a normal view/preview
-require('internal/includes/login.php');
+else
+{
+	// Not an LTI, behave like a normal view/preview
+	require('internal/includes/login.php');
+}
 
 $API = \obo\API::getInstance();
 
-// ================= CHECK FOR REQUIRED ROLE =======================
+// ================= CHECK FOR REQUIRED ROLE TO SEE PREVIEW =======================
 
 if($loggedIn === true && isset($_REQUEST['loID']))
 {
@@ -27,9 +30,11 @@ if($loggedIn === true && isset($_REQUEST['loID']))
 }
 
 // ================ DISPLAY OUTPUT =================================
+
 if($loggedIn === true)
 {
-	// prepare template variables
+	// logged in, show the viewer
+
 	$instID = isset($instID) ? $instID : filter_input(INPUT_GET, 'instID', FILTER_VALIDATE_INT);
 	$loID = filter_input(INPUT_GET, 'loID', FILTER_VALIDATE_INT);
 	$globalJSVars = [
@@ -38,15 +43,13 @@ if($loggedIn === true)
 		'_credhubUrl'     => \AppCfg::CREDHUB_URL,
 		'_credhubTimeout' => (int) \AppCfg::CREDHUB_TIMEOUT,
 	];
-	// logged in, show the viewer
+
 	header('X-UA-Compatible: IE=edge');
-	include('assets/templates/viewer-main.php');
+	include('assets/templates/viewer.php');
 }
 else
 {
 	// not logged in, show login screen
-
-	// ================ PREPARE VARS FOR THE TEMPLATE ================
 
 	$title = 'Obojobo';
 	// Instance requested - student mode

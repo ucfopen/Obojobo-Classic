@@ -10,7 +10,18 @@ class ModLTI extends AuthModule
 	public function fetchUserByLogin($login)
 	{
 		$authMod = $this->getRelatedAuthMod();
-		return $authMod->fetchUserByLogin($login);
+		$result = $authMod->fetchUserByLogin($login);
+
+		// if the related auth module fails to find them and create if missing is true
+		// we want to fall back on just getting them out of the database
+		// sometimes fechUserByLogin will fail in an auth module because
+		// it returns false if a user doesn't exist upstream, we need to be able to bypass this
+		if ( ! ($result instanceof \rocketD\auth\User) && \AppCfg::LTI_CREATE_USER_IF_MISSING)
+		{
+			$result = parent::fetchUserByLogin($login);
+		}
+
+		return $result;
 	}
 
 	// Make sure createNewUser uses the relatedAuthMod

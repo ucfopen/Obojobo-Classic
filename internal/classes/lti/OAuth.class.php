@@ -1,6 +1,8 @@
 <?php
 namespace lti;
 
+class Exception extends \Exception {}
+
 class OAuth
 {
 	public static $ltiData;
@@ -10,54 +12,23 @@ class OAuth
 
 	public static function validateLtiMessage($ltiData, $key, $secret, $timeout)
 	{
-		if(!$ltiData->oauthNonce)
-		{
-			return false;
-		}
+		if(empty($_REQUEST['oauth_nonce'])) throw new Exception("Authorization fingerprint is missing.");
+		if($_REQUEST['oauth_timestamp'] >= (time() - \lti\OAuth::$timeout)) throw new Exception("Authorization signature is too old.");
+		if($_REQUEST['oauth_consumer_key'] !== $key) throw new Exception("Authorization signature failure.");
 
-		self::$ltiData = $ltiData;
-		self::$key     = $key;
-		self::$secret  = $secret;
-		self::$timeout = $timeout;
+		$hmcsha1   = new \Eher\OAuth\HmacSha1();
+		$consumer  = new \Eher\OAuth\Consumer($key, $secret);
+		$request   = \Eher\OAuth\Request::from_request();
+		$signature = $request->build_signature($hmcsha1, $consumer, false);
 
-		$timestampChecker = function($provider)
-		{
-			//@TODO - Check to see if nonce is already used
-			return $provider->timestamp >= time() - \lti\OAuth::$timeout ? OAUTH_OK : OAUTH_TOKEN_EXPIRED;
-		};
+		if($signature !== $_REQUEST['oauth_signature']) throw new Exception("Authorization signatures don't match.");
 
-		$consumerHandler = function($provider)
-		{
-			$provider->consumer_secret = \lti\OAuth::$secret;
-
-			return OAUTH_OK;
-		};
-
-		// ===============  VALIDATE THE OAUTH SIG ===============
-		try
-		{
-			$op = new \OAuthProvider();
-			$op->consumerHandler($consumerHandler);
-			$op->timestampNonceHandler($timestampChecker);
-			$op->is2LeggedEndpoint(true);
-			//return true;
-			$op->checkOAuthRequest();
-			return true;
-		}
-		catch (\OAuthException $e)
-		{
-			return $e;
-		}
-
-		\lti\Views::logError($ltiData);
-		return false;
+		return true;
 	}
 
 	public static function buildPostArgs($user, $endpoint, $params, $key, $secret, $outcomeUrl = false)
 	{
-		$roleMan = \obo\perms\RoleManager::getInstance();
-
-		$oauthParams = array(
+		$oauthParams = [
 			"oauth_consumer_key"                     => $key,
 			"oauth_nonce"                            => uniqid(),
 			"oauth_timestamp"                        => time(),
@@ -79,24 +50,22 @@ class OAuth
 
 			"launch_presentation_document_target"    => 'iframe',
 			"launch_presentation_return_url"         => \AppCfg::URL_WEB.\AppCfg::LTI_LAUNCH_PRESENTATION_RETURN_URL
-		);
+		];
 
 		if($outcomeUrl)
 		{
 			$oauthParams['lis_outcome_service_url'] = $outcomeUrl;
 		}
 
-		$params = array_merge($params, $oauthParams);
-
-		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'oauth.php');
-
-		$consumer = new \OAuthConsumer('', $secret); // create the consumer
-		$request = \OAuthRequest::from_consumer_and_token($consumer, '', 'POST', $endpoint );
+		$params   = array_merge($params, $oauthParams);
+		$hmcsha1  = new \Eher\OAuth\HmacSha1();
+		$consumer = new \Eher\OAuth\Consumer('', $secret);
+		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint);
 		foreach($params as $key => $val)
 		{
 			$request->set_parameter($key, $val, false);
 		}
-		$request->sign_request(new \OAuthSignatureMethod_HMAC_SHA1(), $consumer, '');
+		$request->sign_request($hmcsha1, $consumer, '');
 
 		return $request->get_parameters();
 	}
@@ -107,23 +76,22 @@ class OAuth
 	public static function sendBodyHashedPOST($endpoint, $body, $secret)
 	{
 		// ================ BUILD OAUTH REQUEST =========================
-		include_once(\AppCfg::DIR_BASE . \AppCfg::DIR_SCRIPTS . 'oauth.php');
 
 		$bodyHash = base64_encode(sha1($body, TRUE)); // build body hash
-		$consumer = new \OAuthConsumer('', $secret); // create the consumer
-
-		$request = \OAuthRequest::from_consumer_and_token($consumer, '', 'POST', $endpoint, array('oauth_body_hash' => $bodyHash) );
-		$request->sign_request(new \OAuthSignatureMethod_HMAC_SHA1(), $consumer, '');
+		$hmcsha1  = new \Eher\OAuth\HmacSha1();
+		$consumer = new \Eher\OAuth\Consumer('', $secret);
+		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint, ['oauth_body_hash' => $bodyHash]);
+		$request->sign_request($hmcsha1, $consumer, '');
 
 		$response = false;
-		$timeouts = array(10, 25, 35);
+		$timeouts = [10, 25, 35];
 		foreach ($timeouts as $timeoutIndex => $timeout)
 		{
 			$attemptCount = $timeoutIndex + 1;
 
 			// ================= SEND REQUEST =================================
 			$streamHeaders = $request->to_header() . "\r\n" . 'Content-Type: application/xml' . "\r\n"; // add content type header
-			$params = array('http' => array('timeout' => $timeout, 'method' => 'POST', 'content' => $body, 'header' => $streamHeaders));
+			$params = ['http' => ['timeout' => $timeout, 'method' => 'POST', 'content' => $body, 'header' => $streamHeaders]];
 			$streamContext = stream_context_create($params);
 			$fp = @fopen($endpoint, 'rb', false, $streamContext);
 
@@ -157,10 +125,10 @@ class OAuth
 
 		$codeMajorValue = $xml->imsx_POXHeader->imsx_POXResponseHeaderInfo->imsx_statusInfo->imsx_codeMajor;
 
-		$result = array(
+		$result = [
 			'success' => !empty($codeMajorValue) && $codeMajorValue[0] == 'success',
 			'error'   => false
-		);
+		];
 
 		if(!$result['success'])
 		{

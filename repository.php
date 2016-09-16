@@ -16,9 +16,8 @@ if ( !$loggedIn)
 <title>Repository | Obojobo&#8482;</title>
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 
-<script src='/wp/wp-includes/js/jquery/jquery.js?ver=1.7.1'></script>
-
-<script src='/wp/wp-includes/js/swfobject.js?ver=2.2'></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 <style type="text/css" media="screen">
 	html, body{
