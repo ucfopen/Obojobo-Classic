@@ -1038,4 +1038,3 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 
 }
-?>

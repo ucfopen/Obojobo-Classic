@@ -7,9 +7,8 @@ $time = empty($title) ? '' : $title;
 <title><?php echo $title; ?> | Obojobo Learning Object</title>
 <?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 	<!-- DEV JAVASCRIPT LIBRARIES -->
-	<script type="text/javascript" src="/assets/js/jquery.js"></script>
-	<script type="text/javascript" src="/assets/js/modernizr.js"></script>
-	<script type="text/javascript" src="/assets/js/date.format.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/assets/js/date.format.js"></script>
 
 	<!-- DEV OBOJOBO CSS -->
 	<link type="text/css" rel="stylesheet" href="/assets/css/themes/default.css" media="screen">
@@ -22,7 +21,8 @@ $time = empty($title) ? '' : $title;
 
 <?php else: ?>
 
-	<script type="text/javascript" src="/min/b=assets/js&amp;f=jquery.js,modernizr.js,date.format.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/min/b=assets/js&amp;f=date.format.js"></script>
 	<link type="text/css" rel="stylesheet" href="/min/b=assets/css&amp;f=themes/default.css,login.css" media="screen">
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
 
@@ -42,7 +42,7 @@ $time = empty($title) ? '' : $title;
 
 <style type="text/css">.__oldBrowser { background: #eeeeee; }</style>
 
-<script type="text/javascript">
+<script>
 // Guess if they have an old browser
 // We check for IE <= 7 up in the IE conditionals.
 // We assume Chrome is up to date
@@ -70,15 +70,14 @@ $('document').ready(function()
 		$('html').addClass('older-browser-background');
 		$('body').attr('id', '');
 		$('body').append('<div id="older-browser-container"></div>');
-		$('#older-browser-container').load('/assets/templates/viewer.html #older-browser-dialog', function() {
-			$('#ignore-older-browser-warning').click(function(event) {
-				event.preventDefault();
-				$('body').attr('id', 'login-page');
-				$('html').removeClass('older-browser-background');
-				$('#older-browser-dialog').remove();
-				$('body *').show();
-				initLoginScreen();
-			});
+		$('#older-browser-container').append($('#template-older-browser-dialog').html());
+		$('#ignore-older-browser-warning').click(function(event) {
+			event.preventDefault();
+			$('body').attr('id', 'login-page');
+			$('html').removeClass('older-browser-background');
+			$('#older-browser-dialog').remove();
+			$('body *').show();
+			initLoginScreen();
 		});
 	}
 	else
@@ -131,5 +130,19 @@ function initLoginScreen()
 		</div>
 	</footer>
 <?php include(\AppCfg::DIR_BASE . 'assets/templates/google_analytics.php'); ?>
+<script type="text/template" id="template-older-browser-dialog">
+	<div id="older-browser-dialog">
+		<h1>Your browser is out of date and may not work well with Obojobo.</h1>
+		<p>Please upgrade or update your browser with one of the following:</p>
+		<ul>
+			<a href="https://www.google.com/chrome"><li class="google-chrome">Google Chrome</li></a>
+			<a href="http://www.mozilla.org/en-US/firefox/new/"><li class="firefox">Firefox</li></a>
+			<a href="http://www.opera.com/"><li class="opera">Opera</li></a>
+			<a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home"><li class="ie">Internet Explorer</li></a>
+			<a href="http://www.apple.com/safari/"><li class="safari">Safari</li></a>
+		</ul>
+		<p class="note">You can continue to Obojobo but important features may not function or display correctly: <a id="ignore-older-browser-warning" href="#">Proceed anyway</a></p>
+	</div>
+</script>
 </body>
 </html>

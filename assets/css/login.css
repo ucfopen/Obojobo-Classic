@@ -127,8 +127,7 @@ body
 	/* ================ LOGIN FORM ====================*/
 
 
-	#login-page #login-form label,
-	#login-page #login-form input
+	#login-form input
 	{
 		position: absolute;
 		top: 0;
@@ -138,12 +137,12 @@ body
 	}
 
 	/* Order matters with this and the above style*/
-	#login-page #login-form label
+	#login-form label
 	{
 		display:none;
 	}
 
-	#login-page #login-form #signInSubmit
+	#login-form #signInSubmit
 	{
 		position: relative;
 		top: 13px;
@@ -169,7 +168,7 @@ body
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#afc7dc', endColorstr='#7198b4',GradientType=0 ); /* IE6-9 */
 	}
 
-	#login-page #login-form h1
+	#login-form h1
 	{
 		text-align: center;
 		color: #000;
@@ -178,61 +177,61 @@ body
 	}
 
 
-	#login-page #login-form h2
+	#login-form h2
 	{
 		margin-top:31px;
 	}
 
 
-		#login-page #login-form #password,
-		#login-page #login-form #username
-		{
-			width: 300px;
-			-moz-background-clip: border;
-			-moz-background-inline-policy: continuous;
-			-moz-background-origin: padding;
-			-moz-border-radius: 4px;
-			-webkit-border-radius: 4px;
-			border: 1px solid #DDD;
-			color: #000;
-			font-size: 14px;
-			margin: 0 0 10px 0;
-			padding: 7px 10px 8px;
-			z-index: 5;
-			border-image: initial;
-		}
+	#login-form #password,
+	#login-form #username
+	{
+		width: 300px;
+		-moz-background-clip: border;
+		-moz-background-inline-policy: continuous;
+		-moz-background-origin: padding;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border: 1px solid #DDD;
+		color: #000;
+		font-size: 14px;
+		margin: 0 0 10px 0;
+		padding: 7px 10px 8px;
+		z-index: 5;
+		border-image: initial;
+	}
 
-	#login-page #login-form ul
+	#login-form ul
 	{
 		padding:0px;
 	}
 
-		#login-page #login-form ul li 
-		{
-			list-style-type:none;
-			margin: 0 auto;
-			margin-bottom: 5px;
-			width:315px;
-			padding-left:0;
-			padding-right:0;
-			position: relative;
-			z-index: 2000;
-			padding: 0 0 20px 0;
-		}
+	#login-form ul li
+	{
+		list-style-type:none;
+		margin: 0 auto;
+		margin-bottom: 5px;
+		width:315px;
+		padding-left:0;
+		padding-right:0;
+		position: relative;
+		z-index: 2000;
+		padding: 0 0 20px 0;
+	}
 
-	#login-page #login-form ul.foot
+	#login-form ul.foot
 	{
 		margin: 30px 0px;
 	}
 
-		#login-page #login-form ul.foot li
-		{
-			display: inline;
-			padding: 0 !important;
-			position: relative;
-			background: none !important;
-			margin:0 6px;
-		}
+	#login-form ul.foot li
+	{
+		display: inline;
+		padding: 0 !important;
+		position: relative;
+		background: none !important;
+		margin:0 6px;
+	}
 
 	/* ================== NOTICE ====================*/
 	#login-page .login-notice
@@ -241,5 +240,4 @@ body
 		background-color: #FF5;
 		margin: 2px;
 		color: #555;
-		/*text-align: left;*/
 	}

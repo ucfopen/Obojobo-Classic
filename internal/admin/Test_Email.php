@@ -44,5 +44,3 @@
 	$sent = $this->mail($student->email, $subject, $body, $headers);
 
 	profile('email', "'$studentID','$user->email','$score','" . ($sent ? '1' : '0' ));
-
-?>

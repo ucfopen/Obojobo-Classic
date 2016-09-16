@@ -233,4 +233,3 @@ function printLogs($nid)
 	fclose($file);
 }
 
-?>

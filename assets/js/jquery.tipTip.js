@@ -5,6 +5,7 @@
  * code.drewwilson.com/entry/tiptip-jquery-plugin
  *
  * Version 1.3   -   Updated: Mar. 23, 2010
+ * **** NOTE - THIS IS CUSOMIZED TO ADD LIVE OPTION ****
  *
  * This Plug-In will create a custom tooltip to replace the default
  * browser tooltip. It is extremely lightweight and very smart in
@@ -56,11 +57,10 @@
 			var deadOpts = $.extend({}, opts, {live:false, activateTipOnInit:true});
 			this.live('mouseenter', function() {
 				var $this = $(this);
-				//if (!$this.data('poshytip'))
-					$this.tipTip(deadOpts);
+				$this.tipTip(deadOpts);
 			});
 		}
-		
+
 		return this.each(function(){
 			var org_elem = $(this);
 			if(opts.content){
@@ -68,7 +68,7 @@
 			} else {
 				var org_title = org_elem.attr(opts.attribute);
 			}
-			
+
 			if(org_title != undefined && org_title != ""){
 				if(!opts.content){
 					org_elem.removeAttr(opts.attribute); //remove original Attribute
@@ -204,7 +204,7 @@
 					if (timeout){ clearTimeout(timeout); }
 					tiptip_holder.fadeOut(opts.fadeOut);
 				}
-				
+
 				if(opts.activateTipOnInit)
 				{
 					active_tiptip();

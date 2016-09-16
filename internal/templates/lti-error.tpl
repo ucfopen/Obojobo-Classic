@@ -23,9 +23,9 @@
 	</header>
 	<section>
 		{$message}
-		<h3>Technical Support</h3>
+		<h3>Webcourses@UCF Technical Support</h3>
 		<dl>
-			<dt>Webcourses@UCF Support</dt> <dd><a target="_blank" href="https://online.ucf.edu/support/">http://online.ucf.edu/support/</a></dd>
+			<dt>Website</dt> <dd><a target="_blank" href="https://online.ucf.edu/support/">http://online.ucf.edu/support/</a></dd>
 			<dt>Email</dt> <dd><a href="mailto:webcourses@ucf.edu">webcourses@ucf.edu</a></dd>
 			<dt>Phone</dt> <dd>(407) 823-0407</dd>
 		</dl>

@@ -40,10 +40,7 @@ obo.media = function()
 				bgcolor: '#FFFFFF',
 				align: 't',
 				salign: 't',
-				wmode: 'direct'/*,
-				// we want high performance gpu, but in preview mode the popups for the subnavs (question alts)
-				// can be blocked by the swf (gpu/direct swfs are the front most layer)
-				wmode: obo.model.getMode() === 'preview' ? 'opaque' : 'direct'*/
+				wmode: 'direct'
 			};
 		}
 	};
@@ -56,11 +53,6 @@ obo.media = function()
 			var $placeholder = $(placeholder);
 			$placeholder.removeClass('materia-placeholder').addClass('materia-container');
 			var giid = $placeholder.attr('data-giid');
-//public function getLTIParams($mode, $itemID=null, $loID=null, $pageOrQuestionID=null, $pageItemIndex=null, $visitKey=null)
-			//preview, content, question
-			//content=not interactive question
-			//preview=interactive questions not in inst mode
-
 			var p = obo.model.getPageObject();
 			var itemIndex = $placeholder.parents('figure').attr('data-item-index');
 
@@ -123,9 +115,11 @@ obo.media = function()
 						case '2':
 							url = '/assets/flash/captivateSpyCP2.swf?id=' + placeholder.id + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
 							break;
+
 						case '3':
 							url = '/assets/flash/captivateSpyCP5.swf?id=' + placeholder.id + '&callback=obo.captivate.onCaptivateSpyEvent&captivateURL=/media/';
 							break;
+
 					}
 				}
 				var w = $placeholder.width();
@@ -170,7 +164,6 @@ obo.media = function()
 			{
 				var $placeholder = $(placeholder);
 				$placeholder.removeClass('flv-placeholder').addClass('flv-container');
-				//var mediaID = placeholder.id.split('media-')[1];
 				var mediaID = $placeholder.attr('data-media-id');
 				var flashvars = {
 					file: "/media/" + mediaID +'/video.flv',
@@ -252,6 +245,7 @@ obo.media = function()
 					$mediaElement.append($embed);
 					$target.append($mediaElement);
 					break;
+
 				case 'pic':
 					$target.append($mediaElement);
 					$img = $('<img id="pic-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="pic" src="/media/' + mediaObject.mediaID + '" title="' + mediaObject.title + '" alt="' + mediaObject.title + '">');
@@ -264,8 +258,8 @@ obo.media = function()
 						}
 					});
 					$mediaElement.append($img);
-					//$mediaElement.width(mediaObject.width).height(mediaObject.height);
 					break;
+
 				case 'cap5': // @TODO - is 'cap5' used?
 				case 'swf':
 					// standin represents our media stand-in - where the swf would be placed normally.
@@ -279,8 +273,6 @@ obo.media = function()
 				
 					if(isCaptivate)
 					{
-						//$('#swap-cap').show();
-					
 						createSwfHolder(section);
 					
 						// define standin, since we need to overlay captivates
@@ -311,7 +303,6 @@ obo.media = function()
 					if(isCaptivate)
 					{
 						// there are two captivate connection methods - version 2-4 or version 5.
-						//$swf.attr('data-captivate-version', mediaObject.itemType.toLowerCase() === 'cap5' ? '5' : '2');
 						// assume AS3 if no version found
 						$swf.attr('data-as-version', (typeof mediaObject.meta !== 'undefined' && mediaObject.meta !== null && typeof mediaObject.meta.asVersion !== 'undefined' ? mediaObject.meta.asVersion : '3'));
 					}
@@ -359,6 +350,7 @@ obo.media = function()
 					
 				
 					break;
+
 				case 'kogneato':
 					// some sanity values in case we're getting bad sizes back.
 					if(mediaObject.width < 100 || mediaObject.height < 100)
@@ -374,8 +366,6 @@ obo.media = function()
 					var isInteractive = (section === 'practice' || section === 'assessment') && obo.model.getPageObject().itemType.toLowerCase() === 'media';
 					if(isInteractive)
 					{
-						//$('#swap-cap').show();
-					
 						createSwfHolder(section);
 					
 						// define standin, since we need to overlay captivates
@@ -421,6 +411,7 @@ obo.media = function()
 					}
 
 					break;
+
 				case 'youtube':
 					var $youtube = $('<div id="youtube-' + mediaCount + '" data-youtube-id="' + mediaObject.url + '" data-media-id="' + mediaObject.mediaID + '" class="youtube-placeholder"></div>');
 				
@@ -449,6 +440,7 @@ obo.media = function()
 					$mediaElement.append($youtube);
 				
 					break;
+
 				case 'flv':
 					var style = '';
 					if(mediaObject.width > 0 && mediaObject.height > 0)
@@ -457,8 +449,12 @@ obo.media = function()
 					}
 					$target.append($mediaElement);
 					$mediaElement.append('<div id="flv-' + mediaCount + '" data-media-id="' + mediaObject.mediaID + '" class="flv-placeholder" ' + style + '></div>');
-					$mediaElement.children('#flv-' + mediaCount).load('/assets/templates/viewer.html #flv-alt-text', jwplayerize);
+
+					$mediaElement.children('#flv-' + mediaCount).append($('#template-flv-alt-text').html());
+					jwplayerize();
+
 					break;
+
 				default:
 					return false;
 			}
@@ -549,19 +545,22 @@ obo.media = function()
 				}
 			}
 		
-			if(typeof $youtube !== 'undefined')//if(mediaObject.itemType.toLowerCase() === 'youtube')
+			if(typeof $youtube !== 'undefined')
 			{
-				$youtube.load('/assets/templates/viewer.html #swf-alt-text', youtubeize);
+				$youtube.append($('#template-swf-alt-text').html());
+				youtubeize();
 				$youtube = undefined;
 			}
 			if(typeof $swf !== 'undefined')
 			{
-				$swf.load('/assets/templates/viewer.html #swf-alt-text', swfize);
+				$swf.append($('#template-swf-alt-text').html());
+				swfize();
 				$swf = undefined;
 			}
 			if(typeof $materia !== 'undefined')
 			{
-				$materia.load('/assets/templates/viewer.html #swf-alt-text', materiaize);
+				$materia.append($('#template-swf-alt-text').html());
+				materiaize();
 				$materia = undefined;
 			}
 

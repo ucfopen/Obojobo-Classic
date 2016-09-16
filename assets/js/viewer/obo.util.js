@@ -284,14 +284,7 @@ obo.util = function()
 	// @public
 	getRGBA = function(colorInt, alpha)
 	{
-		if(Modernizr.rgba)
-		{
-			return 'rgba(' + ((colorInt >> 16) & 255) + ',' + ((colorInt >> 8) & 255) + ',' + (colorInt & 255) + ',' + alpha + ')';
-		}
-		else
-		{
-			return '#' + ('000000' + colorInt.toString(16)).slice(-6);
-		}
+		return 'rgba(' + ((colorInt >> 16) & 255) + ',' + ((colorInt >> 8) & 255) + ',' + (colorInt & 255) + ',' + alpha + ')';
 	};
 
 	getURLFromEmbeddedSwf = function($objectElement)
