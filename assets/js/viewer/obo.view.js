@@ -128,7 +128,8 @@ obo.view = function()
 	
 	var loadUI = function($element)
 	{
-		$element.load('/assets/templates/viewer.html #template-main > *', setupUI);
+		$element.append($('#template-main').html());
+		setupUI();
 	}
 	
 	var setupUI = function()
@@ -138,13 +139,10 @@ obo.view = function()
 		$('.copyright-year').html(d.format('yyyy'));
 
 		// listen for history events
-		if(Modernizr.history)
-		{
-			window.onpopstate = function(event) {
-				preventUpdateHistoryOnNextRender = true;
-				gotoPageFromURL();
-			};
-		}
+		window.onpopstate = function(event) {
+			preventUpdateHistoryOnNextRender = true;
+			gotoPageFromURL();
+		};
 		
 		// Live events:
 		$(document).on('click', '.next-section-button', function(event) {
@@ -253,53 +251,51 @@ obo.view = function()
 		{
 			$('body').addClass('preview-mode');
 			$('#wrapper').prepend('<div id="preview-mode-container"></div>');
-			$('#preview-mode-container').load('/assets/templates/viewer.html #preview-mode-notification', function() {
-				$('#enable-teach-view input')
-					.change(function(event) {
-						//obo.model.setTeachView($(this).is(':checked'));
-					})
-					.click(function(event) {
-						obo.model.setTeachView($(this).is(':checked'));
-					});
-				if(obo.model.isTeachView())
+			$('#preview-mode-container').append($('#template-preview-mode-notification').html());
+
+			$('#enable-teach-view input')
+				.change(function(event) {})
+				.click(function(event) {
+					obo.model.setTeachView($(this).is(':checked'));
+				});
+			if(obo.model.isTeachView())
+			{
+				setTeachViewSwitch(true, false);
+			}
+			$('#teach-view-switch').mousedown(function() {
+				if(obo.model.isInAssessmentQuiz())
 				{
-					setTeachViewSwitch(true, false);
+					obo.dialog.showDialog({
+						title: 'Notice',
+						contents: 'The assessment quiz has been rebuilt.',
+						center: true,
+						closeCallback: function() {
+							obo.dialog.closeDialogs();
+							// @HACK: wipe out assessment captivate overlays
+							if($('#swf-holder-assessment').length > 0)
+							{
+								$('#swf-holder-assessment').remove();
+							}
+							obo.captivate.clearCaptivateData('assessment');
+							toggleTeachViewSwitch();
+						},
+						buttons: [
+							{label: 'OK'}
+						]
+					});
 				}
-				$('#teach-view-switch').mousedown(function() {
-					if(obo.model.isInAssessmentQuiz())
-					{
-						obo.dialog.showDialog({
-							title: 'Notice',
-							contents: 'The assessment quiz has been rebuilt.',
-							center: true,
-							closeCallback: function() {
-								obo.dialog.closeDialogs();
-								// @HACK: wipe out assessment captivate overlays
-								if($('#swf-holder-assessment').length > 0)
-								{
-									$('#swf-holder-assessment').remove();
-								}
-								obo.captivate.clearCaptivateData('assessment');
-								toggleTeachViewSwitch();
-							},
-							buttons: [
-								{label: 'OK'}
-							]
-						});
-					}
-					else
-					{
-						toggleTeachViewSwitch();
-					}
-				});
-				$('#preview-mode-help-container a').click(function(event) {
-					event.preventDefault();
-					togglePreviewModeHelp();
-				});
-				$('#preview-mode-bar a').click(function(event) {
-					event.preventDefault();
-					togglePreviewModeHelp();
-				});
+				else
+				{
+					toggleTeachViewSwitch();
+				}
+			});
+			$('#preview-mode-help-container a').click(function(event) {
+				event.preventDefault();
+				togglePreviewModeHelp();
+			});
+			$('#preview-mode-bar a').click(function(event) {
+				event.preventDefault();
+				togglePreviewModeHelp();
 			});
 		}
 		// for convience we map a H1 title click to the overview page
@@ -319,34 +315,10 @@ obo.view = function()
 		});
 		
 		// set the href's so the mouse-over and default click funcionality do what we want
-		/*
-		$('#nav-overview')[0].href = baseURL + 'overview/';
-		$('#nav-content')[0].href = baseURL + 'page/1/';
-		$('#nav-practice')[0].href = baseURL + 'practice/start/';
-		$('#nav-assessment')[0].href = baseURL + 'assessment/start/';*/
 		$('#nav-overview').attr('href', baseURL + '#/overview');
 		$('#nav-content').attr('href', baseURL + '#/content/1');
 		$('#nav-practice').attr('href', baseURL + '#/practice/start');
 		$('#nav-assessment').attr('href', baseURL + '#/assessment/start');
-		/*
-		// navigation handlers:
-		$('.prev-page-button').click(function(event) {
-			event.preventDefault();
-			
-			if(!$(event.target).hasClass('disabled'))
-			{
-				obo.model.gotoPrevPage();
-			}
-		});
-		$('.next-page-button').click(function(event) {
-			event.preventDefault();
-			
-			if(!$(event.target).hasClass('disabled'))
-			{
-				obo.model.gotoNextPage();
-			}
-		});*/
-		
 		// setup tooltips:
 		var o = {maxWidth:'200px', delay:0, fadeIn:0, fadeOut:0, defaultPosition:'top', live:true, deactivationOnClick:true};
 		// oml tooltips
@@ -383,7 +355,6 @@ obo.view = function()
 		// the back button
 		preventUpdateHistoryOnNextRender = true;
 		gotoPageFromURL();
-		//updateHistory(true);
 	}
 
 	var togglePreviewModeHelp = function() {
@@ -459,8 +430,6 @@ obo.view = function()
 		var section = '';
 		var pg = '';
 		
-		//var url = location.href;
-		//var hashIndex = url.indexOf('#');
 		if(location.hash.length > 1)
 		{
 			var hashURL = location.hash.substr(1); //chop off '#'
@@ -641,18 +610,6 @@ obo.view = function()
 			// @TODO - This is really buggy on un-lockout
 			//$($li.children()[0]).attr('data-lockout-message', 'You can visit this section after you complete the assessment quiz.');
 		}
-		
-		// setup tooltip:
-		/*
-		$('#nav-list li a').tipTip({
-			maxWidth: '200px',
-			delay: 0,
-			fadeIn: 250,
-			fadeOut: 250,
-			defaultPosition: 'bottom',
-			attribute: 'data-lockout-message',
-			edgeOffset: -20
-		});*/
 	};
 	
 	var lockoutNonAssessment = function()
@@ -671,34 +628,22 @@ obo.view = function()
 		});
 	};
 	
-	// @TODO
-	/*
-	var onChangeSection = function()
-	{
-		$('#content').empty(); // clear previous content
-		$('.subnav-list').remove(); // clear previous subnav
-		$('#nav-list li').removeClass('selected'); // reset the class for nav links
-		
-		obo.model.section = 'blah';
-	};*/
-	
 	var buildOverviewPage = function()
 	{
-		$('#content').load('/assets/templates/viewer.html #overview-page', function() {
-			var lo = obo.model.getLO();
-			var t = obo.util.strip(obo.model.getTitle());
-			$("#overview-blurb-title").text(t);
-			$("#title").text(t);
-			$("#version").text(lo.version + '.' + lo.subVersion);
-			$("#language").text(lo.languageID);
-			$("#objective").append(obo.util.cleanFlashHTML(lo.objective));
-			$("#learn-time").text(lo.learnTime + ' Min.');
-			$("#key-words").text(lo.keywords.join(", "));
-			$("#content-size").text(lo.summary.contentSize + ' Pages');
-			$("#practice-size").text(lo.summary.practiceSize + ' Questions');
-			$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');
-			$('#get-started-button').attr('href', baseURL + obo.model.isResumingPreviousAttempt() ? '#/assessment/start' : '#/content/1');
-		});
+		$('#content').append($('#template-overview-page').html());
+		var lo = obo.model.getLO();
+		var t = obo.util.strip(obo.model.getTitle());
+		$("#overview-blurb-title").text(t);
+		$("#title").text(t);
+		$("#version").text(lo.version + '.' + lo.subVersion);
+		$("#language").text(lo.languageID);
+		$("#objective").append(obo.util.cleanFlashHTML(lo.objective));
+		$("#learn-time").text(lo.learnTime + ' Min.');
+		$("#key-words").text(lo.keywords.join(", "));
+		$("#content-size").text(lo.summary.contentSize + ' Pages');
+		$("#practice-size").text(lo.summary.practiceSize + ' Questions');
+		$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');
+		$('#get-started-button').attr('href', baseURL + obo.model.isResumingPreviousAttempt() ? '#/assessment/start' : '#/content/1');
 	};
 	
 	// this creates our 'you missed a page or two' subnav list for anything not 'visited'
@@ -718,11 +663,6 @@ obo.view = function()
 		// we added in 'finish', remove it when cloning
 		if(obo.model.getSection() === 'assessment')
 		{
-			// ul.subnav-list
-			//		li[.answered] <--
-			//			ul.subnav-list-alts
-			//				li[.answered] <--
-			//var unanswered = $('.subnav-list.assessment li:not(.answered)');//.not(':last-child');
 			unanswered = $('.subnav-list.assessment > li:not(:last-child)').filter(function(index) {
 				var $this = $(this);
 				if($this.hasClass('answered'))
@@ -747,10 +687,22 @@ obo.view = function()
 		
 		switch(section)
 		{
-			case 'overview': buildOverviewPage(); break;
-			case 'content': buildContentPage(index); break;
-			case 'practice': buildQuestionPage(section, index); break;
-			case 'assessment': buildQuestionPage(section, index); break;
+			case 'overview':
+				buildOverviewPage();
+				break;
+
+			case 'content':
+				buildContentPage(index);
+				break;
+
+			case 'practice':
+				buildQuestionPage(section, index);
+				break;
+
+			case 'assessment':
+				buildQuestionPage(section, index);
+				break;
+
 		}
 	};
 	
@@ -778,18 +730,16 @@ obo.view = function()
 			if(obo.model.getNumPagesWithViewStateProperty('content', 'visited') === obo.model.getLO().pages.length)
 			{
 				// all content pages seen
-				$('#content').load('/assets/templates/viewer.html #template-final-content-page-complete');
+				$('#content').append($('#template-final-content-page-complete').html());
 			}
 			else
 			{
 				// some content pages missed
-				$('#content').load('/assets/templates/viewer.html #template-final-content-page-incomplete', function() {
-					createUnvisitedPageList();
-					$('.next-section-button').attr('href', baseURL + '#/practice/start');
-				});
+				$('#content').append($('#template-final-content-page-incomplete').html());
+				createUnvisitedPageList();
+				$('.next-section-button').attr('href', baseURL + '#/practice/start');
 				hideSubnav();
 			}
-			//curPageIndex = lo.pages.length;
 		}
 		// standard page (1 - n)
 		else
@@ -799,10 +749,7 @@ obo.view = function()
 			var page = obo.model.getLO().pages[index - 1];
 			
 			var $pageHTML = $('<div id="content-'+index+'" class="page-layout page-layout-'+page.layoutID+'"></div>');
-			//$pageHTML.append('<h2>' + (page.title.length > 0 ? page.title : 'Page ' + index) + '</h2>'); // add title - defaults to "Page N" if there is no title
-			//$pageHTML.append('<nav id="page-navigation-top" class="page-navigation"><ul><li><a class="prev-page-button" href="#" role="button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>');
 			buildPageHeader($pageHTML, page.title.length > 0 ? page.title : 'Page ' + index);
-			//$pageHTML.append('<nav id="page-navigation-top"></nav>');
 			$('#content').append($pageHTML);
 			
 			// for custom layout the html target is a container div for the custom layout page,
@@ -822,7 +769,6 @@ obo.view = function()
 			else
 			{
 				// @TODO - get rid of .template-page
-				//container.addClass('template-page');
 				$target = $pageHTML;
 			}
 
@@ -835,12 +781,12 @@ obo.view = function()
 					pageItems[0] = page.items[1];
 					pageItems[1] = page.items[0];
 					break;
+
 				default:
 					pageItems = $(page.items);
 					break;
-			}
 
-			//pageItems = $(page.items);
+			}
 
 			// loop through each page item
 			$(pageItems).each(function(itemIndex, item)
@@ -850,9 +796,11 @@ obo.view = function()
 					case 'MediaView':
 						createPageItemMediaView(item, $target);
 						break;
+
 					case 'TextArea':
 						$target.append(formatPageItemTextArea(item, parseInt(page.layoutID, 10) === 8));
 						break;
+
 				}
 			});
 
@@ -870,15 +818,12 @@ obo.view = function()
 				$pageHTML.append($target);
 				$pageHTML.append('<span class="attribution">' + obo.util.createCombinedAttributionString(page.items) + '</span>');
 			}
-			
-			//$('#content').append($pageHTML);
 		}
 	};
 	
 	var buildPageHeader = function($target, title)
 	{
 		$target.append('<h2>' + title + '</h2>');
-		//$target.append('<nav id="page-navigation-top" class="page-navigation"><ul><li><a class="prev-page-button" href="#" role="button">Prev</a></li><li><a class="next-page-button" href="#" role="button">Next</a></li></ul></nav>');
 	};
 
 	var buildQuestionPage = function(section, index)
@@ -895,188 +840,193 @@ obo.view = function()
 				switch(sectionName.toLowerCase())
 				{
 					case 'practice':
-						$('#content').load('/assets/templates/viewer.html #practice-overview', function() {
-							var n = obo.model.getNumPagesOfSection('practice');
-							$('.icon-dynamic-background').text(n).next().prepend(n + ' ');
-							$('#start-practice-button').attr('href', baseURL + '#/practice/1');
-						});
+						$('#content').append($('#template-practice-overview').html());
+
+						var n = obo.model.getNumPagesOfSection('practice');
+						$('.icon-dynamic-background').text(n).next().prepend(n + ' ');
+						$('#start-practice-button').attr('href', baseURL + '#/practice/1');
 						break;
+
 					case 'assessment':
-						$('#content').load('/assets/templates/viewer.html #assessment-overview', function() {
-							var flashRequirements = obo.model.getFlashRequirementsForSection('assessment');
-							var canViewFlash = !flashRequirements.containsFlashContent || flashRequirements.installedMajorVersion >= flashRequirements.highestMajorVersion;
-							var numAssessment = obo.model.getNumPagesOfSection('assessment');
-							var numAttempts = obo.model.getNumAttemptsRemaining();
-							$('#start-assessment-button').attr('href', baseURL + '#/assessment/1');
-							$('#view-scores-button').attr('href', baseURL + '#/assessment/scores/');
+						$('#content').append($('#template-assessment-overview').html());
 
-							// set the dynamic icons
-							$('.icon-dynamic-background:eq(0)').text(numAssessment).next().prepend(numAssessment + ' ') // number of questions
-							$('.assessment-attempt-count').prepend(numAttempts + ' '); // number of assessments remaining
-							var s;
-							switch(obo.model.getScoreMethod())
+						var flashRequirements = obo.model.getFlashRequirementsForSection('assessment');
+						var canViewFlash = !flashRequirements.containsFlashContent || flashRequirements.installedMajorVersion >= flashRequirements.highestMajorVersion;
+						var numAssessment = obo.model.getNumPagesOfSection('assessment');
+						var numAttempts = obo.model.getNumAttemptsRemaining();
+						$('#start-assessment-button').attr('href', baseURL + '#/assessment/1');
+						$('#view-scores-button').attr('href', baseURL + '#/assessment/scores/');
+
+						// set the dynamic icons
+						$('.icon-dynamic-background:eq(0)').text(numAssessment).next().prepend(numAssessment + ' ') // number of questions
+						$('.assessment-attempt-count').prepend(numAttempts + ' '); // number of assessments remaining
+						var s;
+						switch(obo.model.getScoreMethod())
+						{
+							case 'h': //highest
+								s = 'Your highest attempt score counts';
+								break;
+
+							case 'm': //mean
+								s = 'Your final score is the average of your attempt scores';
+								break;
+
+							case 'r': //most recent
+								s = 'Your last attempt score counts';
+								break;
+
+						}
+						$('.final-score-method').html(s);
+
+						var showMissingPractice = false;
+						var showMissingPages = false;
+
+						var lo = obo.model.getLO();
+
+						// determine which practice pages weren't seen
+						var practiceMissed = obo.model.getNumPagesOfSection('practice') - obo.model.getNumPagesWithViewStateProperty('practice', 'answered');
+						showMissingPractice =  practiceMissed > 0;
+
+						// determine which content pages weren't seen
+						var contentMissed = obo.model.getNumPagesOfSection('content') - obo.model.getNumPagesWithViewStateProperty('content', 'visited');
+						showMissingPages =  contentMissed > 0 ;
+
+						// Hide everything
+						if(!showMissingPractice && !showMissingPages)
+						{
+							$('.assessment-missed-section').remove()
+						}
+						// just hide one or the other
+						else
+						{
+							// Note this order is important, if you remove the 0 first, index 1 will become 0, booo
+							if(!showMissingPractice)
 							{
-								case 'h': //highest
-									s = 'Your highest attempt score counts';
-									break;
-								case 'm': //mean
-									s = 'Your final score is the average of your attempt scores';
-									break;
-								case 'r': //most recent
-									s = 'Your last attempt score counts';
-									break;
+								$('.icon-missed-count:eq(1)').parent().parent().remove()
 							}
-							$('.final-score-method').html(s);
-
-							var showMissingPractice = false;
-							var showMissingPages = false;
-
-							var lo = obo.model.getLO();
-
-							// determine which practice pages weren't seen
-							var practiceMissed = obo.model.getNumPagesOfSection('practice') - obo.model.getNumPagesWithViewStateProperty('practice', 'answered');
-							showMissingPractice =  practiceMissed > 0;
-
-							// determine which content pages weren't seen
-							var contentMissed = obo.model.getNumPagesOfSection('content') - obo.model.getNumPagesWithViewStateProperty('content', 'visited');
-							showMissingPages =  contentMissed > 0 ;
-
-							// Hide everything
-							if(!showMissingPractice && !showMissingPages)
-							{
-								$('.assessment-missed-section').remove()
-							}
-							// just hide one or the other
 							else
 							{
-								// Note this order is important, if you remove the 0 first, index 1 will become 0, booo
-								if(!showMissingPractice)
+								$('.icon-missed-count:eq(1)').text(practiceMissed)
+							}
+							if(!showMissingPages)
+							{
+								$('.icon-missed-count:eq(0)').parent().parent().remove()
+							}
+							else
+							{
+								$('.icon-missed-count:eq(0)').text(contentMissed)
+							}
+						}
+
+						if(obo.model.instanceIsClosed())
+						{
+							$('.assessment-missed-section').hide();
+							$('#assessment-info').hide();
+							$('#assessment-info-closed').show();
+							$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
+						}
+						else if(numAttempts === 0)
+						{
+							$('.assessment-missed-section').hide();
+							$('#assessment-info').hide();
+							$('#assessment-info-no-attempts').show();
+						}
+
+						// disable button if they don't have any more attempts (0 if they have imported a score)
+						// or if the instance is closed
+						// of they are missing flash or are on a flashless device
+						if(numAttempts === 0 || obo.model.instanceIsClosed() || !canViewFlash)
+						{
+							$('#start-assessment-button').addClass('disabled');
+						}
+
+						if(!canViewFlash)
+						{
+							if(flashRequirements.installedMajorVersion === 0)
+							{
+								if(obo.util.isIOS())
 								{
-									$('.icon-missed-count:eq(1)').parent().parent().remove()
+									$('#ios-flash-notice').show();
 								}
 								else
 								{
-									$('.icon-missed-count:eq(1)').text(practiceMissed)
-								}
-								if(!showMissingPages)
-								{
-									$('.icon-missed-count:eq(0)').parent().parent().remove()
-								}
-								else
-								{
-									$('.icon-missed-count:eq(0)').text(contentMissed)
+									$('#no-flash-notice').show();
 								}
 							}
-
-							if(obo.model.instanceIsClosed())
+							else
 							{
-								$('.assessment-missed-section').hide();
-								$('#assessment-info').hide();
-								$('#assessment-info-closed').show();
-								$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
+								$('#old-version-flash-notice').show();
 							}
-							else if(numAttempts === 0)
-							{
-								$('.assessment-missed-section').hide();
-								$('#assessment-info').hide();
-								$('#assessment-info-no-attempts').show();
-							}
+						}
 
-							// disable button if they don't have any more attempts (0 if they have imported a score)
-							// or if the instance is closed
-							// of they are missing flash or are on a flashless device
-							if(numAttempts === 0 || obo.model.instanceIsClosed() || !canViewFlash)
-							{
-								$('#start-assessment-button').addClass('disabled');
-							}
+						// show/hide 'view scores' button
+						if(obo.model.getScores().length === 0)
+						{
+							$('#view-scores-button').remove();
+						}
 
-							if(!canViewFlash)
-							{
-								if(flashRequirements.installedMajorVersion === 0)
-								{
-									if(obo.util.isIOS())
-									{
-										$('#ios-flash-notice').show();
-									}
-									else
-									{
-										$('#no-flash-notice').show();
-									}
-								}
-								else
-								{
-									$('#old-version-flash-notice').show();
-								}
-							}
+						// previous score importable notice
+						var importableScore = obo.model.getImportableScore();
+						if(importableScore != -1)
+						{
+							// we use css() instead of show() due to a FF 3.6 bug that was setting display to 'inline'
+							$('.assessment-import-score-section').css('display', 'block');
+							$('.assessment-missed-section').hide();
 
-							// show/hide 'view scores' button
-							if(obo.model.getScores().length === 0)
-							{
-								$('#view-scores-button').remove();
-							}
+							$('.previous-score').html(importableScore);
+							$('#do-import-previous-score-button').click(function(event) {
+								event.preventDefault();
 
-							// previous score importable notice
-							var importableScore = obo.model.getImportableScore();
-							if(importableScore != -1)
-							{
-								// we use css() instead of show() due to a FF 3.6 bug that was setting display to 'inline'
-								$('.assessment-import-score-section').css('display', 'block');
-								$('.assessment-missed-section').hide();
-
-								$('.previous-score').html(importableScore);
-								$('#do-import-previous-score-button').click(function(event) {
-									event.preventDefault();
-
-									var score = obo.model.getImportableScore();
-									obo.dialog.showDialog({
-										title: 'Confirm Score Importing: ' + score + '%',
-										contents: '<strong>WARNING:</strong> Importing will forfeit all of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
-										modal: true,
-										width: 600,
-										buttons: [
-											{label: 'Cancel'},
-											{label: 'Import Score: ' + score + '%', action: function() {
-												showThrobber();
-												obo.model.importPreviousScore();
-											}}
-										]
-									});
-									
-								});
-								$('#dont-import-previous-score-button').click(function(event) {
-									event.preventDefault();
-
-									obo.dialog.showDialog({
-										title: 'Are You Sure?',
-										contents: 'By choosing not to import you will need to complete the assessment attempt. Once you begin an attempt you can no longer import your previous score.<br><br>Are you sure you don\'t want to import?',
-										modal: true,
-										width: 600,
-										buttons: [
-											{label: 'Cancel'},
-											{label: 'Do Not Import', action: function() {
-												$('.assessment-import-score-section').remove();
-												$('.assessment-missed-section').show();
-												$('#start-assessment-button').removeClass('disabled');
-											}}
-										]
-									});
-									//$('.assessment-import-score-section').remove();
-									//$('#start-assessment-button').removeClass('disabled');
+								var score = obo.model.getImportableScore();
+								obo.dialog.showDialog({
+									title: 'Confirm Score Importing: ' + score + '%',
+									contents: '<strong>WARNING:</strong> Importing will forfeit all of your attempts, setting your final score for this learning object to <strong>' + score + '%</strong><br><br>Are you sure you want to import your previous score?',
+									modal: true,
+									width: 600,
+									buttons: [
+										{label: 'Cancel'},
+										{label: 'Import Score: ' + score + '%', action: function() {
+											showThrobber();
+											obo.model.importPreviousScore();
+										}}
+									]
 								});
 
-								// disable start assessment until they choose an option
-								$('#start-assessment-button').addClass('disabled');
-							}
+							});
+							$('#dont-import-previous-score-button').click(function(event) {
+								event.preventDefault();
 
-							// modify 'start assessment' button if they are resuming assessment
-							if(obo.model.isResumingPreviousAttempt())
-							{
-								$('#start-assessment-button').html('Resume Assessment <span class="triange-right"></span>');
-							}
-						});
+								obo.dialog.showDialog({
+									title: 'Are You Sure?',
+									contents: 'By choosing not to import you will need to complete the assessment attempt. Once you begin an attempt you can no longer import your previous score.<br><br>Are you sure you don\'t want to import?',
+									modal: true,
+									width: 600,
+									buttons: [
+										{label: 'Cancel'},
+										{label: 'Do Not Import', action: function() {
+											$('.assessment-import-score-section').remove();
+											$('.assessment-missed-section').show();
+											$('#start-assessment-button').removeClass('disabled');
+										}}
+									]
+								});
+							});
+
+							// disable start assessment until they choose an option
+							$('#start-assessment-button').addClass('disabled');
+						}
+
+						// modify 'start assessment' button if they are resuming assessment
+						if(obo.model.isResumingPreviousAttempt())
+						{
+							$('#start-assessment-button').html('Resume Assessment <span class="triange-right"></span>');
+						}
+
 						break;
+
 				}
 				break;
+
 			case 'end':
 				hideNextPrevNav();
 				
@@ -1088,39 +1038,39 @@ obo.view = function()
 						if(obo.model.getNumPagesWithViewStateProperty('practice', 'answered') >= obo.model.getNumPagesOfCurrentSection())
 						{
 							// all practice questions answered
-							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-complete');
+							$('#content').append($('#template-final-practice-page-complete').html());
 							showSubnav();
 						}
 						else
 						{
 							// some practice questions not answered
-							$('#content').load('/assets/templates/viewer.html #template-final-practice-page-incomplete', function() {
-								createUnansweredPageList();
-								$('.next-section-button').attr('href', baseURL + '#/assessment/start');
-							});
+							$('#content').append($('#template-final-practice-page-incomplete').html());
+							createUnansweredPageList();
+							$('.next-section-button').attr('href', baseURL + '#/assessment/start');
 							hideSubnav();
 						}
 						break;
+
 					case 'assessment':
 						// check the number of visited questions vs the number of questions
+						$('#content').append($('#template-final-assessment-page-complete').html());
 						if(obo.model.getNumPagesWithViewStateProperty('assessment', 'answered') >= obo.model.getNumPagesOfCurrentSection())
 						{
 							// all practice questions seen
-							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-complete');
 							showSubnav();
 						}
 						else
 						{
 							// some practice questions missed
-							$('#content').load('/assets/templates/viewer.html #template-final-assessment-page-incomplete', function() {
-								createUnansweredPageList();
-								$('#submit-assessment-button').attr('href', baseURL + '#/assessment/scores');
-							});
+							createUnansweredPageList();
+							$('#submit-assessment-button').attr('href', baseURL + '#/assessment/scores');
 							hideSubnav();
 						}
 						break;
+
 				}
 				break;
+
 			case 'scores':
 				hideSubnav();
 				hideNextPrevNav();
@@ -1128,149 +1078,128 @@ obo.view = function()
 				var scores = obo.model.getScores();
 				if(scores.length > 0)
 				{
-					$('#content').load('/assets/templates/viewer.html #score-results', function() {
-						$('#return-to-overview-button').attr('href', baseURL + '#/assessment/start');
-						var recentScoreObject = scores[scores.length - 1];
-						var recordedScore = obo.model.getFinalCalculatedScore();
-						var attemptsRemaining = obo.model.getNumAttemptsRemaining();
+					$('#content').append($('#template-score-results').html());
+					$('#return-to-overview-button').attr('href', baseURL + '#/assessment/start');
+					var recentScoreObject = scores[scores.length - 1];
+					var recordedScore = obo.model.getFinalCalculatedScore();
+					var attemptsRemaining = obo.model.getNumAttemptsRemaining();
 
-						if(scores.length > 1)
+					if(scores.length > 1)
+					{
+						$('#score-results').addClass('multiple-attempts');
+
+						// build score table
+						var endDate;
+						var len = scores.length;
+						for(var i = 0; i < len; i++)
 						{
-							$('#score-results').addClass('multiple-attempts');
+							endDate = new Date(scores[i].endTime * 1000);
+							$('#attempt-history').append(
+								'<tr><td>' + (parseInt(i, 10) + 1) + '.</td>' +
+								'<td>' + scores[i].score + '%</td>' +
+								'<td>' + endDate.format('mm/dd/yy - h:MM:ss TT') + '</td></tr>'
+							);
+						}
+					}
 
-							// build score table
-							var endDate;
-							var len = scores.length;
-							for(var i = 0; i < len; i++)
+					$('#attempt-score-result h2').html('Attempt ' + scores.length + ' Score:');
+					$('#attempt-score').html(recentScoreObject.score + '%');
+					$('.recorded-score').html(recordedScore + '%');
+					$('.attempts-remaining').html(attemptsRemaining + ' Attempt' + (attemptsRemaining === 1 ? '' : 's'));
+					var note = '';
+					switch(obo.model.getScoreMethod())
+					{
+						case 'h': //highest
+							note = '(This is your highest attempt score)';
+							break;
+
+						case 'r': //recent
+							note = '(This is your latest attempt score)';
+							break;
+
+						case 'm': //mean
+							note = '(This is your attempt score average)';
+							break;
+					}
+					$('#recorded-score-note').html(note);
+
+					if(obo.model.instanceIsClosed())
+					{
+						$('#recent-attempt p.assessment-closed').show();
+						$('#assessment-close-notice').hide();
+					}
+					else if(attemptsRemaining == 0)
+					{
+						$('#recent-attempt p.out-of-attempts').show();
+					}
+					else
+					{
+						$('#recent-attempt p.assessment-open').show();
+					}
+
+					$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
+
+					// special case: we should hide the close notice if there are no access dates
+					if(obo.model.instanceHasNoAccessDates())
+					{
+						$('#assessment-close-notice').hide();
+					}
+
+					var badgeInfo = obo.model.getBadgeInfo();
+					if(badgeInfo)
+					{
+						$('#badge-info').show();
+
+						if(badgeInfo.awarded)
+						{
+							var now = (new Date()).getTime();
+							if(now - lastCredHubRequestTime <= _credhubTimeout)
 							{
-								endDate = new Date(scores[i].endTime * 1000);
-								$('#attempt-history').append(
-									'<tr><td>' + (parseInt(i, 10) + 1) + '.</td>' +
-									'<td>' + scores[i].score + '%</td>' +
-									'<td>' + endDate.format('mm/dd/yy - h:MM:ss TT') + '</td></tr>'
-								);
-							}
-						}
-
-						$('#attempt-score-result h2').html('Attempt ' + scores.length + ' Score:');
-						$('#attempt-score').html(recentScoreObject.score + '%');
-						$('.recorded-score').html(recordedScore + '%');
-						$('.attempts-remaining').html(attemptsRemaining + ' Attempt' + (attemptsRemaining === 1 ? '' : 's'));
-						var note = '';
-						switch(obo.model.getScoreMethod())
-						{
-							case 'h': //highest
-								note = '(This is your highest attempt score)';
-								break;
-							case 'r': //recent
-								note = '(This is your latest attempt score)';
-								break;
-							case 'm': //mean
-								note = '(This is your attempt score average)';
-								break;
-						}
-						$('#recorded-score-note').html(note);
-
-						if(obo.model.instanceIsClosed())
-						{
-							$('#recent-attempt p.assessment-closed').show();
-							$('#assessment-close-notice').hide();
-						}
-						else if(attemptsRemaining == 0)
-						{
-							$('#recent-attempt p.out-of-attempts').show();
-						}
-						else
-						{
-							$('#recent-attempt p.assessment-open').show();
-						}
-
-						$('.assessment-close-date').html(obo.model.getInstanceCloseDate().format('mm/dd/yy "at" h:MM:ss TT'));
-
-						// special case: we should hide the close notice if there are no access dates
-						if(obo.model.instanceHasNoAccessDates())
-						{
-							$('#assessment-close-notice').hide();
-						}
-
-						var badgeInfo = obo.model.getBadgeInfo();
-						if(badgeInfo)
-						{
-							$('#badge-info').show();
-
-							if(badgeInfo.awarded)
-							{
-								var now = (new Date()).getTime();
-								if(now - lastCredHubRequestTime <= _credhubTimeout)
-								{
-									$('#badges').show();
-									createCredHubIFrameFromParams(badgeInfo.params);
-									lastCredHubRequestTime = now;
-								}
-								else
-								{
-									$('.badges-expired').show();
-								}
+								$('#badges').show();
+								createCredHubIFrameFromParams(badgeInfo.params);
+								lastCredHubRequestTime = now;
 							}
 							else
 							{
-								var minScore = parseFloat(badgeInfo.minScore);
-								$('.badge-not-awarded').show();
-								$('.badge-min-score').html(minScore == 100 ? '100%' : minScore + '% or higher');
+								$('.badges-expired').show();
 							}
 						}
-
-						/*
-						var $ul = $('#scores-list');
-						var scores = obo.model.getScores();
-						var $li;
-						var t;
-						for(var i = 0; i < scores.length; i++)
+						else
 						{
-							t = scores[i].endTime - scores[i].startTime;
-							$ul.append($('<li>#' + (i + 1) + ' | ' + t + " duration | submitted " + scores[i].endTime + " | " + scores[i].score + '</li>'));
+							var minScore = parseFloat(badgeInfo.minScore);
+							$('.badge-not-awarded').show();
+							$('.badge-min-score').html(minScore == 100 ? '100%' : minScore + '% or higher');
 						}
-						$ul.append($('<li>' + getScoreMethodString() + ' score: ' + obo.model.getFinalCalculatedScore() + '%</li>'));
-						*/
-						// we clear out the subnav so no item looks to be 'answered'
-						// we could delete the subnav instead if that's faster
-						resetSubnav('answered');
-						resetSubnav('visited');
-					});
+					}
+
+					// we clear out the subnav so no item looks to be 'answered'
+					// we could delete the subnav instead if that's faster
+					resetSubnav('answered');
+					resetSubnav('visited');
 				}
 				else
 				{
 					// we should never get here
 					obo.model.gotoPage('start');
 				}
-				
 				break;
+
 			default:
 				showSubnav();
 				showAndUpdateNextPrevNav();
-				
-				//var question = obo.model.getQGroup().kids[index - 1];
+
 				var question = obo.model.getPageObject();
 				
 				// init container
 				var page = $('<div id="' + baseid + '-' + index + '" class="question-page question-type-' + question.itemType + '"></div>');
-				//page.append('<h2>'+sectionName+' Question ' + index + ':</h2>'); // title
 				buildPageHeader(page, sectionName+' Question ' + index + ':');
 				
 				$('#content').append(page);
 				
 				// add switcher for questions with alternates:
-				//var numVersions = obo.model.getCurrentAssessmentQuestions().length;
 				if(obo.model.currentQuestionIsAlternate())
 				{
 					page.append('<span id="question-alt-notice">(Question Alternate)</span>');
-					
-					/*var $list = $('<ul id="switch-question-version-list"></ul>');
-					for(var i = 97; i < 97 + numVersions; i++)
-					{
-						$list.append('<li><a href="#">' + String.fromCharCode(i) + '</a></li>');
-					}
-					page.append($list);*/
 				}
 				
 				var questionPage = $('<div class="question"></div>');
@@ -1282,7 +1211,6 @@ obo.view = function()
 					if(question.items[0].component === 'MediaView' && question.items[1].component === 'TextArea')
 					{
 						page.addClass('page-layout-2');
-						//questionPage.append(formatPageItemMediaView(question.items[0]));
 						createPageItemMediaView(question.items[0], questionPage);
 						questionPage.append(formatPageItemTextArea(question.items[1]));
 					}
@@ -1290,7 +1218,6 @@ obo.view = function()
 					else if(question.items[0].component === 'TextArea' && question.items[1].component === 'MediaView')
 					{
 						page.addClass('page-layout-4');
-						//questionPage.append(formatPageItemMediaView(question.items[1]));
 						createPageItemMediaView(question.items[1], questionPage);
 						questionPage.append(formatPageItemTextArea(question.items[0]));
 					}
@@ -1316,16 +1243,15 @@ obo.view = function()
 					{
 						case 'MediaView':
 							page.addClass('page-layout-7');
-							//questionPage.append(formatPageItemMediaView(question.items[0]));
 							createPageItemMediaView(question.items[0], questionPage);
 							break;
+
 						case 'TextArea':
 							page.addClass('page-layout-1');
 							questionPage.append(formatPageItemTextArea(question.items[0]));
 							break;
 					}
 				}
-				//page.append(questionPage);
 
 				// build answer form input
 				switch(question.itemType)
@@ -1337,11 +1263,10 @@ obo.view = function()
 						$('.answer-list :input').die('click', onAnswerRadioClicked).live('click', onAnswerRadioClicked);
 
 						break;
+
 					case 'QA':
 						page.append('<h3>Input your answer:</h3>');
 						var $form = $('<div id="qa-form" class="shortanswer"></div>');
-						/*$form.append('<input id="qa-input" placeholder="Enter answer here"></input>');
-						$form.append('<a href="#" class="button disabled" id="submit-qa-answer-button" role="button">Save Answer</a>');*/
 						page.append($form);
 
 						//answers, allowCheckAnswer
@@ -1391,6 +1316,7 @@ obo.view = function()
 								obo.model.setViewStatePropertyForPage('show-answers', false);
 							});
 						break;
+
 					case 'Media':
 						// If this is an interactive practice question go ahead and mark it as answered
 						// so if the media is buggy it won't trigger any notices to the user.
@@ -1401,10 +1327,10 @@ obo.view = function()
 							markSubnavItem(section, obo.model.getPage(), 'answered');
 						}
 						break;
-				}
 
-				//$('#content').append(page);
+				}
 				break;
+
 		}
 	};
 
@@ -1435,9 +1361,11 @@ obo.view = function()
 				case 'mc':
 					selectMCAnswer(prevResponse);
 					break;
+
 				case 'qa':
 					fillInQAAnswer(prevResponse);
 					break;
+
 				case 'media':
 					// we don't want to update the score display if we are in real assessment,
 					// since that will only flash 'question score updated'.
@@ -1446,6 +1374,7 @@ obo.view = function()
 						updateInteractiveScoreDisplay(prevResponse);
 					}
 					break;
+
 			}
 		}
 	}
@@ -1534,9 +1463,11 @@ obo.view = function()
 			case '100': case 100:
 				weightCSS = 'answer-preview-correct';
 				break;
+
 			case '0': case 0:
 				weightCSS = 'answer-preview-wrong';
 				break;
+
 		}
 		
 		$bubble = $('<span ' + (useAnimations ? 'style="display:none;" ' : '') + 'class="answer-preview '+ weightCSS +'">'+weight+'%</span>');
@@ -1714,7 +1645,6 @@ obo.view = function()
 			
 			$ansLi = $('<li class="answer"><input id="' + answer.answerID + '" type="radio" name="QID-'+questionID+'" value="'+answer.answerID+'"><label for="'+answer.answerID+'">' + answerText + '</label></li>');
 			answersHTML.append($ansLi);
-			/*$(event.target).parent().append('<span class="answer-preview '+ weightCSS +'">'+answer.weight+'%</span><span class="answer-feedback"><h4>Review:</h4><p>' + cleanFlashHTML(answer.feedback) + '</p></span>');*/
 
 			if(obo.model.isTeachView())
 			{
@@ -1810,18 +1740,15 @@ obo.view = function()
 	// browers that don't support it simply don't modify the history.
 	var updateHistory = function(replaceState)
 	{
-		if(Modernizr.history)
+		var newURL = baseURL + '#' + getHashURL();
+		if(replaceState === true)
 		{
-			var newURL = baseURL + '#' + getHashURL();
-			if(replaceState === true)
-			{
-				history.replaceState(null, null, newURL);
-			}
-			// only push if we're not adding a duplicate url to the stack:
-			else
-			{
-				history.pushState(null, null, baseURL + '#' + getHashURL());
-			}
+			history.replaceState(null, null, newURL);
+		}
+		// only push if we're not adding a duplicate url to the stack:
+		else
+		{
+			history.pushState(null, null, baseURL + '#' + getHashURL());
 		}
 	};
 	
@@ -1844,27 +1771,18 @@ obo.view = function()
 	// makes the content page nav if none exists
 	var makeContentPageNav = function() 
 	{
-		//if($('.nav-P-1').length === 0)
 		if($('.subnav-list.content').length === 0)
 		{
-			//var pList = $('<ul class="subnav-list content"></ul>');
-			//$('#nav-content').parent().append('<a class="page-navigation prev-page-button" href="#">Prev</a>').append(pList).append('<a class="page-navigation next-page-button" href="#">Next</a>');
 			var pList = makePageNav('content', $('#nav-content').parent());
 		
 			var lo = obo.model.getLO();
 			$(lo.pages).each(function(index, page){
 				index++
-				//var pageHTML = $('<li ' + (isPageVisited('content', index) === true ? 'class="visited"' : '') + '><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'#/content/' + index + '" title="'+ obo.util.strip(page.title) +'">' + index +'</a></li>');
+
 				var pageHTML = $('<li ' + (obo.model.getViewStatePropertyForPage('visited', 'content', index) === true ? 'class="visited"' : '') + '><a class="subnav-item nav-P-'+index+'"  href="'+ baseURL +'#/content/' + index + '" title="'+ obo.util.strip(page.title) +'">' + index +'</a></li>');
 				pList.append(pageHTML);
 				pageHTML.children('a').click(onNavPageLinkClick);
 			});
-			//appendFinishButton(pList);
-			
-			// @TODO - a js hack to 
-			/*setTimeout(function() {
-				$($('.page-layout h2')[0]).css('padding-bottom', (pList.height() + 40) + 'px');
-			}, 1);*/
 		}
 	};
 	
@@ -1873,15 +1791,12 @@ obo.view = function()
 	{
 		if($('.subnav-list.practice').length === 0)
 		{
-			//var qListHTML = $('<ul class="subnav-list practice"></ul>');
-			//$('#nav-practice').parent().append(qListHTML);
 			var qListHTML = makePageNav('practice', $('#nav-practice').parent());
 			
 			var lo = obo.model.getLO();
 			$(obo.model.getPageObjects()).each(function(index, page)
 			{
 				index++;
-				//var qLink = $('<li '+(isPageVisited('practice', index) === true ? 'class="visited"' : '')+'><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'#/practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 				var qLink = $('<li><a class="subnav-item nav-PQ-'+index+'" href="'+ baseURL +'#/practice/' + index + '" title="Practice Question '+index+'">' + index +'</a></li>');
 				if(obo.model.getViewStatePropertyForPage('visited', 'practice', index) === true)
 				{
@@ -1894,7 +1809,6 @@ obo.view = function()
 				qListHTML.append(qLink)
 				qLink.children('a').click(onNavPageLinkClick);
 			});
-			//appendFinishButton(qListHTML);
 		}
 	};
 	
@@ -1911,7 +1825,7 @@ obo.view = function()
 			{
 				$li.addClass('visited');
 			}
-			//if(obo.model.isPageAnswered('assessment', qIndex))
+
 			if(obo.model.getViewStatePropertyForPage('answered', 'assessment', qIndex))
 			{
 				$li.addClass('answered');
@@ -1982,9 +1896,11 @@ obo.view = function()
 				case 'PQ':
 					obo.model.gotoPage(parseInt(RegExp.$2));
 					break
+
 				case 'AQ':
 					obo.model.gotoPage(RegExp.$2 + RegExp.$3);
 					break;
+
 			}
 		}
 	};
@@ -1995,9 +1911,18 @@ obo.view = function()
 		var selectedLinkID = '';
 		switch(section)
 		{
-			case 'content': selectedLinkID = '.nav-P-' + pageNumber; break;
-			case 'practice': selectedLinkID = '.nav-PQ-' + pageNumber; break;
-			case 'assessment': selectedLinkID = '.nav-AQ-' + pageNumber; break;
+			case 'content':
+				selectedLinkID = '.nav-P-' + pageNumber;
+				break;
+
+			case 'practice':
+				selectedLinkID = '.nav-PQ-' + pageNumber;
+				break;
+
+			case 'assessment':
+				selectedLinkID = '.nav-AQ-' + pageNumber;
+				break;
+
 		}
 		
 		var $e = $(selectedLinkID);
@@ -2012,9 +1937,18 @@ obo.view = function()
 		var selectedLinkID = '';
 		switch(section)
 		{
-			case 'content': selectedLinkID = '.nav-P-' + pageNumber; break;
-			case 'practice': selectedLinkID = '.nav-PQ-' + pageNumber; break;
-			case 'assessment': selectedLinkID = '.nav-AQ-' + pageNumber; break;
+			case 'content':
+				selectedLinkID = '.nav-P-' + pageNumber;
+				break;
+
+			case 'practice':
+				selectedLinkID = '.nav-PQ-' + pageNumber;
+				break;
+
+			case 'assessment':
+				selectedLinkID = '.nav-AQ-' + pageNumber;
+				break;
+
 		}
 		
 		var $e = $(selectedLinkID);
@@ -2078,13 +2012,13 @@ obo.view = function()
 				buildPage('overview');
 				hideSubnav();
 				hideNextPrevNav();
-
 				break;
+
 			case 'content':
 				makeContentPageNav();
 				buildPage('content', p);
-
 				break;
+
 			case 'practice':
 				if(p != 'start')
 				{
@@ -2092,8 +2026,8 @@ obo.view = function()
 				}
 				buildPage('practice', p);
 				selectPreviousAnswer();
-
 				break;
+
 			case 'assessment':
 				// we don't want to make the page nav until after startAssessment is called
 				// (since before then we don't know which pages have been answered)
@@ -2113,8 +2047,8 @@ obo.view = function()
 				{
 					$('.prev-page-button').addClass('disabled');
 				}
-
 				break;
+
 		}
 		
 		// change the selected nav item if we are rendering a new section
@@ -2131,8 +2065,6 @@ obo.view = function()
 			markSubnavItem(section, p, 'visited');
 			markSubnavItem(section, p, 'selected');
 		}
-		
-		// $.history.load(sectionHashes[currentSection]);*/
 		
 		// actions to take for the first render:
 		if(unrendered)
@@ -2288,8 +2220,7 @@ obo.view = function()
 		}
 		
 		debug.log('ERROR: ' + error + ',' + m);
-		
-		//obo.dialog.showOKDialog('ERROR', $('<p>' + m + '</p>'), false, 'OK');
+
 		var opts = {
 			title: 'ERROR',
 			contents: m

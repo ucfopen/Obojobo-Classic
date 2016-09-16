@@ -26,12 +26,9 @@ obo.model = function()
 		opts = options;
 
 		// pull data from local storage
-		if(Modernizr.localstorage)
+		if(typeof localStorage.teachView !== 'undefined' && localStorage.teachView === 'true' || localStorage.teachView === 'false')
 		{
-			if(typeof localStorage.teachView !== 'undefined' && localStorage.teachView === 'true' || localStorage.teachView === 'false')
-			{
-				teachView = localStorage.teachView === 'true';
-			}
+			teachView = localStorage.teachView === 'true';
 		}
 
 		// start the verify timer
@@ -1299,10 +1296,7 @@ obo.model = function()
 				setLocation('assessment', 1);
 			}
 
-			if(Modernizr.localstorage)
-			{
-				localStorage.teachView = teachView ? 'true' : 'false';
-			}
+			localStorage.teachView = teachView ? 'true' : 'false';
 
 			if((section === 'practice' || section === 'assessment') && pageIsNumericWithinBounds())
 			{
