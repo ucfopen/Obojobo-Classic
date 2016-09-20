@@ -60,4 +60,10 @@ class Media
 			$this->attribution = $attribution;
         }
 	}
+
+
+	public function __sleep()
+	{
+		return ['mediaID', 'auth', 'title', 'itemType', 'descText', 'createTime', 'copyright', 'thumb', 'url', 'size', 'length', 'width', 'height', 'meta', 'attribution'];
+	}
 }
