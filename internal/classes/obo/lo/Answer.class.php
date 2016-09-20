@@ -18,9 +18,16 @@ class Answer
 		$this->feedback = $feedback;
 	}
 
-	public function cleanForAssessmentAttempt()
+	public function cleanForAssessmentAttempt($clearAnswer = false)
 	{
 		$this->weight = null;
 		$this->feedback = null;
+		if($clearAnswer) $this->answer = null;
+	}
+
+	public function __sleep()
+	{
+		if(isset($this->feedback)) $this->feedback = (array) $this->feedback;
+		return ['answerID', 'userID', 'answer', 'weight', 'feedback'];
 	}
 }
