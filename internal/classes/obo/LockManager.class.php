@@ -32,13 +32,11 @@ class LockManager extends \rocketD\db\DBEnabled
 	{
 		if(!\obo\util\Validator::isPosInt($loID))
 		{
-
-
 			return \rocketD\util\Error::getError(2);
 		}
-		// get from cache
 
-		if($lock = \rocketD\util\Cache::getInstance()->setLock($lockObj))
+		// get from cache
+		if($lock = \rocketD\util\Cache::getInstance()->getLock($loID))
 		{
 			return $lock;
 		}
@@ -52,7 +50,9 @@ class LockManager extends \rocketD\db\DBEnabled
 		}
 
 		$userMan = \rocketD\auth\AuthManager::getInstance();
-		return new \obo\Lock($r->{\cfg_obo_Lock::ID}, $r->{\cfg_obo_LO::ID}, $userMan->fetchUserByID($r->{\cfg_core_User::ID}), $r->{\cfg_obo_Lock::UNLOCK_TIME});
+		$lockObj = new \obo\Lock($r->{\cfg_obo_Lock::ID}, $r->{\cfg_obo_LO::ID}, $userMan->fetchUserByID($r->{\cfg_core_User::ID}), $r->{\cfg_obo_Lock::UNLOCK_TIME});
+		\rocketD\util\Cache::getInstance()->setLock($lockObj);
+		return $lockObj;
 	}
 
 	/**
@@ -68,26 +68,21 @@ class LockManager extends \rocketD\db\DBEnabled
 	{
 		if(!\obo\util\Validator::isPosInt($loID))
 		{
-
-
 			return \rocketD\util\Error::getError(2);
 		}
 
+		//check if user is a Super User
 		$roleMan = \obo\perms\RoleManager::getInstance();
-        //check if user is a Super User
 		if(!$roleMan->isSuperUser())
 		{
 			if(!$roleMan->isLibraryUser())
 			{
-
-
 				return \rocketD\util\Error::getError(4);
 			}
+
 			$permMan = \obo\perms\PermissionsManager::getInstance();
 			if(!$permMan->getMergedPerm($loID, \cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::WRITE, $_SESSION['userID']))
 			{
-
-
 				return \rocketD\util\Error::getError(4);
 			}
 		}
@@ -153,7 +148,7 @@ class LockManager extends \rocketD\db\DBEnabled
 	{
 
 		$roleMan = \obo\perms\RoleManager::getInstance();
-        //check if user is a Super User
+		//check if user is a Super User
 		if(!$roleMan->isSuperUser())
 		{
 			if(!$roleMan->isLibraryUser())

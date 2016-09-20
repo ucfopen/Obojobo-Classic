@@ -105,34 +105,27 @@ class BadgeManager extends \rocketD\db\DBEnabled
 	*/
 	protected function sign_oauth_post_args($endpoint, array $params, $key, $secret)
 	{
-		// generate the timestamp and nonce
-		$time = time();
-		$nonce = uniqid();
-
 		// set up all the required params -this is mostly so they exist when we return them
 		// OAuth will create a signature with them even if we dont include them here
 		$oauth_params = array(
-			'oauth_nonce'            => $nonce,
+			'oauth_nonce'            => uniqid(),
 			'oauth_consumer_key'     => $key,
-			'oauth_timestamp'        => $time,
-			'oauth_nonce'            => $nonce,
-			'oauth_version'          => '1.0',
-			'oauth_signature_method' => 'HMAC-SHA1',
+			'oauth_timestamp'        => time(),
 		);
 
 		// combine our oauth params with our input
 		$params = array_merge($params, $oauth_params);
 
-		// build and sign the oauth variables
-		$oauth = new \OAuth($key, $secret);
-		$oauth->setTimestamp($time);
-		$oauth->setNonce($nonce);
-		$oauth->setAuthType(OAUTH_AUTH_TYPE_FORM);
-		$signature = $oauth->generateSignature('POST', $endpoint, $params);
+		// build and sign the oauth varia
+		$hmcsha1  = new \Eher\OAuth\HmacSha1();
+		$consumer = new \Eher\OAuth\Consumer('', $secret);
+		$request  = \Eher\OAuth\Request::from_consumer_and_token($consumer, '', 'POST', $endpoint);
+		foreach($params as $key => $val)
+		{
+			$request->set_parameter($key, $val, false);
+		}
+		$request->sign_request($hmcsha1, $consumer, '');
 
-		// add the signature back into the params
-		$params['oauth_signature'] = $signature;
-
-		return $params;
+		return $request->get_parameters();
 	}
 }
