@@ -177,6 +177,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 	private function cleanAnswersForAttempt($questions)
 	{
+		// TODO: 09/2016 - clean out QA answers (requires some viewer changes)
 		foreach ($questions as &$q)
 		{
 			foreach ($q->answers as &$a)

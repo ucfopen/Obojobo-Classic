@@ -21,4 +21,10 @@ class PageItem
 		$this->advancedEdit = $advancedEdit;
 		$this->options = $options;
 	}
+
+	public function __sleep()
+	{
+		if(isset($this->options)) $this->options = (array) $this->options;
+		return ['pageItemID', 'component', 'data', 'media', 'advancedEdit', 'options'];
+	}
 }
