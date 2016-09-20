@@ -1,16 +1,24 @@
 <?php
+// This api endpoint emulates legacy obojobo urls so we don't have to re-compile the repository
+// urls look like /api/json.php/loRepository.createInstanceVisit/1
+// /api/json.php/<service>.<method>/<arg1>/<arg2
+// The newer format is in /api/viewer.php
 
 require_once(dirname(__FILE__)."/../internal/app.php");
 
-$servicesPath = \AppCfg::DIR_BASE.\AppCfg::DIR_AMFPHP."services/";
-$voPath = \AppCfg::DIR_BASE.\AppCfg::DIR_AMFPHP."services/vo/";
-define("PRODUCTION_SERVER", !\AppCfg::DEBUG_MODE); // if debug == true, production server = false
-//Include framework
-include \AppCfg::DIR_BASE.\AppCfg::DIR_AMFPHP."core/json/app/Gateway.php";
-$gateway = new Gateway();
-$gateway->setBaseClassPath($servicesPath);
+$config = new \Amfphp_Core_Config();
+$config->checkArgumentCount = false;
+$config->serviceFolders = [\AppCfg::DIR_BASE . 'internal/includes/amfphpServices/'];
+$config->pluginsFolders[] = \AppCfg::DIR_BASE . 'internal/includes/amfphpPlugins';
+$config->disabledPlugins = ['AmfphpLogger', 'AmfphpErrorHandler','AmfphpMonitor', 'AmfphpDummy', 'AmfphpGet', 'ObojoboAmfphpGet', 'AmfphpDiscovery', 'AmfphpAuthentication', 'AmfphpVoConverter'];
 
-$GLOBALS['amfphp']['errorLevel'] = \AppCfg::DEBUG_MODE ? E_ALL ^ E_NOTICE : E_ERROR;
+$config->pluginsConfig = [
+	'ObojoboAmfphpVoConverter' => [
+		'voFolders' => [\AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES],
+		'enforceConversion' => false
+	],
+];
 
-//Service now
+$gateway = \Amfphp_Core_HttpRequestGatewayFactory::createGateway($config);
 $gateway->service();
+$gateway->output();

@@ -62,7 +62,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 
 		$result = array();
 		$result = $this->getMediaWithPerm('read');
-		if(count($mediaArr) > 0) // remove unwanted items
+		if(!empty($mediaArr) && count($mediaArr) > 0) // remove unwanted items
 		{
 			$result2 = array();
 			foreach($result AS $media)
