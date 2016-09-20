@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0c8bec54bce13f1819fee221c137602d",
-    "content-hash": "d233a2968700ef637a95c8d04304671c",
+    "hash": "e1105ded84515cea329131bc88b35b0c",
+    "content-hash": "c27b3d1dee90e9005fdb2c1c87b1bd64",
     "packages": [
         {
             "name": "composer/installers",
@@ -460,6 +460,36 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "silexlabs/amfphp",
+            "version": "v2.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexlabs/amfphp-2.0.git",
+                "reference": "b5963ef1d1bdd105b2b07f50d4839101d86c76cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexlabs/amfphp-2.0/zipball/b5963ef1d1bdd105b2b07f50d4839101d86c76cc",
+                "reference": "b5963ef1d1bdd105b2b07f50d4839101d86c76cc",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "Amfphp/ClassLoader.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Ariel Sommeria",
+                    "email": "ariel@silexlabs.org"
+                }
+            ],
+            "description": "Simple Remoting for Web Applications",
+            "time": "2016-01-26 14:48:49"
         },
         {
             "name": "ucfcdl/php-saml",

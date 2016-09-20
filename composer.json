@@ -35,7 +35,8 @@
         "wpackagist-plugin/page-list": "5.1",
         "wpackagist-plugin/w3-total-cache": "0.9.4.1",
         "mrclay/minify": "2.3.0",
-        "eher/oauth": "^1.0"
+        "eher/oauth": "^1.0",
+        "silexlabs/amfphp": "^2.2"
     },
     "extra": {
         "wordpress-install-dir": "wp",
