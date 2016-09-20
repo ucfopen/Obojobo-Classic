@@ -20,4 +20,9 @@ class Question
 		$this->perms = $perms;
 		$this->items = $items;
 	}
+
+	public function __sleep()
+	{
+		return ['questionID', 'userID', 'itemType', 'answers', 'perms', 'items'];
+	}
 }
