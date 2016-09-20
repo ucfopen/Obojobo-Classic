@@ -72,6 +72,5 @@ function classAutoLoader($className)
 				$file = \AppCfg::DIR_BASE . \AppCfg::DIR_CLASSES . str_replace('_', '/', $className) . '.class.php';
 		}
 	}
-
 	@include($file);
 }
