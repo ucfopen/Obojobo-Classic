@@ -20,7 +20,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 
 $mediaMan = \obo\lo\MediaManager::getInstance();
 trace($_GET);
-$return =  $mediaMan->handleMediaUpload($_FILES['Filedata'], $_GET['t'], $_GET['d'], $_GET['c'], $_GET['l']);
+if(empty($_GET['l'])) $_GET['l'] = null;
+
+$return = $mediaMan->handleMediaUpload($_FILES['Filedata'], $_GET['t'], $_GET['d'], $_GET['c'], $_GET['l']);
 
 
 if($return == true) echo 0; // return success
