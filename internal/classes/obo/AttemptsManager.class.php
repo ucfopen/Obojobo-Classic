@@ -70,103 +70,123 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 		$isAssessment = $lo->aGroup->qGroupID == $qGroupID;
 
-		if($isAssessment)
+		// =============== We're in Practice
+
+		if(!$isAssessment)
 		{
-			// make sure its not past closing time
-			if(!$instanceData->externalLink && ($instanceData->endTime <= time() || $instanceData->startTime >= time()))
-			{
-				return \rocketD\util\Error::getError(2010); // error: assessment closed
-			}
-
-			// incomplete attempt found, resume
-			if($unfinishedAttempt = $this->getUnfinishedAttempt($qGroupID))
-			{
-				// fail if a linked attempt is found, they cant use equivelant scores after starting an attempt
-				if(is_object($equivalentAttempt))
-				{
-					return \rocketD\util\Error::getError(2007); // error: no assessments attempts available
-				}
-				// store the open attempts in the session (required to sort out what open instance is making this call)
-				$regAttempt = $this->registerCurrentAttempt($unfinishedAttempt);
-
-				if($regAttempt instanceof \rocketD\util\Error)
-				{
-					return  $regAttempt; // return the error if one is made here
-				}
-
-				// track resume attempt
-				$TM = \obo\log\LogManager::getInstance();
-				$TM->trackResumeAttempt();
-
-				$scoreMan = \obo\ScoreManager::getInstance();
-				$quizState = $scoreMan->getQuizState($qGroupID);
-
-				$qgroupMan = \obo\lo\QuestionGroupManager::getInstance();
-				$group = $qgroupMan->getGroup($qGroupID);
-
-				if($group->rand || $group->allowAlts)
-				{
-					$kids = $this->filterQuestionsByAttempt($group->kids, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
-				}
-				else
-				{
-					$kids = $group->kids;
-				}
-
-				// insert saved answers
-				foreach($kids AS  $kid)
-				{
-					foreach($quizState['questions'] AS $question)
-					{
-						if($kid->questionID == $question['questionID'])
-						{
-							$kid->savedAnswer = array('answerID' => $question['answerID'], 'user_answer' => $question['user_answer'], 'real_answer' => $question['real_answer']);
-						}
-					}
-				}
-				return $kids;
-			}
-			else //no incomplete attempt found
-			{
-				// get remaining attempts
-				$numRemainingAttempts = $this->getNumRemainingAttempts($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
-				if($numRemainingAttempts == 0)
-				{
-					return \rocketD\util\Error::getError(2004); // error: no assessments attempts available
-				}
-
-				// check to make sure they havnt previously chosen to import an old score for this instance
-				if($this->isEquivalentAttemptUsed($_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
-				{
-					return \rocketD\util\Error::getError(2008); // error: no assessments attempts available
-				}
-
-				// create the attempt, pass the equivalent attempt if its set
-				if(!$this->createAttempt($lo->loID, $qGroupID, $equivalentAttempt))
-				{
-					return \rocketD\util\Error::getError(2001); // error: should never happen
-				}
-				// if importing previous score, return now true, no need to build question list
-				if(is_object($equivalentAttempt))
-				{
-					return true;
-				}
-			}
-		}
-		else // this is practice
-		{
-			// create the attempt
 			if(!$this->createAttempt($lo->loID, $qGroupID))
 			{
-				return \rocketD\util\Error::getError(2001); // error: should never happen
+				return \rocketD\util\Error::getError(2001);
 			}
+
+			return $this->filterQuestionsForNewAttempt($qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		}
+
+		// ================ We're in the Assessment
+
+		// CLOSED??
+		if(!$instanceData->externalLink && ($instanceData->endTime <= time() || $instanceData->startTime >= time()))
+		{
+			return \rocketD\util\Error::getError(2010); // error: assessment closed
+		}
+
+		// ================= RESUME? ===================
+
+		// we return the filtered questions / answers
+		// include all the answers they saved
+		if($unfinishedAttempt = $this->getUnfinishedAttempt($qGroupID))
+		{
+			// fail if a linked attempt is found, they cant use equivelant scores after starting an attempt
+			if(is_object($equivalentAttempt))
+			{
+				return \rocketD\util\Error::getError(2007); // error: no assessments attempts available
+			}
+			// store the open attempts in the session (required to sort out what open instance is making this call)
+			$regAttempt = $this->registerCurrentAttempt($unfinishedAttempt);
+
+			if($regAttempt instanceof \rocketD\util\Error)
+			{
+				return $regAttempt; // return the error if one is made here
+			}
+
+			// track resume attempt
+			\obo\log\LogManager::getInstance()->trackResumeAttempt();
+
+			$quizState = \obo\ScoreManager::getInstance()->getQuizState($qGroupID);
+
+			$group = \obo\lo\QuestionGroupManager::getInstance()->getGroup($qGroupID);
+
+			if($group->rand || $group->allowAlts)
+			{
+				$kids = $this->filterQuestionsByAttempt($group->kids, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID']);
+			}
+			else
+			{
+				$kids = $group->kids;
+			}
+
+			// insert saved answers
+			foreach($kids AS $kid)
+			{
+				foreach($quizState['questions'] AS $question)
+				{
+					if($kid->questionID == $question['questionID'])
+					{
+						$kid->savedAnswer = [
+							'answerID'    => $question['answerID'],
+							'user_answer' => $question['user_answer'],
+							'real_answer' => $question['real_answer']
+						];
+					}
+				}
+			}
+			return $this->cleanAnswersForAttempt($kids);
+		}
+
+		// ==============  NEW ASSESSMENT =================
+
+		// get remaining attempts
+		$numRemainingAttempts = $this->getNumRemainingAttempts($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
+		if($numRemainingAttempts == 0)
+		{
+			return \rocketD\util\Error::getError(2004); // error: no assessments attempts available
+		}
+
+		// already used import score?
+		if($this->isEquivalentAttemptUsed($_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']))
+		{
+			return \rocketD\util\Error::getError(2008); // error: no assessments attempts available
+		}
+
+		// create the attempt, pass the equivalent attempt if its set
+		if(!$this->createAttempt($lo->loID, $qGroupID, $equivalentAttempt))
+		{
+			return \rocketD\util\Error::getError(2001); // error: should never happen
+		}
+
+		// We are importing previous score!
+		if(is_object($equivalentAttempt))
+		{
+			return true;
 		}
 
 		$kids = $this->filterQuestionsForNewAttempt($qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
-		return $kids;
+
+		return $this->cleanAnswersForAttempt($kids); // return new assessment attempt data
 	}
 
+	private function cleanAnswersForAttempt($questions)
+	{
+		foreach ($questions as &$q)
+		{
+			foreach ($q->answers as &$a)
+			{
+				$a->cleanForAssessmentAttempt();
+			}
+		}
 
+		return $questions;
+	}
 
 	/**
 	 * Zach: Generates a listing of assessment questions.  Depending on the altMethod options will choose the questions to display.
