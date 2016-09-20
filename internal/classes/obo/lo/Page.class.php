@@ -26,4 +26,9 @@ class Page
 		$this->items = $items;
 		$this->questionID = $questionID;
 	}
+
+	public function __sleep()
+	{
+		return ['pageID', 'title', 'userID', 'layoutID', 'createTime', 'items', 'questionID'];
+	}
 }
