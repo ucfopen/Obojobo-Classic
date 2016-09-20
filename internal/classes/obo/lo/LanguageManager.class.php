@@ -15,9 +15,9 @@ class LanguageManager extends \rocketD\db\DBEnabled
 
 		// check memcache
  		$oboCache = \rocketD\util\Cache::getInstance();
-		if($langs = $oboCache->getAllLangs)
+		if($langs = $oboCache->getAllLangs())
 		{
-			return $langs;
+			return (array) $langs;
 		}
 
 		if( !($q = $this->DBM->query("SELECT * FROM ".\cfg_obo_Language::TABLE)) ) // no need for querySae

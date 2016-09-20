@@ -521,7 +521,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		$permMan = \obo\perms\PermissionsManager::getInstance();
 		$loIDArr = $permMan->getItemsWithPerm(\cfg_obo_Perm::TYPE_LO, \cfg_obo_Perm::READ, true);
 		$loArr = array();
-		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='".$loID."' AND ".\cfg_obo_LO::SUB_VER." = 0 ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";
+
 		foreach($loIDArr as $loID)
 		{
 			$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='".$loID."' AND ".\cfg_obo_LO::SUB_VER." = 0 ORDER BY ".\cfg_obo_LO::VER." DESC, ".\cfg_obo_LO::SUB_VER." DESC LIMIT 1";

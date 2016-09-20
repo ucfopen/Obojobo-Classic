@@ -1192,7 +1192,7 @@ class API extends \rocketD\db\DBEnabled
 		{
 			$roleMan = \obo\perms\RoleManager::getInstance();
 			$roleIDs = $roleMan->getRoleIDsFromNames($roleNames);
-			if($roleIDs == false || $roleID instanceof \rocketD\util\Error)
+			if($roleIDs == false || $roleIDs instanceof \rocketD\util\Error)
 			{
 				return false;
 			}
