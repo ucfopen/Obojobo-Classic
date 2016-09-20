@@ -681,7 +681,7 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function editMedia($mediaObj, $visitKey=-1)
 	{
-		if( ! \obo\util\Validator::isPosInt($mediaObj['mediaID']))
+		if( ! \obo\util\Validator::isPosInt($mediaObj->mediaID))
 		{
 			// TODO: this is wrong
 			return false;
@@ -700,7 +700,7 @@ class API extends \rocketD\db\DBEnabled
 			}
 			$this->DBM->startTransaction();
 			$mediaMan = \obo\lo\MediaManager::getInstance();
-			$result = $mediaMan->saveMedia(new \obo\lo\Media($mediaObj));
+			$result = $mediaMan->saveMedia(new \obo\lo\Media((array) $mediaObj));
 			$this->DBM->commit();
 		}
 		else
@@ -777,7 +777,7 @@ class API extends \rocketD\db\DBEnabled
 					{
 						foreach($permObjects AS $value)
 						{
-							$result = $PMan->setPermsForUserToItem($value['userID'], \cfg_core_Perm::TYPE_INSTANCE, $itemID, $value['perm'], array() );
+							$result = $PMan->setPermsForUserToItem($value->userID, \cfg_core_Perm::TYPE_INSTANCE, $itemID, $value->perm, array() );
 						}
 					}
 					// remove perms
@@ -785,7 +785,7 @@ class API extends \rocketD\db\DBEnabled
 					{
 						foreach($removePerms as $value)
 						{
-							$result = $PMan->setPermsForUserToItem($value['userID'], \cfg_core_Perm::TYPE_INSTANCE, $itemID, array(), $value['perm'] );
+							$result = $PMan->setPermsForUserToItem($value->userID, \cfg_core_Perm::TYPE_INSTANCE, $itemID, array(), $value->perm );
 						}
 					}
 					break;
@@ -795,24 +795,20 @@ class API extends \rocketD\db\DBEnabled
 					{
 						return \rocketD\util\Error::getError(2);
 					}
+
+					$PMan2 = \obo\perms\PermissionsManager::getInstance();
+
 					foreach($permObjects as $permObj)
 					{
+						$permObj = (array) $permObj;
 						if(!\obo\util\Validator::isPermObj($permObj))
 						{
 							return \rocketD\util\Error::getError(2);
 						}
+
+						$PMan2->setUserPerms($itemID, $itemType, new \obo\perms\Permissions($permObj));
 					}
-					$this->DBM->startTransaction();
-					$permMan = \obo\perms\PermissionsManager::getInstance();
-					$result = $permMan->setUsersPerms($permObjects, $itemID, $itemType, new \obo\perms\Permissions($permObj));
-					if($result)
-					{
-						$this->DBM->commit();
-					}
-					else
-					{
-						$this->DBM->rollback();
-					}
+					$result = true;
 					break;
 			}
 		}
