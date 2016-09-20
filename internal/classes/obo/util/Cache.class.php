@@ -125,7 +125,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			return $this->set($this->ns.'\obo\Lock:'.$loid);
+			return $this->get($this->ns.'\obo\Lock:'.$loid);
 		}
 	}
 
