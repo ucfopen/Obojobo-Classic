@@ -17,4 +17,10 @@ class Answer
 		$this->weight = $weight;
 		$this->feedback = $feedback;
 	}
+
+	public function cleanForAssessmentAttempt()
+	{
+		$this->weight = null;
+		$this->feedback = null;
+	}
 }
