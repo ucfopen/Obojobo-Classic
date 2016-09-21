@@ -179,7 +179,7 @@ class ObojoboAmfphpVoConverter  implements Amfphp_Core_Common_IVoConverter {
             }
         }
 
-        return $obj;
+        return (array) $obj;
     }
 
     /**
