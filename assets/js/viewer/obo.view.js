@@ -1053,15 +1053,16 @@ obo.view = function()
 
 					case 'assessment':
 						// check the number of visited questions vs the number of questions
-						$('#content').append($('#template-final-assessment-page-complete').html());
 						if(obo.model.getNumPagesWithViewStateProperty('assessment', 'answered') >= obo.model.getNumPagesOfCurrentSection())
 						{
 							// all practice questions seen
+							$('#content').append($('#template-final-assessment-page-complete').html());
 							showSubnav();
 						}
 						else
 						{
 							// some practice questions missed
+							$('#content').append($('#template-final-assessment-page-incomplete').html());
 							createUnansweredPageList();
 							$('#submit-assessment-button').attr('href', baseURL + '#/assessment/scores');
 							hideSubnav();
