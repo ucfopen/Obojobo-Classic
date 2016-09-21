@@ -22,11 +22,12 @@ class Media
 
 	function __construct($mediaID=0, $auth=0, $title='', $itemType='pic', $descText='', $createTime=0, $copyright='', $thumb='', $url='', $size=0, $length=0, $perms=0, $width=0, $height=0, $meta=0, $attribution=0)
 	{
-	    if(func_num_args() == 1)
-        {
-       		$mediaObj = func_get_arg(0);
-       		$this->mediaID = empty($mediaObj['mediaID']) ? 0 : $mediaObj['mediaID'];
-//			$this->auth = $mediaObj[''];
+		if(func_num_args() == 1)
+		{
+
+			$mediaObj = func_get_arg(0);
+			if(isset($mediaObj) && $mediaObj instanceof \stdClass) $mediaObj = (array) $mediaObj;
+			$this->mediaID = empty($mediaObj['mediaID']) ? 0 : $mediaObj['mediaID'];
 			$this->title = $mediaObj['title'];
 			$this->itemType = $mediaObj['itemType'];
 			$this->descText = $mediaObj['descText'];
@@ -39,9 +40,9 @@ class Media
 			$this->height = $mediaObj['height'];
 			$this->meta = $mediaObj['meta'];
 			$this->attribution = $mediaObj['attribution'];
-        }
-        else
-        {
+		}
+		else
+		{
 			$this->mediaID = $mediaID;
 			$this->auth = $auth;
 			$this->title = $title;
@@ -58,7 +59,7 @@ class Media
 			$this->height = $height;
 			$this->meta = $meta;
 			$this->attribution = $attribution;
-        }
+		}
 	}
 
 
