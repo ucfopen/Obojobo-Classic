@@ -10,6 +10,7 @@ class Question
 	public $perms;			//Permissions object:  merged from global and user
 	public $items;			//Array: of page items
 	public $questionIndex;
+	public $feedback;
 
 	function __construct($questionID=0, $userID=0, $itemType='QA', $answers=Array(), $perms=0, $items=Array())
 	{
@@ -23,6 +24,7 @@ class Question
 
 	public function __sleep()
 	{
-		return ['questionID', 'userID', 'itemType', 'answers', 'perms', 'items'];
+		if(isset($this->feedback) && $this->feedback instanceof \stdClass) $this->feedback = (array) $this->feedback;
+		return ['questionID', 'userID', 'itemType', 'answers', 'perms', 'items', 'feedback'];
 	}
 }
