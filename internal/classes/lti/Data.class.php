@@ -7,7 +7,7 @@ class Data
 	const ROLE_CONTENT_DEVELOPER = 'ContentDeveloper';
 	const ROLE_ADMINISTRATOR     = 'Administrator';
 	const ROLE_INSTRUCTOR        = 'Instructor';
-	const ROLE_TA                = 'urn:lti:role:ims/lis/TeachingAssistant';
+	const ROLE_TA                = 'TeachingAssistant';
 	const ROLE_LEARNER           = 'Learner';
 	const ROLE_STUDENT           = 'Student';
 
@@ -28,6 +28,8 @@ class Data
 	public $contextId;
 	public $contextTitle;
 
+	protected $flatRoles;
+
 	public function __construct($data)
 	{
 		$this->sourceId       = static::get($data, 'lis_result_sourcedid');
@@ -45,7 +47,8 @@ class Data
 		$this->contextTitle   = static::get($data, 'context_title', 'Unknown Course');
 		$this->isSelectorMode = static::get($data, 'selection_directive') === 'select_link';
 		$this->returnUrl      = static::get($data, 'launch_presentation_return_url');
-		$this->roles          = explode(',', static::get($data, 'roles'));
+		$this->flatRoles      = static::get($data, 'roles');
+		$this->roles          = explode(',', $this->flatRoles);
 	}
 
 	public function hasValidUserData()
@@ -58,14 +61,12 @@ class Data
 		return $this->first === 'Test' && $this->last === 'Student' && $this->isLearner();
 	}
 
+	// Checks launch roles for any string matches
 	public function hasRole($roles)
 	{
-		foreach($this->roles as $role)
+		foreach($roles as $role)
 		{
-			if(in_array($role, $roles))
-			{
-				return true;
-			}
+			if(strpos($this->flatRoles, $role) !== false) return true;
 		}
 
 		return false;
