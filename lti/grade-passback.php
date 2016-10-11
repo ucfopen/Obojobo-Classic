@@ -45,33 +45,32 @@ $description = "Invalid Oauth Signature";
 $ltiData = new \lti\Data($_POST);
 $outMsgId = 0;
 $score = null;
-$sourceid = null;
+$sourceId = null;
 $inMsgId = null;
+$body = @file_get_contents('php://input');
 
 try
 {
-	$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT);
+	$valid = \lti\OAuth::validateLtiPassback(\AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT);
 }
 catch (\lti\Exception $e)
 {
-	profile('lti',"'invalid-lti-passback-received', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+	profile('lti',"'invalid-lti-passback-received', '".time()."'");
 	trace($e->getMessage(), true);
-	trace($ltiData, true);
-	trace($_SERVER, true);
+	trace($body, true);
 }
 
 if($valid)
 {
 	// process the incoming data
-	$body       = @file_get_contents('php://input');
-	$xml        = simplexml_load_string($body);
-	$inMsgId    = (string) $xml->imsx_POXHeader->imsx_POXRequestHeaderInfo->imsx_messageIdentifier;
-	$sourceid   = (string) $xml->imsx_POXBody->replaceResultRequest->resultRecord->sourcedGUID->sourcedId;
-	$score      = (string) $xml->imsx_POXBody->replaceResultRequest->resultRecord->result->resultScore->textString;
-	$outMsgId   = uniqid();
+	$xml      = simplexml_load_string($body);
+	$inMsgId  = (string) $xml->imsx_POXHeader->imsx_POXRequestHeaderInfo->imsx_messageIdentifier;
+	$sourceId = (string) $xml->imsx_POXBody->replaceResultRequest->resultRecord->sourcedGUID->sourcedId;
+	$score    = (string) $xml->imsx_POXBody->replaceResultRequest->resultRecord->result->resultScore->textString;
+	$outMsgId = uniqid();
 
 	$sm = \obo\ScoreManager::getInstance();
-	list($valid, $description) = $sm->submitLTIQuestion($sourceid, 'materia', $score);
+	list($valid, $description) = $sm->submitLTIQuestion($sourceId, 'materia', $score);
 }
 
 // build response
@@ -85,4 +84,4 @@ $response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-rep
 
 header('Content-Type: application/xml');
 echo($response);
-profile('lti-score', "'".time()."',materia','$sourceid','$score','$description','$success'");
+profile('lti-score', "'".time()."',materia','$sourceId','$score','$description','$success'");
