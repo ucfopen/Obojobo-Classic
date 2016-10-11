@@ -763,12 +763,15 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		{
 			return \rocketD\util\Error::getError(2);
 		}
+		$linkedAttemptID = 0;
 		if(is_object($equivalentAttempt))
 		{
 			if(!\obo\util\Validator::isPosInt($equivalentAttempt->attemptID) || !\obo\util\Validator::isPosInt($equivalentAttempt->score) || !\obo\util\Validator::isPosInt($equivalentAttempt->loID))
 			{
 				return \rocketD\util\Error::getError(2);
 			}
+
+			$linkedAttemptID = $equivalentAttempt->attemptID;
 		}
 		if($GLOBALS['CURRENT_INSTANCE_DATA']['visitID'] < 1) //exit if they do not have an open instance
 		{
@@ -785,7 +788,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			".\cfg_obo_Attempt::END_TIME."='0',
 			".\cfg_obo_Attempt::LINKED_ATTEMPT."='?'";
 
-		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $loID, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'], $equivalentAttempt->attemptID)))
+		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $loID, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'], $linkedAttemptID)))
 		{
 			$this->DBM->rollback();
 			trace(mysql_error(), true);
