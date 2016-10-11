@@ -285,8 +285,8 @@ class LO
 				/********* CHECK FOR PR-EXISTING DESIRED VERSION **********/
 				/* (make sure the desired X.0 version doesnt already exist by checking for LO's with a parentID of my current rootID) */
 				$qstr = "SELECT * FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::VER." = '?' AND ".\cfg_obo_LO::SUB_VER." = '0' AND ".\cfg_obo_LO::PARENT_LO." = '?'";
-				$r = $DBM->querySafe($qstr,  $this->version + 1, $this->loID);
-				if($DBM->fetch_num != 0)
+				$query = $DBM->querySafe($qstr,  $this->version + 1, $this->loID);
+				if($DBM->fetch_num($query) != 0)
 				{
 					return \rocketD\util\Error::getError(6005); // Master version already exists
 				}
