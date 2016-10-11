@@ -10,6 +10,25 @@ class OAuth
 	public static $secret;
 	public static $timeout;
 
+
+	public static function validateLtiPassback($key, $secret, $timeout)
+	{
+		$hmcsha1   = new \Eher\OAuth\HmacSha1();
+		$consumer  = new \Eher\OAuth\Consumer($key, $secret);
+		$request   = \Eher\OAuth\Request::from_request();
+		$signature = $request->build_signature($hmcsha1, $consumer, false);
+		$params    = $request->get_parameters();
+
+		// check the oauth signature
+		if($signature !== $params['oauth_signature']) throw new Exception("Authorization signatures don't match.");
+
+		// check the body hash
+		$body_hash = base64_encode(sha1(file_get_contents('php://input'), TRUE));
+		if($body_hash !== $params['oauth_body_hash']) throw new Exception("Authorization hashes don't match.");
+
+		return true;
+	}
+
 	public static function validateLtiMessage($ltiData, $key, $secret, $timeout)
 	{
 		if(empty($_REQUEST['oauth_nonce'])) throw new Exception("Authorization fingerprint is missing.");
