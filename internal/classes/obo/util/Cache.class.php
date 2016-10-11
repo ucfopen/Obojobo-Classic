@@ -12,10 +12,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 
 		$this->connectMemCache();
-		// dump any profiler data to file
-		\rocketD\util\Log::dumpProfile('memcache_missed');
 		$this->flush();
-
 	}
 
 	public function setModUCFExternalUser($username, $userData)
@@ -312,7 +309,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $lo;
 			}
-			profile('memcache_missed', 'loID:'.$loID);
 		}
 
 		return false;
@@ -347,7 +343,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $lo;
 			}
-			profile('memcache_missed', 'loMeta:'.$loID);
 		}
 		return false;
 	}
@@ -476,7 +471,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'qGroupID:'.$qGroupID);
 		}
 
 		return false;
@@ -514,7 +508,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'pagesForLOID:'.$loID);
 		}
 
 		return false;
@@ -536,7 +529,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'equivalentAttempts:'.$userID . ' ' .$loID);
 		}
 	}
 	public function clearEquivalentAttempt($userID, $loID)
@@ -555,7 +547,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'PermsForItem:'.$itemType . ','. $itemID);
 		}
 	}
 
@@ -600,7 +591,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'getPermsForGroup:'.$groupID);
 		}
 	}
 
@@ -621,7 +611,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'permsForUserToItem:'.$userID.','.$itemType.','.$itemID);
 		}
 	}
 	public function  clearPermsForUserToItem($userID, $itemType, $itemID)
@@ -648,7 +637,6 @@ class Cache extends \rocketD\util\RDMemcache
 			{
 				return $result;
 			}
-			profile('memcache_missed', 'courseStudents:'.$courseID);
 		}
 	}
 
