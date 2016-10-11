@@ -44,6 +44,9 @@ $valid = false;
 $description = "Invalid Oauth Signature";
 $ltiData = new \lti\Data($_POST);
 $outMsgId = 0;
+$score = null;
+$sourceid = null;
+$inMsgId = null;
 
 try
 {
@@ -54,7 +57,7 @@ catch (\lti\Exception $e)
 	profile('lti',"'invalid-lti-passback-received', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
 	trace($e->getMessage(), true);
 	trace($ltiData, true);
-	trace($_SERVER['HTTP_REFERER'], true);
+	trace($_SERVER, true);
 }
 
 if($valid)
