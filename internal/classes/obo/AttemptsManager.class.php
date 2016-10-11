@@ -241,7 +241,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 					}
 					else
 					{
-						if( !is_array($tmpArray[$value->questionIndex]) )
+						if(empty($tmpArray[$value->questionIndex]) || !is_array($tmpArray[$value->questionIndex]))
 						{
 							$tmpArray[$value->questionIndex] = array();
 						}
