@@ -24,7 +24,7 @@ class PageItem
 
 	public function __sleep()
 	{
-		if(isset($this->options) && $this->feedback instanceof \stdClass) $this->options = (array) $this->options;
+		if(isset($this->options) && isset($this->$feedback) && $this->feedback instanceof \stdClass) $this->options = (array) $this->options;
 		return ['pageItemID', 'component', 'data', 'media', 'advancedEdit', 'options'];
 	}
 }
