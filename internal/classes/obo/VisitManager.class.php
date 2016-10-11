@@ -180,12 +180,12 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 	public function startInstanceView($instID, $loID)
 	{
-		if(!is_array($_SESSION['OPEN_INSTANCE_DATA']))
+		if(empty($_SESSION['OPEN_INSTANCE_DATA']) || !is_array($_SESSION['OPEN_INSTANCE_DATA']))
 		{
 			$_SESSION['OPEN_INSTANCE_DATA'] = array();
 		}
 
-		if(!is_array($_SESSION['OPEN_INSTANCE_DATA'][$instID]))
+		if(empty($_SESSION['OPEN_INSTANCE_DATA'][$instID]) || ! is_array($_SESSION['OPEN_INSTANCE_DATA'][$instID]))
 		{
 			$_SESSION['OPEN_INSTANCE_DATA'][$instID] = array('instID' => $instID, 'VIEW_KEY' => -1, 'attemptID' => -1, 'visitID' => -1, 'loID' => $loID);
 		}

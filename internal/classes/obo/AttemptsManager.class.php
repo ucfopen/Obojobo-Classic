@@ -448,6 +448,8 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 		$r = $this->DBM->fetch_obj($q);
 
+		if(empty($r->{\cfg_obo_ExtraAttempt::EXTRA_COUNT})) return 0;
+
 		return (int) $r->{\cfg_obo_ExtraAttempt::EXTRA_COUNT};
 	}
 
