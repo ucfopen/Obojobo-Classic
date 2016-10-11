@@ -511,6 +511,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return false;
 		}
 
+		$result = null;
 		$userMan = \rocketD\auth\AuthManager::getInstance();
 
 		while($r = $this->DBM->fetch_obj($q))
