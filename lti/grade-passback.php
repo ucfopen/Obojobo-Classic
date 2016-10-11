@@ -42,13 +42,22 @@ if(empty($_POST))
 
 $valid = false;
 $description = "Invalid Oauth Signature";
-
 $ltiData = new \lti\Data($_POST);
-
 $outMsgId = 0;
 
-// validate the oauth signature
-if(\lti\OAuth::validateLtiMessage($ltiData, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT) === true)
+try
+{
+	$valid = \lti\OAuth::validateLtiMessage($ltiData, \AppCfg::MATERIA_LTI_KEY, \AppCfg::MATERIA_LTI_SECRET, \AppCfg::MATERIA_LTI_TIMELIMIT);
+}
+catch (\lti\Exception $e)
+{
+	profile('lti',"'invalid-lti-passback-received', '$ltiData->username', '$ltiData->email', '$ltiData->consumer', '$ltiData->resourceId', '".time()."'");
+	trace($e->getMessage(), true);
+	trace($ltiData, true);
+	trace($_SERVER['HTTP_REFERER'], true);
+}
+
+if($valid)
 {
 	// process the incoming data
 	$body       = @file_get_contents('php://input');
