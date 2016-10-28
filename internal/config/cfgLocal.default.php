@@ -1,4 +1,7 @@
-<?php // Local config options set here, override settings from config_main here
+<?php
+
+// VIEW cfg.php TO SEE ALL OPTIONS YOU CAN OVERRIDE!
+
 require_once('cfg.php'); // default config
 
 class AppCfg extends AppCfgDefault
@@ -22,10 +25,8 @@ class AppCfg extends AppCfgDefault
 	const DB_WP_TYPE = ''; // either mysql or oci8
 
 	// --- WORDPRESS keys ---
-	/* Change these to different unique phrases!
-	* You can generate new ones here https://api.wordpress.org/secret-key/1.1/salt/
-	* You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
-	*/
+	// GET NEW KEYS HERE https://api.wordpress.org/secret-key/1.1/salt/
+
 	const WP_AUTH_KEY         = '';
 	const WP_SECURE_AUTH_KEY  = '';
 	const WP_LOGGED_IN_KEY    = '';
