@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e1105ded84515cea329131bc88b35b0c",
-    "content-hash": "c27b3d1dee90e9005fdb2c1c87b1bd64",
+    "hash": "113415b297a456cf074f6e1f7126af11",
+    "content-hash": "e12553a56fbe533cce2f7b46e1c752ea",
     "packages": [
         {
             "name": "composer/installers",
@@ -381,11 +381,11 @@
         },
         {
             "name": "obojobo/obo-stats",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git",
-                "reference": "2ca89ffde47485cf1a2f3f14f19258cc099a7046"
+                "reference": "f53231f454f19cd4361b74ba82517d169f5bd84b"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -401,7 +401,7 @@
                     "email": "zachberry@gmail.com"
                 }
             ],
-            "time": "2015-05-18 20:03:23"
+            "time": "2016-11-01 19:31:15"
         },
         {
             "name": "obojobo/rocketD",
