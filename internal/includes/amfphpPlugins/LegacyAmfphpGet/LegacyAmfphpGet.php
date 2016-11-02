@@ -60,8 +60,6 @@ class LegacyAmfphpGet implements Amfphp_Core_Common_IDeserializer, Amfphp_Core_C
 	 * @return the service call response
 	 */
 	public function handleDeserializedRequest($deserializedRequest, Amfphp_Core_Common_ServiceRouter $serviceRouter){
-
-		// str_replace('/api/json.php/', '', '/api/json.php/loRepository.createInstanceVisit/1');
 		$query = str_replace("{$_SERVER['SCRIPT_NAME']}/", '', $_SERVER['REQUEST_URI']); // loRepository.createInstanceVisit/1
 		$splits = explode('/', $query);
 		$service_and_method = array_shift($splits);
@@ -69,6 +67,19 @@ class LegacyAmfphpGet implements Amfphp_Core_Common_IDeserializer, Amfphp_Core_C
 		$serviceName = $s_and_m_splits[0];
 		$methodName = $s_and_m_splits[1];
 		$parameters = $splits;
+		// check for arrays that need to be parsed
+		// ie: .com/api/json.api/class.method/[1,2,3]/a
+		// this makes sure parameters[0] = array(1,2,3)
+		if(count($parameters))
+		{
+			foreach ($parameters as $key => $value)
+			{
+				if(substr($value, 0, 1) == '[' && substr($value, -1) == ']')
+				{
+					$parameters[$key] = explode(',', substr($value, 1, -1));
+				}
+			}
+		}
 		return $serviceRouter->executeServiceCall($serviceName, $methodName, $parameters);
 	}
 
