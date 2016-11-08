@@ -51,39 +51,27 @@ class API
 
 		// ================ RENDER OR REDIRECT DEPENDING ON LTI LAUNCH ROLE ================
 
-		if($ltiData->isTestUser())
-		{
-			$instanceData = static::getInstanceDataOrRenderError($instID);
-			static::initAssessmentSession($instID, $ltiData);
-			profile('lti', "'lti-launch-testuser', '$instID', '".time()."'");
-			// test user shows a special page
-			\lti\Views::renderTestUserConfirmPage($instanceData);
-			exit();
-		}
-
 		// does the lti role indicate this is an instructor?
 		// this overrides their state in the local obojobo database!
-		if($ltiData->isInstructor())
+		if($ltiData->isInstructor() || $ltiData->isTestUser())
 		{
 			$instanceData = static::getInstanceDataOrRenderError($instID);
-			$loID = $instanceData->loID;
 
 			// We want to store in some additional permissions info in
 			// the session so this gives the instructor a way to be
 			// able to view the instance in Obojobo
-			if(!empty($ltiData->username))
+			if($ltiData->isInstructor() && !empty($ltiData->username))
 			{
-				$AM = \rocketD\auth\AuthManager::getInstance();
-				$user = $AM->fetchUserByUserName($ltiData->username);
-
-				$PM = \obo\perms\PermManager::getInstance();
-				$PM->setSessionPermsForUserToItem($user->userID, \cfg_core_Perm::TYPE_INSTANCE, $instID, array(20));
+				$user = \rocketD\auth\AuthManager::getInstance()->fetchUserByUserName($ltiData->username);
+				if($user instanceof \rocketD\auth\User)
+				{
+					\obo\perms\PermManager::getInstance()->setSessionPermsForUserToItem($user->userID, \cfg_core_Perm::TYPE_INSTANCE, $instID, array(20));
+				}
 			}
 
-			// redirect to preview
-			$previewURL = \AppCfg::URL_WEB . 'preview/' . $loID;
-			profile('lti',"'lti-launch-redirect-instructor', '$previewURL', '".time()."'");
-			header('Location: ' . $previewURL);
+			profile('lti',"'lti-launch-".($ltiData->isTestUser() ? 'testuser' : 'instructor')."', '$previewURL', '".time()."'");
+			// static::initAssessmentSession($instID, $ltiData);
+			\lti\Views::renderTestUserConfirmPage($instanceData);
 			exit();
 		}
 
