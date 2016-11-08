@@ -5,11 +5,6 @@ class Exception extends \Exception {}
 
 class OAuth
 {
-	public static $ltiData;
-	public static $key;
-	public static $secret;
-	public static $timeout;
-
 
 	public static function validateLtiPassback($key, $secret, $timeout)
 	{
@@ -32,7 +27,8 @@ class OAuth
 	public static function validateLtiMessage($ltiData, $key, $secret, $timeout)
 	{
 		if(empty($_REQUEST['oauth_nonce'])) throw new Exception("Authorization fingerprint is missing.");
-		if($_REQUEST['oauth_timestamp'] >= (time() - \lti\OAuth::$timeout)) throw new Exception("Authorization signature is too old.");
+		// IS THE OAUTH TIMESTAMP LESS THEN THE OLDEST VALID TIMESTAMP (NOW - MAX AGE DELTA)
+		if(((int) $_REQUEST['oauth_timestamp']) < (time() - $timeout)) throw new Exception("Authorization signature is too old.");
 		if($_REQUEST['oauth_consumer_key'] !== $key) throw new Exception("Authorization signature failure.");
 
 		// OK, so OAUTH IS FUN
