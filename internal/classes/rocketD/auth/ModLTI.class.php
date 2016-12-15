@@ -25,7 +25,7 @@ class ModLTI extends AuthModule
 	}
 
 	// Make sure createNewUser uses the relatedAuthMod
-	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=0)
+	public function createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars=[])
 	{
 		$authMod = $this->getRelatedAuthMod();
 		return $authMod->createNewUser($userName, $fName, $lName, $mName, $email, $optionalVars);
