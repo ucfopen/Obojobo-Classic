@@ -27,7 +27,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $roleName)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -52,7 +52,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $roleID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -60,7 +60,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $roleID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -88,7 +88,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		{
 			return false;
 		}
-		trace(mysql_error(), true);
+		trace($this->DBM->error(), true);
 		$userIDArr = array();
 		$userIDArr[] = $userID;
 		return $this->addUsersToRole($userIDArr, $roleName);
@@ -105,7 +105,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->query($qstr)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -138,7 +138,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 			$qstr = "SELECT U.userID, login, first, last, mi FROM obo_users AS U, obo_map_roles_to_user AS M WHERE U.userID = M.userID AND M.roleID IN (?) GROUP BY U.userID";
 			if(!($q = $this->DBM->querySafe($qstr, $cacheKey)))
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				return false;
 			}
 			$users = $this->DBM->getAllRows($q, 'assoc');
@@ -170,7 +170,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 		{
 			if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'])))
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				return false;
 			}
 
@@ -187,7 +187,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 			{
 				if(!($q = $this->DBM->querySafe($qstr, $userID)))
 				{
-					trace(mysql_error(), true);
+					trace($this->DBM->error(), true);
 					return false;
 				}
 
@@ -238,7 +238,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $userID )))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -269,7 +269,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $roleName)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -308,7 +308,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $roleName)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -363,7 +363,7 @@ class RoleManager extends \rocketD\db\DBEnabled
 
 				if(!($q = $this->DBM->querySafe($qstr, $userID, $this->getRoleID($roleName))))
 				{
-					trace(mysql_error(), true);
+					trace($this->DBM->error(), true);
 					$this->DBM->rollback();
 					$success = false;
 				}

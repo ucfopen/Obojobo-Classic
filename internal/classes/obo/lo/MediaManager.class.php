@@ -523,7 +523,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
-        	trace(mysql_error(), true);
+        	trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -557,7 +557,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		if(!$this->DBM->querySafe("INSERT INTO ".\cfg_obo_Media::MAP_TABLE." SET ".\cfg_obo_Media::ID." = '?', ".\cfg_obo_LO::ID." = '?'", $mediaID, $loID))
 		{
 		    $this->DBM->rollback();
-        	trace(mysql_error(), true);
+        	trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -581,7 +581,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
-        	trace(mysql_error(), true);
+        	trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -601,7 +601,7 @@ class MediaManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $mediaID)))
 		{
 		    $this->DBM->rollback();
-        	trace(mysql_error(), true);
+        	trace($this->DBM->error(), true);
 			return false;
 		}
 

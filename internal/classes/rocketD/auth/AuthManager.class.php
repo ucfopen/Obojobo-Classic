@@ -222,7 +222,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 			if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'])))
 			{
 				$this->DBM->rollback();
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				return false;
 			}
 			// clear cache that may contain this user's data

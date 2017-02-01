@@ -33,7 +33,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $_SERVER['REMOTE_ADDR'], $instID, $instID)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -73,7 +73,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $visitID)) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -108,7 +108,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE `".\cfg_obo_Instance::ID."`='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
-		    trace(mysql_error(), true);
+		    trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;
