@@ -207,7 +207,6 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 			$optUserID = 0;
 		}
-		$itemType = mysql_real_escape_string($itemType);
 
 		$q = $this->DBM->querySafe("SELECT * FROM `".\cfg_obo_Perm::TABLE."` WHERE
 			".\cfg_core_User::ID."='?' AND
@@ -393,16 +392,15 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	 */
 	private function getPerm($itemID=0, $itemType='l', $perm='read', $optUserID=0)
 	{
-		$perm = mysql_real_escape_string($perm);
 		$itemType = substr($itemType,0,1);	//Make sure $itemType is only one char long
 		if(is_numeric($itemID) && is_numeric($optUserID) && $itemID > 0)
 		{
-			$q = $this->DBM->querySafe("SELECT `{$perm}` FROM ".\cfg_obo_Perm::TABLE." WHERE
+			$q = $this->DBM->querySafe("SELECT `?` FROM ".\cfg_obo_Perm::TABLE." WHERE
 				".\cfg_core_User::ID."='?' AND
 				".\cfg_obo_Perm::ITEM."='?' AND
 				`".\cfg_obo_Perm::TYPE."`='?' AND
 				`?`='1'
-				LIMIT 1", $optUserID, $itemID, $itemType, $perm);
+				LIMIT 1", $perm, $optUserID, $itemID, $itemType, $perm);
 			return ((bool) $r = $this->DBM->fetch_obj($q));
 		}
 		else
@@ -422,11 +420,10 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 	// TODO: FIX RETURN FOR DB ABSTRACTION
 	public function getUsersWithPerm($itemID=0, $itemType='i', $perm='read')
 	{
-		$perm = mysql_real_escape_string($perm);
 		$itemType = substr($itemType,0,1);	//Make sure $itemType is only one char long
 		if(is_numeric($itemID) && $itemID > 0)
 		{
-			if( !($q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND	`?`='1'", $itemID, $itemType, $perm)) )
+			if( !($q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND `?`='1'", $itemID, $itemType, $perm)) )
 			{
 				trace(mysql_error(), true);
 				$this->DBM->rollback();
