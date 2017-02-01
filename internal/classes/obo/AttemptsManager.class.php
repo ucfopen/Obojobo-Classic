@@ -30,7 +30,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $_SESSION['userID'])))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -381,7 +381,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $attemptID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 		$r = $this->DBM->fetch_obj($q);
@@ -534,7 +534,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				if(!($q = $this->DBM->querySafe($qstr, $userID, $instID, $count)))
 				{
 					$this->DBM->rollback();
-					trace(mysql_error(), true);
+					trace($this->DBM->error(), true);
 					//die();
 					return false;
 				}
@@ -550,7 +550,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 				if(!($q = $this->DBM->querySafe($qstr, $count, $userID, $instID)))
 				{
 					$this->DBM->rollback();
-					trace(mysql_error(), true);
+					trace($this->DBM->error(), true);
 					return false;
 				}
 			}
@@ -588,7 +588,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $instID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			//die();
 			return false;
 		}
@@ -791,7 +791,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $_SESSION['userID'], $GLOBALS['CURRENT_INSTANCE_DATA']['instID'], $loID, $qGroupID, $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'], $linkedAttemptID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -821,7 +821,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT * FROM " . \cfg_obo_Attempt::TABLE . " WHERE ".\cfg_obo_Attempt::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 		$r = $this->DBM->fetch_obj($q);
@@ -834,7 +834,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 			$qstr = "SELECT `".\cfg_obo_Score::TYPE."`, ".\cfg_obo_Score::ITEM_ID.", ".\cfg_obo_Answer::ID.", ".\cfg_obo_Score::ANSWER.", ".\cfg_obo_Score::SCORE." FROM ".\cfg_obo_Score::TABLE." WHERE ".\cfg_obo_Attempt::ID."='?'";
 			if(!($q = $this->DBM->querySafe($qstr, $attemptID)))
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				return false;
 			}
 
