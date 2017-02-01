@@ -194,7 +194,7 @@ class LockManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->query($qstr)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			//exit;
 			return false;
 		}

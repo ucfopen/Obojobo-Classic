@@ -22,7 +22,7 @@ class PageManager extends \rocketD\db\DBEnabled
 			$qstr = "INSERT INTO ".\cfg_obo_Page::TABLE." SET ".\cfg_obo_Page::PAGE_DATA."='?'";
 			if( !($q = $this->DBM->querySafe($qstr, $this->db_serialize($page)) ) )
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				$this->DBM->rollback();
 				return false;
 			}
@@ -38,7 +38,7 @@ class PageManager extends \rocketD\db\DBEnabled
 		$qstr = "INSERT IGNORE INTO ".\cfg_obo_Page::MAP_TABLE." SET ".\cfg_obo_LO::ID."='?', ".\cfg_obo_Page::ID."='?', ".\cfg_obo_Page::MAP_ORDER."='?'";
 		if( !( $this->DBM->querySafe($qstr, $loID, $pageID, $orderIndex) ) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -93,7 +93,7 @@ class PageManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT * FROM ".\cfg_obo_Page::TABLE." WHERE ".\cfg_obo_Page::ID."='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $pgid)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 

@@ -172,7 +172,7 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 				}
 				else
 				{
-					trace("unable to update user " . mysql_error(), true);
+					trace("unable to update user " . $this->DBM->error(), true);
 				}
 			}
 		}

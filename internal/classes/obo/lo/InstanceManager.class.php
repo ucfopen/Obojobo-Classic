@@ -83,7 +83,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		if(!($this->DBM->querySafe($qstr, $userID, $instID)))
 		{
 			$this->DBM->rollback();
-			//erro_log("ERROR: newInstance query 2  ".mysql_error());
+			//erro_log("ERROR: newInstance query 2  ".$this->DBM->error());
 			return false;
 		}
 
@@ -417,7 +417,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $name, $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, $instID)) )
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -461,7 +461,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		if( !($q = $this->DBM->querySafe($qstr, $externalLinkName, $instID)) )
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
@@ -657,7 +657,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 		if(!($this->DBM->querySafe($qstr, $name, $loID, $userID, time(), $course, $startTime, $endTime, $attemptCount, $scoreMethod, (int)$allowScoreImport, (int)$originalID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
