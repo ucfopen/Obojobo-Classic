@@ -724,7 +724,7 @@ class LogManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 			$this->DBM->rollback();
-			trace("ERROR: getInstanceTrackingData query 2  ".mysql_error(), true);
+			trace("ERROR: getInstanceTrackingData query 2  ".$this->DBM->error(), true);
 			return false;
 		}
 

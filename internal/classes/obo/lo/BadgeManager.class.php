@@ -57,8 +57,8 @@ class BadgeManager extends \rocketD\db\DBEnabled
 		$q = $this->DBM->querySafe($qstr, $loID);
 		if(!$q)
 		{
-			trace(mysql_error(), true);
-			$DBM->rollback();
+			trace($this->DBM->error(), true);
+			$this->DBM->rollback();
 			return false;
 		}
 
