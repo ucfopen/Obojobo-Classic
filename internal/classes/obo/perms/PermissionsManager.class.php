@@ -58,7 +58,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $itemID, $itemType)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -425,7 +425,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 			if( !($q = $this->DBM->querySafe("SELECT ".\cfg_core_User::ID." FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND `?`='1'", $itemID, $itemType, $perm)) )
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				$this->DBM->rollback();
 				return false;
 			}
@@ -616,7 +616,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 				VALUES ('?', '?', '?', '1', '1', '1', '1', '1', '1', '1', '1', '1');";
 			if(!($q = $this->DBM->querySafe($qstr, $userID, $itemID, $itemType)) )
 			{
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				$this->DBM->rollback();
 				return false;
 			}
@@ -707,7 +707,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $userID, $itemID, $itemType)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}

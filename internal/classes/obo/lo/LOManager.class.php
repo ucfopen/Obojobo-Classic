@@ -20,7 +20,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		$qstr = "SELECT ".\cfg_obo_LO::ROOT_LO." FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='?' LIMIT 1";
 		if( !($q = $this->DBM->querySafe($qstr, $loID)) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 		$r = $this->DBM->fetch_obj($q);
@@ -675,7 +675,7 @@ class LOManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $loID)))
 		{
 			$this->DBM->rollback();
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return false;
 		}
 
