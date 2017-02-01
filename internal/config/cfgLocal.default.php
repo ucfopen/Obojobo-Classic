@@ -15,14 +15,14 @@ class AppCfg extends AppCfgDefault
 	const DB_USER = '';
 	const DB_PASS = '';
 	const DB_NAME = '';
-	const DB_TYPE = ''; // either mysql or oci8
+	const DB_TYPE = ''; // either mysql, mysqli, or oci8
 
 	// --- Wordpress DB Connection ---
 	const DB_WP_HOST = '';
 	const DB_WP_USER = '';
 	const DB_WP_PASS = '';
 	const DB_WP_NAME = '';
-	const DB_WP_TYPE = ''; // either mysql or oci8
+	const DB_WP_TYPE = ''; // either mysql, mysqli, or oci8
 
 	// --- WORDPRESS keys ---
 	// GET NEW KEYS HERE https://api.wordpress.org/secret-key/1.1/salt/
