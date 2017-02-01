@@ -23,6 +23,11 @@ class DBConnectionOCI8 extends DBConnection
 		return false;
 	}
 
+	public function error()
+	{
+		return '';
+	}
+
 	public function db_select($db_name='')
 	{
 		//@mysql_select_db($db_name);

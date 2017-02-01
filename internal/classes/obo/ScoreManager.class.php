@@ -128,7 +128,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, time(), $questionID, 'm', 0, $score, $score, $attemptID, time(), 0, $score, $score)) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			return array(false, "Could not save score");
 		}
 
@@ -283,7 +283,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			if( !($q = $this->DBM->querySafe($qstr, time(), $questionID, $itemType, $checkArr['answerID'], $answer, $checkArr['weight'], $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], time(), $checkArr['answerID'], $answer, $checkArr['weight'])) )
 			{
  				$this->DBM->rollback();
-				trace(mysql_error(), true);
+				trace($this->DBM->error(), true);
 				return false;
 			}
 
@@ -408,7 +408,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -506,7 +506,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -575,7 +575,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $aGroupID, $offset, $amount)))
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -636,7 +636,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 		if(!($q = $this->DBM->querySafe($qstr, $instID, $userID)))
 		{
 			$this->DBM->rollback();
-			trace("ERROR: getAssessmentScores".mysql_error(), true);
+			trace("ERROR: getAssessmentScores".$this->DBM->error(), true);
 			return false;
 		}
 
@@ -824,7 +824,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $qGroupID)) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			return false;
 		}
@@ -906,7 +906,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 		if( !($q = $this->DBM->querySafe($qstr, $qGroupID)) )
 		{
-			trace(mysql_error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;

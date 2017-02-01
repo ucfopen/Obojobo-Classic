@@ -308,7 +308,7 @@ class LO
 				if(!($q = $DBM->querySafe($qstr, $this->loID)))
 				{
 					$DBM->rollback();
-					trace(mysql_error(), true);
+					trace($DBM->error(), true);
 					return false;
 				}
 				$this->loID = $DBM->insertID;
@@ -425,7 +425,7 @@ class LO
 		$qstr = "SELECT ".\cfg_obo_LO::ID.", ".\cfg_obo_LO::VER.", ".\cfg_obo_LO::AGROUP.", ".\cfg_obo_LO::PGROUP." FROM ".\cfg_obo_LO::TABLE." WHERE (".\cfg_obo_LO::ROOT_LO." = '?' OR ".\cfg_obo_LO::ID." = '?' ) AND ".\cfg_obo_LO::SUB_VER." > 0 ORDER BY ".\cfg_obo_LO::SUB_VER." ASC";
 		if( !($q = $DBM->querySafe($qstr, $delRootID, $delRootID)) )
 		{
-		    trace(mysql_error(), true);
+		    trace($DBM->error(), true);
 			return false;
 		}
 	    $drafts = array();
@@ -644,7 +644,7 @@ class LO
 			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright, $this->summary['contentSize'], $this->summary['practiceSize'], $this->summary['assessmentSize']);
 			if(!$q)
 			{
-			    trace(mysql_error(), true);
+			    trace($DBM->error(), true);
 				$DBM->rollback();
 				return false;
 			}

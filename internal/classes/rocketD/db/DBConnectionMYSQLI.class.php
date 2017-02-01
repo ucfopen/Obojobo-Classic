@@ -26,6 +26,11 @@ class DBConnectionMYSQLI extends DBConnection
 		return false;
 	}
 
+	public function error()
+	{
+		return mysqli_error();
+	}
+
 	public function db_select($db_name='')
 	{
 		$return = @mysqli_select_db($db_name, $this->connData->connID);
