@@ -192,11 +192,15 @@ abstract class AuthModule extends \rocketD\db\dbEnabled
 
 		if ( ! session_id())
 		{
-			@session_name(\AppCfg::SESSION_NAME);
-			@session_start();
+			session_name(\AppCfg::SESSION_NAME);
+			session_start();
 		}
 
-		@session_regenerate_id(false);
+		// bypass issue in php 7.0.x https://github.com/php/php-src/pull/1739
+		if(version_compare(PHP_VERSION, '7.0.0') < 0 || version_compare(PHP_VERSION, '7.1.0') >= 0){
+			session_regenerate_id(false);
+		}
+
 		$_SESSION = array();// force a fresh start on the session variables
 		$_SESSION['userID'] = $user->userID;
 		$_SESSION['passed'] = true;
