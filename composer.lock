@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "113415b297a456cf074f6e1f7126af11",
-    "content-hash": "e12553a56fbe533cce2f7b46e1c752ea",
+    "content-hash": "e8cdc717452d498c39d5d737ebf4ce16",
     "packages": [
         {
             "name": "composer/installers",
@@ -112,7 +111,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2016-08-13 20:53:52"
+            "time": "2016-08-13T20:53:52+00:00"
         },
         {
             "name": "eher/oauth",
@@ -145,20 +144,20 @@
                 "BSD-3-Clause"
             ],
             "description": "OAuth 1 PHP Library",
-            "time": "2012-12-13 23:48:10"
+            "time": "2012-12-13T23:48:10+00:00"
         },
         {
             "name": "johnpbloch/wordpress",
-            "version": "4.5.3",
+            "version": "4.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/johnpbloch/wordpress.git",
-                "reference": "f5c6f4dd899e6365ddf2752d2705ed1de7e10715"
+                "reference": "ac7b1792641d1fb61cb2901db292903b31694057"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/f5c6f4dd899e6365ddf2752d2705ed1de7e10715",
-                "reference": "f5c6f4dd899e6365ddf2752d2705ed1de7e10715",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/ac7b1792641d1fb61cb2901db292903b31694057",
+                "reference": "ac7b1792641d1fb61cb2901db292903b31694057",
                 "shasum": ""
             },
             "require": {
@@ -182,7 +181,7 @@
                 "blog",
                 "cms"
             ],
-            "time": "2016-06-21 16:31:21"
+            "time": "2017-01-26T18:32:19+00:00"
         },
         {
             "name": "johnpbloch/wordpress-core-installer",
@@ -230,7 +229,7 @@
             "keywords": [
                 "wordpress"
             ],
-            "time": "2015-06-11 15:15:30"
+            "time": "2015-06-11T15:15:30+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -308,7 +307,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-04-02 13:12:58"
+            "time": "2016-04-02T13:12:58+00:00"
         },
         {
             "name": "mrclay/minify",
@@ -353,7 +352,7 @@
             ],
             "description": "Minify is a PHP5 app that helps you follow several rules for client-side performance. It combines multiple CSS or Javascript files, removes unnecessary whitespace and comments, and serves them with gzip encoding and optimal client-side cache headers",
             "homepage": "http://code.google.com/p/minify/",
-            "time": "2016-03-08 11:49:57"
+            "time": "2016-03-08T11:49:57+00:00"
         },
         {
             "name": "obojobo-themes/obojobo",
@@ -377,7 +376,7 @@
                     "email": "zachberry@gmail.com"
                 }
             ],
-            "time": "2016-03-18 19:31:48"
+            "time": "2016-03-18T19:31:48+00:00"
         },
         {
             "name": "obojobo/obo-stats",
@@ -401,7 +400,7 @@
                     "email": "zachberry@gmail.com"
                 }
             ],
-            "time": "2016-11-01 19:31:15"
+            "time": "2016-11-01T19:31:15+00:00"
         },
         {
             "name": "obojobo/rocketD",
@@ -421,26 +420,34 @@
                     "email": "iturgeon@gmail.com"
                 }
             ],
-            "time": "2015-12-10 20:30:37"
+            "time": "2015-12-10T20:30:37+00:00"
         },
         {
             "name": "psr/log",
-            "version": "1.0.0",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
                 "shasum": ""
             },
+            "require": {
+                "php": ">=5.3.0"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -454,12 +461,13 @@
                 }
             ],
             "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
             "keywords": [
                 "log",
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "silexlabs/amfphp",
@@ -489,7 +497,7 @@
                 }
             ],
             "description": "Simple Remoting for Web Applications",
-            "time": "2016-01-26 14:48:49"
+            "time": "2016-01-26T14:48:49+00:00"
         },
         {
             "name": "ucfcdl/php-saml",
@@ -581,16 +589,16 @@
         },
         {
             "name": "wpackagist-plugin/w3-total-cache",
-            "version": "0.9.4.1",
+            "version": "0.9.5.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/w3-total-cache/",
-                "reference": "tags/0.9.4.1"
+                "reference": "tags/0.9.5.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.4.1.zip",
-                "reference": "tags/0.9.4.1",
+                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.5.2.zip",
+                "reference": null,
                 "shasum": null
             },
             "require": {
