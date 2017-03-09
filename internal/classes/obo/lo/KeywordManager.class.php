@@ -31,9 +31,9 @@ class KeywordManager extends \rocketD\db\DBEnabled
 					WHERE kmap.".\cfg_obo_Keyword::MAP_TYPE." = '?' AND kmap.".\cfg_obo_LO::ID." = '?'";
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype, $itmid)))
 		{
-		    $this->DBM->rollback();
-		    trace($this->DBM->error(), true);
-		    //die();
+			$this->DBM->rollback();
+			trace($this->DBM->error(), true);
+			//die();
 			return false;
 		}
 		$keyarr = array();
@@ -53,7 +53,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	{
 		if(!is_array($keyArr))
 		{
-		    return false;
+			return false;
 		}
 
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_Keyword::ID." IN (
@@ -65,21 +65,21 @@ class KeywordManager extends \rocketD\db\DBEnabled
 			$tempstr = strtolower($keyArr[$i]);
 			$qstr .= "'{$tempstr}'";
 			if($i != $numkeys-1)
-			    $qstr .= ',';
+				$qstr .= ',';
 		}
 		$qstr .= '))';
 
 		//Gather up everything
 		if(!($q = $this->DBM->querySafe($qstr, $itmtype)))
 		{
-		    $this->DBM->rollback();
-		    trace($this->DBM->error(), true);
-		    //die();
+			$this->DBM->rollback();
+			trace($this->DBM->error(), true);
+			//die();
 			return false;
 		}
 
 		if(!($r = $this->DBM->fetch_obj($q)))
-		    return false;
+			return false;
 		$itmarr = array();
 		do
 		{
@@ -130,7 +130,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	{
 		if($keyname == '')
 		{
-		    return false;
+			return false;
 		}
 		$key = $this->keywordExists($keyname);
 
@@ -165,15 +165,15 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	{
 		if($keyid != 0 && $itmid != 0)
 		{
-		    return false;
+			return false;
 		}
 
 		$qstr = "SELECT ".\cfg_obo_LO::ID." FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_LO::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $keyid, $itmid, $itmtype)))
 		{
-		    $this->DBM->rollback();
-		    trace($this->DBM->error(), true);
-		    //die();
+			$this->DBM->rollback();
+			trace($this->DBM->error(), true);
+			//die();
 			return false;
 		}
 		if( $r = $this->DBM->fetch_obj($q) )
@@ -197,7 +197,7 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	{
 		if( !is_array($keyArr) || $itmid < 1)
 		{
-		    return false;
+			return false;
 		}
 
 		foreach($keyArr as $val)
@@ -217,10 +217,10 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	 * @return (bool) TRUE if link made, FALSE if linked already
 	 */
 	public function linkKeyword($keyid=0, $itmid=0, $itmtype='l')
-    {
+	{
 		if(!is_numeric($keyid) || $keyid < 0 || !is_numeric($itmid) || $itmid < 0)
 		{
-		    return false;
+			return false;
 		}
 		//If the keyword is not linked to this item already, link it
 		if(!$this->linkedAlready($keyid, $itmid, $itmtype))
@@ -251,10 +251,10 @@ class KeywordManager extends \rocketD\db\DBEnabled
 	 */
 	function unlinkKeyword($keyid=0, $itmid=0, $itmtype='l')
 	{
-        if(!is_numeric($keyid) || $keyid < 0 || !is_numeric($itmid) || $itmid < 0)
+		if(!is_numeric($keyid) || $keyid < 0 || !is_numeric($itmid) || $itmid < 0)
 		{
-		    return false;
-	    }
+			return false;
+		}
 		//Create entry in mapping table
 		$qstr = "DELETE FROM ".\cfg_obo_Keyword::MAP_TABLE." WHERE ".\cfg_obo_Keyword::ID."='?' AND ".\cfg_obo_Keyword::MAP_TYPE."='?' AND ".\cfg_obo_LO::ID."='?' LIMIT 1";
 		if( !($q = $this->DBM->querySafe($qstr, $keyid, $itmtype, $itmid)) )
@@ -297,9 +297,9 @@ class KeywordManager extends \rocketD\db\DBEnabled
 
 		if(!($q = $this->DBM->query($qstr)))
 		{
-            $this->DBM->rollback();
-            trace($this->DBM->error(), true);
-            //die();
+			$this->DBM->rollback();
+			trace($this->DBM->error(), true);
+			//die();
 			return false;
 		}
 

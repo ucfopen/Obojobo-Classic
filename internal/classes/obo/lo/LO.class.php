@@ -385,10 +385,10 @@ class LO
 		$qstr = "SELECT ".\cfg_obo_LO::ID.", ".\cfg_obo_LO::VER.", ".\cfg_obo_LO::AGROUP.", ".\cfg_obo_LO::PGROUP." FROM ".\cfg_obo_LO::TABLE." WHERE (".\cfg_obo_LO::ROOT_LO." = '?' OR ".\cfg_obo_LO::ID." = '?' ) AND ".\cfg_obo_LO::SUB_VER." > 0 ORDER BY ".\cfg_obo_LO::SUB_VER." ASC";
 		if( !($q = $DBM->querySafe($qstr, $delRootID, $delRootID)) )
 		{
-		    trace($DBM->error(), true);
+			trace($DBM->error(), true);
 			return false;
 		}
-	    $drafts = array();
+		$drafts = array();
 		while($r = $DBM->fetch_obj($q))
 		{
 			$drafts[] = $r->{\cfg_obo_LO::ID};
@@ -408,7 +408,7 @@ class LO
 				$qstr = "UPDATE IGNORE `".\cfg_obo_LO::MAP_AUTH_TABLE."` SET ".\cfg_obo_LO::ID."='?' WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 				if( !($q = $DBM->querySafe($qstr, $newLoID)))
 				{
-	                $DBM->rollback();
+					$DBM->rollback();
 					return false;
 				}
 			}
@@ -417,7 +417,7 @@ class LO
 			$qstr = "DELETE FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-                $DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 
@@ -426,7 +426,7 @@ class LO
 			$qstr = "DELETE FROM ".\cfg_obo_Media::MAP_TABLE." WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-                $DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 
@@ -443,7 +443,7 @@ class LO
 			$qstr = "DELETE FROM obo_map_pages_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-                $DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 
@@ -454,7 +454,7 @@ class LO
 			WHERE M.".\cfg_obo_Page::ID." IS NULL;";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-	            $DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 
@@ -463,7 +463,7 @@ class LO
 			$qstr = "DELETE FROM obo_map_keywords_to_lo WHERE ".\cfg_obo_LO::ID." IN (".$draftstr.")";
 			if(!($q = $DBM->query($qstr))) // no need for querySafe, all these val's are out of the database above
 			{
-                $DBM->rollback();
+				$DBM->rollback();
 				return false;
 			}
 
@@ -604,7 +604,7 @@ class LO
 			$q = $DBM->querySafe($qstr, $this->title, $this->languageID, $this->notes, $this->objective, $this->learnTime, $this->pGroup->qGroupID, $this->aGroup->qGroupID, $this->version, $this->subVersion, $this->rootID, $this->parentID, $this->copyright, $this->summary['contentSize'], $this->summary['practiceSize'], $this->summary['assessmentSize']);
 			if(!$q)
 			{
-			    trace($DBM->error(), true);
+				trace($DBM->error(), true);
 				$DBM->rollback();
 				return false;
 			}

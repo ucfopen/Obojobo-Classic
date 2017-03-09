@@ -21,7 +21,7 @@ class Question
 		$this->perms = $perms;
 		$this->items = $items;
 		$this->questionIndex = 0;
-	}
+ }
 
 	public function __sleep()
 	{

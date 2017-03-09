@@ -5,7 +5,6 @@ class PageItem
 {
 	public $pageItemID;
 	public $component;
-	//public $layoutItemID;
 	public $data;
 	public $media;
 	public $advancedEdit;
@@ -14,7 +13,6 @@ class PageItem
 	function __construct($pageItemID=0, $component='', $data='', $media=Array(), $advancedEdit=0, $options=NULL)
 	{
 		$this->pageItemID = $pageItemID;
-		//$this->layoutItemID = $layoutItemID;
 		$this->component = $component;
 		$this->data = $data;
 		$this->media = $media;
