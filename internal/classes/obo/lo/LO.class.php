@@ -150,20 +150,6 @@ class LO
 		return false;
 	}
 
-	// Gets the LO minus assessment questions (aGroup->kids)
-	public function dbGetInstance($DBM, $loID)
-	{
-		if($this->dbGetFull($DBM, $loID))
-		{
-			if(is_object($this) && is_object($this->aGroup))
-			{
-				unset($this->aGroup->kids);
-			}
-			return true;
-		}
-		return false;
-	}
-
 	// Hydrates this LO with the contents of an LO loaded from cache
 	// Replaces cached permissions with the current user's
 	protected function becomeCachedLO($lo)
