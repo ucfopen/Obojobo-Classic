@@ -401,10 +401,8 @@ class LOManager extends \rocketD\db\DBEnabled
 			switch($amount)
 			{
 				case 'content':
-					$lo->dbGetContent($this->DBM, $loID);
-					break;
 				case 'instance':
-					$lo->dbGetInstance($this->DBM, $loID);
+					$lo->dbGetContent($this->DBM, $loID);
 					break;
 				case 'full': // Get the full LO, authentication should be required
 					$lo->dbGetFull($this->DBM, $loID);
