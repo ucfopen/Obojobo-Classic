@@ -3,12 +3,12 @@
 namespace obo\lo;
 class Question
 {
-	public $questionID;				//Number:
-	public $userID;			//Number:  ID of userID
-	public $itemType;			//String:  'QA', 'MC', etc
-	public $answers;		//Array: answers
-	public $perms;			//Permissions object:  merged from global and user
-	public $items;			//Array: of page items
+	public $questionID; // Number:
+	public $userID; // Number:  ID of userID
+	public $itemType; // String:  'QA', 'MC', etc
+	public $answers; // Array: answers
+	public $perms; // Permissions object:  merged from global and user
+	public $items; // Array: of page items
 	public $questionIndex;
 	public $feedback;
 
@@ -20,6 +20,7 @@ class Question
 		$this->answers = $answers;
 		$this->perms = $perms;
 		$this->items = $items;
+		$this->questionIndex = 0;
 	}
 
 	public function __sleep()
