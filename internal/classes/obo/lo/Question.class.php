@@ -26,6 +26,6 @@ class Question
 	public function __sleep()
 	{
 		if(isset($this->feedback) && $this->feedback instanceof \stdClass) $this->feedback = (array) $this->feedback;
-		return ['questionID', 'userID', 'itemType', 'answers', 'perms', 'items', 'feedback'];
+		return ['questionID', 'userID', 'itemType', 'answers', 'perms', 'items', 'feedback', 'questionIndex'];
 	}
 }
