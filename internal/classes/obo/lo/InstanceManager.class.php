@@ -187,13 +187,11 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$curtime = time();
 			// Reject if the instance isn't open yet
 			if($r->{\cfg_obo_Instance::START_TIME} > $curtime)
+			{
 				return \rocketD\util\Error::getError(4003);
 			}
 
 			$lom = \obo\lo\LOManager::getInstance();
-
-			$permman = \obo\perms\PermissionsManager::getInstance();
-			$roleMan = \obo\perms\RoleManager::getInstance();
 
 			$visitMan = \obo\VisitManager::getInstance();
 			$visitMan->startInstanceView($instID, $r->{\cfg_obo_LO::ID});
@@ -221,18 +219,14 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			$attemptMan = \obo\AttemptsManager::getInstance();
 			$lo->instanceData->attemptCount = $attemptMan->getTotalAttempts($instID);
 			unset($lo->pGroup->kids);
-			//unset($lo->aGroup->kids);
 
 			// Add in badge information
-			$BM = \obo\lo\BadgeManager::getInstance();
-			$lo->badgeInfo = $BM->getBadgeInfo($r->{\cfg_obo_LO::ID}, $instID);
+			$lo->badgeInfo = \obo\lo\BadgeManager::getInstance()->getBadgeInfo($r->{\cfg_obo_LO::ID}, $instID);
 
 			return $lo;
 		}
 		else
 		{
-
-
 			return \rocketD\util\Error::getError(4002);
 		}
 	}
