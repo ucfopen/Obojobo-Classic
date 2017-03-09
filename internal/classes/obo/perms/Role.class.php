@@ -2,8 +2,6 @@
 /**
  * This is the class that defines the Role data type
  * @author Luis Estrada <lestrada@mail.ucf.edu>
- */
-/**
  * This is the class that defines the Role data type.
  * It is used simply for representing data in memory, and has no methods.
  */

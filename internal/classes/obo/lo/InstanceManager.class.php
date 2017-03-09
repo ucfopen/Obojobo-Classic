@@ -78,7 +78,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 							`".\cfg_obo_Perm::G_USE."`,
 							`".\cfg_obo_Perm::G_GLOBAL."`
 						)
-                	VALUES
+					VALUES
 						('?', '?', 'i', '1', '1', '0', '0', '1', '1', '0', '0', '0');";
 		if(!($this->DBM->querySafe($qstr, $userID, $instID)))
 		{
@@ -484,7 +484,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 	public function deleteInstance($instID = 0)
 	{
-	    if(!\obo\util\Validator::isPosInt($instID))
+		if(!\obo\util\Validator::isPosInt($instID))
 		{
 			return \rocketD\util\Error::getError(2);
 		}
