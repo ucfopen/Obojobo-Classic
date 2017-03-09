@@ -3,13 +3,13 @@
 namespace obo\lo;
 class QuestionGroup
 {
-	public $qGroupID;				//Number:
-	public $userID;			//Number:
-	public $rand;			//Boolean:
-	public $allowAlts;			//Boolean:
-	public $altMethod;		//Enum: 'r' or 'k'
-	public $kids;			//Array: Questions
-	public $quizSize;		//Number: actual size of quiz taking alts into account
+	public $qGroupID; // Number:
+	public $userID; // Number:
+	public $rand; // Boolean:
+	public $allowAlts; // Boolean:
+	public $altMethod; // Enum: 'r' or 'k'
+	public $kids; // Array: Questions
+	public $quizSize; // Number: actual size of quiz taking alts into account
 
 	function __construct($qGroupID=0, $userID=0, $name='', $rand=0, $allowAlts=0, $altMethod='r', $kids=Array())
 	{
@@ -81,6 +81,13 @@ class QuestionGroup
 			{
 				$this->$key = $value;
 			}
+
+			// remove kids if we have to
+			if( ! $includeKids)
+			{
+				$this->kids = Array();
+			}
+
 			return true;
 		}
 
@@ -91,40 +98,39 @@ class QuestionGroup
 
 		if($includeKids)
 		{
-			//Gather questions/groups into an Array from mapping table
+			// Find all the question ids for this group
 			$q = $DBM->querySafe("SELECT ".\cfg_obo_QGroup::MAP_CHILD." FROM ".\cfg_obo_QGroup::MAP_TABLE." WHERE ".\cfg_obo_QGroup::ID."='?' ORDER BY ".\cfg_obo_QGroup::MAP_ORDER." ASC", $qGroupID);
 			$qman = \obo\lo\QuestionManager::getInstance();
 
 			while($r = $DBM->fetch_obj($q))
 			{
+				// load the question
 				$question = $qman->getQuestion($r->{\cfg_obo_QGroup::MAP_CHILD});
 
-				//Gather question alternate grouping links for this question
+				// load question alternate data for this question
 				$qStr = " SELECT ".\cfg_obo_QGroup::MAP_ALT_INDEX." FROM ".\cfg_obo_QGroup::MAP_ALT_TABLE." WHERE ".\cfg_obo_QGroup::ID." = '?' AND ".\cfg_obo_Question::ID." = '?'";
 				$q2 = $DBM->querySafe($qStr, $qGroupID, $question->questionID);
 
-				$question->questionIndex = 0;
-				if($DBM->fetch_num($q2) == 1)
+				// figure out this question's alt index if it has any
+				if($DBM->fetch_num($q2) > 0)
 				{
+					// there was an error
 					if(!$r2 = $DBM->fetch_assoc($q2))
 					{
 						return false;
 					}
-					$question->questionIndex = $r2['questionIndex'];
+
+					$question->questionIndex = (int) $r2['questionIndex'];
 				}
 
-				//Push to group:
 				$this->kids[] = $question;
-
 			}
+
 			$this->quizSize = $this->calculateQuizSize();
 
 			\rocketD\util\Cache::getInstance()->setQGroup($qGroupID, $this);
 		}
 
-
-
 		return true;
 	}
-
 }

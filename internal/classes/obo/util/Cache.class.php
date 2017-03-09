@@ -318,43 +318,10 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			$this->clearLOMeta($loID);
 			return $this->delete($this->ns.'\obo\lo\LO'.$loID);
 		}
 
 	}
-
-	public function setLOMeta($loID, $LO)
-	{
-		if($this->memEnabled)
-		{
-			// set lo in memcache
-			$this->set($this->ns.'\obo\lo\LO:Meta'.$loID, $LO, false, 0) or trace('Memcache Failed to write', true);
-		}
-	}
-
-	public function getLOMeta($loID)
-	{
-
-		if($this->memEnabled)
-		{
-			// get from memcache
-			if($lo = $this->get($this->ns.'\obo\lo\LO:Meta'.$loID))
-			{
-				return $lo;
-			}
-		}
-		return false;
-	}
-
-	public function clearLOMeta($loID)
-	{
-		if($this->memEnabled)
-		{
-			return $this->delete($this->ns.'\obo\lo\LO:Meta'.$loID);
-		}
-	}
-
 
 	public function getUsersInRole($roleID)
 	{
@@ -404,31 +371,6 @@ class Cache extends \rocketD\util\RDMemcache
 			$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByUserAndInstance:'.$instID.':'.$userID);
 		}
 	}
-
-	// public function getInteractionsByVisit($visitID)
-	// {
-	// 	if($this->memEnabled)
-	// 	{
-	// 		return $this->get($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
-	// 	}
-	//
-	// }
-	//
-	// public function setInteractionsByVisit($visitID, $interactions)
-	// {
-	// 	if($this->memEnabled)
-	// 	{
-	// 		$this->set($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID, $interactions, false, 3600) or trace('failure writing memcache', true);
-	// 	}
-	// }
-	//
-	// public function clearInteractionsByVisit($visitID)
-	// {
-	// 	if($this->memEnabled)
-	// 	{
-	// 		$this->delete($this->ns.'\obo\log\LogManager:getInteractionLogByVisit:'.$visitID);
-	// 	}
-	// }
 
 	public function setUIDForUserName($userID, $userName)
 	{

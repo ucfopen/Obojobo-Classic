@@ -490,11 +490,11 @@ class MediaManager extends \rocketD\db\DBEnabled
 			}
 
 			\rocketD\util\Cache::getInstance()->setMedia($mediaObj);
+
 			// clear cache for loid's containing this media
 			$los = $this->locateLOsWithMedia($mediaObj->mediaID);
 			if(is_array($los) && count($los) > 0)
 			{
-
 				foreach($los AS $loID)
 				{
 					\rocketD\util\Cache::getInstance()->clearLO($loID);
