@@ -51,7 +51,8 @@ class LO
 		$this->perms = $perms;
 	}
 
-	public function dbGetFull($DBM, $loID, $getMeta=false)
+	// Gets a full learning object
+	public function dbGetFull($DBM, $loID)
 	{
 		// whitelist input
 		if(!$DBM)
@@ -67,56 +68,33 @@ class LO
 
 		$oboCache = \rocketD\util\Cache::getInstance();
 
-		// full isnt in cache, try to get meta
-		if($getMeta)
+		// try to get from cache
+		if($lo = $oboCache->getLO($loID))
 		{
-			if($lo = $oboCache->getLOMeta($loID))
-			{
-				$this->becomeCachedLO($lo);
-				return true;
-			}
-		}
-		else
-		{
-			// try to get from cache
-			if($lo = $oboCache->getLO($loID))
-			{
-				$this->becomeCachedLO($lo);
-				return true;
-			}
+			$this->becomeCachedLO($lo);
+			return true;
 		}
 
 		// if not, build and cache it
 		$q = $DBM->querySafe("SELECT * FROM ".\cfg_obo_LO::TABLE." WHERE ".\cfg_obo_LO::ID."='?' LIMIT 1", $loID);
 		if($r = $DBM->fetch_obj($q))
 		{
-			// no cache found, retrieve the lo
+
 			$this->__construct((int)$r->{\cfg_obo_LO::ID}, $r->{\cfg_obo_LO::TITLE}, (int)$r->{\cfg_obo_Language::ID}, 0, 0, (int)$r->{\cfg_obo_LO::LEARN_TIME}, (int)$r->{\cfg_obo_LO::VER}, (int)$r->{\cfg_obo_LO::SUB_VER}, (int)$r->{\cfg_obo_LO::ROOT_LO}, (int)$r->{\cfg_obo_LO::PARENT_LO}, (int)$r->{\cfg_obo_LO::TIME}, $r->{\cfg_obo_LO::COPYRIGHT});
 
 			// set rootID if its zero (stored as zero when the rootID is the current loID)
 			if($this->rootID == 0) $this->rootID = $this->loID;
 			if($this->rootID == $this->loID) $this->isMaster = true;
 
-			if($getMeta == false)
-			{
-				// drop in a shell for the aGroup and pGroup IDs (need to put the id's in the cache so we can build the full aGroup and pGroup seperately)
-				$this->pGroup = new \obo\lo\QuestionGroup($r->{\cfg_obo_LO::PGROUP});
-				$this->aGroup = new \obo\lo\QuestionGroup($r->{\cfg_obo_LO::AGROUP});
+			// Get Pages (page manager caches these internally)
+			$this->pages = \obo\lo\PageManager::getInstance()->getPagesForLOID($loID);
 
-				// Get Pages (page manager caches these internally, temp var needed to prevent caching it here)
-				$pgman = \obo\lo\PageManager::getInstance();
-				$pages = $pgman->getPagesForLOID($loID);
-				// grab full question groups  (question group manager caches these internally, temp var needed to prevent caching it here)
-				$pGroup = new \obo\lo\QuestionGroup();
-				$pGroup->getFromDB($DBM, $r->{\cfg_obo_LO::PGROUP}, true);
-				$aGroup = new \obo\lo\QuestionGroup();
-				$aGroup->getFromDb($DBM, $r->{\cfg_obo_LO::AGROUP}, true);
+			// grab full question groups  (question group manager caches these internally)
+			$this->pGroup = new \obo\lo\QuestionGroup();
+			$this->pGroup->getFromDB($DBM, $r->{\cfg_obo_LO::PGROUP}, true);
 
-				// put page structures into this object after caching
-				$this->pages = $pages;
-				$this->pGroup = $pGroup;
-				$this->aGroup = $aGroup;
-			}
+			$this->aGroup = new \obo\lo\QuestionGroup();
+			$this->aGroup->getFromDb($DBM, $r->{\cfg_obo_LO::AGROUP}, true);
 
 			// build summary object
 			$this->summary = array(
@@ -126,21 +104,13 @@ class LO
 			);
 
 			// grab keywords
-			$keyman = \obo\lo\KeywordManager::getInstance();
-			$this->keywords = $keyman->getKeywordsFromItem($loID, 'l');
+			$this->keywords = \obo\lo\KeywordManager::getInstance()->getKeywordsFromItem($loID, 'l');
 
 			$this->notes = $r->{\cfg_obo_LO::NOTES};
 			$this->objective = $r->{\cfg_obo_LO::OBJECTIVE};
 
 			//TODO: Get the actual names of authors
-			if($getMeta == false)
-			{
-				$oboCache->setLO($loID, $this);
-			}
-			else
-			{
-				$oboCache->setLOMeta($loID, $this);
-			}
+			$oboCache->setLO($loID, $this);
 
 			// get perms
 			$permman = \obo\perms\PermissionsManager::getInstance();
@@ -151,9 +121,10 @@ class LO
 		return false;
 	}
 
+	// Gets an LO minus all the content and questions
 	public function dbGetMeta($DBM, $loID)
 	{
-		if($this->dbGetFull($DBM, $loID, true))
+		if($this->dbGetFull($DBM, $loID))
 		{
 			unset($this->aGroup);
 			unset($this->pGroup);
@@ -165,33 +136,36 @@ class LO
 		return false;
 	}
 
+	// Gets the LO minus assessment questions (aGroup->kids)
 	public function dbGetContent($DBM, $loID)
 	{
 		if($this->dbGetFull($DBM, $loID))
 		{
-			unset($this->aGroup->kids);
+			if(is_object($this) && is_object($this->aGroup))
+			{
+				unset($this->aGroup->kids);
+			}
 			return true;
 		}
 		return false;
 	}
 
+	// Gets the LO minus assessment questions (aGroup->kids)
 	public function dbGetInstance($DBM, $loID)
 	{
 		if($this->dbGetFull($DBM, $loID))
 		{
-			/*
-			if(is_object($this) && is_object($this->pGroup))
-			{
-				unset($this->pGroup->kids);
-			}*/
 			if(is_object($this) && is_object($this->aGroup))
 			{
 				unset($this->aGroup->kids);
 			}
+			return true;
 		}
 		return false;
 	}
 
+	// Hydrates this LO with the contents of an LO loaded from cache
+	// Replaces cached permissions with the current user's
 	protected function becomeCachedLO($lo)
 	{
 		foreach($lo AS $key => &$value)
