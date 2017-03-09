@@ -66,7 +66,7 @@ class AttemptsManager extends \rocketD\db\DBEnabled
 		$instanceData = $IM->getInstanceData($GLOBALS['CURRENT_INSTANCE_DATA']['instID']);
 
 		$lo = new \obo\lo\LO();
-		$lo->dbGetInstance($this->DBM, $instanceData->loID);
+		$lo->dbGetContent($this->DBM, $instanceData->loID);
 
 		$isAssessment = $lo->aGroup->qGroupID == $qGroupID;
 
