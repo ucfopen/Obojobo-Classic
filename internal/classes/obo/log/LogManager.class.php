@@ -98,7 +98,7 @@ class LogManager extends \rocketD\db\DBEnabled
 			$trackQ = "SELECT * FROM ".\cfg_obo_Track::TABLE." WHERE ".\cfg_obo_Instance::ID." IN (" . implode(",", $loIDs) . ") ORDER BY ".\cfg_obo_Instance::ID.", ".\cfg_core_User::ID.", ".\cfg_obo_Track::TIME;
 			return $this->getInteractionLogs($this->DBM->query($trackQ), $totalsOnly);
 		}
-	 	return array();
+		return array();
 	}
 
 	public function getInteractionLogTotals()

@@ -96,19 +96,17 @@ class VisitManager extends \rocketD\db\DBEnabled
 		return $GLOBALS['CURRENT_INSTANCE_DATA']['visitID'];
 	}
 
-    public function resumeVisit($instID = 0)
-    {
-        if(!is_numeric($instID) || $instID < 1)
+	public function resumeVisit($instID = 0)
+	{
+		if(!is_numeric($instID) || $instID < 1)
 		{
-
-
 			return \rocketD\util\Error::getError(1);
 		}
 		//check to see if the instance exists
 		$qstr = "SELECT * FROM ".\cfg_obo_Instance::TABLE." WHERE `".\cfg_obo_Instance::ID."`='?' LIMIT 1";
 		if(!($q = $this->DBM->querySafe($qstr, $instID)))
 		{
-		    trace($this->DBM->error(), true);
+			trace($this->DBM->error(), true);
 			$this->DBM->rollback();
 			//die();
 			return false;
@@ -135,7 +133,7 @@ class VisitManager extends \rocketD\db\DBEnabled
 		}
 
 		return false;
-    }
+	}
 
 
 	public function getInstanceViewKey($instID)

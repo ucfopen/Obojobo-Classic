@@ -101,7 +101,7 @@ class PageManager extends \rocketD\db\DBEnabled
 		if(!($r = $this->DBM->fetch_obj($q)))
 		{
 			trace('page does not exist ' . $pageid, true);
-		    return false; // error: page does not exist
+			return false; // error: page does not exist
 		}
 		$page = $this->db_unserialize($r->{\cfg_obo_Page::PAGE_DATA});
 		$page->pageID = $r->{\cfg_obo_Page::ID};

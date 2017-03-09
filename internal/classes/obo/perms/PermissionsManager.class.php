@@ -34,7 +34,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 
 	function __construct()
 	{
-	    $this->defaultDBM();
+		$this->defaultDBM();
 	}
 
 	static public function getInstance()
@@ -154,7 +154,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		$qstr = "INSERT	IGNORE INTO
 					".\cfg_obo_Perm::TABLE."
 					(".\cfg_core_User::ID.",
-				 		".\cfg_obo_Perm::ITEM.",
+						".\cfg_obo_Perm::ITEM.",
 						".\cfg_obo_Perm::TYPE.",
 						`".\cfg_obo_Perm::READ."`,
 						`".\cfg_obo_Perm::WRITE."`,
@@ -166,7 +166,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 						".\cfg_obo_Perm::G_USE.",
 						".\cfg_obo_Perm::G_GLOBAL.")
 					SELECT	".\cfg_core_User::ID.",
-				 		'?' AS ".\cfg_obo_Perm::ITEM.",
+						'?' AS ".\cfg_obo_Perm::ITEM.",
 						".\cfg_obo_Perm::TYPE.",
 						`".\cfg_obo_Perm::READ."`,
 						`".\cfg_obo_Perm::WRITE."`,
@@ -405,7 +405,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		else
 		{
-            return false;
+			return false;
 		}
 	}
 
@@ -491,7 +491,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 
 
-	        return \rocketD\util\Error::getError(2);
+			return \rocketD\util\Error::getError(2);
 		}
 
 		foreach($permObjects as $permObj)
@@ -509,12 +509,12 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 
 
-	        return \rocketD\util\Error::getError(2);
+			return \rocketD\util\Error::getError(2);
 		}
 		//check if user had permissions to this first.
-	    $qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."!='?' AND
-	    			`".\cfg_obo_Perm::READ."`='1' AND `".\cfg_obo_Perm::WRITE."`='1' AND ".\cfg_obo_Perm::COPY."='1' AND ".\cfg_obo_Perm::PUBLISH."='1' AND ".\cfg_obo_Perm::G_READ."='1' AND
-	    			".\cfg_obo_Perm::G_WRITE."='1' AND ".\cfg_obo_Perm::G_COPY."='1' AND ".\cfg_obo_Perm::G_USE."='1'";
+		$qstr = "SELECT * FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."!='?' AND
+					`".\cfg_obo_Perm::READ."`='1' AND `".\cfg_obo_Perm::WRITE."`='1' AND ".\cfg_obo_Perm::COPY."='1' AND ".\cfg_obo_Perm::PUBLISH."='1' AND ".\cfg_obo_Perm::G_READ."='1' AND
+					".\cfg_obo_Perm::G_WRITE."='1' AND ".\cfg_obo_Perm::G_COPY."='1' AND ".\cfg_obo_Perm::G_USE."='1'";
 		if(!($q = $this->DBM->querySafe($qstr, $itemID, $itemType, $userID)))
 		{
 			return false;
@@ -523,7 +523,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		{
 
 
-	        return \rocketD\util\Error::getError(5003);
+			return \rocketD\util\Error::getError(5003);
 		}
 		$qstr = "DELETE FROM ".\cfg_obo_Perm::TABLE." WHERE ".\cfg_obo_Perm::ITEM."='?' AND `".\cfg_obo_Perm::TYPE."`='?' AND ".\cfg_core_User::ID."='?'";
 		if(!($q = $this->DBM->querySafe($qstr, $itemID, $itemType, $userID)))
@@ -573,7 +573,7 @@ class PermissionsManager extends \rocketD\db\DBEnabled
 		}
 		foreach($userIDs as $key => $userID)
 		{
-		    $this->removeUserPerms($itemID, $itemType, $userID);
+			$this->removeUserPerms($itemID, $itemType, $userID);
 		}
 		return true;
 	}
