@@ -48,7 +48,7 @@ class QuestionGroupManager extends \rocketD\db\DBEnabled
 
 		if(!($qgroup instanceof \obo\lo\QuestionGroup))
 		{
-	        return false;
+			return false;
 		}
 		// if id isnt 0, no need to make any changes
 		if($qgroup->qGroupID != 0)

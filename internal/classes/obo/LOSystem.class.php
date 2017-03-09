@@ -66,7 +66,7 @@ class LOSystem extends \rocketD\db\DBEnabled
 			return $success;
 		}
 
-        return \rocketD\util\Error::getError(4);
+		return \rocketD\util\Error::getError(4);
 	}
 
 }
