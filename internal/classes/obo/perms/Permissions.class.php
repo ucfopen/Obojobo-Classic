@@ -12,16 +12,16 @@
 namespace obo\perms;
 class Permissions
 {
-	public $userID;		// Number: User id this permission object pertains to
-	public $read;			// Number: Whether the user can view the item
-	public $write;			// Number: Whether the user can alter the item
-	public $copy;			// Number: Whether the user can make a copy of the item
-	public $publish;			// Number: Whether the user can use the item in their course
-	public $giveRead;		// Number: Whether the user can give other users read access
-	public $giveWrite;		// Number: Whether the user can give other users write access
-	public $giveCopy;		// Number: Whether the user can give other users copy access
-	public $givePublish;		// Number: Whether the user can give other users use access
-	public $giveGlobal;	// Number: Whether the user can give global permissions
+	public $userID; // Number: User id this permission object pertains to
+	public $read; // Number: Whether the user can view the item
+	public $write; // Number: Whether the user can alter the item
+	public $copy; // Number: Whether the user can make a copy of the item
+	public $publish; // Number: Whether the user can use the item in their course
+	public $giveRead; // Number: Whether the user can give other users read access
+	public $giveWrite; // Number: Whether the user can give other users write access
+	public $giveCopy; // Number: Whether the user can give other users copy access
+	public $givePublish; // Number: Whether the user can give other users use access
+	public $giveGlobal; // Number: Whether the user can give global permissions
 
 	public function __construct($userID=-1, $read=0, $write=0, $copy=0, $publish=0, $giveRead=0, $giveWrite=0, $giveCopy=0, $givePublish=0, $giveGlobal=0)
 	{
