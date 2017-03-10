@@ -27,7 +27,7 @@
         "php": ">=5.4",
         "ucfcdl/php-saml": "master-dev",
         "monolog/monolog": "1.18.2",
-        "johnpbloch/wordpress": "4.7.2",
+        "johnpbloch/wordpress": "4.7.3",
         "obojobo/obo-stats": "0.0.3",
         "obojobo/rocketD": "0.0.2",
         "obojobo-themes/obojobo": "0.0.3",
