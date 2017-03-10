@@ -7,7 +7,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 	function __construct()
 	{
-	    $this->defaultDBM();
+		$this->defaultDBM();
 	}
 
 	static public function getInstance()
@@ -282,7 +282,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			ON DUPLICATE KEY UPDATE ".\cfg_obo_Score::TIME." = '?', ".\cfg_obo_Answer::ID." = '?', ".\cfg_obo_Score::ANSWER."='?', ".\cfg_obo_Score::SCORE." = '?' ";
 			if( !($q = $this->DBM->querySafe($qstr, time(), $questionID, $itemType, $checkArr['answerID'], $answer, $checkArr['weight'], $GLOBALS['CURRENT_INSTANCE_DATA']['attemptID'], time(), $checkArr['answerID'], $answer, $checkArr['weight'])) )
 			{
- 				$this->DBM->rollback();
+				$this->DBM->rollback();
 				trace($this->DBM->error(), true);
 				return false;
 			}
@@ -386,17 +386,17 @@ class ScoreManager extends \rocketD\db\DBEnabled
 							V.".\cfg_obo_Instance::ID." as instance_id,
 							A.".\cfg_obo_Attempt::LINKED_ATTEMPT.",
 							A.".\cfg_obo_Attempt::END_TIME."
- 						FROM
+						FROM
 							".\cfg_obo_Attempt::TABLE." AS A,
 							".\cfg_obo_Visit::TABLE." AS V,
 							".\cfg_obo_LO::TABLE." AS L,
 							".\cfg_obo_Instance::TABLE." as I
- 						WHERE
+						WHERE
 							V.".\cfg_obo_Instance::ID." = '?'
 							AND V.".\cfg_obo_Instance::ID." = I.".\cfg_obo_Instance::ID."
 							AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID."
 							AND L.".\cfg_obo_LO::AGROUP." = A.".\cfg_obo_QGroup::ID."
- 							AND A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID."
+							AND A.".\cfg_obo_Visit::ID." = V.".\cfg_obo_Visit::ID."
 					) AS t1
 					LEFT OUTER JOIN ".\cfg_obo_ExtraAttempt::TABLE." AS AA
 						ON (AA.".\cfg_core_User::ID." = t1.".\cfg_core_User::ID."
@@ -483,12 +483,12 @@ class ScoreManager extends \rocketD\db\DBEnabled
 							V.".\cfg_obo_Instance::ID." as instance_id,
 							A.".\cfg_obo_Attempt::LINKED_ATTEMPT.",
 							A.".\cfg_obo_Attempt::END_TIME."
- 						FROM
+						FROM
 							".\cfg_obo_Attempt::TABLE." AS A,
 							".\cfg_obo_Visit::TABLE." AS V,
 							".\cfg_obo_LO::TABLE." AS L,
 							".\cfg_obo_Instance::TABLE." as I
- 						WHERE
+						WHERE
 							V.".\cfg_obo_Instance::ID." = '?'
 							AND V.".\cfg_obo_Instance::ID." = I.".\cfg_obo_Instance::ID."
 							AND L.".\cfg_obo_LO::ID." = I.".\cfg_obo_LO::ID."
@@ -551,7 +551,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return $loID; // error
 		}
 		$lom = \obo\lo\LOManager::getInstance();
- 		if(($aGroupID = $lom->getAssessmentID($loID)) == false) // if instanceof Error
+		if(($aGroupID = $lom->getAssessmentID($loID)) == false) // if instanceof Error
 		{
 			return $aGroupID; // error
 		}
@@ -606,7 +606,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 			return $loID; // error
 		}
 		$lom = \obo\lo\LOManager::getInstance();
- 		if(($aGroup = $lom->getAssessmentID($loID)) == false) // if instanceof Error
+		if(($aGroup = $lom->getAssessmentID($loID)) == false) // if instanceof Error
 		{
 			return $aGroup; // error
 		}
@@ -663,7 +663,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 	/**
 	 * get student's attempt data for their own review
-     * @param $instID	(number)	Instance id to retrieve score data from
+	 * @param $instID	(number)	Instance id to retrieve score data from
 	 * @return (array)
 	 */
 	public function getStudentInstanceAnswers($instID=0)
@@ -742,7 +742,7 @@ class ScoreManager extends \rocketD\db\DBEnabled
 
 	/**
 	 * build an object to store score data for deleted instances
-     * @param $instID	(number)	Instance id to retrieve score data from
+	 * @param $instID	(number)	Instance id to retrieve score data from
 	 * @return (array)	Object array of attempts, each containing an array of question answers
 	 */
 	// TODO: FIX RETURN FOR DB ABSTRACTION

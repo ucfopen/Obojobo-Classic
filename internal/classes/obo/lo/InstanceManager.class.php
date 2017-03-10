@@ -78,7 +78,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 							`".\cfg_obo_Perm::G_USE."`,
 							`".\cfg_obo_Perm::G_GLOBAL."`
 						)
-                	VALUES
+					VALUES
 						('?', '?', 'i', '1', '1', '0', '0', '1', '1', '0', '0', '0');";
 		if(!($this->DBM->querySafe($qstr, $userID, $instID)))
 		{
@@ -185,60 +185,48 @@ class InstanceManager extends \rocketD\db\DBEnabled
 			}
 
 			$curtime = time();
-			//Verify that the instance is currently active
-			if($r->{\cfg_obo_Instance::START_TIME} <= $curtime)
+			// Reject if the instance isn't open yet
+			if($r->{\cfg_obo_Instance::START_TIME} > $curtime)
 			{
-				$lom = \obo\lo\LOManager::getInstance();
-				// $rootID = $lom->getRootId($r->{\cfg_obo_LO::ID});
-				$permman = \obo\perms\PermissionsManager::getInstance();
-				$roleMan = \obo\perms\RoleManager::getInstance();
+				return \rocketD\util\Error::getError(4003);
+			}
 
-				$visitMan = \obo\VisitManager::getInstance();
-				$visitMan->startInstanceView($instID, $r->{\cfg_obo_LO::ID});
-				$visitMan->createVisit($instID);
+			$lom = \obo\lo\LOManager::getInstance();
 
-				// getinstance, only get content if its past the assessment end time
-				$trackMan = \obo\log\LogManager::getInstance();
-				if(empty($r->{\cfg_obo_Instance::EXTERNAL_LINK}) && $curtime >= $r->{\cfg_obo_Instance::END_TIME})
-				{
-					$lo = $lom->getLO($r->{\cfg_obo_LO::ID}, 'content', false);
-                    $lo->tracking =  $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
-				}
-				else
-				{
-					$lo = $lom->getLO($r->{\cfg_obo_LO::ID}, 'instance', false);
-					$AM = \obo\AttemptsManager::getInstance();
-					$lo->equivalentAttempt = $AM->getEquivalentAttempt($_SESSION['userID'], $instID, $r->{\cfg_obo_LO::ID});
-					$lo->tracking =  $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
-					$lo->tracking->isInAttempt = $AM->getUnfinishedAttempt($lo->aGroup->qGroupID) != false;
-				}
+			$visitMan = \obo\VisitManager::getInstance();
+			$visitMan->startInstanceView($instID, $r->{\cfg_obo_LO::ID});
+			$visitMan->createVisit($instID);
 
-				// Add in instance viewing variables
-				$lo->viewID = $visitMan->getInstanceViewKey($instID);
-				$lo->instanceData = $this->getInstanceData($instID);
-				$attemptMan = \obo\AttemptsManager::getInstance();
-				$lo->instanceData->attemptCount = $attemptMan->getTotalAttempts($instID);
-				unset($lo->pGroup->kids);
-				//unset($lo->aGroup->kids);
-
-				// Add in badge information
-				$BM = \obo\lo\BadgeManager::getInstance();
-				$lo->badgeInfo = $BM->getBadgeInfo($r->{\cfg_obo_LO::ID}, $instID);
-
-				return $lo;
-
+			// getinstance, only get content if its past the assessment end time
+			$trackMan = \obo\log\LogManager::getInstance();
+			if(empty($r->{\cfg_obo_Instance::EXTERNAL_LINK}) && $curtime >= $r->{\cfg_obo_Instance::END_TIME})
+			{
+				$lo = $lom->getLO($r->{\cfg_obo_LO::ID}, 'content', false);
+				$lo->tracking = $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
 			}
 			else
 			{
-
-
-				return \rocketD\util\Error::getError(4003);
+				$lo = $lom->getLO($r->{\cfg_obo_LO::ID}, 'instance', false);
+				$AM = \obo\AttemptsManager::getInstance();
+				$lo->equivalentAttempt = $AM->getEquivalentAttempt($_SESSION['userID'], $instID, $r->{\cfg_obo_LO::ID});
+				$lo->tracking =  $trackMan->getInstanceTrackingData($_SESSION['userID'], $instID);
+				$lo->tracking->isInAttempt = $AM->getUnfinishedAttempt($lo->aGroup->qGroupID) != false;
 			}
+
+			// Add in instance viewing variables
+			$lo->viewID = $visitMan->getInstanceViewKey($instID);
+			$lo->instanceData = $this->getInstanceData($instID);
+			$attemptMan = \obo\AttemptsManager::getInstance();
+			$lo->instanceData->attemptCount = $attemptMan->getTotalAttempts($instID);
+			unset($lo->pGroup->kids);
+
+			// Add in badge information
+			$lo->badgeInfo = \obo\lo\BadgeManager::getInstance()->getBadgeInfo($r->{\cfg_obo_LO::ID}, $instID);
+
+			return $lo;
 		}
 		else
 		{
-
-
 			return \rocketD\util\Error::getError(4002);
 		}
 	}
@@ -496,7 +484,7 @@ class InstanceManager extends \rocketD\db\DBEnabled
 
 	public function deleteInstance($instID = 0)
 	{
-	    if(!\obo\util\Validator::isPosInt($instID))
+		if(!\obo\util\Validator::isPosInt($instID))
 		{
 			return \rocketD\util\Error::getError(2);
 		}

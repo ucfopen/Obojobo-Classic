@@ -26,9 +26,9 @@ class Permissions
 	public function __construct($userID=-1, $read=0, $write=0, $copy=0, $publish=0, $giveRead=0, $giveWrite=0, $giveCopy=0, $givePublish=0, $giveGlobal=0)
 	{
 		if(func_num_args() == 1)
-        {
-       		$permObj = func_get_arg(0);
-       		$this->userID = (int)$permObj['userID'];
+		{
+			$permObj = func_get_arg(0);
+			$this->userID = (int)$permObj['userID'];
 			$this->read = (int)$permObj['read'];
 			$this->write = (int)$permObj['write'];
 			$this->copy = (int)$permObj['copy'];
@@ -38,9 +38,9 @@ class Permissions
 			$this->giveCopy = (int)$permObj['giveCopy'];
 			$this->givePublish = (int)$permObj['givePublish'];
 			$this->giveGlobal = (int)$permObj['giveGlobal'];
-        }
-        else
-        {
+		}
+		else
+		{
 			$this->userID = (int)$userID;
 			$this->read = (int)$read;
 			$this->write = (int)$write;
@@ -51,7 +51,7 @@ class Permissions
 			$this->giveCopy = (int)$giveCopy;
 			$this->givePublish = (int)$givePublish;
 			$this->giveGlobal = (int)$giveGlobal;
-        }
+		}
 	}
 
 	public function isOwner()
