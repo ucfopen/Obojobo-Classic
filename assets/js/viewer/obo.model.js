@@ -1522,7 +1522,7 @@ obo.model = function()
 				}
 				else
 				{
-					return parseInt(lo.summary.assessmentSize, 10);
+					return parseInt(lo.aGroup.quizSize, 10);
 				}
 		}
 	};
