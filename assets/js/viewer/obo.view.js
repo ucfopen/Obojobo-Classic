@@ -642,7 +642,7 @@ obo.view = function()
 		$("#key-words").text(lo.keywords.join(", "));
 		$("#content-size").text(lo.summary.contentSize + ' Pages');
 		$("#practice-size").text(lo.summary.practiceSize + ' Questions');
-		$("#assessment-size").text(lo.summary.assessmentSize + ' Questions');
+		$("#assessment-size").text(lo.aGroup.quizSize + ' Questions');
 		$('#get-started-button').attr('href', baseURL + obo.model.isResumingPreviousAttempt() ? '#/assessment/start' : '#/content/1');
 	};
 	
