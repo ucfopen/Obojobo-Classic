@@ -17,17 +17,13 @@
         {
             "type": "git",
             "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/ucfcdl/php-saml.git"
         }
     ],
     "require": {
         "php": ">=5.4",
         "onelogin/php-saml": "2.10.2",
         "monolog/monolog": "1.18.2",
-        "johnpbloch/wordpress": "4.7.3",
+        "johnpbloch/wordpress": "4.8.0",
         "obojobo/obo-stats": "0.0.3",
         "obojobo/rocketD": "0.0.2",
         "obojobo-themes/obojobo": "0.0.3",
