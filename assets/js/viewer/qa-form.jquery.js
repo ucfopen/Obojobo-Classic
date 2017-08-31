@@ -20,6 +20,7 @@
 		_init: function(settings) {
 			answers = false;
 			typingIntervalID = undefined;
+			checkInputIntevalId = undefined;
 			elements = {};
 			lastSaved = undefined;
 
@@ -58,32 +59,34 @@
 			}
 
 			// setup our events:
-			elements.$input
-				.keyup(function(event) {
-					clearTimeout(typingIntervalID);
+			elements.$input.keyup(function(event) {
+				clearTimeout(typingIntervalID);
 
-					if(event.keyCode == 13) //enter
-					{
-						methods._save();
-					}
-					else
-					{
-						if(methods.getText() != lastSaved)
-						{
-							unsavedChanges = true;
-							methods.hideFeedback();
-						}
-						typingIntervalID = setTimeout(methods._update, TYPING_INTERVAL_SECONDS * 1000);
-					}
-
+				if(event.keyCode == 13) //enter
+				{
+					methods._save();
 					methods._updateButton();
-				})
-				.blur(function(event) {
-					if(typeof lastSaved === 'undefined' || lastSaved !== methods.getText())
-					{
-						methods._update();
-					}
-				});
+				}
+				else
+				{
+					methods.checkInputForChanges()
+				}
+			});
+
+			elements.$input.focusin(function(event){
+				clearInterval(checkInputIntevalId)
+				checkInputIntevalId = setInterval(methods.checkInputForChanges, 300)
+			});
+
+			elements.$input.blur(function(event) {
+				clearInterval(checkInputIntevalId)
+				if(typeof lastSaved === 'undefined' || lastSaved !== methods.getText())
+				{
+					methods._update();
+				}
+			});
+
+
 			if(typeof elements.$button !== 'undefined')
 			{
 				elements.$button.click(function(event) {
@@ -101,6 +104,17 @@
 			{
 				elements.$input.focus();
 			}
+		},
+
+		checkInputForChanges: function(){
+			if(methods.getText() != lastSaved)
+			{
+				unsavedChanges = true;
+				methods.hideFeedback();
+			}
+			clearTimeout(typingIntervalID);
+			typingIntervalID = setTimeout(methods._update, TYPING_INTERVAL_SECONDS * 1000);
+			methods._updateButton();
 		},
 
 		// if savedAnswer is true then we display the 'Answer Saved' notice
