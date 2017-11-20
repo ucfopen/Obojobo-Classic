@@ -51,4 +51,6 @@ internal/templates/compiled/*
 
 # ignore the composer directory
 internal/vendor/
+internal/wordpress-core/
 wp/*
+
