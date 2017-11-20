@@ -40,8 +40,8 @@
     },
     "extra": {
         "wordpress-install-dir": {
-            "wordpress/wordpress": "wp",
-            "johnpbloch/wordpress-core": "internal/wordpress-core"
+            "wordpress/wordpress": "internal/wp2",
+            "johnpbloch/wordpress-core": "wp"
         },
         "installer-paths" : {
             "wp/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
