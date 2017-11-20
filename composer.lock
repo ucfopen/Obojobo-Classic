@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d65703de00e0873fa44956ab76e09d0",
+    "content-hash": "051f90916f6ecbcfc44ddc649f3d63dc",
     "packages": [
         {
             "name": "composer/installers",
@@ -648,15 +648,15 @@
         },
         {
             "name": "wpackagist-plugin/w3-total-cache",
-            "version": "0.9.5.2",
+            "version": "0.9.5.4",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/w3-total-cache/",
-                "reference": "tags/0.9.5.2"
+                "reference": "tags/0.9.5.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.5.2.zip",
+                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.5.4.zip",
                 "reference": null,
                 "shasum": null
             },
