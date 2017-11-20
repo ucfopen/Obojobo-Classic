@@ -27,7 +27,7 @@
         "php": ">=5.4",
         "onelogin/php-saml": "2.10.2",
         "monolog/monolog": "1.18.2",
-        "johnpbloch/wordpress": "4.7.3",
+        "johnpbloch/wordpress": "4.9.0",
         "obojobo/obo-stats": "0.0.3",
         "obojobo/rocketD": "0.0.2",
         "obojobo-themes/obojobo": "0.0.3",
@@ -39,7 +39,10 @@
         "silexlabs/amfphp": "2.2.2"
     },
     "extra": {
-        "wordpress-install-dir": "wp",
+        "wordpress-install-dir": {
+            "wordpress/wordpress": "wp",
+            "johnpbloch/wordpress-core": "internal/wordpress-core"
+        },
         "installer-paths" : {
             "wp/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
             "wp/wp-content/themes/{$name}/": ["type:wordpress-theme"]
