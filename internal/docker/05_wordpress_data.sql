@@ -12,7 +12,7 @@ LOCK TABLES `wp_options` WRITE;
 
 INSERT INTO `wp_options` (`option_id`, `option_name`, `option_value`, `autoload`)
 VALUES
-	(1,'siteurl','http://localhost/wp','yes'),
+	(1,'siteurl','http://127.0.0.1/wp','yes'),
 	(2,'blogname','Obojobo&#8482;','yes'),
 	(3,'blogdescription','Forward thinking online learning','yes'),
 	(4,'users_can_register','0','yes'),
@@ -43,7 +43,7 @@ VALUES
 	(34,'blog_charset','UTF-8','yes'),
 	(35,'moderation_keys','','no'),
 	(36,'active_plugins','a:5:{i:1;s:23:\"obo-stats/obo-stats.php\";i:2;s:23:\"page-list/page-list.php\";i:3;s:33:\"rocketD/rocketDAuthentication.php\";i:4;s:30:\"table-of-contents-plus/toc.php\";i:5;s:33:\"w3-total-cache/w3-total-cache.php\";}','yes'),
-	(37,'home','http://localhost/','yes'),
+	(37,'home','http://127.0.0.1/','yes'),
 	(38,'category_base','','yes'),
 	(39,'ping_sites','http://rpc.pingomatic.com/','yes'),
 	(41,'comment_max_links','2','yes'),
@@ -552,7 +552,7 @@ VALUES
 	(607,5,'2013-10-23 20:33:51','2013-10-23 20:33:51','','New Homepage','','publish','closed','closed','','new-homepage','','','2013-10-23 20:33:51','2013-10-23 20:33:51','',0,'https://obojobo.ucf.edu/?page_id=607',0,'page','',0),
 	(627,5,'2015-12-17 16:23:13','0000-00-00 00:00:00','','Auto Draft','','auto-draft','closed','closed','','','','','2015-12-17 16:23:13','0000-00-00 00:00:00','',0,'https://obojobo.ucf.edu/?p=627',0,'post','',0),
 	(630,7,'2016-05-11 15:10:48','0000-00-00 00:00:00','','Auto Draft','','auto-draft','closed','closed','','','','','2016-05-11 15:10:48','0000-00-00 00:00:00','',0,'https://obojobo.ucf.edu/?p=630',0,'post','',0),
-	(631,2,'2016-08-15 21:25:11','0000-00-00 00:00:00','','Auto Draft','','auto-draft','closed','closed','','','','','2016-08-15 21:25:11','0000-00-00 00:00:00','',0,'http://localhost/?p=631',0,'post','',0);
+	(631,2,'2016-08-15 21:25:11','0000-00-00 00:00:00','','Auto Draft','','auto-draft','closed','closed','','','','','2016-08-15 21:25:11','0000-00-00 00:00:00','',0,'http://127.0.0.1/?p=631',0,'post','',0);
 
 /*!40000 ALTER TABLE `wp_posts` ENABLE KEYS */;
 UNLOCK TABLES;
