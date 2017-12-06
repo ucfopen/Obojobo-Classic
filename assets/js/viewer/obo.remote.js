@@ -30,14 +30,14 @@ obo.remote = function()
 		}
 		else
 		{
-			var callURL = "/api/viewer.php?m="+method
+			var callURL = "/api/json.php?m="+method
 			// append the arguments
 			var len = args.length
 			for (var i = 0; i < len; i++) {
 				callURL = callURL+"&p"+(i+1)+"="+args[i]
 			}
 		}
-		
+
 
 		// force content type to be json so we don't have to parse every return
 		// we also automatically filter every call to check for errors
