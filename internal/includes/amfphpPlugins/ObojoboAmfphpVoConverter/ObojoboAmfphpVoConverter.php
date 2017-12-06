@@ -179,6 +179,9 @@ class ObojoboAmfphpVoConverter  implements Amfphp_Core_Common_IVoConverter {
             }
         }
 
+        // if this object is the top level json object, amfphp requries the obj be protected
+        if(isset($obj->serviceName) && isset($obj->methodName)) return $obj;
+
         return (array) $obj;
     }
 
