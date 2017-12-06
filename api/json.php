@@ -10,7 +10,16 @@ $config = new \Amfphp_Core_Config();
 $config->checkArgumentCount = false;
 $config->serviceFolders = [\AppCfg::DIR_BASE . 'internal/includes/amfphpServices/'];
 $config->pluginsFolders[] = \AppCfg::DIR_BASE . 'internal/includes/amfphpPlugins';
-$config->disabledPlugins = ['AmfphpLogger', 'AmfphpErrorHandler','AmfphpMonitor', 'AmfphpDummy', 'AmfphpGet', 'ObojoboAmfphpGet', 'AmfphpDiscovery', 'AmfphpAuthentication', 'AmfphpVoConverter'];
+$config->disabledPlugins = [
+	'AmfphpLogger',
+	'AmfphpErrorHandler',
+	'AmfphpMonitor',
+	'AmfphpDummy',
+	'AmfphpGet',
+	'AmfphpDiscovery',
+	'AmfphpAuthentication',
+	'AmfphpVoConverter'
+];
 
 $config->pluginsConfig = [
 	'ObojoboAmfphpVoConverter' => [
