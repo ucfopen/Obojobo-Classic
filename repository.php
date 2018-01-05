@@ -28,7 +28,7 @@ if ( !$loggedIn)
 	}
 </style>
 <script>
-	var SWF_URL = "Repository_2_1_8.swf";
+	var SWF_URL = "Repository_2_1_9.swf";
 
 	// START PREVENT CLOSE
 	window.onbeforeunload = confirmExit;
