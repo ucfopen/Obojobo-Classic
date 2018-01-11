@@ -89,6 +89,7 @@ class BadgeManager extends \rocketD\db\DBEnabled
 			'email' => $userInfo->email,
 			'badge_id' => $badge->{\cfg_obo_Badge::BADGE_ID},
 			'name' => $userInfo->first,
+			'last_name' => $userInfo->last,
 		);
 
 		return $this->sign_oauth_post_args(\AppCfg::CREDHUB_URL, $params, \AppCfg::CREDHUB_KEY, \AppCfg::CREDHUB_SECRET);
