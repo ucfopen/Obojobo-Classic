@@ -9,11 +9,14 @@ For local development, testing, and as a reference for the architecture setup, w
 
 The docker-compose setup will automatically set up the server containers, seed the database, and get everything up and running.
 
-1. Install [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker)
-2. Install PHP Composer via https://getcomposer.org/download
-3. Run `composer install` - if you have git permission issues, [configure your github ssh keys](https://help.github.com/articles/generating-an-ssh-key/)
-4. Run `docker-compose up`
-5. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to generate the obojobo_admin user's password
+1. Install Docker for Mac
+2. cd into top level obojobo directory
+3. Build self signed ssl certs `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout internal/docker/nginx-selfsigned.key -out internal/docker/nginx-selfsigned.crt`
+4. Install composer: `wget https://raw.githubusercontent.com/composer/getcomposer.org/1b137f8bf6db3e79a38a5bc45324414a6b1f9df2/web/installer -O - -q | php -- --quiet`
+5. Run `docker-compose build` and wait for it to build
+6. Run `docker-compose run --rm phpfpm php composer.phar install`
+7. Run `docker-compose up` (add `-d` to run in background)
+8. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to generate the obojobo_admin user's password
 
 
 # Requirements

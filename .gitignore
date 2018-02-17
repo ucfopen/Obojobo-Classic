@@ -54,3 +54,5 @@ internal/vendor/
 internal/wordpress-core/
 wp/*
 
+internal/docker/nginx-selfsigned*
+
