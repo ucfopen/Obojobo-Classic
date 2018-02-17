@@ -120,27 +120,32 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		return $allItems;
 	}
 
+	public function duplictePermsToNewItem($itemType, $oldItemID, $newItemId)
+	{
+		/** Validate Input **/
+		if(!\obo\util\Validator::isPosInt($oldItemID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($newItemId)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+
+
+		$query = "
+		INSERT INTO ".\cfg_core_Perm::TABLE."
+			(".\cfg_core_User::ID.", ".\cfg_core_Role::ID.", ".\cfg_core_Perm::ITEM.", ".\cfg_core_Perm::TYPE.", ".\cfg_core_Perm::PERM.")
+		SELECT
+			".\cfg_core_User::ID.", ".\cfg_core_Role::ID.", '?' as ".\cfg_core_Perm::ITEM.", ".\cfg_core_Perm::TYPE.", ".\cfg_core_Perm::PERM."
+		FROM ".\cfg_core_Perm::TABLE."
+		WHERE ".\cfg_core_Perm::ITEM." = '?'
+		AND ".\cfg_core_Perm::TYPE." = '?'";
+
+		$q = $this->DBM->querySafe($query, $newItemId, $oldItemID, $itemType);
+	}
 
 	public function getAllUsersIDsForItem($itemType, $itemID, $includeGroupRights=false)
 	{
 		/** Validate Input **/
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
 
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-		// TODO: enable group rights option, this would need to find users that are in groups that have rights to this item
-		if($includeGroupRights == true)
-		{
-			// we may not need to do this
-		}
 		$users = array();
 		$query = "SELECT ".\cfg_core_User::ID.", ".\cfg_core_Perm::PERM." FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." ='0' AND ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?'";
 		$q = $this->DBM->querySafe($query, $itemType, $itemID);
