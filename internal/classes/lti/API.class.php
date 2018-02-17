@@ -55,7 +55,7 @@ class API
 		// this overrides their state in the local obojobo database!
 		if($ltiData->isInstructor() || $ltiData->isTestUser())
 		{
-			$instanceData = static::getInstanceDataOrRenderError($instID);
+			$instanceData = static::getInstanceDataOrRenderError($instID, $ltiData);
 
 			// We want to store in some additional permissions info in
 			// the session so this gives the instructor a way to be
@@ -69,7 +69,7 @@ class API
 				}
 			}
 
-			profile('lti',"'lti-launch-".($ltiData->isTestUser() ? 'testuser' : 'instructor')."', '$previewURL', '".time()."'");
+			profile('lti',"'lti-launch-".($ltiData->isTestUser() ? 'testuser' : 'instructor')."', '".time()."'");
 			// static::initAssessmentSession($instID, $ltiData);
 			\lti\Views::renderTestUserConfirmPage($instanceData);
 			exit();
@@ -242,7 +242,7 @@ class API
 		// First, duplicate the instance
 		$IM = \obo\lo\InstanceManager::getInstance();
 
-		// We override the courseID to the this course
+		// We override the courseID to this course
 		$newInstId = $IM->duplicateInstance_systemOnly($originalInstId, array('courseID' => $ltiData->contextTitle));
 		if(!$newInstId)
 		{
@@ -254,6 +254,15 @@ class API
 		if(!$success)
 		{
 			return \obo\util\Error::getError(8001); // unable to set/update assoc
+		}
+
+		if(\AppCfg::LTI_COPY_PERMS_ON_DUPLICATE)
+		{
+			// Copy all permissions from the old instance to the new one
+			// In some cases, this is a bad idea (old instructor passes batton to new instructor)
+			// but, if we don't do this - it doesn't behave like ANYONE expects - making a ghost instance
+			$PM = \obo\perms\PermManager::getInstance();
+			$PM->duplictePermsToNewItem(\cfg_core_Perm::TYPE_INSTANCE, $originalInstId, $newInstId);
 		}
 
 		return $newInstId;
