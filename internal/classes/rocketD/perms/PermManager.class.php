@@ -50,18 +50,9 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 	public function getAllItemsForUser($userID, $itemType, $includeGroupRights=true, $includeSessionRights=false)
 	{
 		/** Validate Input **/
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
 
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
 		$allItems = array();
 
 		if($includeGroupRights)
@@ -160,29 +151,11 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 	public function getPermsForUserToItem($userID, $itemType, $itemID)
 	{
 		/** Validate Input **/
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
 
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if($perms = \rocketD\util\Cache::getInstance()->getPermsForUserToItem($userID, $itemType, $itemID))
-		{
-			return $perms;
-		}
+		if($perms = \rocketD\util\Cache::getInstance()->getPermsForUserToItem($userID, $itemType, $itemID)) return $perms;
 
 		$perms = array();
 		$query = "SELECT ".\cfg_core_Perm::PERM." FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." ='0' AND ".\cfg_core_Perm::TYPE." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_User::ID." = '?'";
@@ -207,64 +180,37 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 	public function setPermsForUserToItem($userID, $itemType, $itemID, $addPerms, $remPerms)
 	{
 		/** Validate Input **/
-
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
 		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($addPerms) == false)
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
+		if($this->_validatePermArray($addPerms) == false) return \rocketD\util\Error::getError(2);
 		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($remPerms) == false)
-		{
+		if($this->_validatePermArray($remPerms) == false) return \rocketD\util\Error::getError(2);
 
-			return \rocketD\util\Error::getError(2);
-		}
-
-		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Role::ID." ='0', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_User::ID." = '?', ".\cfg_core_Perm::ITEM." = '?', ".\cfg_core_Perm::TYPE." = '?'";
+		// insert ignoring duplicate errors
+		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Role::ID." = '0', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_User::ID." = '?', ".\cfg_core_Perm::ITEM." = '?', ".\cfg_core_Perm::TYPE." = '?'";
 		foreach($addPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $perm, $userID, $itemID, $itemType);
 		}
 
+		// remove perms
 		$query = "DELETE FROM ".\cfg_core_Perm::TABLE." WHERE ".\cfg_core_Role::ID." = 0 AND ".\cfg_core_Perm::PERM." = '?' AND ".\cfg_core_User::ID." = '?' AND ".\cfg_core_Perm::ITEM." = '?' AND ".\cfg_core_Perm::TYPE." = '?'";
 		foreach($remPerms AS $perm)
 		{
 			$q = $this->DBM->querySafe($query, $perm, $userID, $itemID, $itemType);
 		}
 
+		// clear cache
 		\rocketD\util\Cache::getInstance()->clearPermsFOrUserToItem($userID, $itemType, $itemID);
 		return true;
 	}
 
 	public function getGlobalPermsForGroups($groupIDs)
 	{
+		if($this->_validateGroupArray($groupIDs) == false) return \rocketD\util\Error::getError(2);
 
-		if($this->_validateGroupArray($groupIDs) == false)
-		{
-
-
-			return \rocketD\util\Error::getError(2);
-		}
 		$perms = array();
 
 		foreach($groupIDs AS $groupID)
@@ -292,34 +238,17 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		{
 			return sort(array_unique($perms), SORT_NUMERIC); // only sort if there are more then 1
 		}
-		else
-		{
-			return $perms;
-		}
+
+		return $perms;
 	}
 
 	public function setGlobalPermsForGroup($groupID, $addPerms, $remPerms)
 	{
-
-		if(!\obo\util\Validator::isPosInt($groupID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
+		if(!\obo\util\Validator::isPosInt($groupID)) return \rocketD\util\Error::getError(2);
+		// allow non array input, but convert it to an array so we can deal with it easilz
+		if($this->_validatePermArray($addPerms, true) == false) return \rocketD\util\Error::getError(2);
 		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($addPerms, true) == false)
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($remPerms, true) == false)
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
+		if($this->_validatePermArray($remPerms, true) == false) return \rocketD\util\Error::getError(2);
 
 		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Role::ID." = '?', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_User::ID." ='0', ".\cfg_core_Perm::ITEM." ='0', ".\cfg_core_Perm::TYPE." ='0'";
 		foreach($addPerms AS $perm)
@@ -337,27 +266,15 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		return true;
 	}
 
+	// This function check global perms for an object (userID=0)
 	public function getPermsForItem($itemType, $itemID)
 	{
-
 		/** Validate Input **/
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
 
 		/** Get From Cache **/
-		if($perms = \rocketD\util\Cache::getInstance()->getPermsForItem($itemType, $itemID))
-		{
-			return $perms;
-		}
+		if($perms = \rocketD\util\Cache::getInstance()->getPermsForItem($itemType, $itemID)) return $perms;
 
 		/** Get From DB **/
 		$perms = array();
@@ -371,35 +288,16 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		\rocketD\util\Cache::getInstance()->setPermsForItem($itemType, $itemID, $perms);
 		return $perms;
 	}
+
 	public function setPermsForItem($itemType, $itemID, $addPerms, $remPerms)
 	{
-
 		/** Validate Input **/
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
 		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($addPerms) == false)
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
-
+		if($this->_validatePermArray($addPerms) == false) return \rocketD\util\Error::getError(2);
 		// allow non array input, but convert it to an array so we can deal with it easily
-		if($this->_validatePermArray($remPerms) == false)
-		{
-
-			return \rocketD\util\Error::getError(2);
-		}
+		if($this->_validatePermArray($remPerms) == false) return \rocketD\util\Error::getError(2);
 
 		// add perms
 		$query = "INSERT IGNORE INTO ".\cfg_core_Perm::TABLE." SET ".\cfg_core_Perm::TYPE." = '?', ".\cfg_core_Perm::ITEM." = '?', ".\cfg_core_Perm::PERM." = '?', ".\cfg_core_Role::ID." ='0'";
@@ -464,25 +362,10 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 
 	public function setSessionPermsForUserToItem($userID, $itemType, $itemID, $permValues)
 	{
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!is_array($permValues))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
+		if(!is_array($permValues)) return \rocketD\util\Error::getError(2);
 
 		$sessionKey = 'perm:'.$userID.':'.$itemType;
 		if(!isset($_SESSION[$sessionKey]))
@@ -506,48 +389,23 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 
 	public function getSessionPermsForUser($userID, $itemType)
 	{
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
 
 		$sessionKey = 'perm:'.$userID.':'.$itemType;
-		if(!isset($_SESSION[$sessionKey]))
-		{
-			return false;
-		}
+		if(!isset($_SESSION[$sessionKey])) return false;
 
 		return unserialize($_SESSION[$sessionKey]);
 	}
 
 	public function getSessionPermsForUserToItem($userID, $itemType, $itemID)
 	{
-		if(!\obo\util\Validator::isPosInt($userID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPermItemType($itemType))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
-
-		if(!\obo\util\Validator::isPosInt($itemID))
-		{
-			return \rocketD\util\Error::getError(2);
-		}
+		if(!\obo\util\Validator::isPosInt($userID)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPermItemType($itemType)) return \rocketD\util\Error::getError(2);
+		if(!\obo\util\Validator::isPosInt($itemID)) return \rocketD\util\Error::getError(2);
 
 		$perms = $this->getSessionPermsForUser($userID, $itemType);
-
-		if(!$perms || !isset($perms[$itemID]))
-		{
-			return false;
-		}
+		if(!$perms || !isset($perms[$itemID])) return false;
 
 		return $perms[$itemID];
 	}
@@ -556,8 +414,6 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 	{
 		return array_values(array_unique(array_merge($a, $b)));
 	}
-
-	public function getPermsForUserToItemCombined($userID, $itemType, $itemID){}
 
 	public function clearPermsForItem($itemType, $itemID)
 	{
