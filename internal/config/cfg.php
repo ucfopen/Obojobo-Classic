@@ -175,6 +175,7 @@ class AppCfgDefault
 	const LTI_REMOTE_USERNAME_FIELD = 'lis_person_sourcedid';
 	const LTI_CREATE_USER_IF_MISSING = true;
 	const LTI_USE_ROLE = true;
+	const LTI_COPY_PERMS_ON_DUPLICATE = true;
 
 	// REQUIRED CREDHUB @TODO - these shouldnt be required
 	const CREDHUB_KEY = 'key';
