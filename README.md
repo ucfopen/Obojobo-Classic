@@ -1,9 +1,6 @@
 # Obojobo
 Obojobo is a Learning Module Management System
 
-# License
-Obojobo is not open source. If you have access to this repository, your license are goverend by the agreement you signed with UCF.
-
 # Quick Start with Docker
 For local development, testing, and as a reference for the architecture setup, we have a Docker environment to get you up and running quickly.
 
