@@ -29,7 +29,7 @@
         "monolog/monolog": "1.18.2",
         "johnpbloch/wordpress": ">=5.1.1",
         "obojobo/obo-stats": "0.0.3",
-        "obojobo/rocketD": "0.0.2",
+        "obojobo/rocketD": "0.0.3",
         "obojobo-themes/obojobo": "0.0.3",
         "wpackagist-plugin/table-of-contents-plus": ">=1601",
         "wpackagist-plugin/page-list": ">=5.1",
