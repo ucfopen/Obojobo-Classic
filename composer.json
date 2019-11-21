@@ -17,6 +17,10 @@
         {
             "type": "git",
             "url": "https://github.com/ucfopen/Obojobo-Wordpress-Theme.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-RocketD-Plugin.git"
         }
     ],
     "require": {

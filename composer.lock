@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61fb16cf26935efc7730d1e1ebce85f3",
+    "content-hash": "134d518ae8eddd259ba3a7ad31e1ec91",
     "packages": [
         {
             "name": "composer/installers",
@@ -465,7 +465,7 @@
             "version": "0.0.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git",
+                "url": "https://github.com/ucfopen/Obojobo-Wordpress-RocketD-Plugin.git",
                 "reference": "564ee387d5341595410f8a6caf9f8bab841bdbc2"
             },
             "require": {
