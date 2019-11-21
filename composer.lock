@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c11008c868752663e2f1bea5cf25978",
+    "content-hash": "134d518ae8eddd259ba3a7ad31e1ec91",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b"
+                "reference": "141b272484481432cda342727a427dc1e206bfa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/cfcca6b1b60bc4974324efb5783c13dca6932b5b",
-                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "url": "https://api.github.com/repos/composer/installers/zipball/141b272484481432cda342727a427dc1e206bfa0",
+                "reference": "141b272484481432cda342727a427dc1e206bfa0",
                 "shasum": ""
             },
             "require": {
@@ -73,6 +73,7 @@
                 "RadPHP",
                 "SMF",
                 "Thelia",
+                "Whmcs",
                 "WolfCMS",
                 "agl",
                 "aimeos",
@@ -95,6 +96,7 @@
                 "installer",
                 "itop",
                 "joomla",
+                "known",
                 "kohana",
                 "laravel",
                 "lavalite",
@@ -124,7 +126,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2018-08-27T06:10:37+00:00"
+            "time": "2019-08-12T15:00:31+00:00"
         },
         {
             "name": "eher/oauth",
@@ -415,7 +417,7 @@
             "version": "0.0.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git",
+                "url": "https://github.com/ucfopen/Obojobo-Wordpress-Theme.git",
                 "reference": "0454e705e626234ec4e6785913a3edb78bd463a1"
             },
             "require": {
@@ -439,7 +441,7 @@
             "version": "0.0.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git",
+                "url": "https://github.com/ucfopen/Obojobo-Wordpress-Stats-Plugin.git",
                 "reference": "f53231f454f19cd4361b74ba82517d169f5bd84b"
             },
             "require": {
@@ -463,7 +465,7 @@
             "version": "0.0.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git",
+                "url": "https://github.com/ucfopen/Obojobo-Wordpress-RocketD-Plugin.git",
                 "reference": "564ee387d5341595410f8a6caf9f8bab841bdbc2"
             },
             "require": {
@@ -534,16 +536,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.0",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
                 "shasum": ""
             },
             "require": {
@@ -552,7 +554,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -577,7 +579,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20T15:27:04+00:00"
+            "time": "2019-11-01T11:05:21+00:00"
         },
         {
             "name": "silexlabs/amfphp",
@@ -647,15 +649,15 @@
         },
         {
             "name": "wpackagist-plugin/w3-total-cache",
-            "version": "0.9.7.3",
+            "version": "0.10.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/w3-total-cache/",
-                "reference": "tags/0.9.7.3"
+                "reference": "tags/0.10.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.9.7.3.zip"
+                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.0.10.2.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
