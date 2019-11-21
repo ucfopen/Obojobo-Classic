@@ -8,19 +8,15 @@
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Stats-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Stats-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/ucfcdl/php-saml.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Theme.git"
         }
     ],
     "require": {
