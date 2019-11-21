@@ -74,3 +74,22 @@ function classAutoLoader($className)
 	}
 	@include($file);
 }
+
+// Fix a bug with php7.1 + and php72-pecl-memcache which breaks the session handling w/ memcache
+class PeclMemcacheBugFixForSessionsHandler extends SessionHandler
+{
+	public function read($id)
+	{
+		$data = parent::read($id);
+		 // the bug is a result of pecl-memcache not returning an empty string
+		 // and that being incompatable with php 7.1's session handler
+		return empty($data) ? '' : $data;
+	}
+}
+
+if(\AppCfg::CACHE_MEMCACHE === true)
+{
+	$sessionHandler = new PeclMemcacheBugFixForSessionsHandler();
+	session_set_save_handler($sessionHandler);
+}
+// END php72-pecl-memcache bug fix
