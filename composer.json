@@ -8,26 +8,26 @@
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Stats-Plugin.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Stats-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-RocketD-Plugin.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Stats-Plugin.git"
         },
         {
             "type": "git",
-            "url": "git@github.com:ucfcdl/Obojobo-Wordpress-Theme.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-Theme.git"
         },
         {
             "type": "git",
-            "url": "https://github.com/ucfcdl/php-saml.git"
+            "url": "https://github.com/ucfopen/Obojobo-Wordpress-RocketD-Plugin.git"
         }
     ],
     "require": {
-        "php": ">=5.4",
+        "php": ">=7.2",
         "onelogin/php-saml": "2.10.2",
         "monolog/monolog": "1.18.2",
-        "johnpbloch/wordpress": ">=5.1.1",
+        "johnpbloch/wordpress": ">=5.3.0",
         "obojobo/obo-stats": "0.0.3",
         "obojobo/rocketD": "0.0.3",
         "obojobo-themes/obojobo": "0.0.3",

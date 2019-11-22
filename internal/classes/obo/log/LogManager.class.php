@@ -256,7 +256,7 @@ class LogManager extends \rocketD\db\DBEnabled
 						{
 							$toSection = (int) ($r->{\cfg_obo_Track::IN} == 0 ? 1 : $r->{\cfg_obo_Track::IN});
 							$pageIndex = '?';
-							if(isset($lo->pages) && count($lo->pages > 0))
+							if(isset($lo->pages) && count($lo->pages) > 0)
 							{
 								switch($toSection)
 								{
