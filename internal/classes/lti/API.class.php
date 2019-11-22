@@ -305,7 +305,7 @@ class API
 	{
 		if(!($score >= 0) || empty($instID) || empty($sourceID) || empty($serviceUrl) || empty($secret))
 		{
-			profile('lti', "'outcome-no-passback', '$inst_id', '{$_SESSION['userID']}', '$service_url', '$score', '$source_id', '".time()."'");
+			profile('lti', "'outcome-no-passback', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '".time()."'");
 			return false;
 		}
 
