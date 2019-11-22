@@ -130,7 +130,7 @@ class Cache extends \rocketD\util\RDMemcache
 	{
 		if($this->memEnabled)
 		{
-			$this->delete($this->ns.'\obo\Lock:'.$lock->lockID);
+			$this->delete($this->ns.'\obo\Lock:'.$loid);
 		}
 	}
 
