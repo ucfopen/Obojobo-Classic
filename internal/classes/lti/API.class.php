@@ -319,8 +319,9 @@ class API
 		// render message body:
 		if ($smarty = \rocketD\util\Template::getInstance())
 		{
+			$messageId = uniqid();
 			$smarty->assign('score', $score);
-			$smarty->assign('message', uniqid());
+			$smarty->assign('message', $messageId);
 			$smarty->assign('sourceId', $sourceID);
 			$messageBody = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-outcomes-xml.tpl');
 
@@ -335,7 +336,7 @@ class API
 			}
 		}
 
-		profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$error', '".time()."'");
+		profile('lti', "'outcome-".($success ? 'success':'failure')."', '$instID', '{$_SESSION['userID']}', '$serviceUrl', '$score', '$sourceID', '$messageId', '$error', '".time()."'");
 
 		return $success;
 	}
