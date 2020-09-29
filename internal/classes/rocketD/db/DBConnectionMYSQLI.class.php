@@ -82,7 +82,7 @@ class DBConnectionMYSQLI extends DBConnection
 				$value = stripslashes($value);
 			}
 			// Quote if not integer
-			if (!is_numeric($value) || $value[0] == '0')
+			if (!is_numeric($value) || ( isset($value[0]) && $value[0] == '0' ) )
 			{
 				$newvalue = mysqli_real_escape_string($this->connData->connID, $value);
 				$value = $newvalue;
