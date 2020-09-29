@@ -12,14 +12,14 @@ class AppCfg extends AppCfgDefault
 	const DB_USER = 'obojobo_user';
 	const DB_PASS = 'obojobo_pass';
 	const DB_NAME = 'obojobo';
-	const DB_TYPE = 'mysql';
+	const DB_TYPE = 'mysqli';
 
 	// --- Wordpress DB Connection ---
 	const DB_WP_HOST = 'mysql';
 	const DB_WP_USER = 'obojobo_user';
 	const DB_WP_PASS = 'obojobo_pass';
 	const DB_WP_NAME = 'obojobo_wordpress';
-	const DB_WP_TYPE = 'mysql';
+	const DB_WP_TYPE = 'mysqli';
 
 
 	// --- WORDPRESS keys ---
