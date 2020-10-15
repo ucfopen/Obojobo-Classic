@@ -1,0 +1,11 @@
+.button{
+	background: black;
+	color: white;
+	border: 0;
+	display: inline-block;
+	padding: 5px 10px;
+
+	&:hover{
+		color: red;
+	}
+}

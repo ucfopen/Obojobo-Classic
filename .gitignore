@@ -54,3 +54,4 @@ internal/vendor/
 internal/wordpress-core/
 wp/*
 
+node_modules
