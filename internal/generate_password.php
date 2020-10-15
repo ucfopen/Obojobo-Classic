@@ -21,5 +21,8 @@ if ( ! in_array('--return-query', $argv))
 	echo("\n=============== SQL for password '$argv[2]' =============\r\n");
 }
 
+$now = time();
+
 echo("INSERT INTO `obo_user_meta` (`userID`, `meta`, `value`) VALUES ('$argv[1]', 'salt', '$salt') ON DUPLICATE KEY UPDATE `value` = '$salt';\r\n");
 echo("INSERT INTO `obo_user_meta` (`userID`, `meta`, `value`) VALUES ('$argv[1]', 'password', '$dbPassword') ON DUPLICATE KEY UPDATE `value` = '$dbPassword';\r\n");
+echo("INSERT INTO `obo_user_meta` (`userID`, `meta`, `value`) VALUES ('$argv[1]', 'lastPassChange', '$now') ON DUPLICATE KEY UPDATE `value` = '$now';\r\n");

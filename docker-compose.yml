@@ -41,4 +41,4 @@ services:
       - "./internal/docker/05_wordpress_data.sql:/docker-entrypoint-initdb.d/05.sql"
 
   memcached:
-    image: memcached:1.4.27-alpine
+    image: memcached:1.6.7-alpine
