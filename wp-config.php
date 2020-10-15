@@ -17,6 +17,12 @@
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 
+// override the wordpress database settings for siteurl and home
+// this SHOULD reduce trouble when using webpack-dev-server and docker together
+// allowing you to set URL_WEB to use :8080
+define( 'WP_HOME', \AppCfg::URL_WEB );
+define( 'WP_SITEURL', \AppCfg::URL_WEB );
+
 /** Enable W3 Total Cache */
 define('WP_CACHE', true);
 

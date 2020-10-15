@@ -39,7 +39,18 @@ module.exports =
 				watchOptions: {
 					ignored: '/node_modules/'
 				},
-				stats: { children: false, modules: false }
+				stats: { children: false, modules: false },
+				openPage: 'repository.html',
+				open: true,
+				proxy: {
+					// proxy everything back into docker
+					context: () => true,
+					target: 'http://127.0.0.1',
+					secure: false,
+					headers: {
+						'X-Use-Webpack': 'true'
+					}
+				}
 			},
 			output: {
 				publicPath: '/',
