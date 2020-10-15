@@ -10,5 +10,10 @@
 				// targets: 'defaults' // allows .browserslistrc to work
 			},
 		]
+	],
+	"plugins": [
+		[
+			"babel-plugin-react-docgen"
+		]
 	]
 }
