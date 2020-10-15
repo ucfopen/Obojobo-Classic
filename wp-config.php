@@ -17,18 +17,18 @@
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 
-// override the wordpress database settings for siteurl and home
-// this SHOULD reduce trouble when using webpack-dev-server and docker together
-// allowing you to set URL_WEB to use :8080
-define( 'WP_HOME', \AppCfg::URL_WEB );
-define( 'WP_SITEURL', \AppCfg::URL_WEB );
-
 /** Enable W3 Total Cache */
 define('WP_CACHE', true);
 
 // OBOJOBO configuration
 include_once(__DIR__.'/internal/config/cfgLocal.php'); // local config
 if ( ! class_exists('AppCfg')) exit('Error: Obojobo cfgLocal invalid or missing.');
+
+// override the wordpress database settings for siteurl and home
+// this SHOULD reduce trouble when using webpack-dev-server and docker together
+// allowing you to set URL_WEB to use :8080
+define( 'WP_HOME', AppCfg::URL_WEB );
+define( 'WP_SITEURL', AppCfg::URL_WEB );
 
 define('DB_NAME', AppCfg::DB_WP_NAME);
 
