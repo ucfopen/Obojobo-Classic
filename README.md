@@ -11,6 +11,12 @@ The docker-compose setup will automatically set up the server containers, seed t
 3. Run `composer install` - if you have git permission issues, [configure your github ssh keys](https://help.github.com/articles/generating-an-ssh-key/)
 4. Run `docker-compose up -d` (-d makes it run in the background eg: daemonized)
 5. After up finishes, Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` to generate the obojobo_admin user's password
+6. Log in either at http://127.0.0.1/repository or http://127.0.0.1/wp/wp-admin
+
+## Working on React Repository w/ Docker
+Docker isn't needed to work on the storybook components.  To allow react to talk to the server, you'll need to run webpack-dev-server and the docker servers together.
+
+That means you need to have the docker-compose servers running (`docker-compose up -d` shown above) AND the webpack dev server (`yarn dev`)
 
 
 # Requirements
