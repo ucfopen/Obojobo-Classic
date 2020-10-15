@@ -1,26 +1,47 @@
-FROM php:5.6.19-fpm-alpine
-MAINTAINER Ian Turgeon
+FROM php:7.4-fpm-alpine
+MAINTAINER UCF/Open_
 
-RUN apk --no-cache add \
-	git \
-	libjpeg-turbo-dev\
-	libmcrypt-dev \
-	libpng-dev \
-	libxml2-dev
+ARG PHP_EXT="bcmath gd xml mysqli"
+ARG PECL="mcrypt-1.0.3"
+ARG PHP_EXT_ENABLE="memcache mcrypt"
+ARG PHP_MEMCACHED_VERSION="4.0.5.2"
+ARG COMPOSER_VERSION="1.10.0"
+ARG COMPOSER_INSTALLER_URL="https://raw.githubusercontent.com/composer/getcomposer.org/d2c7283f9a7df2db2ab64097a047aae780b8f6b7/web/installer"
+ARG COMPOSER_INSTALLER_SHA="e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a"
 
-# PECL Libraries and php extensions
-RUN docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
-	&& pecl install memcache \
-	&& docker-php-ext-enable memcache \
-	&& docker-php-ext-install \
-	bcmath \
-	gd \
-	mbstring \
-	mcrypt \
-	mysql \
-	mysqlnd \
-	xml \
-	&& rm -rf /usr/src/php
+# os packages needed for php extensions
+ARG BUILD_PACKAGES="autoconf bash build-base cyrus-sasl-dev freetype git libjpeg-turbo-dev libmemcached-dev libpng-dev libxml2-dev libmcrypt-dev"
+ARG PURGE_PACKAGES="autoconf build-base cyrus-sasl-dev freetype libjpeg-turbo-dev"
+ARG PURGE_FILES="/var/lib/apt/lists/* /usr/src/php /usr/include /usr/local/include /usr/share/doc /usr/share/doc-base /var/www/html/php-memcached"
 
-# Make sure composer is installed globally
-RUN ash -c "curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer"
+RUN apk add --no-cache $BUILD_PACKAGES \
+	# ======== PHP CONFIGURE GD
+	&& docker-php-ext-configure gd --with-jpeg=/usr/include \
+	# ======== PECL INSTALL
+	&& pecl install $PECL \
+	# ======== PHP EXTENSIONS
+	&& docker-php-ext-install $PHP_EXT \
+	# ======== PHP-MEMCACHED
+	&& git clone -b $PHP_MEMCACHED_VERSION https://github.com/websupport-sk/pecl-memcache.git \
+	&& cd pecl-memcache \
+	&& phpize \
+	&& ./configure \
+	&& make \
+	&& make install \
+	# ======= ENABLE PECL AND COMPILED EXTENSIONS \
+	&& docker-php-ext-enable $PHP_EXT_ENABLE \
+	# ======== PHP COMPOSER
+	&& php -r "copy('$COMPOSER_INSTALLER_URL', 'composer-setup.php');" \
+	&& php -r "if (hash_file('sha384', 'composer-setup.php') === '$COMPOSER_INSTALLER_SHA') { echo 'COMPOSER VERIFIED'; } else { echo 'COMPOSER INVALID'; exit(1); } echo PHP_EOL;" \
+	&& php composer-setup.php --install-dir=/usr/local/bin --filename=composer --version=$COMPOSER_VERSION \
+	&& rm -f composer-setup.php \
+	# ======== CLEANUP
+	&& apk del $PURGE_PACKAGES \
+	&& rm -rf $PURGE_FILES
+
+# hack to let php write to the shared disk with boot2docker shares
+# files shared from host into a container appear to use a user on host with UID 1000
+# looks like this container not only doesnt have a user at 1000, but the www-data user cant write to these files
+# so, this changes www-data's uid to 1000
+# RUN usermod -u 1000 www-data
+RUN sed -i "s/^www-data:x:[0-9]*/www-data:x:1000/" /etc/passwd
