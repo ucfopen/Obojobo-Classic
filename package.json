@@ -1,0 +1,52 @@
+{
+  "name": "Obojobo-Classic",
+  "version": "3.0.0-alpha1",
+  "description": "Obojobo Classic - UCF's Learning Object Repository",
+  "main": "index.js",
+  "repository": "https://github.com/ucfopen/Obojobo-Classic.git",
+  "author": "UCF Center for Distributed Learning",
+  "license": "AGPL-3.0-only",
+  "private": false,
+  "devDependencies": {
+    "@babel/core": "^7.12.0",
+    "@babel/preset-env": "^7.12.0",
+    "@babel/preset-react": "^7.10.4",
+    "@storybook/addon-actions": "^6.0.26",
+    "@storybook/addon-essentials": "^6.0.26",
+    "@storybook/addon-links": "^6.0.26",
+    "@storybook/react": "^6.0.26",
+    "autoprefixer": "^10.0.1",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "bluebird": "^3.7.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.5.3",
+    "express-list-endpoints": "^4.0.1",
+    "lint-staged": "^10.2.6",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
+    "oauth-signature": "^1.5.0",
+    "postcss": "^8.1.1",
+    "postcss-loader": "^4.0.4",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.2.1",
+    "supertest": "^4.0.2",
+    "svg-url-loader": "^6.0.0",
+    "url": "^0.11.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-manifest-plugin": "^2.2.0"
+  },
+  "dependencies": {
+    "prop-types": "^15.7.2"
+  },
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "build": "webpack --config internal/src/webpack.config.js -p",
+    "dev": "webpack-dev-server --config internal/src/webpack.config.js"
+  }
+}
