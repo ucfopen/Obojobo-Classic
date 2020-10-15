@@ -24,12 +24,6 @@ define('WP_CACHE', true);
 include_once(__DIR__.'/internal/config/cfgLocal.php'); // local config
 if ( ! class_exists('AppCfg')) exit('Error: Obojobo cfgLocal invalid or missing.');
 
-// override the wordpress database settings for siteurl and home
-// this SHOULD reduce trouble when using webpack-dev-server and docker together
-// allowing you to set URL_WEB to use :8080
-define( 'WP_HOME', AppCfg::URL_WEB );
-define( 'WP_SITEURL', AppCfg::URL_WEB );
-
 define('DB_NAME', AppCfg::DB_WP_NAME);
 
 /** MySQL database username */
@@ -108,3 +102,9 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+
+// when docker is used and the request is coming from webpack, don't redirect to siteurl
+if (AppCfg::IS_DEV_DOCKER === true &&  $_SERVER['HTTP_X_USE_WEBPACK'] === 'true')
+{
+	remove_filter('template_redirect','redirect_canonical');
+}
