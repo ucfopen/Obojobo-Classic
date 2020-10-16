@@ -35,9 +35,18 @@ module.exports =
 				https: true,
 				host: '127.0.0.1',
 				publicPath: '/assets/dist',
-				watchContentBase: true,
 				watchOptions: {
-					ignored: '/node_modules/'
+					ignored: [
+						'/node_modules/',
+						'/internal/admin/',
+						'/internal/classes/',
+						'/internal/config/',
+						'/internal/vendor/',
+						'/internal/logs',
+						'/internal/includes',
+						'/assets',
+
+					]
 				},
 				stats: { children: false, modules: false },
 				openPage: 'repository.html',
