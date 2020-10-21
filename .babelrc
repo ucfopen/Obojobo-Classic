@@ -13,6 +13,6 @@
 	],
 	"plugins": [
 		["@babel/transform-runtime"],
-		["babel-plugin-react-docgen"]
+		["babel-plugin-react-docgen"] // needed for storybooks to pick up react prop types
 	]
 }

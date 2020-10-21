@@ -44,7 +44,8 @@
   "dependencies": {
     "prop-types": "^15.7.2",
     "react-query": "^2.23.1",
-    "react-query-devtools": "^2.6.0"
+    "react-query-devtools": "^2.6.0",
+    "react-table": "^7.6.0"
   },
   "scripts": {
     "storybook": "start-storybook -p 6006",
