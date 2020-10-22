@@ -21,7 +21,8 @@ EmptyExample.args = {
 
 export const SimpleExample = Template.bind({})
 SimpleExample.args = {
-	value: '<TEXTFORMAT>',
+	value:
+		'<TEXTFORMAT LEFTMARGIN="10" RIGHTMARGIN="15" LEADING="3"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#393939" LETTERSPACING="0" KERNING="1">Example text</FONT></P></TEXTFORMAT>',
 }
 
 export const ComplexExample = Template.bind({})
