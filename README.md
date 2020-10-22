@@ -9,7 +9,7 @@ The docker-compose setup will automatically set up the server containers, seed t
 1. Install [Docker for Mac/Windows/Linux](https://www.docker.com/products/docker)
 2. Run `docker-compose up -d` (-d makes it run in the background eg: daemonized). this will take a while the first time.
 3. After 2 finishes: Run `docker-compose run --rm phpfpm composer install` to install wordpress and all the php vendor libraries.
-4. After 3 finishes:  Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin` VIEW output for the obojobo_admin user's password.
+4. After 3 finishes:  Run `docker-compose run --rm phpfpm php internal/update_password.php obojobo_admin rocketduck` to set the obojobo_admin user's password.
 5. Log in either at `http://127.0.0.1/repository` or `http://127.0.0.1/wp/wp-admin`
 
 ## React Repository AND Docker
