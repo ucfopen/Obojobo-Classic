@@ -1,5 +1,7 @@
 import React, {useState, useCallback} from 'react'
 
+import './data-grid-timestamp-cell.scss'
+
 const formatAMPM = (date) => {
 	var hours = date.getHours();
 	var minutes = date.getMinutes();

@@ -1,0 +1,19 @@
+.repository--data-grid{
+	.date-time-cell {
+		padding: 0;
+		margin: 0;
+		height: 100%;
+		position: relative;
+
+
+		& > div{
+			height: 50%;
+			line-height: 34px;
+			margin-bottom: -9px;
+
+			&:nth-child(1){
+				font-weight: bold;
+			}
+		}
+	}
+}

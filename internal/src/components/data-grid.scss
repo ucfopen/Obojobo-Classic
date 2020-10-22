@@ -1,0 +1,36 @@
+.repository--data-grid{
+	font-size: .8em;
+	padding: 0px;
+	margin: 0px;
+	border-spacing: 0px;
+
+	td{
+		padding: 5px 10px;
+	}
+
+	tbody{
+		tr:nth-child(even) {
+			background-color: #f2f2f2;
+		}
+
+		tr.selected{
+			background-color: #22b2b2;
+		}
+
+		td.no-data{
+			text-align: center;
+			color: #ccc;
+		}
+	}
+
+	&.selectable tbody{
+		tr{
+			cursor: pointer;
+		}
+
+		tr:hover{
+			background-color: #b2b2b2;
+		}
+	}
+
+}
