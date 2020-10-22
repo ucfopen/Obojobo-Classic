@@ -49,7 +49,7 @@ module.exports =
 					]
 				},
 				stats: { children: false, modules: false },
-				openPage: 'repository.html',
+				openPage: 'repository2.php',
 				open: true,
 				proxy: {
 					// proxy everything back into docker
