@@ -13,7 +13,11 @@ const RepositoryPage = () => {
 	const queryCache = useQueryCache()
 	const reloadInstances = useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
-	}, [])
+		//@TODO: This needs to clear out the instance data (set to null)
+		//and reset the selected instance. However the line below doesn't update the datagrid,
+		//so the data grids probably need a selectedIndex property
+		setSelectedInstance(null)
+	}, null)
 	const { isLoading, isError, data, error }  = useQuery('getInstances', apiGetInstances, {initialStale: true, staleTime: 0})
 	const [selectedInstance, setSelectedInstance] = useState(null)
 	if (isError) return <span>Error: {error.message}</span>
@@ -22,7 +26,7 @@ const RepositoryPage = () => {
 		<React.Fragment>
 		<Header />
 		<main>
-			<MyInstances instances={data} onSelect={row => setSelectedInstance(row) } />
+			<MyInstances instances={data} onSelect={row => setSelectedInstance(row) } onClickRefresh={() => reloadInstances()} />
 			<InstanceSection instance={selectedInstance} />
 		</main>
 		</React.Fragment>

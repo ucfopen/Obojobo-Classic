@@ -1,10 +1,10 @@
 import React from 'react'
 
-import AssessmentScoresGraph from './assessment-scores-summary'
+import AssessmentScoresSummary from './assessment-scores-summary'
 
 export default {
-	component: AssessmentScoresGraph,
-	title: 'AssessmentScoresGraph',
+	component: AssessmentScoresSummary,
+	title: 'AssessmentScoresSummary',
 	parameters: {
 		controls: {
 			expanded: true,
@@ -12,7 +12,7 @@ export default {
 	},
 }
 
-const Template = (args) => <AssessmentScoresGraph {...args} />
+const Template = (args) => <AssessmentScoresSummary {...args} />
 
 export const Example = Template.bind({})
 Example.args = {

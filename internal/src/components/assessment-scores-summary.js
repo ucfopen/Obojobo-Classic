@@ -1,15 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function AssessmentScoresGraph({ scores }) {
+export default function AssessmentScoresSummary({ scores }) {
 	return <div>@TODO</div>
 }
 
-AssessmentScoresGraph.propTypes = {
+AssessmentScoresSummary.propTypes = {
 	scores: PropTypes.arrayOf(PropTypes.number).isRequired,
 }
 
-// AssessmentScoresGraph.propTypes = {
+// AssessmentScoresSummary.propTypes = {
 // 	scoringMethod: PropTypes.oneOf(['highest', 'average', 'last']),
 // 	scores: PropTypes.arrayOf(
 // 		PropTypes.shape({
