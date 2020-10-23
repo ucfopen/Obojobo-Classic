@@ -63,6 +63,11 @@
     "prettier:run": "prettier --write 'internal/src/**/*.{js,jsx,scss}'",
     "precommit": "lint-staged"
   },
+	"husky": {
+		"hooks": {
+			"pre-commit": "yarn precommit"
+		}
+	},
   "lint-staged": {
     "internal/src/**/*.scss": [
       "stylelint"
