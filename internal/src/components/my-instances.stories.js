@@ -15,17 +15,17 @@ const Template = (args) => <MyInstances {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
-	data: null,
+	instances: null,
 }
 
 export const NoData = Template.bind({})
 NoData.args = {
-	data: [],
+	instances: [],
 }
 
 export const Data = Template.bind({})
 Data.args = {
-	data: [
+	instances: [
 		{
 			instID: '1438',
 			loID: '14427',
