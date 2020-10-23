@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function SearchField({ value }) {
+export default function SectionHeader({ label }) {
 	return <div>@TODO</div>
 }
 
-SearchField.propTypes = {
+SectionHeader.propTypes = {
 	label: PropTypes.string.isRequired,
 }

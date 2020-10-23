@@ -1,6 +1,6 @@
 import React from 'react'
 
-import SectionHeader from './SectionHeader'
+import SectionHeader from './section-header'
 
 export default {
 	component: SectionHeader,

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ModalAboutLO from './ModalAboutLO'
+import ModalAboutLO from './modal-about-lo'
 
 export default {
 	component: ModalAboutLO,

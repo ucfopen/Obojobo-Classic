@@ -4,11 +4,13 @@ import PropTypes from 'prop-types';
 
 import './data-grid.scss'
 
-const DataGrid = ({data = [], columns = [], isLoading = true, onSelect}) => {
+const DataGrid = ({data, columns, onSelect}) => {
+	const isLoading = data === null
+
 	// setup react-table
 	const instanceTable = useTable({
 		columns,
-		data
+		data: data || []
 	})
 
 	const {
@@ -67,11 +69,15 @@ const DataGrid = ({data = [], columns = [], isLoading = true, onSelect}) => {
 	)
 }
 
+DataGrid.defaultProps = {
+	data: null,
+	columns: []
+}
+
 DataGrid.propTypes = {
-	data: PropTypes.arrayOf(PropTypes.object),
+	data: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
 	columns: PropTypes.arrayOf(PropTypes.object),
-	isLoading: PropTypes.bool,
-	onSelect: PropTypes.func
+	onSelect: PropTypes.func.isRequired
 }
 
 export default DataGrid

@@ -1,15 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function HeaderBar({ userName }) {
-	return <div>@TODO</div>
+export default function Header({
+	isShowingBanner,
+	userName,
+	onClickAboutOrBannerLink,
+	onClickLogOut,
+}) {
+	return <div>Header @TODO</div>
 }
 
-HeaderBar.defaultProps = {
+Header.defaultProps = {
 	isShowingBanner: true,
 }
 
-HeaderBar.propTypes = {
+Header.propTypes = {
 	isShowingBanner: PropTypes.bool,
 	userName: PropTypes.string.isRequired,
 	onClickAboutOrBannerLink: PropTypes.func.isRequired,

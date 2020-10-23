@@ -1,6 +1,6 @@
 import React from 'react'
 
-import SearchField from './SearchField'
+import SearchField from './search-field'
 
 export default {
 	component: SearchField,
@@ -15,9 +15,12 @@ export default {
 const Template = (args) => <SearchField {...args} />
 
 export const Empty = Template.bind({})
-Empty.args = {}
+Empty.args = {
+	placeholder: 'Example placeholder',
+}
 
 export const NonEmpty = Template.bind({})
 NonEmpty.args = {
+	placeholder: 'Find a basketball player...',
 	value: 'Scottie Pippen',
 }

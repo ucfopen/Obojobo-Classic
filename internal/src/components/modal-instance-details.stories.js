@@ -1,10 +1,10 @@
 import React from 'react'
 
-import InstanceDetailsDialog from './InstanceDetailsDialog'
+import ModalInstanceDetails from './modal-instance-details'
 
 export default {
-	component: InstanceDetailsDialog,
-	title: 'InstanceDetailsDialog',
+	component: ModalInstanceDetails,
+	title: 'ModalInstanceDetails',
 	argTypes: {
 		isExternallyLinked: {
 			description: 'If true, the instance is linked to an LMS and has no start and end date',
@@ -23,7 +23,7 @@ export default {
 	},
 }
 
-const Template = (args) => <InstanceDetailsDialog {...args} />
+const Template = (args) => <ModalInstanceDetails {...args} />
 
 export const Create = Template.bind({})
 Create.args = {

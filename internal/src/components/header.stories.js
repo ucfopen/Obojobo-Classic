@@ -1,10 +1,10 @@
 import React from 'react'
 
-import HeaderBar from './HeaderBar'
+import Header from './header'
 
 export default {
-	component: HeaderBar,
-	title: 'HeaderBar',
+	component: Header,
+	title: 'Header',
 	parameters: {
 		controls: {
 			expanded: true,
@@ -12,7 +12,7 @@ export default {
 	},
 }
 
-const Template = (args) => <HeaderBar {...args} />
+const Template = (args) => <Header {...args} />
 
 export const Example = Template.bind({})
 Example.args = {

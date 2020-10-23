@@ -28,13 +28,12 @@ const Template = (args) => <DataGrid {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
-	isLoading: true,
 	columns: [
 		{accessor: 'userID', Header: 'User ID'},
 		{accessor: 'itemID', Header: 'Question ID' },
 		{accessor: 'score', Header: 'Score'},
 	],
-	data: []
+	data: null
 }
 
 export const NoData = Template.bind({})

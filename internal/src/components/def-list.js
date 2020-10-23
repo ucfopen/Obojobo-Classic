@@ -8,5 +8,7 @@ export default function DefList({ items }) {
 DefList.defaultProps = {}
 
 DefList.propTypes = {
-	items: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string, value: PropTypes.string })),
+	items: PropTypes.arrayOf(
+		PropTypes.shape({ label: PropTypes.string, value: PropTypes.string.isRequired })
+	),
 }

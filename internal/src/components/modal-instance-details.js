@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function InstanceDetailsDialog({
+export default function ModalInstanceDetails({
 	isExternallyLinked,
 	mode,
 	instanceName,
@@ -17,7 +17,7 @@ export default function InstanceDetailsDialog({
 	return <div>@TODO</div>
 }
 
-InstanceDetailsDialog.defaultProps = {
+ModalInstanceDetails.defaultProps = {
 	instanceName: '',
 	courseName: '',
 	startDate: null,
@@ -27,7 +27,7 @@ InstanceDetailsDialog.defaultProps = {
 	isImportAllowed: true,
 }
 
-InstanceDetailsDialog.propTypes = {
+ModalInstanceDetails.propTypes = {
 	onCancel: PropTypes.func.isRequired,
 	onSave: PropTypes.func.isRequired,
 	isExternallyLinked: PropTypes.bool.isRequired,

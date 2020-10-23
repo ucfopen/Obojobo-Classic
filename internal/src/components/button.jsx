@@ -1,15 +1,16 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import './button.scss'
 
-const Button = ({text, onClick}) => (
-	<div className="button" onClick={onClick}>{text}</div>
+import React from 'react'
+import PropTypes from 'prop-types'
+
+const Button = ({text, type, onClick}) => (
+	<div className={`repository--button is-type-${type}`} onClick={onClick}>{text}</div>
 )
 
 Button.propTypes = {
 	text: PropTypes.string,
 	onClick: PropTypes.func,
-	type: PropTypes.oneOf(['simple', 'text'])
+	type: PropTypes.oneOf(['text', 'small', 'large', 'alt']).isRequired
 }
 
 export default Button

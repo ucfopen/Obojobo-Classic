@@ -1,6 +1,6 @@
 import React from 'react'
 
-import FlashHTML from './FlashHTML'
+import FlashHTML from './flash-html'
 
 export default {
 	component: FlashHTML,

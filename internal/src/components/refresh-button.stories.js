@@ -1,6 +1,6 @@
 import React from 'react'
 
-import RefreshButton from './RefreshButton'
+import RefreshButton from './refresh-button'
 
 export default {
 	component: RefreshButton,
@@ -15,6 +15,4 @@ export default {
 const Template = (args) => <RefreshButton {...args} />
 
 export const Example = Template.bind({})
-Example.args = {
-	label: 'Details',
-}
+Example.args = {}

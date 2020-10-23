@@ -1,36 +1,38 @@
-.repository--data-grid{
-	font-size: .8em;
+.repository--data-grid {
 	padding: 0px;
 	margin: 0px;
 	border-spacing: 0px;
 
-	td{
-		padding: 5px 10px;
+	td {
+		padding: 0.2em 0.4em;
 	}
 
-	tbody{
+	tbody {
 		tr:nth-child(even) {
 			background-color: #f2f2f2;
 		}
 
-		tr.selected{
-			background-color: #22b2b2;
+		tr.selected {
+			background-color: #ccdaeb;
 		}
 
-		td.no-data{
+		td.no-data {
 			text-align: center;
 			color: #ccc;
 		}
 	}
 
-	&.selectable tbody{
-		tr{
+	&.selectable tbody {
+		tr {
 			cursor: pointer;
 		}
 
-		tr:hover{
-			background-color: #b2b2b2;
+		tr:hover {
+			background-color: #e6edf6;
+		}
+
+		tr.selected:hover {
+			background-color: #ccdaeb;
 		}
 	}
-
 }
