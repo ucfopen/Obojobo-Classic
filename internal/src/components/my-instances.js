@@ -8,7 +8,7 @@ export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 	return (
 		<div>
 			<SearchField />
-			<RefreshButton />
+			<RefreshButton onClick={onClickRefresh} />
 			<DataGridInstances data={instances} onSelect={onSelect} />
 		</div>
 	)
