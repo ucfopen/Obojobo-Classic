@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react'
+import React, { useState, useCallback } from 'react'
 import { useQuery, useQueryCache } from 'react-query'
 import { apiGetInstances } from '../util/api'
 import LoadingIndicator from './loading-indicator'
@@ -18,17 +18,24 @@ const RepositoryPage = () => {
 		//so the data grids probably need a selectedIndex property
 		setSelectedInstance(null)
 	}, null)
-	const { isLoading, isError, data, error }  = useQuery('getInstances', apiGetInstances, {initialStale: true, staleTime: 0})
+	const { isLoading, isError, data, error } = useQuery('getInstances', apiGetInstances, {
+		initialStale: true,
+		staleTime: 0
+	})
 	const [selectedInstance, setSelectedInstance] = useState(null)
 	if (isError) return <span>Error: {error.message}</span>
 
 	return (
 		<React.Fragment>
-		<Header />
-		<main>
-			<MyInstances instances={data} onSelect={row => setSelectedInstance(row) } onClickRefresh={() => reloadInstances()} />
-			<InstanceSection instance={selectedInstance} />
-		</main>
+			<Header />
+			<main>
+				<MyInstances
+					instances={data}
+					onSelect={row => setSelectedInstance(row)}
+					onClickRefresh={() => reloadInstances()}
+				/>
+				<InstanceSection instance={selectedInstance} />
+			</main>
 		</React.Fragment>
 	)
 

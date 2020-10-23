@@ -7,31 +7,31 @@ export default {
 	argTypes: {
 		onSelect: {
 			description:
-				'callback for when a selection is made. arg is all the data from the selected index',
+				'callback for when a selection is made. arg is all the data from the selected index'
 		},
 		columns: {
 			description: 'See react-table columns'
 		},
 		data: {
 			description:
-				'If null then the data is loading and the DataGrid will be in a loading state. Otherwise this is the data source of the items in the list.',
-		},
+				'If null then the data is loading and the DataGrid will be in a loading state. Otherwise this is the data source of the items in the list.'
+		}
 	},
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DataGrid {...args} />
+const Template = args => <DataGrid {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
 	columns: [
-		{accessor: 'userID', Header: 'User ID'},
-		{accessor: 'itemID', Header: 'Question ID' },
-		{accessor: 'score', Header: 'Score'},
+		{ accessor: 'userID', Header: 'User ID' },
+		{ accessor: 'itemID', Header: 'Question ID' },
+		{ accessor: 'score', Header: 'Score' }
 	],
 	data: null
 }
@@ -40,9 +40,9 @@ export const NoData = Template.bind({})
 NoData.args = {
 	isLoading: false,
 	columns: [
-		{accessor: 'userID', Header: 'User ID'},
-		{accessor: 'itemID', Header: 'Question ID' },
-		{accessor: 'score', Header: 'Score'},
+		{ accessor: 'userID', Header: 'User ID' },
+		{ accessor: 'itemID', Header: 'Question ID' },
+		{ accessor: 'score', Header: 'Score' }
 	],
 	data: []
 }
@@ -51,9 +51,9 @@ export const Data = Template.bind({})
 Data.args = {
 	isLoading: false,
 	columns: [
-		{accessor: 'userID', Header: 'User ID'},
-		{accessor: 'itemID', Header: 'Question ID' },
-		{accessor: 'score', Header: 'Score'},
+		{ accessor: 'userID', Header: 'User ID' },
+		{ accessor: 'itemID', Header: 'Question ID' },
+		{ accessor: 'score', Header: 'Score' }
 	],
 	data: [
 		{

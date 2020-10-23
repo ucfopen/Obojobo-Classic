@@ -8,7 +8,7 @@ export default function ModalAboutLO({
 	numPracticeQuestions,
 	numAssessmentQuestions,
 	authorNotes,
-	learningObjective,
+	learningObjective
 }) {
 	return <div>@TODO</div>
 }
@@ -20,5 +20,5 @@ ModalAboutLO.propTypes = {
 	numPracticeQuestions: PropTypes.number.isRequired,
 	numAssessmentQuestions: PropTypes.number.isRequired,
 	authorNotes: PropTypes.string.isRequired,
-	learningObjective: PropTypes.string.isRequired,
+	learningObjective: PropTypes.string.isRequired
 }

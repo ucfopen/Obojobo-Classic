@@ -7,37 +7,37 @@ export default {
 	title: 'ModalInstanceDetails',
 	argTypes: {
 		isExternallyLinked: {
-			description: 'If true, the instance is linked to an LMS and has no start and end date',
+			description: 'If true, the instance is linked to an LMS and has no start and end date'
 		},
 		startDate: {
-			description: 'If isExternallyLinked is true then this must be null',
+			description: 'If isExternallyLinked is true then this must be null'
 		},
 		endDate: {
-			description: 'If isExternallyLinked is true then this must be null',
-		},
+			description: 'If isExternallyLinked is true then this must be null'
+		}
 	},
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <ModalInstanceDetails {...args} />
+const Template = args => <ModalInstanceDetails {...args} />
 
 export const Create = Template.bind({})
 Create.args = {
-	mode: 'create',
+	mode: 'create'
 }
 
 export const EditNonExternal = Template.bind({})
 EditNonExternal.args = {
 	mode: 'edit',
-	isExternallyLinked: false,
+	isExternallyLinked: false
 }
 
 export const EditExternal = Template.bind({})
 EditExternal.args = {
 	mode: 'edit',
-	isExternallyLinked: true,
+	isExternallyLinked: true
 }

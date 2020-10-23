@@ -7,12 +7,12 @@ export default {
 	title: 'RefreshButton',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <RefreshButton {...args} />
+const Template = args => <RefreshButton {...args} />
 
 export const Example = Template.bind({})
 Example.args = {}

@@ -7,5 +7,5 @@ export default function FlashHTML({ value }) {
 }
 
 FlashHTML.propTypes = {
-	value: PropTypes.string.isRequired,
+	value: PropTypes.string.isRequired
 }

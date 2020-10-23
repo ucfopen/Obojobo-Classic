@@ -5,18 +5,18 @@ export default function Header({
 	isShowingBanner,
 	userName,
 	onClickAboutOrBannerLink,
-	onClickLogOut,
+	onClickLogOut
 }) {
 	return <div>Header @TODO</div>
 }
 
 Header.defaultProps = {
-	isShowingBanner: true,
+	isShowingBanner: true
 }
 
 Header.propTypes = {
 	isShowingBanner: PropTypes.bool,
 	userName: PropTypes.string.isRequired,
 	onClickAboutOrBannerLink: PropTypes.func.isRequired,
-	onClickLogOut: PropTypes.func.isRequired,
+	onClickLogOut: PropTypes.func.isRequired
 }

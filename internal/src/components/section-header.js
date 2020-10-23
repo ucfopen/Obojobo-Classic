@@ -6,5 +6,5 @@ export default function SectionHeader({ label }) {
 }
 
 SectionHeader.propTypes = {
-	label: PropTypes.string.isRequired,
+	label: PropTypes.string.isRequired
 }

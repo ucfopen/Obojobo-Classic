@@ -7,16 +7,16 @@ export default {
 	title: 'AssessmentScoresSummary',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <AssessmentScoresSummary {...args} />
+const Template = args => <AssessmentScoresSummary {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
-	scores: [0, 0, 10, 100, 60, 88, 100, 80, 100, 100, 100, 100, 0],
+	scores: [0, 0, 10, 100, 60, 88, 100, 80, 100, 100, 100, 100, 0]
 }
 
 // export const Example = Template.bind({})

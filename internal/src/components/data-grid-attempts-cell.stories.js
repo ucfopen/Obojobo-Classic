@@ -7,25 +7,25 @@ export default {
 	title: 'DataGridAttemptsCell',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DataGridAttemptsCell {...args} />
+const Template = args => <DataGridAttemptsCell {...args} />
 
 export const NoAdditionalAttempts = Template.bind({})
 NoAdditionalAttempts.args = {
 	numAttemptsTaken: 7,
 	numAdditionalAttemptsAdded: 0,
-	numAttempts: 10,
+	numAttempts: 10
 }
 
 export const AdditionalAttemptsApplied = Template.bind({})
 AdditionalAttemptsApplied.args = {
 	numAttemptsTaken: 7,
 	numAdditionalAttemptsAdded: 5,
-	numAttempts: 10,
+	numAttempts: 10
 }
 
 export const AttemptInProgress = Template.bind({})
@@ -33,5 +33,5 @@ AttemptInProgress.args = {
 	numAttemptsTaken: 0,
 	numAdditionalAttemptsAdded: 0,
 	numAttempts: 2,
-	isAttemptInProgress: true,
+	isAttemptInProgress: true
 }

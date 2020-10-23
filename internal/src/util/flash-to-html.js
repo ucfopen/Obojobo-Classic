@@ -9,7 +9,7 @@ const patternRemoveUL = /<\/?ul>/gi
 const patternAddUL = /<LI>([\s\S]*?)<\/LI>/gi
 const patternRemoveExtraUL = /<\/ul><ul>/gi
 
-const generateStyleFromFlashHTMLTag = function (attribs, rules) {
+const generateStyleFromFlashHTMLTag = function(attribs, rules) {
 	let style = ''
 	let reg
 	let match
@@ -31,7 +31,7 @@ const generateStyleFromFlashHTMLTag = function (attribs, rules) {
 }
 
 // Old learning objects were saved using flash's textfields - which suck at html
-const cleanFlashHTML = function (input, strict) {
+const cleanFlashHTML = function(input, strict) {
 	// get rid of all the textformat tags
 	input = input.replace(patternTF, '')
 

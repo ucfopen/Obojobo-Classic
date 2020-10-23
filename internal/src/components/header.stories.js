@@ -7,14 +7,14 @@ export default {
 	title: 'Header',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <Header {...args} />
+const Template = args => <Header {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
-	userName: 'Scottie Pippen',
+	userName: 'Scottie Pippen'
 }

@@ -7,26 +7,26 @@ export default {
 	argTypes: {
 		data: {
 			description:
-				'If null then the data is loading and the DataGridAssessmentScores will be in a loading state. Otherwise this is the data source of the items in the list.',
-		},
+				'If null then the data is loading and the DataGridAssessmentScores will be in a loading state. Otherwise this is the data source of the items in the list.'
+		}
 	},
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DataGridAssessmentScores {...args} />
+const Template = args => <DataGridAssessmentScores {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
-	data: null,
+	data: null
 }
 
 export const NoData = Template.bind({})
 NoData.args = {
-	data: [],
+	data: []
 }
 
 export const Data = Template.bind({})
@@ -36,57 +36,57 @@ Data.args = {
 			user: 'Berry, Zachary A.',
 			score: {
 				value: 37,
-				isScoreImported: false,
+				isScoreImported: false
 			},
 			lastSubmitted: '1455050441',
 			attempts: {
 				numAttemptsTaken: 3,
 				numAdditionalAttemptsAdded: 3,
 				numAttempts: 5,
-				isAttemptInProgress: false,
-			},
+				isAttemptInProgress: false
+			}
 		},
 		{
 			user: 'Scottie, Pippen',
 			score: {
 				value: null,
-				isScoreImported: false,
+				isScoreImported: false
 			},
 			lastSubmitted: null,
 			attempts: {
 				numAttemptsTaken: 0,
 				numAdditionalAttemptsAdded: 0,
 				numAttempts: 5,
-				isAttemptInProgress: true,
-			},
+				isAttemptInProgress: true
+			}
 		},
 		{
 			user: 'Star, Ringo',
 			score: {
 				value: 64,
-				isScoreImported: false,
+				isScoreImported: false
 			},
 			lastSubmitted: '1455050441',
 			attempts: {
 				numAttemptsTaken: 4,
 				numAdditionalAttemptsAdded: 0,
 				numAttempts: 5,
-				isAttemptInProgress: true,
-			},
+				isAttemptInProgress: true
+			}
 		},
 		{
 			user: 'Tennant, Neil',
 			score: {
 				value: 100,
-				isScoreImported: true,
+				isScoreImported: true
 			},
 			lastSubmitted: '1455050441',
 			attempts: {
 				numAttemptsTaken: 1,
 				numAdditionalAttemptsAdded: 0,
 				numAttempts: 5,
-				isAttemptInProgress: false,
-			},
-		},
-	],
+				isAttemptInProgress: false
+			}
+		}
+	]
 }
