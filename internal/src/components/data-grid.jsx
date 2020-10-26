@@ -1,10 +1,12 @@
-import React, { useState, useCallback } from 'react'
-import { useTable, useRowSelect } from 'react-table'
+/* eslint-disable react/jsx-key */
+
+import React from 'react'
+import { useTable } from 'react-table'
 import PropTypes from 'prop-types'
 
 import './data-grid.scss'
 
-const DataGrid = ({data, columns, selectedIndex, onSelect}) => {
+const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 	const isLoading = data === null
 
 	// setup react-table
@@ -36,10 +38,10 @@ const DataGrid = ({data, columns, selectedIndex, onSelect}) => {
 				) : (
 					rows.map(row => {
 						prepareRow(row)
-						console.log('compare', row, selectedIndex)
-						const className = row.index == selectedIndex ? 'selected' : ''
+
+						const className = row.index === selectedIndex ? 'selected' : ''
 						const onClick = () => {
-							if(!onSelect) return
+							if (!onSelect) return
 							onSelect(row.index)
 						}
 						return (

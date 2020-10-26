@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function AssessmentScoresSection({ assessmentScores, selectedStudentIndex, onSelect, onClickRefresh }) {
+export default function AssessmentScoresSection() {
 	return <div>@TODO</div>
 }
 
-MyInstances.propTypes = {
+AssessmentScoresSection.propTypes = {
 	assessmentScores: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,

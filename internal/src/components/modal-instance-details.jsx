@@ -1,19 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function ModalInstanceDetails({
-	isExternallyLinked,
-	mode,
-	instanceName,
-	courseName,
-	startDate,
-	endDate,
-	numAttempts,
-	scoringMethod,
-	isImportAllowed,
-	onCancel,
-	onSave
-}) {
+export default function ModalInstanceDetails() {
 	return <div>@TODO</div>
 }
 

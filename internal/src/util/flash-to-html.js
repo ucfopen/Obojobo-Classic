@@ -9,29 +9,8 @@ const patternRemoveUL = /<\/?ul>/gi
 const patternAddUL = /<LI>([\s\S]*?)<\/LI>/gi
 const patternRemoveExtraUL = /<\/ul><ul>/gi
 
-const generateStyleFromFlashHTMLTag = function(attribs, rules) {
-	let style = ''
-	let reg
-	let match
-	const len = rules.length
-	for (const a = 0; a < len; a++) {
-		reg = new RegExp(rules[a][0] + 's*=s*(?:\'|")(.+?)(?:\'|")', 'gi')
-		match = reg.exec(attribs)
-		if (match != null && match.length >= 2) {
-			// special case: convert px to % for font size
-			if (rules[a][0] === 'size') {
-				// we multiply by 90 to make 14px = 90%
-				style += rules[a][1] + ':' + (parseFloat(match[1]) / 14) * 90 + rules[a][2] + ';'
-			} else {
-				style += rules[a][1] + ':' + match[1] + rules[a][2] + ';'
-			}
-		}
-	}
-	return style
-}
-
 // Old learning objects were saved using flash's textfields - which suck at html
-const cleanFlashHTML = function(input, strict) {
+const cleanFlashHTML = function(input) {
 	// get rid of all the textformat tags
 	input = input.replace(patternTF, '')
 

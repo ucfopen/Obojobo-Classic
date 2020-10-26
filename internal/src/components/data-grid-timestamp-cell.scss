@@ -1,6 +1,10 @@
 .repository--date-time-cell {
 	text-align: left;
 
+	.time {
+		opacity: 0.65;
+	}
+
 	&.is-display-horizontal {
 		.day::after {
 			content: ' at ';
@@ -19,10 +23,6 @@
 	}
 
 	&.is-display-blank {
-		opacity: 0.65;
-	}
-
-	.time {
 		opacity: 0.65;
 	}
 }

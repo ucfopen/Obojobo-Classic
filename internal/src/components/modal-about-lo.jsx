@@ -1,15 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function ModalAboutLO({
-	learnTime,
-	language,
-	numContentPages,
-	numPracticeQuestions,
-	numAssessmentQuestions,
-	authorNotes,
-	learningObjective
-}) {
+export default function ModalAboutLO() {
 	return <div>@TODO</div>
 }
 

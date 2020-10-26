@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function AssessmentScoresSummary({ scores }) {
+export default function AssessmentScoresSummary() {
 	return <div>@TODO</div>
 }
 

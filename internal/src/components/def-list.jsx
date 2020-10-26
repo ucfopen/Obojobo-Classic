@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DefList({ items }) {
+export default function DefList() {
 	return <div>@TODO</div>
 }
 

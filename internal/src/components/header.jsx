@@ -1,12 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function Header({
-	isShowingBanner,
-	userName,
-	onClickAboutOrBannerLink,
-	onClickLogOut
-}) {
+export default function Header() {
 	return <div>Header @TODO</div>
 }
 

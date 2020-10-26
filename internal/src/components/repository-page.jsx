@@ -1,6 +1,6 @@
 import './repository-page.scss'
 
-import React, {useState, useCallback} from 'react'
+import React, { useState, useCallback } from 'react'
 import { useQuery, useQueryCache } from 'react-query'
 import { apiGetInstances } from '../util/api'
 import MyInstances from './my-instances'
@@ -13,19 +13,29 @@ const RepositoryPage = () => {
 		queryCache.invalidateQueries('getInstances')
 		setSelectedInstanceIndex(null)
 	}, null)
-	const { isError, data, error }  = useQuery('getInstances', apiGetInstances, {initialStale: true, staleTime: 0})
+	const { isError, data, error } = useQuery('getInstances', apiGetInstances, {
+		initialStale: true,
+		staleTime: 0
+	})
 	const [selectedInstanceIndex, setSelectedInstanceIndex] = useState(null)
 
 	if (isError) return <span>Error: {error.message}</span>
 
 	return (
-		<React.Fragment>
-		<Header />
-		<main>
-			<MyInstances instances={data} selectedInstanceIndex={selectedInstanceIndex} onSelect={row => setSelectedInstanceIndex(row) } onClickRefresh={() => reloadInstances()} />
-			<InstanceSection instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null} />
-		</main>
-		</React.Fragment>
+		<div className="repository">
+			<Header />
+			<main>
+				<MyInstances
+					instances={data}
+					selectedInstanceIndex={selectedInstanceIndex}
+					onSelect={row => setSelectedInstanceIndex(row)}
+					onClickRefresh={() => reloadInstances()}
+				/>
+				<InstanceSection
+					instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
+				/>
+			</main>
+		</div>
 	)
 }
 

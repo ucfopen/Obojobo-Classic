@@ -1,14 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DataGridAttemptsCell({
-	numAttemptsTaken,
-	numAdditionalAttemptsAdded,
-	numAttempts,
-	isAttemptInProgress,
-	onClickRemoveAdditionalAttempt,
-	onClickAddAdditionalAttempt
-}) {
+export default function DataGridAttemptsCell() {
 	return <div>@TODO</div>
 }
 

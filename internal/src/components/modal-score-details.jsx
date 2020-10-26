@@ -1,7 +1,7 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 
-export default function ModalScoreDetails({ onClick }) {
+export default function ModalScoreDetails() {
 	return <div>Skip this for now, not ready!</div>
 }
 

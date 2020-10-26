@@ -1,7 +1,13 @@
 .repository--data-grid {
-	padding: 0px;
-	margin: 0px;
-	border-spacing: 0px;
+	// @TODO: Move some of these colors to a global includes file
+	$color-row: #f2f2f2;
+	$color-hover: #e6edf6;
+	$color-selected: #ccdaeb;
+	$color-no-data: #cccccc;
+
+	padding: 0;
+	margin: 0;
+	border-spacing: 0;
 
 	td {
 		padding: 0.2em 0.4em;
@@ -9,16 +15,16 @@
 
 	tbody {
 		tr:nth-child(even) {
-			background-color: #f2f2f2;
+			background-color: $color-row;
 		}
 
 		tr.selected {
-			background-color: #ccdaeb;
+			background-color: $color-selected;
 		}
 
 		td.no-data {
 			text-align: center;
-			color: #ccc;
+			color: $color-no-data;
 		}
 	}
 
@@ -28,11 +34,11 @@
 		}
 
 		tr:hover {
-			background-color: #e6edf6;
+			background-color: $color-hover;
 		}
 
 		tr.selected:hover {
-			background-color: #ccdaeb;
+			background-color: $color-selected;
 		}
 	}
 }

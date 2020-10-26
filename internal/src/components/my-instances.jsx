@@ -8,9 +8,8 @@ export default function MyInstances({
 	instances,
 	selectedInstanceIndex,
 	onSelect,
-	onClickRefresh,
+	onClickRefresh
 }) {
-	console.log('myi', selectedInstanceIndex)
 	return (
 		<div>
 			<SearchField />

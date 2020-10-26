@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function SearchField({ value, placeholder, onChange }) {
+export default function SearchField() {
 	return <div>Search Field @TODO</div>
 }
 
