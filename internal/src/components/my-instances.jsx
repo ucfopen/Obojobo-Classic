@@ -4,12 +4,22 @@ import DataGridInstances from './data-grid-instances'
 import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 
-export default function MyInstances({ instances, onSelect, onClickRefresh }) {
+export default function MyInstances({
+	instances,
+	selectedInstanceIndex,
+	onSelect,
+	onClickRefresh,
+}) {
+	console.log('myi', selectedInstanceIndex)
 	return (
 		<div>
 			<SearchField />
 			<RefreshButton onClick={onClickRefresh} />
-			<DataGridInstances data={instances} onSelect={onSelect} />
+			<DataGridInstances
+				data={instances}
+				selectedIndex={selectedInstanceIndex}
+				onSelect={onSelect}
+			/>
 		</div>
 	)
 }
@@ -26,6 +36,7 @@ MyInstances.propTypes = {
 			})
 		),
 	]),
+	selectedInstanceIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired,
 }

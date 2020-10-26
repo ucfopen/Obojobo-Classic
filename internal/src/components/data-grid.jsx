@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import './data-grid.scss'
 
-const DataGrid = ({data, columns, onSelect}) => {
+const DataGrid = ({data, columns, selectedIndex, onSelect}) => {
 	const isLoading = data === null
 
 	// setup react-table
@@ -20,13 +20,6 @@ const DataGrid = ({data, columns, onSelect}) => {
 		rows,
 		prepareRow
 	} = instanceTable
-
-	// custom selected state
-	let selectedId
-	let setSelectedId
-	if(onSelect){
-		[selectedId, setSelectedId] = useState(null)
-	}
 
 	return (
 		<table {...getTableProps()} className={`repository--data-grid ${onSelect ? 'selectable' : ''}`}>
@@ -46,11 +39,12 @@ const DataGrid = ({data, columns, onSelect}) => {
 					? <tr><td className="no-data" colSpan={columns.length}>{isLoading ? 'loading...' : 'no data'}</td></tr>
 					: rows.map(row => {
 						prepareRow(row)
-						const className = row.id == selectedId ? 'selected' : ''
+						console.log('compare', row, selectedIndex)
+						const className = row.index == selectedIndex ? 'selected' : ''
 						const onClick = () => {
 							if(!onSelect) return
-							onSelect(row.original)
-							setSelectedId(row.id)
+							onSelect(row.index)
+							// setSelectedIndex(row.id)
 						}
 						return (
 						<tr {...row.getRowProps()} onClick={onClick} className={className}>
@@ -77,6 +71,7 @@ DataGrid.defaultProps = {
 DataGrid.propTypes = {
 	data: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
 	columns: PropTypes.arrayOf(PropTypes.object),
+	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired
 }
 

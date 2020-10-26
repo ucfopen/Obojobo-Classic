@@ -14,7 +14,7 @@ const columns = [
 	{accessor: 'attempts', Header: 'Attempts' , Cell: DataGridAttemptsCell}
 ]
 
-const DataGridAssessmentScores = ({data}) => <DataGrid data={data} columns={columns} />
+const DataGridAssessmentScores = ({data, selectedIndex, onSelect}) => <DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
 
 DataGridAssessmentScores.propTypes = {
 	data: PropTypes.arrayOf(PropTypes.shape({
@@ -30,7 +30,9 @@ DataGridAssessmentScores.propTypes = {
 			numAttempts: PropTypes.number.isRequired,
 			isAttemptInProgress: PropTypes.bool
 		})
-	}))
+	})),
+	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	onSelect: PropTypes.func.isRequired
 }
 
 export default DataGridAssessmentScores
