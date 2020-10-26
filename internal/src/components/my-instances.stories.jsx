@@ -6,21 +6,21 @@ export default {
 	component: MyInstances,
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <MyInstances {...args} />
+const Template = args => <MyInstances {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
-	instances: null,
+	instances: null
 }
 
 export const NoData = Template.bind({})
 NoData.args = {
-	instances: [],
+	instances: []
 }
 
 export const Data = Template.bind({})
@@ -43,7 +43,7 @@ Data.args = {
 			courseData: { type: 'none' },
 			externalLink: null,
 			originalID: 0,
-			_explicitType: 'obo\\lo\\InstanceData',
+			_explicitType: 'obo\\lo\\InstanceData'
 		},
 		{
 			instID: '5205',
@@ -62,7 +62,7 @@ Data.args = {
 			courseData: { type: 'none' },
 			externalLink: 'canvas',
 			originalID: 0,
-			_explicitType: 'obo\\lo\\InstanceData',
-		},
-	],
+			_explicitType: 'obo\\lo\\InstanceData'
+		}
+	]
 }

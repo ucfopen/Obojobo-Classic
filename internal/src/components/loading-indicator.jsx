@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const LoadingIndicator =  ({isLoading = false}) => {
-	if(isLoading) {
+const LoadingIndicator = ({ isLoading = false }) => {
+	if (isLoading) {
 		return <div>Loading... (@TODO, Replace with graphic)</div>
 	}
 

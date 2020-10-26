@@ -12,7 +12,7 @@ export default function ModalInstanceDetails({
 	scoringMethod,
 	isImportAllowed,
 	onCancel,
-	onSave,
+	onSave
 }) {
 	return <div>@TODO</div>
 }
@@ -24,7 +24,7 @@ ModalInstanceDetails.defaultProps = {
 	endDate: null,
 	numAttempts: 1,
 	scoringMethod: 'highest',
-	isImportAllowed: true,
+	isImportAllowed: true
 }
 
 ModalInstanceDetails.propTypes = {
@@ -38,5 +38,5 @@ ModalInstanceDetails.propTypes = {
 	endDate: PropTypes.oneOfType([null, PropTypes.instanceOf(Date)]),
 	numAttempts: PropTypes.number,
 	scoringMethod: PropTypes.oneOf(['highest', 'average', 'last']),
-	isImportAllowed: PropTypes.bool,
+	isImportAllowed: PropTypes.bool
 }

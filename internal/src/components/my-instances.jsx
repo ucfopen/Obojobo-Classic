@@ -32,11 +32,11 @@ MyInstances.propTypes = {
 				name: PropTypes.string.isRequired,
 				courseID: PropTypes.string.isRequired,
 				startTime: PropTypes.string.isRequired,
-				endTime: PropTypes.string.isRequired,
+				endTime: PropTypes.string.isRequired
 			})
-		),
+		)
 	]),
 	selectedInstanceIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired,
-	onClickRefresh: PropTypes.func.isRequired,
+	onClickRefresh: PropTypes.func.isRequired
 }

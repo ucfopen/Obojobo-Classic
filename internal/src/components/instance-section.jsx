@@ -8,5 +8,5 @@ export default function InstanceSection({ instance }) {
 }
 
 InstanceSection.propTypes = {
-	instance: PropTypes.oneOfType([null, PropTypes.object]),
+	instance: PropTypes.oneOfType([null, PropTypes.object])
 }

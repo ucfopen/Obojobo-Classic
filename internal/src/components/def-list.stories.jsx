@@ -7,26 +7,26 @@ export default {
 	title: 'DefList',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DefList {...args} />
+const Template = args => <DefList {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
 	items: [
 		{
 			label: 'Favorite Color',
-			value: 'Red',
+			value: 'Red'
 		},
 		{
 			label: 'Pancakes or Waffles?',
-			value: 'Waffles',
+			value: 'Waffles'
 		},
 		{
-			value: 'This line has no label!',
-		},
-	],
+			value: 'This line has no label!'
+		}
+	]
 }

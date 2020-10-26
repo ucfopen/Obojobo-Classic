@@ -6,16 +6,16 @@ export default {
 	component: InstanceSection,
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <InstanceSection {...args} />
+const Template = args => <InstanceSection {...args} />
 
 export const NothingSelected = Template.bind({})
 NothingSelected.args = {
-	instance: null,
+	instance: null
 }
 
 export const Example = Template.bind({})
@@ -37,6 +37,6 @@ Example.args = {
 		courseData: { type: 'none' },
 		externalLink: null,
 		originalID: 0,
-		_explicitType: 'obo\\lo\\InstanceData',
-	},
+		_explicitType: 'obo\\lo\\InstanceData'
+	}
 }

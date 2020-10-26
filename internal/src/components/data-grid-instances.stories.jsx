@@ -7,30 +7,30 @@ export default {
 	argTypes: {
 		onSelect: {
 			description:
-				'callback for when a selection is made. arg is all the data from the selected index',
+				'callback for when a selection is made. arg is all the data from the selected index'
 		},
 		data: {
 			description:
-				'If null then the data is loading and the DataGridInstances will be in a loading state. Otherwise this is the data source of the items in the list.',
-		},
+				'If null then the data is loading and the DataGridInstances will be in a loading state. Otherwise this is the data source of the items in the list.'
+		}
 	},
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DataGridInstances {...args} />
+const Template = args => <DataGridInstances {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
-	data: null,
+	data: null
 }
 
 export const NoData = Template.bind({})
 NoData.args = {
-	data: [],
+	data: []
 }
 
 export const Data = Template.bind({})
@@ -53,7 +53,7 @@ Data.args = {
 			courseData: { type: 'none' },
 			externalLink: null,
 			originalID: 0,
-			_explicitType: 'obo\\lo\\InstanceData',
+			_explicitType: 'obo\\lo\\InstanceData'
 		},
 		{
 			instID: '5205',
@@ -72,7 +72,7 @@ Data.args = {
 			courseData: { type: 'none' },
 			externalLink: 'canvas',
 			originalID: 0,
-			_explicitType: 'obo\\lo\\InstanceData',
-		},
-	],
+			_explicitType: 'obo\\lo\\InstanceData'
+		}
+	]
 }

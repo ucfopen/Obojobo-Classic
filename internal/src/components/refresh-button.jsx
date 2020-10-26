@@ -6,5 +6,5 @@ export default function RefreshButton({ onClick }) {
 }
 
 RefreshButton.propTypes = {
-	onClick: PropTypes.func.isRequired,
+	onClick: PropTypes.func.isRequired
 }

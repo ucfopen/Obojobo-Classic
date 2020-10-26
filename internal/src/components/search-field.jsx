@@ -6,11 +6,11 @@ export default function SearchField({ value, placeholder, onChange }) {
 }
 
 SearchField.defaultProps = {
-	value: '',
+	value: ''
 }
 
 SearchField.propTypes = {
 	value: PropTypes.string,
 	placeholder: PropTypes.string.isRequired,
-	onChange: PropTypes.func.isRequired,
+	onChange: PropTypes.func.isRequired
 }

@@ -6,7 +6,7 @@ export default function AssessmentScoresSummary({ scores }) {
 }
 
 AssessmentScoresSummary.propTypes = {
-	scores: PropTypes.arrayOf(PropTypes.number).isRequired,
+	scores: PropTypes.arrayOf(PropTypes.number).isRequired
 }
 
 // AssessmentScoresSummary.propTypes = {

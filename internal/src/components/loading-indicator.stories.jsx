@@ -7,19 +7,19 @@ export default {
 	title: 'LoadingIndicator',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <LoadingIndicator {...args} />
+const Template = args => <LoadingIndicator {...args} />
 
 export const Blank = Template.bind({})
 Blank.args = {
-	isLoading: false,
+	isLoading: false
 }
 
 export const Loading = Template.bind({})
 Loading.args = {
-	isLoading: true,
+	isLoading: true
 }

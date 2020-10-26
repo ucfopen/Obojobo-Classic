@@ -1,4 +1,3 @@
-
 const glob = require('glob')
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -15,7 +14,7 @@ const entry = {}
 const jsPath = path.join(__dirname)
 glob.sync(path.join(jsPath, '*.js')).forEach(file => {
 	// locates all `./*.js` files
-	if(file.endsWith('webpack.config.js')) return
+	if (file.endsWith('webpack.config.js')) return
 	entry[path.basename(file, '.js')] = file
 })
 
@@ -44,8 +43,7 @@ module.exports =
 						'/internal/vendor/',
 						'/internal/logs',
 						'/internal/includes',
-						'/assets',
-
+						'/assets'
 					]
 				},
 				stats: { children: false, modules: false },
@@ -99,9 +97,12 @@ module.exports =
 									postcssOptions: {
 										plugins: [
 											[
-												'autoprefixer', {/* Options */}
-											],
-										],
+												'autoprefixer',
+												{
+													/* Options */
+												}
+											]
+										]
 									}
 								}
 							},
@@ -118,14 +119,14 @@ module.exports =
 			},
 			externals: {
 				react: 'React',
-				'react-dom': 'ReactDOM',
+				'react-dom': 'ReactDOM'
 			},
 			plugins: [
 				// new WatchIgnorePlugin([
 				// 	path.join(__dirname, 'server', 'public', 'compiled', 'manifest.json')
 				// ]),
 				new CleanWebpackPlugin(), // clear the dist folder before build
-				new MiniCssExtractPlugin({ filename: `${filename}.css` }),
+				new MiniCssExtractPlugin({ filename: `${filename}.css` })
 				// new ManifestPlugin({ publicPath: '/static/' })
 			],
 			resolve: {

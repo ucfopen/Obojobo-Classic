@@ -7,27 +7,27 @@ export default {
 	title: 'DataGridStudentScoreCell',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <DataGridStudentScoreCell {...args} />
+const Template = args => <DataGridStudentScoreCell {...args} />
 
 export const InProgressScore = Template.bind({})
 InProgressScore.args = {
 	value: null,
-	isScoreImported: false,
+	isScoreImported: false
 }
 
 export const Score = Template.bind({})
 Score.args = {
 	value: 77,
-	isScoreImported: false,
+	isScoreImported: false
 }
 
 export const ImportedScore = Template.bind({})
 ImportedScore.args = {
 	value: 100,
-	isScoreImported: true,
+	isScoreImported: true
 }

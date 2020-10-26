@@ -7,13 +7,13 @@ export default function DataGridAttemptsCell({
 	numAttempts,
 	isAttemptInProgress,
 	onClickRemoveAdditionalAttempt,
-	onClickAddAdditionalAttempt,
+	onClickAddAdditionalAttempt
 }) {
 	return <div>@TODO</div>
 }
 
 DataGridAttemptsCell.defaultProps = {
-	isAttemptInProgress: false,
+	isAttemptInProgress: false
 }
 
 DataGridAttemptsCell.propTypes = {
@@ -22,5 +22,5 @@ DataGridAttemptsCell.propTypes = {
 	numAttempts: PropTypes.number.isRequired,
 	isAttemptInProgress: PropTypes.bool.isRequired,
 	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
-	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
+	onClickAddAdditionalAttempt: PropTypes.func.isRequired
 }

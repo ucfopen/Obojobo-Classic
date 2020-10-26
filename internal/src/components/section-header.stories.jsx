@@ -7,14 +7,14 @@ export default {
 	title: 'SectionHeader',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <SectionHeader {...args} />
+const Template = args => <SectionHeader {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
-	label: 'Details',
+	label: 'Details'
 }

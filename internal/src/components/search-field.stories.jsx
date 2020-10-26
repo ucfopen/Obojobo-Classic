@@ -7,20 +7,20 @@ export default {
 	title: 'SearchField',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <SearchField {...args} />
+const Template = args => <SearchField {...args} />
 
 export const Empty = Template.bind({})
 Empty.args = {
-	placeholder: 'Example placeholder',
+	placeholder: 'Example placeholder'
 }
 
 export const NonEmpty = Template.bind({})
 NonEmpty.args = {
 	placeholder: 'Find a basketball player...',
-	value: 'Scottie Pippen',
+	value: 'Scottie Pippen'
 }

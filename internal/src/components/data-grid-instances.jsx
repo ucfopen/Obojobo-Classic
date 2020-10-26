@@ -1,13 +1,13 @@
 import React from 'react'
 import DataGrid from './data-grid'
 import DataGridTimestampCell from './data-grid-timestamp-cell'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 const columns = [
-	{accessor: 'name', Header: 'Title'},
-	{accessor: 'courseID', Header: 'Course' },
-	{accessor: 'startTime', Header: 'Start', Cell: DataGridTimestampCell},
-	{accessor: 'endTime', Header: 'End' , Cell: DataGridTimestampCell}
+	{ accessor: 'name', Header: 'Title' },
+	{ accessor: 'courseID', Header: 'Course' },
+	{ accessor: 'startTime', Header: 'Start', Cell: DataGridTimestampCell },
+	{ accessor: 'endTime', Header: 'End', Cell: DataGridTimestampCell }
 ]
 
 const DataGridInstances = ({data, selectedIndex, onSelect}) => <DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />

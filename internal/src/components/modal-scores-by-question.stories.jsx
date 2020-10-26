@@ -7,12 +7,12 @@ export default {
 	title: 'ModalScoresByQuestion',
 	parameters: {
 		controls: {
-			expanded: true,
-		},
-	},
+			expanded: true
+		}
+	}
 }
 
-const Template = (args) => <ModalScoresByQuestion {...args} />
+const Template = args => <ModalScoresByQuestion {...args} />
 
 export const Example = Template.bind({})
 Example.args = {}

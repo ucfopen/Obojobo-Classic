@@ -6,10 +6,10 @@ export default function DataGridStudentScoreCell({ value, isScoreImported }) {
 }
 
 DataGridStudentScoreCell.defaultProps = {
-	isScoreImported: false,
+	isScoreImported: false
 }
 
 DataGridStudentScoreCell.propTypes = {
 	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired,
-	isScoreImported: PropTypes.bool.isRequired,
+	isScoreImported: PropTypes.bool.isRequired
 }
