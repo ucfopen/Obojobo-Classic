@@ -4,6 +4,8 @@ if (empty($argv[1]))
 	print("Missing username\r\n");
 	print("ex: php update_password.php <username>\r\n");
 	print("ex: php update_password.php obojobo_admin\r\n");
+	print("ex: php update_password.php <username> <new_password>\r\n");
+	print("ex: php update_password.php obojobo_admin my-new-password\r\n");
 	exit(1);
 }
 
@@ -17,6 +19,11 @@ if( ! ($r = $DBM->fetch_obj($q)))
 }
 
 $password = substr(md5(uniqid()), 15);
+if(!empty($argv[2]))
+{
+	$password = $argv[2];
+}
+
 exec("php ".__DIR__."/generate_password.php {$r->userID} $password --return-query", $queries);
 
 foreach ($queries as $query)

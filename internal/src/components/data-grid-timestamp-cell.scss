@@ -1,0 +1,28 @@
+.repository--date-time-cell {
+	text-align: left;
+
+	.time {
+		opacity: 0.65;
+	}
+
+	&.is-display-horizontal {
+		.day::after {
+			content: ' at ';
+			opacity: 0.65;
+		}
+	}
+
+	&.is-display-vertical {
+		span {
+			display: block;
+		}
+
+		.time {
+			font-size: 0.9em;
+		}
+	}
+
+	&.is-display-blank {
+		opacity: 0.65;
+	}
+}

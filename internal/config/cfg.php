@@ -27,6 +27,8 @@ class AppCfgDefault
 	// set the default environment
 	const ENVIRONMENT = 'prod';
 
+	const IS_DEV_DOCKER = false;
+
 	//--------------------   DIRECTORYS & PATHS  -----------------------//
 	// Define output of all php errors
 	const DIR_LOGS = 'internal/logs/';

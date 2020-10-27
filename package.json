@@ -1,0 +1,148 @@
+{
+  "name": "Obojobo-Classic",
+  "version": "3.0.0-alpha1",
+  "description": "Obojobo Classic - UCF's Learning Object Repository",
+  "main": "index.js",
+  "repository": "https://github.com/ucfopen/Obojobo-Classic.git",
+  "author": "UCF Center for Distributed Learning",
+  "license": "AGPL-3.0-only",
+  "private": false,
+  "prettier": "obojobo-lib-utils/prettier.config.js",
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@babel/polyfill": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/runtime": "^7.11.2",
+    "@storybook/addon-actions": "^6.0.26",
+    "@storybook/addon-essentials": "^6.0.26",
+    "@storybook/addon-links": "^6.0.26",
+    "@storybook/react": "^6.0.26",
+    "autoprefixer": "^10.0.1",
+    "babel-core": "^7.0.0-bridge",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.5.3",
+    "eslint": "^6.8.0",
+    "eslint-config-obojobo": "^11.1.0",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.4.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
+    "postcss": "^8.1.1",
+    "postcss-loader": "^4.0.4",
+    "prettier": "1.18.2",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.2.1",
+    "stylelint": "13.7.2",
+    "stylelint-config-obojobo": "^11.1.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-declaration-use-variable": "^1.7.2",
+    "svg-url-loader": "^6.0.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "obojobo-lib-utils": "^11.1.0",
+    "react-query": "^2.23.1",
+    "react-query-devtools": "^2.6.0",
+    "react-table": "^7.6.0"
+  },
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "build": "webpack --config internal/src/webpack.config.js -p",
+    "dev": "webpack-dev-server --config internal/src/webpack.config.js",
+    "lint": "yarn lint:js && yarn lint:css",
+    "lint:js": "eslint internal/src/**/*.{js,jsx}",
+    "lint:css": "stylelint internal/src/**/*.scss",
+    "prettier:run": "prettier --write 'internal/src/**/*.{js,jsx,scss}'",
+    "precommit": "lint-staged"
+  },
+	"husky": {
+		"hooks": {
+			"pre-commit": "yarn precommit"
+		}
+	},
+  "lint-staged": {
+    "internal/src/**/*.scss": [
+      "stylelint"
+    ],
+    "internal/src/**/*.{js,jsx}": [
+      "eslint"
+    ],
+    "internal/src/**/*.{js,jsx,scss}": [
+      "prettier --write"
+    ]
+  },
+  "notes": "replace eslintConfig.extends eslint-config-obojobo once https://github.com/ucfopen/Obojobo/pull/1603 is merged in",
+  "eslintConfig": {
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "settings": {
+      "react": {
+        "version": "16.13.1"
+      }
+    },
+    "parser": "babel-eslint",
+    "globals": {
+      "document": true,
+      "mockStaticDate": false,
+      "mockVirtual": false,
+      "oboRequire": false,
+      "validUUID": false,
+      "window": true,
+      "fetch": false
+    },
+    "env": {
+      "amd": true,
+      "es6": true,
+      "jest": true,
+      "node": true
+    },
+    "rules": {
+      "array-callback-return": "error",
+      "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+      "curly": ["error", "multi-line"],
+      "eqeqeq": "error",
+      "new-cap": ["error", { "capIsNewExceptions": ["express.Router"] }],
+      "no-alert": "error",
+      "no-console": "error",
+      "no-debugger": "error",
+      "no-duplicate-imports": "error",
+      "no-eval": "error",
+      "no-extend-native": "error",
+      "no-floating-decimal": "error",
+      "no-implied-eval": "error",
+      "no-labels": "error",
+      "no-lonely-if": "error",
+      "no-loop-func": "error",
+      "no-nested-ternary": "error",
+      "no-new": "error",
+      "no-new-func": "error",
+      "no-new-wrappers": "error",
+      "no-return-assign": "error",
+      "no-self-compare": "error",
+      "no-undefined": "error",
+      "no-unneeded-ternary": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+      "no-useless-return": "error",
+      "no-var": "error",
+      "no-with": "error",
+      "prefer-const": "error",
+      "radix": "error",
+      "react/prop-types": 0,
+      "yoda": "error"
+    }
+  },
+  "stylelint": {
+    "extends": "stylelint-config-obojobo",
+    "ignoreFiles": [
+      "*.js",
+      "*.jsx"
+    ]
+  }
+}

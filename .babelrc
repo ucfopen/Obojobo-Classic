@@ -1,0 +1,18 @@
+{
+	"presets": [
+		"@babel/preset-react",
+		[
+			"@babel/preset-env",
+			{
+				useBuiltIns: "usage",
+				corejs: 3,
+				debug: false, // outputs polyfills and browserlist
+				// targets: 'defaults' // allows .browserslistrc to work
+			},
+		]
+	],
+	"plugins": [
+		["@babel/transform-runtime"],
+		["babel-plugin-react-docgen"] // needed for storybooks to pick up react prop types
+	]
+}

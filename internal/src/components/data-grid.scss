@@ -1,0 +1,44 @@
+.repository--data-grid {
+	// @TODO: Move some of these colors to a global includes file
+	$color-row: #f2f2f2;
+	$color-hover: #e6edf6;
+	$color-selected: #ccdaeb;
+	$color-no-data: #cccccc;
+
+	padding: 0;
+	margin: 0;
+	border-spacing: 0;
+
+	td {
+		padding: 0.2em 0.4em;
+	}
+
+	tbody {
+		tr:nth-child(even) {
+			background-color: $color-row;
+		}
+
+		tr.selected {
+			background-color: $color-selected;
+		}
+
+		td.no-data {
+			text-align: center;
+			color: $color-no-data;
+		}
+	}
+
+	&.selectable tbody {
+		tr {
+			cursor: pointer;
+		}
+
+		tr:hover {
+			background-color: $color-hover;
+		}
+
+		tr.selected:hover {
+			background-color: $color-selected;
+		}
+	}
+}
