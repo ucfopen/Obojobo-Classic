@@ -1,0 +1,80 @@
+.obo-header {
+	// @TODO: Move some of these colors to a global includes file
+	$color-pinkish-purple: #f5cbe6;
+	$color-purple: #950b5c;
+	$color-white: #ffffff;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	> .obo-header--left-side {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		> .obo-classic-logo {
+			width: 8em;
+		}
+
+		> button {
+			margin-left: 0.3em;
+		}
+	}
+
+	> .banner-header {
+		background-color: $color-purple;
+		border-radius: 50px;
+		padding: 0.4em 1em;
+		color: $color-pinkish-purple;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		> button {
+			border: none;
+			background: transparent;
+			color: $color-white;
+
+			&:hover {
+				cursor: pointer;
+			}
+		}
+
+		> .banner-header--modal-button {
+			font-weight: bold;
+			text-decoration: underline;
+			margin: 0 0.4em;
+		}
+
+		> .banner-header--close-button {
+			color: $color-pinkish-purple;
+			font-size: 0.6em;
+		}
+	}
+
+	> .obo-header--right-side {
+		text-align: right;
+
+		> p {
+			margin: 0.2em 0;
+		}
+	}
+}
+
+.header-btn {
+	// @TODO: Move some of these colors to a global includes file
+	$color-blue-button: #4471b3;
+	$color-dark-blue-button: #295595;
+
+	color: $color-blue-button;
+	text-decoration: underline;
+	border: none;
+	background: transparent;
+	margin: 0;
+
+	&:hover {
+		cursor: pointer;
+		color: $color-dark-blue-button;
+	}
+}

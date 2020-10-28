@@ -28,6 +28,7 @@
     "css-loader": "^3.5.3",
     "eslint": "^6.8.0",
     "eslint-config-obojobo": "^11.1.0",
+    "file-loader": "^6.2.0",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
     "mini-css-extract-plugin": "^0.9.0",
@@ -63,11 +64,11 @@
     "prettier:run": "prettier --write 'internal/src/**/*.{js,jsx,scss}'",
     "precommit": "lint-staged"
   },
-	"husky": {
-		"hooks": {
-			"pre-commit": "yarn precommit"
-		}
-	},
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn precommit"
+    }
+  },
   "lint-staged": {
     "internal/src/**/*.scss": [
       "stylelint"
@@ -81,7 +82,10 @@
   },
   "notes": "replace eslintConfig.extends eslint-config-obojobo once https://github.com/ucfopen/Obojobo/pull/1603 is merged in",
   "eslintConfig": {
-    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
     "settings": {
       "react": {
         "version": "16.13.1"
@@ -105,10 +109,26 @@
     },
     "rules": {
       "array-callback-return": "error",
-      "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
-      "curly": ["error", "multi-line"],
+      "brace-style": [
+        "error",
+        "1tbs",
+        {
+          "allowSingleLine": true
+        }
+      ],
+      "curly": [
+        "error",
+        "multi-line"
+      ],
       "eqeqeq": "error",
-      "new-cap": ["error", { "capIsNewExceptions": ["express.Router"] }],
+      "new-cap": [
+        "error",
+        {
+          "capIsNewExceptions": [
+            "express.Router"
+          ]
+        }
+      ],
       "no-alert": "error",
       "no-console": "error",
       "no-debugger": "error",
@@ -128,7 +148,12 @@
       "no-self-compare": "error",
       "no-undefined": "error",
       "no-unneeded-ternary": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+      "no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "next"
+        }
+      ],
       "no-useless-return": "error",
       "no-var": "error",
       "no-with": "error",
