@@ -1,0 +1,28 @@
+.search-field-wrapper {
+	$color-border: #e7e7e7;
+	$color-font: #adacad;
+	$color-white: #ffffff;
+
+	position: relative;
+
+	> .magnifier-icon {
+		background-image: url('../../../assets/images/viewer/magnifier-icon.svg');
+		background-repeat: no-repeat;
+		display: inline-block;
+		width: 1em;
+		height: 1em;
+		position: absolute;
+		left: 0.7em;
+		top: 0.5em;
+	}
+
+	> .search-field {
+		// Obo's standard font will need to be set again here as soon as the global
+		// include file is created.
+		border-radius: 30px;
+		color: $color-font;
+		border: 2px solid $color-border;
+		padding: 0.4em 0.4em 0.4em 2em;
+		width: 15em;
+	}
+}
