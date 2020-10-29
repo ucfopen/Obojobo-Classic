@@ -1,0 +1,15 @@
+$color-white: white;
+$button-size: 2em;
+
+.refresh-button {
+	background-image: url(../../../assets/images/viewer/refresh.svg);
+	width: $button-size;
+	height: $button-size;
+	border: 1px solid #bbbbbb;
+	border-radius: 50%;
+	background-size: 1.3em;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: $color-white;
+	background-origin: content-box;
+}
