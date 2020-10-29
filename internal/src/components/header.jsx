@@ -3,7 +3,7 @@ import './header.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ObojoboLogo from '../../../assets/images/viewer/obojobo-logo.png'
+import ObojoboLogo from '../../../assets/images/viewer/obojobo-logo.svg'
 
 export default function Header(props) {
 	return (
