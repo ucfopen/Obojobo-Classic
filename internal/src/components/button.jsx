@@ -12,7 +12,7 @@ const Button = ({ text, type, onClick }) => (
 Button.propTypes = {
 	text: PropTypes.string,
 	onClick: PropTypes.func,
-	type: PropTypes.oneOf(['text', 'small', 'large', 'alt']).isRequired
+	type: PropTypes.oneOf(['text', 'text-bold', 'small', 'large', 'alt']).isRequired
 }
 
 export default Button
