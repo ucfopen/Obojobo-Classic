@@ -1,8 +1,18 @@
+import './def-list.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DefList() {
-	return <div>@TODO</div>
+export default function DefList(props) {
+	return (
+		<div className="def-list">
+			{props.items.map(item => (
+				<div className="row" key={item.label}>
+					<p className="label">{item.label}</p>
+					<p className="value">{item.value}</p>
+				</div>
+			))}
+		</div>
+	)
 }
 
 DefList.defaultProps = {}
