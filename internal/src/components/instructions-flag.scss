@@ -1,0 +1,47 @@
+$default-font: 'Lato', arial;
+$border-color: #b6b6b6;
+$font-color: #757575;
+
+.instructions-flag {
+	margin: 1em;
+
+	.label {
+		font-family: $default-font;
+		font-weight: bold;
+		color: $font-color;
+		position: relative;
+		margin: 0;
+		line-height: 1.9em;
+		border: 1px solid $border-color;
+		border-radius: 0 4px 4px 0;
+		border-left: none;
+		padding: 0 2em 0 0.8em;
+		display: inline-block;
+
+		&::after,
+		&::before {
+			content: '';
+			width: 0;
+			height: 0;
+			right: 100%;
+			position: absolute;
+			border-style: solid;
+		}
+
+		&::after {
+			z-index: 1;
+			top: -1px; // stylelint-disable-line
+			border-width: 1.02em;
+			// stylelint-disable-next-line
+			border-color: transparent lighten($border-color, 10%) transparent transparent;
+		}
+
+		&::before {
+			z-index: 2;
+			top: 1px; // stylelint-disable-line
+			border-width: 0.9em;
+			// stylelint-disable-next-line
+			border-color: transparent white transparent transparent;
+		}
+	}
+}
