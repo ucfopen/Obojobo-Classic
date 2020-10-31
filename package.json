@@ -48,6 +48,8 @@
   },
   "dependencies": {
     "@svgr/webpack": "^5.4.0",
+    "dayjs": "^1.9.4",
+    "humanize-duration": "^3.24.0",
     "obojobo-lib-utils": "^11.1.0",
     "react-query": "^2.23.1",
     "react-query-devtools": "^2.6.0",
