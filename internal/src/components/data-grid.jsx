@@ -1,19 +1,25 @@
 /* eslint-disable react/jsx-key */
 
 import React from 'react'
-import { useTable } from 'react-table'
+import { useTable, useSortBy } from 'react-table'
 import PropTypes from 'prop-types'
+import CaretUp from '../../../assets/images/viewer/caret-up.svg'
+import CaretDown from '../../../assets/images/viewer/caret-down.svg'
 
 import './data-grid.scss'
+import LoadingIndicator from './loading-indicator'
 
 const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 	const isLoading = data === null
 
 	// setup react-table
-	const instanceTable = useTable({
-		columns,
-		data: data || []
-	})
+	const instanceTable = useTable(
+		{
+			columns,
+			data: data || []
+		},
+		useSortBy
+	)
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
@@ -23,7 +29,11 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 				{headerGroups.map(headerGroup => (
 					<tr {...headerGroup.getHeaderGroupProps()}>
 						{headerGroup.headers.map(column => (
-							<th {...column.getHeaderProps()}>{column.render('Header')}</th>
+							<th {...column.getHeaderProps(column.getSortByToggleProps())}>
+								{column.render('Header')}
+								{column.isSorted && column.isSortedDesc ? <CaretUp /> : null}
+								{column.isSorted && !column.isSortedDesc ? <CaretDown /> : null}
+							</th>
 						))}
 					</tr>
 				))}
@@ -32,7 +42,7 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 				{isLoading || !rows.length ? (
 					<tr>
 						<td className="no-data" colSpan={columns.length}>
-							{isLoading ? 'loading...' : 'no data'}
+							{isLoading ? <LoadingIndicator isLoading={true} /> : 'No data'}
 						</td>
 					</tr>
 				) : (

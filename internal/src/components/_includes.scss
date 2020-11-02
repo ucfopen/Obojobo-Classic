@@ -1,0 +1,170 @@
+$color-action: #6714bd;
+$color-button-bg: lighten($color-action, 9%);
+$color-action-minor: desaturate(lighten($color-action, 30%), 40%);
+$color-error: #990000;
+$color-dangerous: #d40000;
+$color-dangerous-minor: desaturate($color-dangerous, 20%);
+$color-text: #000000;
+$color-text-minor: lighten($color-text, 40%);
+$color-text-subheading: #a20e83;
+$color-bg: #ffffff;
+$color-shadow: rgba(0, 0, 0, 0.3);
+$color-shadow-light: rgba(0, 0, 0, 0.1);
+$color-highlight: #93c6ff;
+$color-bg2: #f4f4f4;
+$color-bg3: #131313;
+$color-action-bg: #f9f4ff;
+$color-correct: #38ae24;
+$color-partially-correct: lighten($color-correct, 20%);
+$color-incorrect: #c21f00;
+$color-alt-correct: #ffc802;
+$color-unchosen-correct: #808080;
+$color-transparent: rgba(0, 0, 0, 0);
+$color-browser-focus: #5991ca;
+$color-comment: #ffd400;
+$color-preview: #0d4fa7;
+$color-reward: #ffe65d;
+$color-reward-text: #947d00;
+$color-obojobo-blue: #0d4fa7;
+$color-preview: #af1b5c;
+
+$box-shadow-focus: 0 0 3px 3px $color-browser-focus; /* stylelint-disable-line unit-disallowed-list */
+$box-shadow-overlay: 0 2px 2px $color-shadow; /* stylelint-disable-line unit-disallowed-list */
+
+$duration-animation-default: 0.2s;
+
+// default for obobjobo
+// in documents: headers, buttons, dialogs
+/* stylelint-disable-next-line value-keyword-case */
+$font-default: 'Lato', 'Libre Franklin', Arial, sans-serif;
+
+// use for larger blocks of text
+// in a document: all content
+$font-text: 'Noto Serif', serif;
+
+// math or code text
+$font-monospace: 'Roboto Mono', monospace;
+
+$font-size: 12pt;
+
+$dimension-column-width: 44em;
+$dimension-padding: 3em;
+$dimension-editor: $dimension-column-width + 3em + 3em;
+$dimension-toolbar-height: 2.7em;
+$dimension-nav-menu: 18rem;
+$dimension-nav-menu-small: 14rem;
+$dimension-nav-menu-xsmall: 10rem;
+$dimension-prev-next-button-height: 6.5rem;
+$dimension-rounded-radius: 0.25em;
+$dimension-header-padding: 1rem;
+$dimension-preview-banner: 3rem;
+$dimension-review-answer-flag-padding: 0.2em;
+
+$breakpoint-nav-small: 1000px; /* stylelint-disable-line unit-blacklist */
+
+$z-index-above-content: 999;
+$z-index-above-most: 9999;
+$z-index-above-all: 99999;
+$z-index-preview: 999999;
+
+@mixin pad($scalePercent: 1) {
+	padding-left: $dimension-padding * $scalePercent;
+	padding-right: $dimension-padding * $scalePercent;
+}
+
+@mixin placeholder($height) {
+	$color-placeholder-text: transparentize($color-text, 0.5);
+
+	background: $color-bg2;
+	box-sizing: border-box;
+	color: $color-placeholder-text;
+	font-family: $font-default;
+	font-size: 1rem;
+	font-weight: bold;
+	height: $height;
+	line-height: 0;
+	padding-top: $height / 2;
+	text-align: center;
+}
+
+@mixin text-input() {
+	font-family: $font-monospace;
+	border-radius: $dimension-rounded-radius;
+	font-size: 0.8em;
+	padding: 0.4em;
+	border: 1px solid $color-shadow;
+	min-height: 1.5em;
+	position: relative;
+	top: 0.05em;
+}
+
+@mixin select-input() {
+	font-family: $font-default;
+	border-radius: $dimension-rounded-radius;
+	font-size: 0.7em;
+	background-color: $color-bg;
+	padding: 0.7em 2em 0.7em 0.5em;
+	appearance: none;
+	//stylelint-disable-next-line declaration-colon-newline-after, value-list-comma-newline-after
+	background-image: linear-gradient(45deg, transparent 50%, gray 50%),
+		linear-gradient(135deg, gray 50%, transparent 50%);
+	//stylelint-disable-next-line declaration-colon-newline-after, value-list-comma-newline-after
+	background-position: calc(100% - 1.5em) 1.1em, calc(100% - 1.1em) 1.1em, calc(100% - 2.5em) 0.5em;
+	background-size: 0.4em 0.4em, 0.4em 0.4em, 0.1em 1.5em;
+	background-repeat: no-repeat;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	background: $color-bg;
+}
+
+body {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	-webkit-overflow-scrolling: touch;
+	font-size: $font-size;
+	font-family: $font-default;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: $font-default;
+	font-weight: normal;
+	margin: 0;
+}
+
+h1 {
+	line-height: 1em;
+	font-weight: 700;
+
+	b,
+	strong {
+		font-weight: 900;
+	}
+}
+
+h2 {
+	line-height: 1em;
+	color: $color-text-subheading;
+	font-size: 1.5em;
+}
+
+pre,
+textarea {
+	font-family: $font-monospace;
+	font-size: 1em;
+	letter-spacing: -0.01em;
+}
+
+a {
+	text-decoration-skip-ink: auto;
+	color: $color-action;
+}
