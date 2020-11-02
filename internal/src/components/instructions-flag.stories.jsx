@@ -1,6 +1,6 @@
 import React from 'react'
 
-import InstructionsFlag from './instruction-flag'
+import InstructionsFlag from './instructions-flag'
 
 export default {
 	component: InstructionsFlag,
@@ -16,5 +16,5 @@ const Template = args => <InstructionsFlag {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
-	label: 'This is an example'
+	text: 'Here is some example text'
 }
