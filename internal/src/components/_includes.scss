@@ -15,6 +15,7 @@ $color-bg2: #f4f4f4;
 $color-bg3: #131313;
 $color-action-bg: #f9f4ff;
 $color-correct: #38ae24;
+$color-partially-correct: lighten($color-correct, 20%);
 $color-incorrect: #c21f00;
 $color-alt-correct: #ffc802;
 $color-unchosen-correct: #808080;
