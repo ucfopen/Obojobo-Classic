@@ -1,16 +1,50 @@
+@import './includes';
+
 .repository--data-grid {
 	// @TODO: Move some of these colors to a global includes file
 	$color-row: #f2f2f2;
 	$color-hover: #e6edf6;
 	$color-selected: #ccdaeb;
 	$color-no-data: #cccccc;
+	$color-header: #f2eef5;
+	$color-header-hover: darken($color-header, 8%);
+	$color-border: #e2e2e2;
 
 	padding: 0;
 	margin: 0;
 	border-spacing: 0;
+	width: 100%;
+	border-collapse: collapse;
+	font-family: $font-default;
+
+	table,
+	td,
+	th {
+		border: 1px solid $color-border;
+	}
+
+	thead {
+		text-align: left;
+		background-color: $color-header;
+	}
+
+	th {
+		padding: 0.6em 0.4em;
+		cursor: pointer;
+
+		&:hover {
+			background-color: $color-header-hover;
+		}
+
+		svg {
+			margin: 0 0.4em;
+			position: absolute;
+			opacity: 0.25;
+		}
+	}
 
 	td {
-		padding: 0.2em 0.4em;
+		padding: 0.8em 0.4em;
 	}
 
 	tbody {
