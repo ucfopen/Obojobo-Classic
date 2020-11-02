@@ -1,5 +1,6 @@
-$background-color: white;
-$background-color-hover: #6714bd;
+@import 'includes';
+
+$background-color: #ffffff;
 $button-size: 2em;
 $transition-duration: 0.25s;
 
@@ -8,12 +9,9 @@ $transition-duration: 0.25s;
 	height: $button-size;
 	border: 1px solid #bbbbbb;
 	border-radius: 50%;
-	background-size: 1.3em;
-	background-repeat: no-repeat;
-	background-position: center center;
 	background-color: $background-color;
-	background-origin: content-box;
 	transition: background-color $transition-duration, border-color $transition-duration;
+	cursor: pointer;
 
 	& svg {
 		transition: fill $transition-duration;
@@ -22,8 +20,8 @@ $transition-duration: 0.25s;
 	}
 
 	&:hover {
-		background-color: $background-color-hover;
-		border-color: $background-color;
+		background-color: $color-action;
+		border-color: $color-action;
 
 		& svg {
 			fill: $background-color;
