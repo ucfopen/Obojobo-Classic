@@ -7,6 +7,7 @@ import CaretUp from '../../../assets/images/viewer/caret-up.svg'
 import CaretDown from '../../../assets/images/viewer/caret-down.svg'
 
 import './data-grid.scss'
+import LoadingIndicator from './loading-indicator'
 
 const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 	const isLoading = data === null
@@ -41,7 +42,7 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 				{isLoading || !rows.length ? (
 					<tr>
 						<td className="no-data" colSpan={columns.length}>
-							{isLoading ? 'loading...' : 'no data'}
+							{isLoading ? <LoadingIndicator isLoading={true} /> : 'No data'}
 						</td>
 					</tr>
 				) : (
