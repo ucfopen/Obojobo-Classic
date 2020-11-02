@@ -6,6 +6,8 @@ export default function DataGridAttemptsCell(props) {
 	const {
 		numAttemptsTaken,
 		numAttempts,
+		numAdditionalAttemptsAdded,
+		isAttemptInProgress,
 		onClickAddAdditionalAttempt,
 		onClickRemoveAdditionalAttempt
 	} = props
@@ -14,9 +16,12 @@ export default function DataGridAttemptsCell(props) {
 		<div className="data-grid-attempts-cell">
 			<p className="attempts">
 				{numAttemptsTaken} of {numAttempts}
+				{isAttemptInProgress ? <small className="attempts--in-progress">In progress</small> : null}
 			</p>
 			<div className="controls">
-				<button onClick={onClickRemoveAdditionalAttempt}>-</button>
+				{numAdditionalAttemptsAdded > 0 ? (
+					<button onClick={onClickRemoveAdditionalAttempt}>-</button>
+				) : null}
 				<button onClick={onClickAddAdditionalAttempt}>+</button>
 			</div>
 		</div>

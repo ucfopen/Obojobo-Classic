@@ -1,5 +1,6 @@
 @import 'includes';
 
+$font-color: #7d7d7d;
 $button-text-color: #7c364c;
 $button-background-color: #e8cad4;
 $button-size: 1.7em;
@@ -12,7 +13,15 @@ $button-size: 1.7em;
 
 	.attempts {
 		font-family: $font-default;
+		color: $color-text;
 		margin: 0;
+
+		.attempts--in-progress {
+			font-weight: bold;
+			text-transform: uppercase;
+			color: $font-color;
+			display: block;
+		}
 	}
 
 	.controls {
