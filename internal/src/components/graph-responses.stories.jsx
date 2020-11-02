@@ -13,7 +13,7 @@ export default {
 }
 
 const Template = args => (
-	<div style={{border: '1px solid #ccc', display: 'inline-block'}}>
+	<div style={{ border: '1px solid #ccc', display: 'inline-block' }}>
 		<GraphResponses {...args} />
 	</div>
 )
@@ -48,7 +48,7 @@ Example.args = {
 
 export const Empty = Template.bind({})
 Empty.args = {
-	data: [	],
+	data: [],
 	height: 300,
 	width: 300
 }
@@ -108,7 +108,7 @@ Small.args = {
 			label: 'B',
 			value: 1,
 			isCorrect: true
-		},
+		}
 	],
 	height: 200,
 	width: 200

@@ -1,37 +1,36 @@
 @import './includes';
 
-.graph-responses{
-
-	.vx-axis-label{
+.graph-responses {
+	.vx-axis-label {
 		font-family: $font-default;
 		font-size: 1em;
 		text-anchor: middle;
 		fill: #666666;
 	}
 
-	.vx-axis-tick{
+	.vx-axis-tick {
 		font-family: $font-default;
-		font-size: .8em;
+		font-size: 0.8em;
 		fill: #888888;
 	}
 
-	.vx-bar{
-		fill: #C0BDBC;
+	.vx-bar {
+		fill: #c0bdbc;
 	}
 
-	.vx-bar.is-correct{
+	.vx-bar.is-correct {
 		fill: #98bb87;
 	}
 
-	.vx-grid{
-		.vx-line{
-			stroke-opacity: .10;
+	.vx-grid {
+		.vx-line {
+			stroke-opacity: 0.1;
 			stroke-width: 2;
 		}
 	}
 
-	.vx-axis .vx-line{
-		stroke-opacity: .3;
+	.vx-axis .vx-line {
+		stroke-opacity: 0.3;
 		stroke-width: 2;
 	}
 }

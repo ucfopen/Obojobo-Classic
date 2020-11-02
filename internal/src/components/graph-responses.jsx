@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Bar } from '@vx/shape';
-import { Group } from "@vx/group"
-import { scaleBand, scaleLinear } from "@vx/scale"
-import { AxisLeft, AxisBottom } from "@vx/axis"
+import { Bar } from '@vx/shape'
+import { Group } from '@vx/group'
+import { scaleBand, scaleLinear } from '@vx/scale'
+import { AxisLeft, AxisBottom } from '@vx/axis'
 import { Grid } from '@vx/grid'
 import './graph-responses.scss'
 
@@ -29,15 +29,14 @@ export default function GraphResponses({ data, width, height }) {
 		range: [0, xMax],
 		round: true,
 		domain: data.map(x),
-		padding: 0.2,
+		padding: 0.2
 	})
 
 	const yScale = scaleLinear({
 		range: [0, yMax],
 		round: true,
-		domain: [Math.max(...data.map(y)), 0],
+		domain: [Math.max(...data.map(y)), 0]
 	})
-
 
 	return (
 		<span className="graph-responses">
@@ -64,17 +63,19 @@ export default function GraphResponses({ data, width, height }) {
 						labelProps={{}}
 						tickLabelProps={tickLabelPropsLeft}
 					/>
-					{data.map((d) => {
+					{data.map(d => {
 						const barWidth = xScale.bandwidth()
 						const barHeight = yMax - yScale(d.value)
-						return <Bar
-							key={`bar-${d.label}`}
-							x={xScale(d.label)}
-							y={yMax - barHeight}
-							width={barWidth}
-							height={barHeight}
-							className={d.isCorrect ? 'is-correct' : 'is-not-correct'}
-						/>
+						return (
+							<Bar
+								key={`bar-${d.label}`}
+								x={xScale(d.label)}
+								y={yMax - barHeight}
+								width={barWidth}
+								height={barHeight}
+								className={d.isCorrect ? 'is-correct' : 'is-not-correct'}
+							/>
+						)
 					})}
 					<AxisBottom
 						scale={xScale}
