@@ -18,8 +18,6 @@ export default function ModalAboutLO(props) {
 
 	return (
 		<div className="modal-about-learning-object">
-			<span className="horizontal-rule"></span>
-
 			<SectionHeader label={'About this learning object'} />
 
 			<DefList className="def-list" items={items} />
