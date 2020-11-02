@@ -1,0 +1,23 @@
+@import './includes';
+
+.data-grid-score-cell {
+	$color-green: #38ae24;
+	$color-dark-green: darken($color-green, 10%);
+	$color-red: #c21f00;
+	$color-grey: #808080;
+
+	color: $color-grey;
+
+	[class*='score-'] {
+		color: $color-green;
+	}
+
+	.score-100 {
+		color: $color-dark-green;
+		font-weight: bold;
+	}
+
+	.score-0 {
+		color: $color-red;
+	}
+}
