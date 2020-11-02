@@ -4,13 +4,37 @@
 	$color-hover: #e6edf6;
 	$color-selected: #ccdaeb;
 	$color-no-data: #cccccc;
+	$color-header: #f2eef5;
+	$color-border: #e2e2e2;
 
 	padding: 0;
 	margin: 0;
 	border-spacing: 0;
+	width: 100%;
+	border-collapse: collapse;
+
+	table,
+	td,
+	th {
+		border: 1px solid $color-border;
+	}
+
+	thead {
+		text-align: left;
+		background-color: $color-header;
+	}
+
+	th {
+		padding: 0.6em 0.4em;
+
+		svg {
+			margin: 0 0.4em;
+			position: absolute;
+		}
+	}
 
 	td {
-		padding: 0.2em 0.4em;
+		padding: 0.8em 0.4em;
 	}
 
 	tbody {
