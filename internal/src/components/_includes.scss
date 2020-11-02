@@ -27,8 +27,8 @@ $color-reward-text: #947d00;
 $color-obojobo-blue: #0d4fa7;
 $color-preview: #af1b5c;
 
-$box-shadow-focus: 0 0 3px 3px $color-browser-focus;
-$box-shadow-overlay: 0 2px 2px $color-shadow;
+$box-shadow-focus: 0 0 3px 3px $color-browser-focus; /* stylelint-disable-line unit-disallowed-list */
+$box-shadow-overlay: 0 2px 2px $color-shadow; /* stylelint-disable-line unit-disallowed-list */
 
 $duration-animation-default: 0.2s;
 
@@ -59,7 +59,7 @@ $dimension-header-padding: 1rem;
 $dimension-preview-banner: 3rem;
 $dimension-review-answer-flag-padding: 0.2em;
 
-$breakpoint-nav-small: 1000px; /* stylelint-disable-line unit-blacklist */
+$breakpoint-nav-small: 1000px; /* stylelint-disable-line unit-disallowed-list */
 
 $z-index-above-content: 999;
 $z-index-above-most: 9999;

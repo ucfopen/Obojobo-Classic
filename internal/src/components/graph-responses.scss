@@ -1,0 +1,37 @@
+@import './includes';
+
+.graph-responses{
+
+	.vx-axis-label{
+		font-family: $font-default;
+		font-size: 1em;
+		text-anchor: middle;
+		fill: #666666;
+	}
+
+	.vx-axis-tick{
+		font-family: $font-default;
+		font-size: .8em;
+		fill: #888888;
+	}
+
+	.vx-bar{
+		fill: #C0BDBC;
+	}
+
+	.vx-bar.is-correct{
+		fill: #98bb87;
+	}
+
+	.vx-grid{
+		.vx-line{
+			stroke-opacity: .10;
+			stroke-width: 2;
+		}
+	}
+
+	.vx-axis .vx-line{
+		stroke-opacity: .3;
+		stroke-width: 2;
+	}
+}
