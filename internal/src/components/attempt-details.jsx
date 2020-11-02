@@ -1,3 +1,5 @@
+import './attempt-details.scss'
+
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import DefList from './def-list'
@@ -26,7 +28,7 @@ export default function AttemptDetails({
 	}, [score, numAnsweredQuestions, numTotalQuestions, startTime, endTime])
 
 	return (
-		<section className="attempt-details">
+		<section className="repository--attempt-details">
 			<h1>Attempt {attemptNumber}</h1>
 			<DefList items={items} />
 		</section>
