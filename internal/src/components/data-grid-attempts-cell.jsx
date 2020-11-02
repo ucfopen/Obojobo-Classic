@@ -15,7 +15,7 @@ export default function DataGridAttemptsCell(props) {
 	return (
 		<div className="data-grid-attempts-cell">
 			<p className="attempts">
-				{numAttemptsTaken} of {numAttempts}
+				{numAttemptsTaken} of {numAttempts + numAdditionalAttemptsAdded}
 				{isAttemptInProgress ? <small className="attempts--in-progress">In progress</small> : null}
 			</p>
 			<div className="controls">
