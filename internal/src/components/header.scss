@@ -1,8 +1,7 @@
+@import './includes';
+
 .obo-header {
-	// @TODO: Move some of these colors to a global includes file
-	$color-pinkish-purple: #f5cbe6;
-	$color-purple: #950b5c;
-	$color-white: #ffffff;
+	$color-banner-text: lighten($color-banner, 60%);
 
 	display: flex;
 	align-items: center;
@@ -15,29 +14,37 @@
 
 		> .obo-classic-logo {
 			width: 8em;
+			margin-right: 0.5em;
 		}
 
 		> button {
 			margin-left: 0.3em;
+			font-family: $font-default;
 		}
 	}
 
 	> .banner-header {
-		background-color: $color-purple;
-		border-radius: 50px;
+		background-color: $color-banner;
+		border-radius: 1.75em;
+		height: 1.75em;
 		padding: 0.4em 1em;
-		color: $color-pinkish-purple;
+		color: $color-banner-text;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		font-family: $font-default;
+		font-size: 0.8em;
 
 		> button {
 			border: none;
 			background: transparent;
-			color: $color-white;
+			color: $color-bg;
+			font-family: $font-default;
+			font-size: 1em;
 
 			&:hover {
 				cursor: pointer;
+				opacity: 0.8;
 			}
 		}
 
@@ -48,7 +55,7 @@
 		}
 
 		> .banner-header--close-button {
-			color: $color-pinkish-purple;
+			color: $color-banner-text;
 			font-size: 0.6em;
 		}
 	}
@@ -63,11 +70,7 @@
 }
 
 .header-btn {
-	// @TODO: Move some of these colors to a global includes file
-	$color-blue-button: #4471b3;
-	$color-dark-blue-button: #295595;
-
-	color: $color-blue-button;
+	color: $color-obojobo-blue;
 	text-decoration: underline;
 	border: none;
 	background: transparent;
@@ -75,6 +78,6 @@
 
 	&:hover {
 		cursor: pointer;
-		color: $color-dark-blue-button;
+		opacity: 0.8;
 	}
 }
