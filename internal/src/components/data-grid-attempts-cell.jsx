@@ -1,8 +1,26 @@
+import './data-grid-attempts-cell.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DataGridAttemptsCell() {
-	return <div>@TODO</div>
+export default function DataGridAttemptsCell(props) {
+	const {
+		numAttemptsTaken,
+		numAttempts,
+		onClickAddAdditionalAttempt,
+		onClickRemoveAdditionalAttempt
+	} = props
+
+	return (
+		<div className="data-grid-attempts-cell">
+			<p className="attempts">
+				{numAttemptsTaken} of {numAttempts}
+			</p>
+			<div className="controls">
+				<button onClick={onClickRemoveAdditionalAttempt}>-</button>
+				<button onClick={onClickAddAdditionalAttempt}>+</button>
+			</div>
+		</div>
+	)
 }
 
 DataGridAttemptsCell.defaultProps = {
