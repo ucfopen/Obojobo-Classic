@@ -1,26 +1,21 @@
-$font-family: 'Lato', arial;
-$text-color: white;
-$alt-text-color: black;
-$bg-color: #9e4867;
-$alt-bg-color: #ececec;
-$color-transparent: rgba(0, 0, 0, 0);
+@import './includes';
 
 .repository--button {
 	display: inline-block;
 	user-select: none;
 	position: relative;
 	cursor: pointer;
-	font-family: $font-family;
+	font-family: $font-default;
 
 	&.is-type-text {
 		background: none;
-		color: $bg-color;
+		color: $color-button-bg;
 		text-decoration: underline;
 	}
 
 	&.is-type-text-bold {
 		background: none;
-		color: $bg-color;
+		color: $color-button-bg;
 		text-decoration: underline;
 		font-weight: bold;
 	}
@@ -31,9 +26,13 @@ $color-transparent: rgba(0, 0, 0, 0);
 		min-width: 3.25em;
 		border-radius: 0.3em;
 		padding: 0.6em 1em;
-		color: $text-color;
-		background: $bg-color;
-		box-shadow: 0 1px 1px 0 black;
+		color: $color-bg;
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%), $color-button-bg);
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient($color-action, darken($color-action, 10%), $color-action);
+		}
 	}
 
 	&.is-type-large {
@@ -43,9 +42,13 @@ $color-transparent: rgba(0, 0, 0, 0);
 		min-width: 4em;
 		border-radius: 0.3em;
 		padding: 0.6em 1em;
-		color: $text-color;
-		background: $bg-color;
-		box-shadow: 0 1px 1px 0 black;
+		color: $color-bg;
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%), $color-button-bg);
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient($color-action, darken($color-action, 10%), $color-action);
+		}
 	}
 
 	&.is-type-alt {
@@ -54,8 +57,12 @@ $color-transparent: rgba(0, 0, 0, 0);
 		min-width: 3.25em;
 		border-radius: 0.3em;
 		padding: 0.6em 1em;
-		color: $alt-text-color;
-		background: $alt-bg-color;
-		box-shadow: 0 1px 1px 0 black;
+		color: $color-text;
+		background: linear-gradient(darken($color-bg2, 10%), $color-bg2);
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient(darken($color-bg2, 20%), darken($color-bg2, 10%));
+		}
 	}
 }
