@@ -66,8 +66,34 @@ module.exports =
 			},
 			module: {
 				rules: [
+					// Create React SVG Components when imported from js/jsx files
+					{
+						test: /\.svg$/,
+						issuer: {
+							test: /\.(js|jsx)$/
+						},
+						use: [
+							{
+								loader: '@svgr/webpack',
+								options: {
+									svgoConfig: {
+										plugins: [
+											{
+												prefixIds: {
+													prefixClassNames: false // don't prefix class names in svgs
+												}
+											}
+										]
+									}
+								}
+							}
+						]
+					},
 					{
 						test: /\.svg/,
+						issuer: {
+							test: /\.scss$/
+						},
 						use: {
 							loader: 'svg-url-loader',
 							options: {

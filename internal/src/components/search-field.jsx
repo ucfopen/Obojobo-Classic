@@ -1,8 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function SearchField() {
-	return <div>Search Field @TODO</div>
+import './search-field.scss'
+
+export default function SearchField(props) {
+	return (
+		<div className="search-field-wrapper">
+			<i className="magnifier-icon"></i>
+			<input
+				className="search-field"
+				type="text"
+				placeholder={props.placeholder}
+				value={props.value}
+				onChange={props.onChange}
+			/>
+		</div>
+	)
 }
 
 SearchField.defaultProps = {

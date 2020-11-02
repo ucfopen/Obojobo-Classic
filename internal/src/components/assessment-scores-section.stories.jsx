@@ -1,6 +1,6 @@
 import React from 'react'
 
-import AssessmentScoresSection from './section-header'
+import AssessmentScoresSection from './assessment-scores-section'
 
 export default {
 	component: AssessmentScoresSection,
