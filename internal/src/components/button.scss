@@ -1,3 +1,70 @@
+@import './includes';
+
 .repository--button {
-	background: red; //@TODO
+	$color-button-bg: lighten($color-action, 9%);
+
+	display: inline-block;
+	user-select: none;
+	position: relative;
+	cursor: pointer;
+	font-family: $font-default;
+
+	&.is-type-text {
+		background: none;
+		color: $color-button-bg;
+		text-decoration: underline;
+	}
+
+	&.is-type-text-bold {
+		background: none;
+		color: $color-button-bg;
+		text-decoration: underline;
+		font-weight: bold;
+	}
+
+	&.is-type-small {
+		text-align: center;
+		font-size: 0.85em;
+		min-width: 3.25em;
+		border-radius: 0.3em;
+		padding: 0.6em 1em;
+		color: $color-bg;
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%));
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient($color-action, darken($color-action, 10%));
+		}
+	}
+
+	&.is-type-large {
+		text-align: center;
+		font-size: 1em;
+		font-weight: bold;
+		min-width: 4em;
+		border-radius: 0.3em;
+		padding: 0.6em 1em;
+		color: $color-bg;
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%));
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient($color-action, darken($color-action, 10%));
+		}
+	}
+
+	&.is-type-alt {
+		text-align: center;
+		font-size: 0.85em;
+		min-width: 3.25em;
+		border-radius: 0.3em;
+		padding: 0.6em 1em;
+		color: $color-text;
+		background: linear-gradient(darken($color-bg2, 10%), $color-bg2);
+		border: 1px solid $color-shadow;
+
+		&:hover {
+			background: linear-gradient(darken($color-bg2, 20%), darken($color-bg2, 10%));
+		}
+	}
 }
