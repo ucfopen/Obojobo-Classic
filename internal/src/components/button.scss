@@ -1,6 +1,8 @@
 @import './includes';
 
 .repository--button {
+	$color-button-bg: lighten($color-action, 9%);
+
 	display: inline-block;
 	user-select: none;
 	position: relative;
@@ -27,11 +29,11 @@
 		border-radius: 0.3em;
 		padding: 0.6em 1em;
 		color: $color-bg;
-		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%), $color-button-bg);
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%));
 		border: 1px solid $color-shadow;
 
 		&:hover {
-			background: linear-gradient($color-action, darken($color-action, 10%), $color-action);
+			background: linear-gradient($color-action, darken($color-action, 10%));
 		}
 	}
 
@@ -43,11 +45,11 @@
 		border-radius: 0.3em;
 		padding: 0.6em 1em;
 		color: $color-bg;
-		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%), $color-button-bg);
+		background: linear-gradient($color-button-bg, darken($color-button-bg, 10%));
 		border: 1px solid $color-shadow;
 
 		&:hover {
-			background: linear-gradient($color-action, darken($color-action, 10%), $color-action);
+			background: linear-gradient($color-action, darken($color-action, 10%));
 		}
 	}
 
