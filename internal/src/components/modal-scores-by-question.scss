@@ -1,0 +1,22 @@
+@import '_includes.scss';
+
+.modal-scores-by-question {
+	font-family: $font-default;
+	display: flex;
+	background-color: $color-bg2;
+	padding: 0.8em;
+
+	> .scores-by-question--left-sidebar {
+		width: 25%;
+
+		> h2 {
+			font-weight: bolder;
+			color: $color-text;
+			margin-bottom: 0.6em;
+		}
+	}
+
+	> .score-details-right-content {
+		width: 75%;
+	}
+}
