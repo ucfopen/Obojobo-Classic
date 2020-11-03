@@ -2,34 +2,24 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import DataGrid from './data-grid'
 import DataGridTimestampCell from './data-grid-timestamp-cell'
 
-import './data-grid.scss'
+const columns = [
+	{ accessor: 'userName', Header: 'Student' },
+	{ accessor: 'response', Header: 'Response' },
+	{ accessor: 'score', Header: 'Score' },
+	{ accessor: 'time', Header: 'Time', Cell: DataGridTimestampCell }
+]
 
-export default function DataGridResponses({ responses }) {
+export default function DataGridResponses({ responses, selectedIndex, onSelect }) {
 	return (
-		<table className="repository--data-grid">
-			<thead>
-				<tr>
-					<th>Student</th>
-					<th>Response</th>
-					<th>Score</th>
-					<th>Time</th>
-				</tr>
-			</thead>
-			<tbody>
-				{responses.map(response => (
-					<tr>
-						<td>{response.userName}</td>
-						<td>{response.response}</td>
-						<td>{response.score}</td>
-						<td>
-							<DataGridTimestampCell value={response.time} />
-						</td>
-					</tr>
-				))}
-			</tbody>
-		</table>
+		<DataGrid
+			data={responses}
+			columns={columns}
+			selectedIndex={selectedIndex}
+			onSelect={onSelect}
+		/>
 	)
 }
 
@@ -41,5 +31,7 @@ DataGridResponses.propTypes = {
 			score: PropTypes.number,
 			time: PropTypes.number
 		})
-	)
+	),
+	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	onSelect: PropTypes.func.isRequired
 }
