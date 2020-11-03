@@ -9,14 +9,41 @@ const getTimestampCell = ({ value }) => (
 	<DataGridTimestampCell value={value} display="horizontal" showSeconds={true} />
 )
 
-const columns = [
-	{ accessor: 'user', Header: 'User' },
-	{ accessor: 'score', Header: 'Score', Cell: DataGridStudentScoreCell },
-	{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
-	{ accessor: 'attempts', Header: 'Attempts', Cell: DataGridAttemptsCell }
-]
+const DataGridAssessmentScores = ({
+	data,
+	selectedIndex,
+	onSelect,
+	onClickAddAdditionalAttempt,
+	onClickRemoveAdditionalAttempt
+}) => {
+	const getDataGridAttemptsCell = ({ value, row }) => {
+		return (
+			<DataGridAttemptsCell
+				{...value}
+				onClickAddAdditionalAttempt={() => onClickAddAdditionalAttempt(row.index)}
+				onClickRemoveAdditionalAttempt={() => onClickRemoveAdditionalAttempt(row.index)}
+			/>
+		)
+	}
 
-const DataGridAssessmentScores = ({data, selectedIndex, onSelect}) => <DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
+	return (
+		<DataGrid
+			data={data}
+			columns={[
+				{ accessor: 'user', Header: 'User' },
+				{ accessor: 'score', Header: 'Score', Cell: DataGridStudentScoreCell },
+				{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
+				{
+					accessor: 'attempts',
+					Header: 'Attempts',
+					Cell: getDataGridAttemptsCell
+				}
+			]}
+			selectedIndex={selectedIndex}
+			onSelect={onSelect}
+		/>
+	)
+}
 
 DataGridAssessmentScores.propTypes = {
 	data: PropTypes.arrayOf(
@@ -36,7 +63,9 @@ DataGridAssessmentScores.propTypes = {
 		})
 	),
 	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
-	onSelect: PropTypes.func.isRequired
+	onSelect: PropTypes.func.isRequired,
+	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
 }
 
 export default DataGridAssessmentScores
