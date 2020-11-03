@@ -1,20 +1,17 @@
 @import 'includes';
 
-$background-color: #ffffff;
-$button-size: 2em;
-$transition-duration: 0.25s;
-
 .refresh-button {
+	$background-color: #ffffff;
+	$button-size: 2em;
+
 	width: $button-size;
 	height: $button-size;
 	border: 1px solid #bbbbbb;
 	border-radius: 50%;
 	background-color: $background-color;
-	transition: background-color $transition-duration, border-color $transition-duration;
 	cursor: pointer;
 
 	& svg {
-		transition: fill $transition-duration;
 		width: 100%;
 		height: 100%;
 	}
