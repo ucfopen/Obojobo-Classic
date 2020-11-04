@@ -34,12 +34,10 @@ const getDurationText = (startTime, endTime) => {
 	}
 
 	if (now.isBefore(startTime)) {
-		return (
-			'This instance opens in ' + humanizeDuration((endTime - startTime) * 1000, { largest: 2 })
-		)
+		return 'This instance opens in ' + humanizeDuration(startTime - now, { largest: 2 })
 	}
 
-	return 'This instance closes in ' + humanizeDuration((endTime - startTime) * 1000, { largest: 2 })
+	return 'This instance closes in ' + humanizeDuration(endTime - now, { largest: 2 })
 }
 
 export default function InstanceSection({
@@ -102,11 +100,11 @@ export default function InstanceSection({
 					items={[
 						{
 							label: 'Instance Open',
-							value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A')
+							value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A') + ' EST'
 						},
 						{
 							label: 'Close',
-							value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A')
+							value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A') + ' EST'
 						},
 						{
 							value: instance.externalLink
