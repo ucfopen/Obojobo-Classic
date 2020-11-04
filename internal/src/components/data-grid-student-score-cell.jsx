@@ -1,8 +1,20 @@
+import './data-grid-student-score-cell.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
+import Button from './button'
 
-export default function DataGridStudentScoreCell() {
-	return <div>@TODO</div>
+export default function DataGridStudentScoreCell({ value, isScoreImported }) {
+	return (
+		<div className="data-grid-student-score-cell">
+			<span className="data-grid-student-score-cell--score">{value !== null ? value : '--'}</span>
+			{isScoreImported ? (
+				<span className="data-grid-student-score-cell--imported-text">(Imported)</span>
+			) : (
+				<Button type="text-bold" text="Details..." />
+			)}
+		</div>
+	)
 }
 
 DataGridStudentScoreCell.defaultProps = {
