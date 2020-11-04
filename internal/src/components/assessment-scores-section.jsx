@@ -1,8 +1,36 @@
+import './assessment-scores-section.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
+import SectionHeader from './section-header'
+import AssessmentScoresSummary from './assessment-scores-summary'
+import DataGridAssessmentScores from './data-grid-assessment-scores'
+import Button from './button'
+import SearchField from './search-field'
 
-export default function AssessmentScoresSection() {
-	return <div>@TODO</div>
+export default function AssessmentScoresSection(props) {
+	const { assessmentScores, selectedStudentIndex, onSelect } = props
+
+	return (
+		<div className="assessment-scores-section">
+			<SectionHeader label="Assessment Scores" />
+			<div className="assessment-scores-summary">
+				<AssessmentScoresSummary />
+			</div>
+			<hr className="section-divider" />
+			<div className="assessment-score-search">
+				<p className="title">Scores by student</p>
+				<SearchField placeholder="Search for a name" />
+			</div>
+			<DataGridAssessmentScores
+				data={assessmentScores}
+				selectedIndex={selectedStudentIndex}
+				onSelect={onSelect}
+			/>
+			<div className="download-button">
+				<Button type="large" text="Download these scores as a CSV file" />
+			</div>
+		</div>
+	)
 }
 
 AssessmentScoresSection.propTypes = {

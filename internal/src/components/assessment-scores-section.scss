@@ -1,0 +1,34 @@
+@import 'includes';
+
+$divider-color: #dedede;
+
+.assessment-scores-section {
+	.assessment-scores-summary {
+		margin: 1em 0;
+	}
+
+	.section-divider {
+		border-width: 1px;
+		border-style: solid;
+		border-top: none;
+		border-left: none;
+		border-right: none;
+		border-color: $divider-color;
+	}
+
+	.assessment-score-search {
+		margin: 2.5em 0 0.5em 0;
+		display: flex;
+		justify-content: space-between;
+
+		.title {
+			margin: 0;
+			font-size: 1.2em;
+			font-weight: bold;
+		}
+	}
+
+	.download-button {
+		margin-top: 1em;
+	}
+}
