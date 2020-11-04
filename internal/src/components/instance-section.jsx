@@ -1,12 +1,167 @@
+import './instance-section.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
+import Button from './button'
+import SectionHeader from './section-header'
+import DefList from './def-list'
+import AssessmentScoresSummary from './assessment-scores-summary'
+import SearchField from './search-field'
+import DataGridAssessmentScores from './data-grid-assessment-scores'
+import HelpButton from './help-button'
+import InstructionsFlag from './instructions-flag'
+import dayjs from 'dayjs'
+import humanizeDuration from 'humanize-duration'
 
-export default function InstanceSection({ instance }) {
+const getScoringMethodText = scoreMethod => {
+	switch (scoreMethod) {
+		case 'h':
+			return 'Highest Attempt'
+
+		case 'm':
+			return 'Attempt Average'
+
+		case 'r':
+			return 'Last Attempt'
+	}
+}
+
+const getDurationText = (startTime, endTime) => {
+	const now = dayjs()
+
+	if (now.isAfter(endTime)) {
+		return '(This instance is closed)'
+	}
+
+	if (now.isBefore(startTime)) {
+		return (
+			'This instance opens in ' + humanizeDuration((endTime - startTime) * 1000, { largest: 2 })
+		)
+	}
+
+	return 'This instance closes in ' + humanizeDuration((endTime - startTime) * 1000, { largest: 2 })
+}
+
+export default function InstanceSection({
+	instance,
+	onClickAboutThisLO,
+	onClickPreview,
+	onClickEditInstanceDetails,
+	onClickManageAccess,
+	onClickDownloadScores,
+	onClickViewScoresByQuestion
+}) {
+	if (!instance) {
+		return (
+			<div className="repository--instance-section is-empty">
+				<InstructionsFlag text="Select an instance from the left" />
+			</div>
+		)
+	}
+
+	const startTime = dayjs(instance.startTime * 1000)
+	const endTime = dayjs(instance.endTime * 1000)
+
 	return (
-		<div>{instance ? 'Selected instance id: ' + instance.instID : 'Nothing selected (@TODO)'}</div>
+		<div className="repository--instance-section is-not-empty">
+			<div className="header">
+				<div className="main-info">
+					<h1>{instance.name}</h1>
+					<h2>{`Course: ${instance.courseID}`}</h2>
+				</div>
+				<Button onClick={onClickAboutThisLO} type="text" text="About this learning object..." />
+				<Button onClick={onClickPreview} type="large" text="Preview" />
+			</div>
+
+			<div className="link">
+				<h3>Link</h3>
+				{instance.externalLink ? (
+					<div className="container">
+						<input disabled type="text" value="--" />
+						<HelpButton>
+							<div>This instance is being used in an external system so no link is available</div>
+						</HelpButton>
+					</div>
+				) : (
+					<div className="container">
+						<input readOnly type="text" value={`${window.origin}/view/${instance.instID}`} />
+						<HelpButton>
+							<div>
+								Copy this link and distribute it to your students via online assignment, webcourses,
+								course webpage or e-mail. Students will click on this ilnk to sign into Obojobo and
+								take your instance.
+							</div>
+						</HelpButton>
+					</div>
+				)}
+			</div>
+
+			<SectionHeader label="Details" />
+			<div className="details">
+				<DefList
+					items={[
+						{
+							label: 'Instance Open',
+							value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A')
+						},
+						{
+							label: 'Close',
+							value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A')
+						},
+						{
+							value: instance.externalLink
+								? '(This instance is being used in an external system)'
+								: getDurationText(startTime, endTime)
+						},
+						{ label: 'Attempts', value: instance.attemptCount },
+						{ label: 'Scoring Method', value: getScoringMethodText(instance.scoreMethod) },
+						{
+							label: 'Score Import',
+							value: instance.allowScoreImport === '1' ? 'Enabled' : 'Disabled'
+						}
+					]}
+				/>
+				<Button onClick={onClickEditInstanceDetails} type="small" text="Edit Details" />
+			</div>
+
+			<SectionHeader label="Ownership &amp; Access" />
+			<div className="ownership">
+				<span>(@TODO - Put ownership text here)</span>
+				<Button onClick={onClickManageAccess} type="small" text="Manage access" />
+			</div>
+
+			<SectionHeader label="AssessmentScores" />
+			<AssessmentScoresSummary />
+			<hr />
+
+			<div className="scores-by-student">
+				<div className="header">
+					<h4>Scores by student</h4>
+					<SearchField placeholder="Search for a name" />
+				</div>
+				<DataGridAssessmentScores />
+				<Button
+					onClick={onClickDownloadScores}
+					type="small"
+					text="Download these scores as a CSV file"
+				/>
+			</div>
+			<hr />
+
+			<div className="scores-by-question">
+				<h4>Scores by question</h4>
+				<Button onClick={onClickViewScoresByQuestion} type="small" text="View..." />
+			</div>
+		</div>
 	)
 }
 
 InstanceSection.propTypes = {
-	instance: PropTypes.oneOfType([null, PropTypes.object])
+	instance: PropTypes.oneOfType([null, PropTypes.object]),
+	onClickDownloadScores: PropTypes.func.isRequired,
+	onClickEditInstanceDetails: PropTypes.func.isRequired,
+	onClickManageAccess: PropTypes.func.isRequired,
+	onClickViewScoresByQuestion: PropTypes.func.isRequired,
+	onClickAboutThisLO: PropTypes.func.isRequired,
+	onClickPreview: PropTypes.func.isRequired
 }
