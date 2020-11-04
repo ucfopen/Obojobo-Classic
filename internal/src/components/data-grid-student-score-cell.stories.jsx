@@ -1,6 +1,6 @@
 import React from 'react'
 
-import DataGridStudentScoreCell from './data-grid-attempts-cell'
+import DataGridStudentScoreCell from './data-grid-student-score-cell'
 
 export default {
 	component: DataGridStudentScoreCell,
