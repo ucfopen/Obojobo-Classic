@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default function FormDateTime({ value, onChange }) {
-	const dateTime = new Date(value)
+	const dateTime = new Date(value * 1000)
 	const [date, setDate] = React.useState(dateTime.toISOString().substring(0, 10))
 	const [time, setTime] = React.useState(
 		dateTime
@@ -36,11 +36,21 @@ export default function FormDateTime({ value, onChange }) {
 	}
 
 	return (
-		<div className="form-date-time">
-			<input type="date" value={date} onChange={updateDayTime} />
+		<div className={`form-date-time ${value === null ? 'is-null' : 'is-not-null'}`}>
+			<input
+				disabled={value === null}
+				type="date"
+				value={value === null ? '' : date}
+				onChange={updateDayTime}
+			/>
 			<span>at</span>
-			<input type="time" value={time} onChange={updateDayTime} />
-			<span>ETS</span>
+			<input
+				disabled={value === null}
+				type="time"
+				value={value === null ? '' : time}
+				onChange={updateDayTime}
+			/>
+			<span>EST</span>
 		</div>
 	)
 }
