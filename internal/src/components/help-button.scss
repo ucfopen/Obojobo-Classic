@@ -1,0 +1,85 @@
+@import './includes';
+
+.repository--help-button {
+	@keyframes repository--slidein {
+		0% {
+			transform: translate(100%, -50%) translate(-1em, 0);
+		}
+
+		100% {
+			transform: translate(100%, -50%);
+		}
+	}
+
+	@keyframes repository--fadein {
+		0% {
+			opacity: 0;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+
+	position: relative;
+	display: inline-block;
+
+	> button {
+		background: $color-bg2;
+		width: 2em;
+		height: 2em;
+		border-radius: 1.5em;
+		color: $color-action;
+		border: none;
+		cursor: help;
+	}
+
+	&.is-mode-hover {
+		> button {
+			background: transparentize($color-action, 0.3);
+			color: $color-bg;
+		}
+	}
+
+	&.is-mode-clicked {
+		> button {
+			background: $color-action;
+			color: $color-bg;
+			cursor: pointer;
+		}
+	}
+
+	> .info {
+		pointer-events: none;
+		position: absolute;
+		right: -1em;
+		top: 50%;
+		transform: translate(100%, -50%);
+		background: $color-bg2;
+		box-shadow: $box-shadow-overlay;
+		z-index: $z-index-above-content;
+		//stylelint-disable-next-line declaration-colon-newline-after
+		animation: repository--fadein $duration-animation-default,
+			repository--slidein $duration-animation-default;
+
+		&::before {
+			position: absolute;
+			left: 0;
+			top: 50%;
+			transform: translate(-50%, -50%) rotate(45deg);
+			content: ' ';
+			width: 1em;
+			height: 1em;
+			// background: $color-shadow;
+			background: $color-bg2;
+			box-shadow: $box-shadow-overlay;
+		}
+
+		> .container {
+			background: $color-bg2;
+			position: relative;
+			padding: 1em;
+			min-width: 14em;
+		}
+	}
+}
