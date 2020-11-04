@@ -1,0 +1,50 @@
+@import 'includes';
+
+$font-color: #7d7d7d;
+$button-text-color: #7c364c;
+$button-background-color: #e8cad4;
+$button-size: 1.7em;
+
+.data-grid-attempts-cell {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.7em 0.3em;
+
+	.attempts {
+		font-family: $font-default;
+		color: $color-text;
+		margin: 0;
+
+		.attempts--in-progress {
+			font-weight: bold;
+			text-transform: uppercase;
+			color: $font-color;
+			display: block;
+		}
+	}
+
+	.controls {
+		button {
+			width: $button-size;
+			height: $button-size;
+			padding: 0;
+			border: none;
+			border-radius: 50%;
+			color: $button-text-color;
+			background-color: $button-background-color;
+			cursor: pointer;
+			font-weight: bold;
+			transition: color 0.25s, background-color 0.25s;
+
+			&:hover {
+				background-color: $button-text-color;
+				color: $button-background-color;
+			}
+		}
+
+		button:first-child {
+			margin-right: 0.3em;
+		}
+	}
+}

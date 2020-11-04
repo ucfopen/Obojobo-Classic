@@ -12,30 +12,104 @@ export default {
 	}
 }
 
-const Template = args => <GraphResponses {...args} />
+const Template = args => (
+	<div style={{ border: '1px solid #ccc', display: 'inline-block' }}>
+		<GraphResponses {...args} />
+	</div>
+)
 
 export const Example = Template.bind({})
 Example.args = {
 	data: [
 		{
 			label: 'A',
-			amount: 0,
+			value: 2,
 			isCorrect: false
 		},
 		{
 			label: 'B',
-			amount: 0,
+			value: 0,
 			isCorrect: false
 		},
 		{
 			label: 'C',
-			amount: 5,
+			value: 5,
 			isCorrect: false
 		},
 		{
 			label: 'D',
-			amount: 29,
+			value: 2,
 			isCorrect: true
 		}
-	]
+	],
+	height: 300,
+	width: 300
+}
+
+export const Empty = Template.bind({})
+Empty.args = {
+	data: [],
+	height: 300,
+	width: 300
+}
+
+export const Big = Template.bind({})
+Big.args = {
+	data: [
+		{
+			label: 'A',
+			value: 2,
+			isCorrect: false
+		},
+		{
+			label: 'B',
+			value: 200,
+			isCorrect: false
+		},
+		{
+			label: 'C',
+			value: 20,
+			isCorrect: false
+		},
+		{
+			label: 'D',
+			value: 10,
+			isCorrect: true
+		},
+		{
+			label: 'E',
+			value: 35,
+			isCorrect: true
+		},
+		{
+			label: 'F',
+			value: 2,
+			isCorrect: true
+		},
+		{
+			label: 'G',
+			value: 15,
+			isCorrect: true
+		}
+	],
+	height: 500,
+	width: 500
+}
+
+export const Small = Template.bind({})
+Small.args = {
+	data: [
+		{
+			label: 'A',
+			value: 2,
+			isCorrect: false
+		},
+		{
+			label: 'B',
+			value: 1,
+			isCorrect: true
+		}
+	],
+	height: 200,
+	width: 200
 }
