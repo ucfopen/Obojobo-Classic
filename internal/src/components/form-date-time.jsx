@@ -31,7 +31,7 @@ export default function FormDateTime({ value, onChange }) {
 		}
 
 		if (updatedDateTime.toString() !== 'Invalid Date') {
-			onChange(updatedDateTime.getTime())
+			onChange(updatedDateTime.getTime() / 1000)
 		}
 	}
 
