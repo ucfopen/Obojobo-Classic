@@ -13,21 +13,23 @@ export default function AssessmentScoresSection(props) {
 	return (
 		<div className="assessment-scores-section">
 			<SectionHeader label="Assessment Scores" />
-			<div className="assessment-scores-summary">
-				<AssessmentScoresSummary />
-			</div>
-			<hr className="section-divider" />
-			<div className="assessment-score-search">
-				<p className="title">Scores by student</p>
-				<SearchField placeholder="Search for a name" />
-			</div>
-			<DataGridAssessmentScores
-				data={assessmentScores}
-				selectedIndex={selectedStudentIndex}
-				onSelect={onSelect}
-			/>
-			<div className="download-button">
-				<Button type="large" text="Download these scores as a CSV file" />
+			<div className="assessment-section-body">
+				<div className="assessment-scores-summary">
+					<AssessmentScoresSummary />
+				</div>
+				<hr className="section-divider" />
+				<div className="assessment-score-search">
+					<p className="title">Scores by student</p>
+					<SearchField placeholder="Search for a name" />
+				</div>
+				<DataGridAssessmentScores
+					data={assessmentScores}
+					selectedIndex={selectedStudentIndex}
+					onSelect={onSelect}
+				/>
+				<div className="download-button">
+					<Button type="large" text="Download these scores as a CSV file" />
+				</div>
 			</div>
 		</div>
 	)

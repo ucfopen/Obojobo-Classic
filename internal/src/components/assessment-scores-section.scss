@@ -3,6 +3,10 @@
 $divider-color: #dedede;
 
 .assessment-scores-section {
+	.assessment-section-body {
+		padding: 0 0.5em;
+	}
+
 	.assessment-scores-summary {
 		margin: 1em 0;
 	}
