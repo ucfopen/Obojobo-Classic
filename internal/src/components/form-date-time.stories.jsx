@@ -12,8 +12,10 @@ export default {
 	}
 }
 
-const Template = args => <FormDateTime {...args} />
-
+const Template = args => {
+	const [value, setValue] = React.useState(args.value)
+	return <FormDateTime {...args} value={value} onChange={setValue} />
+}
 export const Null = Template.bind({})
 Null.args = {
 	value: null
