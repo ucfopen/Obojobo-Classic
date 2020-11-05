@@ -9,13 +9,16 @@ import SearchField from './search-field'
 
 export default function AssessmentScoresSection(props) {
 	const { assessmentScores, selectedStudentIndex, onSelect } = props
+	const scores = assessmentScores
+		.map(assessment => assessment.score.value)
+		.filter(score => score !== null)
 
 	return (
 		<div className="assessment-scores-section">
 			<SectionHeader label="Assessment Scores" />
 			<div className="assessment-section-body">
 				<div className="assessment-scores-summary">
-					<AssessmentScoresSummary />
+					<AssessmentScoresSummary scores={scores} />
 				</div>
 				<hr className="section-divider" />
 				<div className="assessment-score-search">
