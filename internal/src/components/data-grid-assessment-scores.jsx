@@ -1,3 +1,5 @@
+import './data-grid-assessment-scores.scss'
+
 import React from 'react'
 import DataGrid from './data-grid'
 import DataGridTimestampCell from './data-grid-timestamp-cell'
@@ -8,6 +10,8 @@ import DataGridAttemptsCell from './data-grid-attempts-cell'
 const getTimestampCell = ({ value }) => (
 	<DataGridTimestampCell value={value} display="horizontal" showSeconds={true} />
 )
+
+const getStudentScoreCell = ({ value }) => <DataGridStudentScoreCell {...value} />
 
 const DataGridAssessmentScores = ({
 	data,
@@ -27,21 +31,23 @@ const DataGridAssessmentScores = ({
 	}
 
 	return (
-		<DataGrid
-			data={data}
-			columns={[
-				{ accessor: 'user', Header: 'User' },
-				{ accessor: 'score', Header: 'Score', Cell: DataGridStudentScoreCell },
-				{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
-				{
-					accessor: 'attempts',
-					Header: 'Attempts',
-					Cell: getDataGridAttemptsCell
-				}
-			]}
-			selectedIndex={selectedIndex}
-			onSelect={onSelect}
-		/>
+		<div className="repository--data-grid-assessment-scores">
+			<DataGrid
+				data={data}
+				columns={[
+					{ accessor: 'user', Header: 'User' },
+					{ accessor: 'score', Header: 'Score', Cell: getStudentScoreCell },
+					{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
+					{
+						accessor: 'attempts',
+						Header: 'Attempts',
+						Cell: getDataGridAttemptsCell
+					}
+				]}
+				selectedIndex={selectedIndex}
+				onSelect={onSelect}
+			/>
+		</div>
 	)
 }
 
