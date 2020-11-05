@@ -9,7 +9,6 @@ $button-size: 1.7em;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0.7em 0.3em;
 
 	.attempts {
 		font-family: $font-default;
@@ -43,8 +42,8 @@ $button-size: 1.7em;
 			}
 		}
 
-		button:first-child {
-			margin-right: 0.3em;
+		button:last-child {
+			margin-left: 0.3em;
 		}
 	}
 }
