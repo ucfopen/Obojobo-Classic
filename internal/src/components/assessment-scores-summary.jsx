@@ -1,36 +1,178 @@
 import React from 'react'
+import { Bar } from '@vx/shape'
+import { Grid } from '@vx/grid'
+import DefList from './def-list'
+import { Group } from '@vx/group'
 import PropTypes from 'prop-types'
+import RefreshButton from './refresh-button'
+import { AxisLeft, AxisBottom } from '@vx/axis'
+import { scaleBand, scaleLinear } from '@vx/scale'
+import './assessment-scores-summary.scss'
 
-export default function AssessmentScoresSummary() {
-	return <div>@TODO</div>
+// @vx Accessors
+const x = d => d.label
+const y = d => d.value
+
+const tickLabelPropsLeft = () => ({
+	textAnchor: 'end'
+})
+
+const tickLabelPropsHoriz = () => ({
+	textAnchor: 'middle'
+})
+
+export default function AssessmentScoresSummary(props) {
+	const data = [
+		{ label: '0-9', value: 0 },
+		{ label: '10-19', value: 0 },
+		{ label: '20-29', value: 0 },
+		{ label: '30-39', value: 0 },
+		{ label: '40-49', value: 0 },
+		{ label: '50-59', value: 0 },
+		{ label: '60-69', value: 0 },
+		{ label: '70-79', value: 0 },
+		{ label: '80-89', value: 0 },
+		{ label: '90-100', value: 0 }
+	]
+
+	// Processes data for this component's graph once this component mounts.
+	let sum = 0,
+		lowestScore = 100,
+		highestScore = 0
+	const scores = props.scores
+	for (let i = 0; i < scores.length; i++) {
+		// Edge case:
+		if (scores[i] === 100) {
+			data[9].value++
+			continue
+		}
+		data[Math.floor(scores[i] / 10)].value++
+
+		// To calculate the mean.
+		sum += scores[i]
+
+		if (scores[i] < lowestScore) {
+			lowestScore = scores[i]
+		}
+
+		if (scores[i] > highestScore) {
+			highestScore = scores[i]
+		}
+	}
+
+	const mean = sum / scores.length
+
+	// Calculating standard deviation.
+	let numerator = 0
+	for (let i = 0; i < scores.length; i++) {
+		numerator += Math.pow(scores[i] - mean, 2)
+	}
+
+	const items = [
+		{
+			label: 'Mean',
+			value: mean.toFixed(2)
+		},
+		{
+			label: 'Std Dev',
+			value:
+				Math.sqrt(numerator / scores.length)
+					.toFixed(2)
+					.toString() + '%'
+		},
+		{
+			label: 'Score Range',
+			value: lowestScore.toString() + '-' + highestScore.toString() + '%'
+		}
+	]
+
+	// Graph configurations
+	const width = 600
+	const height = 350
+
+	// Bounds
+	const xMax = width - 80
+	const yMax = height - 80
+
+	// Scales
+	const xScale = scaleBand({
+		range: [0, xMax],
+		round: true,
+		domain: data.map(x),
+		padding: 0.2
+	})
+
+	const yScale = scaleLinear({
+		range: [0, yMax],
+		round: true,
+		domain: [Math.max(...data.map(y)), 0]
+	})
+
+	return (
+		<div className="assessment-scores-summary">
+			<header>
+				<p>Summary</p>
+				<RefreshButton />
+			</header>
+
+			<div className="scores-summary">
+				<span className="graph-container">
+					<svg width={width} height={height}>
+						<Group top={25} left={65}>
+							<Grid
+								left={0}
+								xScale={xScale}
+								yScale={yScale}
+								width={xMax}
+								height={yMax}
+								numTicksRows={4}
+								numTicksColumns={data.length}
+								stroke="black"
+								xOffset={xScale.bandwidth() / 2}
+							/>
+							<AxisLeft
+								labelOffset={32}
+								left={0}
+								scale={yScale}
+								numTicks={4}
+								hideTicks={true}
+								label="Frequency"
+								labelProps={{}}
+								tickLabelProps={tickLabelPropsLeft}
+							/>
+							{data.map(d => {
+								const barWidth = xScale.bandwidth()
+								const barHeight = yMax - yScale(d.value)
+								return (
+									<Bar
+										key={`bar-${d.label}`}
+										x={xScale(d.label)}
+										y={yMax - barHeight}
+										width={barWidth}
+										height={barHeight}
+										className="vx-bar"
+									/>
+								)
+							})}
+							<AxisBottom
+								scale={xScale}
+								label="Assessment Score %"
+								hideTicks={true}
+								labelOffset={20}
+								top={yMax}
+								labelProps={{}}
+								tickLabelProps={tickLabelPropsHoriz}
+								className="test"
+							/>
+						</Group>
+					</svg>
+				</span>
+				<DefList items={items} className="def-list" />
+			</div>
+		</div>
+	)
 }
 
 AssessmentScoresSummary.propTypes = {
 	scores: PropTypes.arrayOf(PropTypes.number).isRequired
 }
-
-// AssessmentScoresSummary.propTypes = {
-// 	scoringMethod: PropTypes.oneOf(['highest', 'average', 'last']),
-// 	scores: PropTypes.arrayOf(
-// 		PropTypes.shape({
-// 			userID: PropTypes.string.isRequired,
-// 			user: PropTypes.shape({
-// 				first: PropTypes.string,
-// 				last: PropTypes.string,
-// 				mi: PropTypes.string,
-// 			}),
-// 			additional: PropTypes.string,
-// 			attempts: PropTypes.arrayOf(
-// 				PropTypes.shape({
-// 					attemptID: PropTypes.string.isRequired,
-// 					score: PropTypes.string.isRequired,
-// 					linkedAttempt: PropTypes.string.isRequired,
-// 					submitted: PropTypes.bool.isRequired,
-// 					submitDate: PropTypes.string.isRequired,
-// 				})
-// 			),
-// 			synced: PropTypes.bool.isRequired,
-// 			syncedScore: PropTypes.number.isRequired,
-// 		})
-// 	),
-// }
