@@ -1,0 +1,40 @@
+@import '_includes.scss';
+
+.question-score-details {
+	font-family: $font-default;
+	padding: 0.6em;
+
+	> .data-and-responses-content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		> .left-sidebar {
+			> .def-list {
+				margin-left: 0.7em;
+			}
+		}
+
+		> .right-content {
+			margin-left: 0.7em;
+
+			> header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+
+				p {
+					font-weight: bolder;
+				}
+			}
+		}
+	}
+
+	> .question-preview-container {
+		padding: 0.5em;
+
+		> .question-preview {
+			margin: 0 auto;
+		}
+	}
+}
