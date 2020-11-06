@@ -5,14 +5,14 @@ import './search-field.scss'
 
 export default function SearchField(props) {
 	return (
-		<div className="search-field-wrapper">
+		<div className="repository--search-field">
 			<i className="magnifier-icon"></i>
 			<input
 				className="search-field"
 				type="text"
 				placeholder={props.placeholder}
 				value={props.value}
-				onChange={props.onChange}
+				onChange={event => props.onChange(event.target.value)}
 			/>
 		</div>
 	)
