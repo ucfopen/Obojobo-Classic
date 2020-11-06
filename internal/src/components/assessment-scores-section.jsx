@@ -14,7 +14,7 @@ export default function AssessmentScoresSection(props) {
 		.filter(score => score !== null)
 
 	return (
-		<div className="assessment-scores-section">
+		<div className="repository--assessment-scores-section">
 			<SectionHeader label="Assessment Scores" />
 			<div className="assessment-section-body">
 				<div className="assessment-scores-summary">
