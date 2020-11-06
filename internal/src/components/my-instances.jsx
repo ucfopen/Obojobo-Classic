@@ -7,6 +7,10 @@ import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 
 const getFilteredInstances = (instances, search) => {
+	if (!instances) {
+		return []
+	}
+
 	return instances.filter(instance => {
 		if (!search) {
 			return instances
@@ -30,7 +34,8 @@ export default function MyInstances({
 }) {
 	const [search, setSearch] = useState('')
 
-	const selectedInstance = instances[selectedInstanceIndex]
+	const selectedInstance =
+		instances === null || selectedInstanceIndex === null ? null : instances[selectedInstanceIndex]
 	const filteredInstances = getFilteredInstances(instances, search)
 	const selectedIndex = filteredInstances.indexOf(selectedInstance)
 
