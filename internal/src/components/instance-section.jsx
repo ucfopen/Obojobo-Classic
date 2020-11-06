@@ -8,6 +8,7 @@ import DefList from './def-list'
 import AssessmentScoresSummary from './assessment-scores-summary'
 import SearchField from './search-field'
 import DataGridAssessmentScores from './data-grid-assessment-scores'
+import AssessmentScoresSection from './assessment-scores-section'
 import HelpButton from './help-button'
 import InstructionsFlag from './instructions-flag'
 import dayjs from 'dayjs'
@@ -128,22 +129,56 @@ export default function InstanceSection({
 				<Button onClick={onClickManageAccess} type="small" text="Manage access" />
 			</div>
 
-			<SectionHeader label="AssessmentScores" />
-			<AssessmentScoresSummary />
-			<hr />
+			<AssessmentScoresSection
+				onClickDownloadScores={onClickDownloadScores}
+				assessmentScores={[
+					{
+						user: 'Berry, Zachary A.',
+						score: { value: 37, isScoreImported: false },
+						lastSubmitted: '1455050441',
+						attempts: {
+							numAttemptsTaken: 3,
+							numAdditionalAttemptsAdded: 3,
+							numAttempts: 5,
+							isAttemptInProgress: false
+						}
+					},
+					{
+						user: 'Scottie, Pippen',
+						score: { value: null, isScoreImported: false },
+						lastSubmitted: null,
+						attempts: {
+							numAttemptsTaken: 0,
+							numAdditionalAttemptsAdded: 0,
+							numAttempts: 5,
+							isAttemptInProgress: true
+						}
+					},
+					{
+						user: 'Star, Ringo',
+						score: { value: 64, isScoreImported: false },
+						lastSubmitted: '1455050441',
+						attempts: {
+							numAttemptsTaken: 4,
+							numAdditionalAttemptsAdded: 0,
+							numAttempts: 5,
+							isAttemptInProgress: true
+						}
+					},
+					{
+						user: 'Tennant, Neil',
+						score: { value: 100, isScoreImported: true },
+						lastSubmitted: '1455050441',
+						attempts: {
+							numAttemptsTaken: 1,
+							numAdditionalAttemptsAdded: 0,
+							numAttempts: 5,
+							isAttemptInProgress: false
+						}
+					}
+				]}
+			/>
 
-			<div className="scores-by-student">
-				<div className="header">
-					<h4>Scores by student</h4>
-					<SearchField placeholder="Search for a name" />
-				</div>
-				<DataGridAssessmentScores />
-				<Button
-					onClick={onClickDownloadScores}
-					type="small"
-					text="Download these scores as a CSV file"
-				/>
-			</div>
 			<hr />
 
 			<div className="scores-by-question">

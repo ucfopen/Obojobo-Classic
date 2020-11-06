@@ -21,19 +21,73 @@ const RepositoryPage = () => {
 
 	if (isError) return <span>Error: {error.message}</span>
 
+	const onClickAboutThisLO = () => {
+		alert('onClickAboutThisLO')
+	}
+
+	const onClickEditInstanceDetails = () => {
+		alert('onClickEditInstanceDetails')
+	}
+
+	const onClickManageAccess = () => {
+		alert('onClickManageAccess')
+	}
+
+	const onClickDownloadScores = () => {
+		alert('onClickDownloadScores')
+	}
+
+	const onClickViewScoresByQuestion = () => {
+		alert('onClickViewScoresByQuestion')
+	}
+
+	const onClickHeaderAboutOrBannerLink = () => {
+		alert('onClickHeaderAboutOrBannerLink')
+	}
+
+	const onClickHeaderCloseBanner = () => {
+		alert('onClickHeaderCloseBanner')
+	}
+
+	const onClickLogOut = () => {
+		alert('onClickLogOut')
+	}
+
+	const onClickPreview = () => {
+		if (selectedInstanceIndex === null) {
+			return
+		}
+
+		const selectedInstance = data[selectedInstanceIndex]
+
+		window.open(`/preview/${selectedInstance.loID}`, '_blank')
+	}
+
 	return (
 		<div className="repository">
-			<Header />
+			<Header
+				onClickAboutOrBannerLink={onClickHeaderAboutOrBannerLink}
+				onClickCloseBanner={onClickHeaderCloseBanner}
+				onClickLogOut={onClickLogOut}
+			/>
 			<main>
-				<MyInstances
-					instances={data}
-					selectedInstanceIndex={selectedInstanceIndex}
-					onSelect={row => setSelectedInstanceIndex(row)}
-					onClickRefresh={() => reloadInstances()}
-				/>
-				<InstanceSection
-					instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
-				/>
+				<div className="wrapper">
+					<MyInstances
+						instances={data}
+						selectedInstanceIndex={selectedInstanceIndex}
+						onSelect={row => setSelectedInstanceIndex(row)}
+						onClickRefresh={() => reloadInstances()}
+					/>
+					<InstanceSection
+						onClickAboutThisLO={onClickAboutThisLO}
+						onClickPreview={onClickPreview}
+						onClickEditInstanceDetails={onClickEditInstanceDetails}
+						onClickManageAccess={onClickManageAccess}
+						onClickDownloadScores={onClickDownloadScores}
+						onClickViewScoresByQuestion={onClickViewScoresByQuestion}
+						instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
+					/>
+				</div>
 			</main>
 		</div>
 	)

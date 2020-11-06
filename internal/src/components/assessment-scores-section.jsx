@@ -7,8 +7,12 @@ import DataGridAssessmentScores from './data-grid-assessment-scores'
 import Button from './button'
 import SearchField from './search-field'
 
-export default function AssessmentScoresSection(props) {
-	const { assessmentScores, selectedStudentIndex, onSelect } = props
+export default function AssessmentScoresSection({
+	assessmentScores,
+	selectedStudentIndex,
+	onSelect,
+	onClickDownloadScores
+}) {
 	const scores = assessmentScores
 		.map(assessment => assessment.score.value)
 		.filter(score => score !== null)
@@ -31,7 +35,11 @@ export default function AssessmentScoresSection(props) {
 					onSelect={onSelect}
 				/>
 				<div className="download-button">
-					<Button type="large" text="Download these scores as a CSV file" />
+					<Button
+						onClick={onClickDownloadScores}
+						type="small"
+						text="Download these scores as a CSV file"
+					/>
 				</div>
 			</div>
 		</div>
@@ -57,5 +65,6 @@ AssessmentScoresSection.propTypes = {
 	),
 	selectedStudentIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired,
-	onClickRefresh: PropTypes.func.isRequired
+	onClickRefresh: PropTypes.func.isRequired,
+	onClickDownloadScores: PropTypes.func.isRequired
 }

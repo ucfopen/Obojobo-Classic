@@ -8,13 +8,17 @@
 		margin-bottom: 1em;
 	}
 
-	.repository--section-header {
+	> .repository--section-header {
 		margin-bottom: 0.5em;
+	}
+
+	> .instructions-flag {
+		margin-top: 4.5em;
 	}
 
 	> .header {
 		display: flex;
-		align-items: center;
+		align-items: baseline;
 		margin-bottom: 1em;
 
 		> .main-info {
@@ -89,21 +93,25 @@
 		}
 	}
 
-	> .scores-by-student {
-		margin-bottom: 3em;
-
-		> .header {
-			display: flex;
-			align-items: center;
-			margin-bottom: 0.5em;
-
-			> h4 {
-				flex-grow: 1;
-			}
-		}
-
-		> .repository--data-grid {
-			margin-bottom: 1em;
-		}
+	> .repository--assessment-scores-section {
+		margin-bottom: 2em;
 	}
+
+	// > .scores-by-student {
+	// 	margin-bottom: 3em;
+
+	// 	> .header {
+	// 		display: flex;
+	// 		align-items: center;
+	// 		margin-bottom: 0.5em;
+
+	// 		> h4 {
+	// 			flex-grow: 1;
+	// 		}
+	// 	}
+
+	// 	> .repository--data-grid {
+	// 		margin-bottom: 1em;
+	// 	}
+	// }
 }

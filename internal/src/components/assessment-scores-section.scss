@@ -3,21 +3,8 @@
 $divider-color: #dedede;
 
 .repository--assessment-scores-section {
-	.assessment-section-body {
-		padding: 0 0.5em;
-	}
-
 	.assessment-scores-summary {
 		margin: 1em 0;
-	}
-
-	.section-divider {
-		border-width: 1px;
-		border-style: solid;
-		border-top: none;
-		border-left: none;
-		border-right: none;
-		border-color: $divider-color;
 	}
 
 	.assessment-score-search {

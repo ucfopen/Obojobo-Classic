@@ -41,6 +41,7 @@ export default function MyInstances({
 
 	return (
 		<div className="repository--my-instances">
+			<h1>My Instances</h1>
 			<div className="filter">
 				<SearchField
 					placeholder="Search by title, course or id"
