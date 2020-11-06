@@ -3,7 +3,12 @@ import PropTypes from 'prop-types'
 import './data-grid-question-number-cell.scss'
 
 export default function DataGridQuestionNumberCell(props) {
-	const altInfo = props.altNumber ? <p>Alternate {props.altNumber}/2</p> : null
+	const altInfo =
+		props.totalAlts <= 1 ? null : (
+			<p>
+				Alternate {props.altNumber}/{props.totalAlts}
+			</p>
+		)
 
 	return (
 		<div className="data-grid-question-number-cell">
@@ -13,11 +18,8 @@ export default function DataGridQuestionNumberCell(props) {
 	)
 }
 
-DataGridQuestionNumberCell.defaultProps = {
-	altNumber: null
-}
-
 DataGridQuestionNumberCell.propTypes = {
 	displayNumber: PropTypes.number.isRequired,
-	altNumber: PropTypes.oneOfType([null, PropTypes.number])
+	altNumber: PropTypes.number.isRequired,
+	totalAlts: PropTypes.number.isRequired
 }

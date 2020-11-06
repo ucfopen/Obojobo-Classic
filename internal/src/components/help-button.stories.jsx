@@ -17,8 +17,22 @@ const Template = args => <HelpButton {...args} />
 export const Example = Template.bind({})
 Example.args = {
 	children: (
-		<p>
+		<div>
 			Here is some <b>example help</b>!
-		</p>
+		</div>
+	)
+}
+
+export const BigExample = Template.bind({})
+BigExample.args = {
+	children: (
+		<div>
+			Lots of text and Lots of text and Lots of text and Lots of text and Lots of text and Lots of
+			text and Lots of text and Lots of text and Lots of text and Lots of text and Lots of text and
+			Lots of text and Lots of text and Lots of text and Lots of text and Lots of text and Lots of
+			text and Lots of text and Lots of text and Lots of text and Lots of text and Lots of text and
+			Lots of text and Lots of text and Lots of text and Lots of text and Lots of text and Lots of
+			text and Lots of text and
+		</div>
 	)
 }
