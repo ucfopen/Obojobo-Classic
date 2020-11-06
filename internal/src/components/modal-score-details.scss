@@ -1,0 +1,48 @@
+@import 'includes';
+
+.modal-score-details {
+	display: flex;
+	background-color: $color-bg2;
+	height: 90vh;
+
+	.left-pane {
+		flex: 1;
+		padding: 1em;
+	}
+
+	.right-pane {
+		flex: 2;
+		margin: 1em;
+		background-color: $color-bg;
+		border-radius: 2px;
+	}
+
+	.modal-title {
+		margin-bottom: 5em;
+
+		h3 {
+			font-weight: bold;
+		}
+
+		p {
+			margin: 0.5em 0 0 0;
+		}
+	}
+
+	.sort-attempts {
+		margin-bottom: 0.5em;
+	}
+
+	.radio-group {
+		display: inline;
+		margin-left: 0.5em;
+
+		input {
+			margin: 0 0.5em;
+		}
+
+		label {
+			margin-right: 0.5em;
+		}
+	}
+}
