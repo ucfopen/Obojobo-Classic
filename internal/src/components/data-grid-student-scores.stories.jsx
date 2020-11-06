@@ -18,7 +18,11 @@ export const Example = Template.bind({})
 Example.args = {
 	data: [
 		{
-			questionNumber: 1,
+			questionNumber: {
+				displayNumber: 1,
+				altNumber: 1,
+				totalAlts: 2
+			},
 			questionAlternateNumber: 1,
 			type: 'MC',
 			questionItems: [
@@ -33,10 +37,14 @@ Example.args = {
 					_explicitType: 'obo\\lo\\PageItem'
 				}
 			],
-			mean: 100
+			score: 100
 		},
 		{
-			questionNumber: '1b',
+			questionNumber: {
+				displayNumber: 1,
+				altNumber: 2,
+				totalAlts: 2
+			},
 			type: 'QA',
 			questionItems: [
 				{
@@ -80,10 +88,14 @@ Example.args = {
 					_explicitType: 'obo\\lo\\PageItem'
 				}
 			],
-			mean: 50
+			score: 50
 		},
 		{
-			questionNumber: '2',
+			questionNumber: {
+				displayNumber: 2,
+				altNumber: 1,
+				totalAlts: 1
+			},
 			type: 'Media',
 			questionItems: [
 				{
@@ -117,7 +129,7 @@ Example.args = {
 					_explicitType: 'obo\\lo\\PageItem'
 				}
 			],
-			mean: null
+			score: null
 		}
 	]
 }
