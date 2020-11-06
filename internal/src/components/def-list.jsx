@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 export default function DefList(props) {
 	return (
-		<div className="def-list">
+		<div className="repository--def-list">
 			{props.items.map(item => (
 				<div className="row" key={item.label}>
 					<p className="label">{item.label}</p>
