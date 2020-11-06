@@ -1,0 +1,15 @@
+@import '_includes.scss';
+
+.data-grid-question-number-cell {
+	font-family: $font-default;
+	padding: 0.5em 0.7em;
+	text-align: center;
+
+	> p {
+		margin: 0;
+	}
+
+	> .question-info {
+		font-weight: bold;
+	}
+}
