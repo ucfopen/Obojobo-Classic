@@ -23,6 +23,8 @@ export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getIns
 export const apiGetLO = loID => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
 export const apiGetScoresForInstance = instID =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`)
+export const apiEditExtraAttempts = (userID, instID, newCount) =>
+	fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
 
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []

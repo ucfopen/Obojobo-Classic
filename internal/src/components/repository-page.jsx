@@ -2,7 +2,12 @@ import './repository-page.scss'
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery, useQueryCache } from 'react-query'
-import { apiGetInstances, apiGetLO, apiGetScoresForInstance } from '../util/api'
+import {
+	apiGetInstances,
+	apiGetLO,
+	apiGetScoresForInstance,
+	apiEditExtraAttempts
+} from '../util/api'
 import MyInstances from './my-instances'
 import InstanceSection from './instance-section'
 import Header from './header'
@@ -24,12 +29,13 @@ const getFinalScoreFromAttemptScores = (attemptScores, scoringMethod) => {
 	return 0
 }
 
-const getAssessmentScoresFromAPIResult = (scores, scoringMethod, attemptCount) => {
-	return scores.map(score => {
+const getAssessmentScoresFromAPIResult = (scoresByUser, scoringMethod, attemptCount) => {
+	return scoresByUser.map(score => {
 		const lastAttempt = score.attempts[score.attempts.length - 1]
 
 		return {
 			user: `${score.user.last}, ${score.user.first}${score.user.mi ? ` ${score.user.mi}.` : ''}`,
+			userID: score.userID,
 			score: {
 				value: getFinalScoreFromAttemptScores(
 					score.attempts.map(attempt => parseFloat(attempt.score)),
@@ -44,6 +50,19 @@ const getAssessmentScoresFromAPIResult = (scores, scoringMethod, attemptCount) =
 				numAttempts: attemptCount,
 				isAttemptInProgress: !lastAttempt.submitted
 			}
+		}
+	})
+}
+
+const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptCount) => {
+	return scoresForInstance.map(score => {
+		if (score.userID !== userID) {
+			return score
+		}
+
+		return {
+			...score,
+			attempts: { ...score.attempts, numAdditionalAttemptsAdded: newAttemptCount }
 		}
 	})
 }
@@ -95,7 +114,10 @@ const RepositoryPage = () => {
 	}
 
 	const onClickEditInstanceDetails = () => {
-		alert('onClickEditInstanceDetails')
+		setModal({
+			type: 'instanceDetails',
+			props: selectedInstance
+		})
 	}
 
 	const onClickManageAccess = () => {
@@ -107,7 +129,10 @@ const RepositoryPage = () => {
 	}
 
 	const onClickViewScoresByQuestion = () => {
-		alert('onClickViewScoresByQuestion')
+		setModal({
+			type: 'scoresByQuestion',
+			props: {}
+		})
 	}
 
 	const onClickHeaderAboutOrBannerLink = () => {
@@ -120,6 +145,29 @@ const RepositoryPage = () => {
 
 	const onClickLogOut = () => {
 		alert('onClickLogOut')
+	}
+
+	const onClickAddAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
+		apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded + 1)
+		setScoresForInstance(
+			getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded + 1)
+		)
+	}
+
+	const onClickRemoveAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
+		if (numAdditionalAttemptsAdded === 0) {
+			alert('Unable to remove attempt!')
+			return
+		}
+
+		apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded - 1)
+		setScoresForInstance(
+			getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded - 1)
+		)
+	}
+
+	const onClickScoreDetails = userID => {
+		setModal({ type: 'scoreDetails', props: {} })
 	}
 
 	const onClickPreview = () => {
@@ -157,7 +205,13 @@ const RepositoryPage = () => {
 				return
 			}
 
-			setScoresForInstance(getAssessmentScoresFromAPIResult(scores, selectedInstance.scoreMethod))
+			setScoresForInstance(
+				getAssessmentScoresFromAPIResult(
+					scores,
+					selectedInstance.scoreMethod,
+					parseInt(selectedInstance.attemptCount, 10)
+				)
+			)
 		})
 	}
 
@@ -184,6 +238,9 @@ const RepositoryPage = () => {
 						onClickDownloadScores={onClickDownloadScores}
 						onClickViewScoresByQuestion={onClickViewScoresByQuestion}
 						onClickRefreshScores={onClickRefreshScores}
+						onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
+						onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
+						onClickScoreDetails={onClickScoreDetails}
 						instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
 						scores={scoresForInstance}
 					/>

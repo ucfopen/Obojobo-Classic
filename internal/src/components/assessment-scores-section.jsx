@@ -12,7 +12,10 @@ export default function AssessmentScoresSection({
 	selectedStudentIndex,
 	onSelect,
 	onClickRefresh,
-	onClickDownloadScores
+	onClickDownloadScores,
+	onClickAddAdditionalAttempt,
+	onClickRemoveAdditionalAttempt,
+	onClickScoreDetails
 }) {
 	const scores = assessmentScores
 		? assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
@@ -34,6 +37,9 @@ export default function AssessmentScoresSection({
 					data={assessmentScores || null}
 					selectedIndex={selectedStudentIndex}
 					onSelect={onSelect}
+					onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
+					onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
+					onClickScoreDetails={onClickScoreDetails}
 				/>
 				<div className="download-button">
 					<Button
@@ -51,6 +57,7 @@ AssessmentScoresSection.propTypes = {
 	assessmentScores: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,
+			userID: PropTypes.string.isRequired,
 			score: PropTypes.shape({
 				value: PropTypes.oneOfType([null, PropTypes.number]),
 				isScoreImported: PropTypes.bool
@@ -67,5 +74,8 @@ AssessmentScoresSection.propTypes = {
 	selectedStudentIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired,
-	onClickDownloadScores: PropTypes.func.isRequired
+	onClickDownloadScores: PropTypes.func.isRequired,
+	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
+	onClickScoreDetails: PropTypes.func.isRequired
 }

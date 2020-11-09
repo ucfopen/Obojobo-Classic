@@ -4,11 +4,23 @@ import React, { useEffect } from 'react'
 import ReactModal from 'react-modal'
 import ModalAboutLO from './modal-about-lo'
 import Button from './button'
+import ModalInstanceDetails from './modal-instance-details'
+import ModalScoreDetails from './modal-score-details'
+import ModalScoresByQuestion from './modal-scores-by-question'
 
 const getModal = (modalType, modalProps, onCloseModal) => {
 	switch (modalType) {
 		case 'aboutThisLO':
 			return <ModalAboutLO {...modalProps} onClose={onCloseModal} />
+
+		case 'instanceDetails':
+			return <ModalInstanceDetails {...modalProps} onClose={onCloseModal} />
+
+		case 'scoreDetails':
+			return <ModalScoreDetails {...modalProps} onClose={onCloseModal} />
+
+		case 'scoresByQuestion':
+			return <ModalScoresByQuestion {...modalProps} onClose={onCloseModal} />
 	}
 
 	return null

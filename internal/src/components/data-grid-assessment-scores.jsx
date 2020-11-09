@@ -11,21 +11,37 @@ const getTimestampCell = ({ value }) => (
 	<DataGridTimestampCell value={value} display="horizontal" showSeconds={true} />
 )
 
-const getStudentScoreCell = ({ value }) => <DataGridStudentScoreCell {...value} />
-
 const DataGridAssessmentScores = ({
 	data,
 	selectedIndex,
 	onSelect,
 	onClickAddAdditionalAttempt,
-	onClickRemoveAdditionalAttempt
+	onClickRemoveAdditionalAttempt,
+	onClickScoreDetails
 }) => {
+	const getStudentScoreCell = ({ value, row }) => (
+		<DataGridStudentScoreCell
+			{...value}
+			onClickScoreDetails={() => onClickScoreDetails(row.original.userID)}
+		/>
+	)
+
 	const getDataGridAttemptsCell = ({ value, row }) => {
 		return (
 			<DataGridAttemptsCell
 				{...value}
-				onClickAddAdditionalAttempt={() => onClickAddAdditionalAttempt(row.index)}
-				onClickRemoveAdditionalAttempt={() => onClickRemoveAdditionalAttempt(row.index)}
+				onClickAddAdditionalAttempt={() => {
+					onClickAddAdditionalAttempt(
+						row.original.userID,
+						row.original.attempts.numAdditionalAttemptsAdded
+					)
+				}}
+				onClickRemoveAdditionalAttempt={() =>
+					onClickRemoveAdditionalAttempt(
+						row.original.userID,
+						row.original.attempts.numAdditionalAttemptsAdded
+					)
+				}
 			/>
 		)
 	}
@@ -55,6 +71,7 @@ DataGridAssessmentScores.propTypes = {
 	data: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,
+			userID: PropTypes.string.isRequired,
 			score: PropTypes.shape({
 				value: PropTypes.oneOfType([null, PropTypes.number]),
 				isScoreImported: PropTypes.bool
@@ -71,7 +88,8 @@ DataGridAssessmentScores.propTypes = {
 	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
+	onClickScoreDetails: PropTypes.func.isRequired
 }
 
 export default DataGridAssessmentScores

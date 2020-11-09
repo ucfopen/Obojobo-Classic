@@ -50,7 +50,10 @@ export default function InstanceSection({
 	onClickManageAccess,
 	onClickDownloadScores,
 	onClickViewScoresByQuestion,
-	onClickRefreshScores
+	onClickRefreshScores,
+	onClickAddAdditionalAttempt,
+	onClickRemoveAdditionalAttempt,
+	onClickScoreDetails
 }) {
 	if (!instance) {
 		return (
@@ -135,6 +138,9 @@ export default function InstanceSection({
 				onClickDownloadScores={onClickDownloadScores}
 				assessmentScores={scores}
 				onClickRefresh={onClickRefreshScores}
+				onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
+				onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
+				onClickScoreDetails={onClickScoreDetails}
 			/>
 
 			<hr />
@@ -156,5 +162,8 @@ InstanceSection.propTypes = {
 	onClickViewScoresByQuestion: PropTypes.func.isRequired,
 	onClickAboutThisLO: PropTypes.func.isRequired,
 	onClickPreview: PropTypes.func.isRequired,
-	onClickRefreshScores: PropTypes.func.isRequired
+	onClickRefreshScores: PropTypes.func.isRequired,
+	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
+	onClickScoreDetails: PropTypes.func.isRequired
 }
