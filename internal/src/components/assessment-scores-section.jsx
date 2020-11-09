@@ -11,18 +11,19 @@ export default function AssessmentScoresSection({
 	assessmentScores,
 	selectedStudentIndex,
 	onSelect,
+	onClickRefresh,
 	onClickDownloadScores
 }) {
 	const scores = assessmentScores
-		.map(assessment => assessment.score.value)
-		.filter(score => score !== null)
+		? assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
+		: []
 
 	return (
 		<div className="repository--assessment-scores-section">
 			<SectionHeader label="Assessment Scores" />
 			<div className="assessment-section-body">
 				<div className="assessment-scores-summary">
-					<AssessmentScoresSummary scores={scores} />
+					<AssessmentScoresSummary scores={scores} onClickRefresh={onClickRefresh} />
 				</div>
 				<hr className="section-divider" />
 				<div className="assessment-score-search">
@@ -30,7 +31,7 @@ export default function AssessmentScoresSection({
 					<SearchField placeholder="Search for a name" />
 				</div>
 				<DataGridAssessmentScores
-					data={assessmentScores}
+					data={assessmentScores || null}
 					selectedIndex={selectedStudentIndex}
 					onSelect={onSelect}
 				/>

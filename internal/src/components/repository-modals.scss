@@ -47,4 +47,41 @@ $duration-animation-default: 0.2s;
 	font-family: $font-default;
 	-webkit-overflow-scrolling: touch;
 	outline: none;
+	border-radius: $dimension-rounded-radius;
+}
+
+.top-bar {
+	text-align: left;
+	position: relative;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+	height: 3em;
+
+	.module-title {
+		display: inline-block;
+		font-weight: bold;
+		color: black;
+		margin: 0;
+		max-width: calc(100% - 8.5em);
+		vertical-align: middle;
+		position: absolute;
+		left: 1.5em;
+		top: 50%;
+		transform: translate(0, -50%);
+		max-height: 1.2em;
+		overflow: hidden;
+		word-break: break-word;
+	}
+
+	> .repository--button {
+		position: absolute;
+		right: 1.5em;
+		top: 50%;
+		transform: translate(0, -50%);
+		text-decoration: none;
+	}
+}
+
+.modal-content {
+	padding: 1.25em;
 }

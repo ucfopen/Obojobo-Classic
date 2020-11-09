@@ -71,18 +71,20 @@ export default function AssessmentScoresSummary(props) {
 	const items = [
 		{
 			label: 'Mean',
-			value: mean.toFixed(2)
+			value: scores.length > 0 ? mean.toFixed(2) : '--'
 		},
 		{
 			label: 'Std Dev',
 			value:
-				Math.sqrt(numerator / scores.length)
-					.toFixed(2)
-					.toString() + '%'
+				scores.length > 0
+					? Math.sqrt(numerator / scores.length)
+							.toFixed(2)
+							.toString() + '%'
+					: '--'
 		},
 		{
 			label: 'Score Range',
-			value: lowestScore.toString() + '-' + highestScore.toString() + '%'
+			value: scores.length > 0 ? lowestScore.toString() + '-' + highestScore.toString() + '%' : '--'
 		}
 	]
 
@@ -112,7 +114,7 @@ export default function AssessmentScoresSummary(props) {
 		<div className="assessment-scores-summary">
 			<header>
 				<p>Summary</p>
-				<RefreshButton />
+				<RefreshButton onClick={props.onClickRefresh} />
 			</header>
 
 			<div className="scores-summary">
@@ -140,20 +142,22 @@ export default function AssessmentScoresSummary(props) {
 								labelProps={{}}
 								tickLabelProps={tickLabelPropsLeft}
 							/>
-							{data.map(d => {
-								const barWidth = xScale.bandwidth()
-								const barHeight = yMax - yScale(d.value)
-								return (
-									<Bar
-										key={`bar-${d.label}`}
-										x={xScale(d.label)}
-										y={yMax - barHeight}
-										width={barWidth}
-										height={barHeight}
-										className="vx-bar"
-									/>
-								)
-							})}
+							{scores.length > 0
+								? data.map(d => {
+										const barWidth = xScale.bandwidth()
+										const barHeight = yMax - yScale(d.value)
+										return (
+											<Bar
+												key={`bar-${d.label}`}
+												x={xScale(d.label)}
+												y={yMax - barHeight}
+												width={barWidth}
+												height={barHeight}
+												className="vx-bar"
+											/>
+										)
+								  })
+								: null}
 							<AxisBottom
 								scale={xScale}
 								label="Assessment Score %"
@@ -174,5 +178,6 @@ export default function AssessmentScoresSummary(props) {
 }
 
 AssessmentScoresSummary.propTypes = {
-	scores: PropTypes.arrayOf(PropTypes.number).isRequired
+	scores: PropTypes.arrayOf(PropTypes.number).isRequired,
+	onClickRefresh: PropTypes.func.isRequired
 }

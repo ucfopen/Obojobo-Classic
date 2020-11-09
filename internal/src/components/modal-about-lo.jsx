@@ -28,7 +28,7 @@ export default function ModalAboutLO(props) {
 				<FlashHTML value={props.learningObjective} />
 			</div>
 
-			<Button className="modal-about-lo-button" text="Close" type="text" onClick={null} />
+			<Button text="Close" type="text" onClick={props.onClose} />
 		</div>
 	)
 }

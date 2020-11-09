@@ -21,6 +21,8 @@ const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
 export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getInstances')
 export const apiGetLO = loID => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
+export const apiGetScoresForInstance = instID =>
+	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`)
 
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []
