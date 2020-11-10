@@ -24,14 +24,14 @@ const tickLabelPropsHoriz = () => ({
 export default function AssessmentScoresSummary(props) {
 	const data = [
 		{ label: '0-9', value: 0 },
-		{ label: '10-19', value: 0 },
-		{ label: '20-29', value: 0 },
-		{ label: '30-39', value: 0 },
-		{ label: '40-49', value: 0 },
-		{ label: '50-59', value: 0 },
-		{ label: '60-69', value: 0 },
-		{ label: '70-79', value: 0 },
-		{ label: '80-89', value: 0 },
+		{ label: '10s', value: 0 },
+		{ label: '20s', value: 0 },
+		{ label: '30s', value: 0 },
+		{ label: '40s', value: 0 },
+		{ label: '50s', value: 0 },
+		{ label: '60s', value: 0 },
+		{ label: '70s', value: 0 },
+		{ label: '80s', value: 0 },
 		{ label: '90-100', value: 0 }
 	]
 
@@ -89,7 +89,7 @@ export default function AssessmentScoresSummary(props) {
 	]
 
 	// Graph configurations
-	const width = 600
+	const width = 500
 	const height = 350
 
 	// Bounds
