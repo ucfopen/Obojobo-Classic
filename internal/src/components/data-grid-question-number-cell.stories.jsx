@@ -16,11 +16,14 @@ const Template = args => <DataGridQuestionNumberCell {...args} />
 
 export const NonAlternate = Template.bind({})
 NonAlternate.args = {
-	displayNumber: 9
+	displayNumber: 9,
+	altNumber: 1,
+	totalAlts: 1
 }
 
 export const Alternate = Template.bind({})
 Alternate.args = {
 	displayNumber: 2,
-	altNumber: 1
+	altNumber: 1,
+	totalAlts: 2
 }

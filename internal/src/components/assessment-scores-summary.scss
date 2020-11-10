@@ -1,0 +1,57 @@
+@import '_includes.scss';
+
+.assessment-scores-summary {
+	font-family: $font-default;
+
+	> header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		> p {
+			color: $color-text;
+			font-weight: bolder;
+		}
+	}
+
+	> .scores-summary {
+		display: flex;
+
+		> .graph-container {
+			.vx-axis-label {
+				font-family: $font-default;
+				font-size: 1em;
+				text-anchor: middle;
+				fill: #000000;
+				font-weight: bolder;
+			}
+
+			.vx-axis-tick {
+				font-family: $font-default;
+				font-size: 0.8em;
+				fill: #888888;
+			}
+
+			.vx-bar {
+				fill: #98bb87;
+			}
+
+			.vx-grid {
+				.vx-line {
+					stroke-opacity: 0.1;
+					stroke-width: 2;
+				}
+			}
+
+			.vx-axis .vx-line {
+				stroke-opacity: 0.3;
+				stroke-width: 2;
+			}
+		}
+
+		> .def-list {
+			margin-top: 0.8em;
+			margin-left: 1.5em;
+		}
+	}
+}

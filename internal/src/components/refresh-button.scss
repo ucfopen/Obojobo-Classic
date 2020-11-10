@@ -1,0 +1,27 @@
+@import 'includes';
+
+.refresh-button {
+	$background-color: #ffffff;
+	$button-size: 2em;
+
+	width: $button-size;
+	height: $button-size;
+	border: 1px solid #bbbbbb;
+	border-radius: 50%;
+	background-color: $background-color;
+	cursor: pointer;
+
+	& svg {
+		width: 100%;
+		height: 100%;
+	}
+
+	&:hover {
+		background-color: $color-action;
+		border-color: $color-action;
+
+		& svg {
+			fill: $background-color;
+		}
+	}
+}

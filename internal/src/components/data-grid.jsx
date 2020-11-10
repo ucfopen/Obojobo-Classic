@@ -29,7 +29,7 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 				{headerGroups.map(headerGroup => (
 					<tr {...headerGroup.getHeaderGroupProps()}>
 						{headerGroup.headers.map(column => (
-							<th {...column.getHeaderProps(column.getSortByToggleProps())}>
+							<th {...column.getHeaderProps(!isLoading ? column.getSortByToggleProps() : {})}>
 								{column.render('Header')}
 								{column.isSorted && column.isSortedDesc ? <CaretUp /> : null}
 								{column.isSorted && !column.isSortedDesc ? <CaretDown /> : null}
