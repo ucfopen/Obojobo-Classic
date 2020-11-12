@@ -1,24 +1,20 @@
 @import 'includes';
 
+$color-modal-bg: #f7f7f7;
+
 .modal-score-details {
 	display: flex;
-	background-color: $color-bg2;
+	background-color: $color-modal-bg;
 	height: 90vh;
 
 	.left-pane {
-		flex: 1;
+		flex: 1.1;
 		padding: 1em;
-	}
-
-	.right-pane {
-		flex: 2;
-		margin: 1em;
-		background-color: $color-bg;
-		border-radius: 2px;
+		overflow: auto;
 	}
 
 	.modal-title {
-		margin-bottom: 5em;
+		margin-bottom: 4em;
 
 		h3 {
 			font-weight: bold;
@@ -33,6 +29,11 @@
 		margin-bottom: 0.5em;
 	}
 
+	.student-scores {
+		background-color: $color-bg;
+		overflow: auto;
+	}
+
 	.radio-group {
 		display: inline;
 		margin-left: 0.5em;
@@ -43,6 +44,24 @@
 
 		label {
 			margin-right: 0.5em;
+		}
+	}
+
+	.right-pane {
+		flex: 2;
+		margin: 1em;
+		padding: 1em;
+		background-color: $color-bg;
+		border-radius: $dimension-rounded-radius;
+		position: relative;
+
+		.instructions {
+			position: absolute;
+			top: 20%;
+
+			.label {
+				margin-bottom: 0.5em;
+			}
 		}
 	}
 }

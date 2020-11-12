@@ -1,10 +1,27 @@
 import './modal-score-details.scss'
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import DataGridStudentScores from './data-grid-student-scores'
 import QuestionPreview from './question-preview'
+import InstructionsFlag from './instructions-flag'
 
-export default function ModalScoreDetails() {
+export default function ModalScoreDetails(props) {
+	const [previewType, setPreviewType] = useState(null)
+
+	const renderPreview = () => {
+		switch (previewType) {
+			case 'question':
+				return <QuestionPreview question={props.question} response={props.response} />
+			default:
+				return (
+					<div className="instructions">
+						<InstructionsFlag text="Select an attempt row to see details about that attempt" />
+						<InstructionsFlag text="Select a question to see how the student answered" />
+					</div>
+				)
+		}
+	}
+
 	return (
 		<div className="modal-score-details">
 			<div className="left-pane">
@@ -21,11 +38,16 @@ export default function ModalScoreDetails() {
 						<label htmlFor="questions">Questions</label>
 					</div>
 				</div>
-				<DataGridStudentScores />
+				<div className="student-scores">
+					<DataGridStudentScores
+						data={props.data}
+						onSelect={() => {
+							setPreviewType('question')
+						}}
+					/>
+				</div>
 			</div>
-			<div className="right-pane">
-				<QuestionPreview />
-			</div>
+			<div className="right-pane">{renderPreview()}</div>
 		</div>
 	)
 }
