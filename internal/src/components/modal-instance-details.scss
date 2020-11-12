@@ -1,0 +1,99 @@
+@import './_includes.scss';
+
+$color-text-disabled: lighten($color-text, 60%);
+
+.modal-instance-details {
+	h1 {
+		text-align: center;
+		margin-top: 0.5em;
+		margin-bottom: 1em;
+	}
+
+	p {
+		margin-top: none;
+		margin-bottom: none;
+	}
+
+	input[type='text'] {
+		width: 20em;
+		font-size: 1em;
+		margin-right: 1em;
+	}
+
+	input[type='number'] {
+		width: 3em;
+		font-size: 1em;
+		margin-right: 1em;
+	}
+
+	select {
+		width: 15em;
+		font-weight: bold;
+		margin-right: 1em;
+	}
+
+	.box {
+		padding-top: 0.25em;
+		padding-bottom: 0.25em;
+
+		&.border {
+			border-top: 2px solid $color-shadow;
+			border-bottom: 2px solid $color-shadow;
+		}
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: 25% 75%;
+		align-items: center;
+		justify-content: center;
+		line-height: 1.4em;
+		margin: 0.3em;
+
+		&.example {
+			font-size: 0.75em;
+
+			> .sub-title {
+				margin-right: 0.4em;
+				justify-self: flex-end;
+			}
+		}
+
+		> .linked {
+			grid-column-start: 2;
+		}
+
+		> .score-import {
+			grid-column-start: 2;
+
+			> span {
+				margin-right: 1em;
+			}
+		}
+
+		> .title {
+			font-weight: bold;
+			margin-right: 0.4em;
+			justify-self: flex-end;
+		}
+
+		> .is-disabled {
+			color: $color-text-disabled;
+		}
+
+		> .flex-container {
+			display: flex;
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		margin-top: 1em;
+
+		> .repository--button {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+		}
+	}
+}
