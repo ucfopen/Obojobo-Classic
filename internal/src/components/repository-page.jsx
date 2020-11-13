@@ -6,7 +6,8 @@ import {
 	apiGetInstances,
 	apiGetLO,
 	apiGetScoresForInstance,
-	apiEditExtraAttempts
+	apiEditExtraAttempts,
+	apiLogout
 } from '../util/api'
 import MyInstances from './my-instances'
 import InstanceSection from './instance-section'
@@ -143,8 +144,9 @@ const RepositoryPage = () => {
 		alert('onClickHeaderCloseBanner')
 	}
 
-	const onClickLogOut = () => {
-		alert('onClickLogOut')
+	const onClickLogOut = async () => {
+		await apiLogout()
+		window.location = window.location
 	}
 
 	const onClickAddAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
