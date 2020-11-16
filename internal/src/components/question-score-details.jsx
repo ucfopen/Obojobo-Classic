@@ -76,8 +76,8 @@ export default function QuestionScoreDetails(props) {
 		dataForGraph.push({ label: 'Incorrect', value: 0, isCorrect: false })
 		dataForGraph.push({ label: 'Correct', value: 0, isCorrect: false })
 	} else if (questionType === MEDIA) {
-		dataForGraph.push({ label: '< 100', value: 0, isCorrect: false })
-		dataForGraph.push({ label: '100', value: 0, isCorrect: true })
+		dataForGraph.push({ label: '< 100', value: 0, isCorrect: false, score: 0 })
+		dataForGraph.push({ label: '100', value: 0, isCorrect: true, score: 0 })
 	}
 
 	if (questionType === QA || questionType === MEDIA) {
@@ -97,12 +97,17 @@ export default function QuestionScoreDetails(props) {
 					indexCorrectAnswer = i
 				}
 			}
+
+			if (questionType === MEDIA) {
+				dataForGraph[i].score = responses[i].score
+			}
 		}
 	}
 
 	// Calculates mean.
 	for (let i = 0; i < dataForGraph.length; i++) {
-		sum += dataForGraph[i].value
+		sum +=
+			questionType === MC || questionType === QA ? dataForGraph[i].value : dataForGraph[i].score
 	}
 	mean = sum / dataForGraph.length
 
@@ -146,11 +151,9 @@ export default function QuestionScoreDetails(props) {
 		items.push({ label: 'Std Dev', value: getStdDev() })
 		response = indexCorrectAnswer !== -1 ? props.question.answers[indexCorrectAnswer].answerID : ''
 	} else if (questionType === QA) {
-		items.push({ label: 'Accuracy', value: getAccuracy() })
-		response = props.responses[props.responses.length - 1].response
+		items.push({ label: 'Accuracy', value: (getAccuracy() * 100).toString() + '%' })
 	} else {
-		items.push({ label: 'Mean', value: mean })
-		response = props.responses[props.responses.length - 1].response
+		items.push({ label: 'Mean', value: mean.toString() + '%' })
 	}
 
 	return (
