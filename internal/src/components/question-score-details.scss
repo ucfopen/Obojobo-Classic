@@ -1,22 +1,27 @@
 @import '_includes.scss';
 
-.question-score-details {
+.repository--question-score-details {
 	font-family: $font-default;
 	padding: 0.6em;
+	max-width: 60em;
 
 	> .data-and-responses-content {
 		display: flex;
-		align-items: center;
-		justify-content: center;
+		// align-items: center;
+		justify-content: space-between;
 
 		> .left-sidebar {
+			width: 40%;
+
 			> .def-list {
 				margin-left: 0.7em;
 			}
 		}
 
 		> .right-content {
-			margin-left: 0.7em;
+			// margin-left: 0.7em;
+			height: 100%;
+			width: 60%;
 
 			> header {
 				display: flex;
