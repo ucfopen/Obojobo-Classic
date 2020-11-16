@@ -9,13 +9,12 @@ $color-text-disabled: lighten($color-text, 60%);
 		margin-bottom: 1em;
 	}
 
-	p {
-		margin-top: none;
-		margin-bottom: none;
+	input {
+		border: 1px solid $color-shadow;
 	}
 
 	input[type='text'] {
-		width: 20em;
+		width: 22.2em;
 		font-size: 1em;
 		margin-right: 1em;
 	}
@@ -26,10 +25,16 @@ $color-text-disabled: lighten($color-text, 60%);
 		margin-right: 1em;
 	}
 
+	input[type='checkbox'] {
+		margin-right: 0.5em;
+	}
+
 	select {
-		width: 15em;
+		width: 22.6em;
 		font-weight: bold;
+		font-size: 1em;
 		margin-right: 1em;
+		border: 1px solid $color-shadow;
 	}
 
 	.box {
@@ -66,7 +71,7 @@ $color-text-disabled: lighten($color-text, 60%);
 		> .score-import {
 			grid-column-start: 2;
 
-			> span {
+			> label {
 				margin-right: 1em;
 			}
 		}
@@ -89,7 +94,7 @@ $color-text-disabled: lighten($color-text, 60%);
 	.buttons {
 		display: flex;
 		justify-content: center;
-		margin-top: 1em;
+		margin-top: 3em;
 
 		> .repository--button {
 			margin-left: 0.5em;

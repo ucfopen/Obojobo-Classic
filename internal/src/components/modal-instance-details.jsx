@@ -119,36 +119,41 @@ export default function ModalInstanceDetails(props) {
 						<input
 							type="number"
 							value={numAttempts}
-							onChange={event => setNumAttempts(parseInt(event.target.value, 10))}
+							onChange={event => {
+								if (event.target.value >= 0 && event.target.value < 256) {
+									setNumAttempts(parseInt(event.target.value, 10))
+								}
+							}}
 						/>
 						<HelpButton />
 					</div>
 				</div>
-				<div className="row">
-					<span className="title">Scoring:</span>
-					<div className="flex-container">
-						<select
-							name="scoringMethod"
-							value={scoringMethod}
-							onChange={event => setScoringMethod(event.target.value)}
-						>
-							<option value="highest">Take Highest Attempt</option>
-							<option value="average">Take Average Score</option>
-							<option value="last">Take Last Attempt</option>
-						</select>
-						<HelpButton />
-					</div>
-				</div>
-				{renderExample()}
+				{numAttempts > 0 ? (
+					<React.Fragment>
+						<div className="row">
+							<span className="title">Scoring:</span>
+							<div className="flex-container">
+								<select
+									name="scoringMethod"
+									value={scoringMethod}
+									onChange={event => setScoringMethod(event.target.value)}
+								>
+									<option value="highest">Take Highest Attempt</option>
+									<option value="average">Take Average Score</option>
+									<option value="last">Take Last Attempt</option>
+								</select>
+								<HelpButton />
+							</div>
+						</div>
+						{renderExample()}
+					</React.Fragment>
+				) : null}
 				<div className="row">
 					<div className="score-import">
-						<input
-							type="checkbox"
-							name="isImportAllowed"
-							defaultChecked={isImportAllowed}
-							onClick={event => setIsImportAllowed(event.target.checked)}
-						/>
-						<span>Allow past scores to be imported</span>
+						<label onClick={event => setIsImportAllowed(event.target.checked)}>
+							<input type="checkbox" name="isImportAllowed" defaultChecked={isImportAllowed} />
+							<span>Allow past scores to be imported</span>
+						</label>
 						<HelpButton />
 					</div>
 				</div>
