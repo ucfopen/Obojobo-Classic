@@ -1,0 +1,113 @@
+@import './_includes.scss';
+
+$color-text-disabled: lighten($color-text, 60%);
+
+.modal-instance-details {
+	h1 {
+		text-align: center;
+		margin-top: 0.5em;
+		margin-bottom: 1em;
+	}
+
+	input {
+		border: 1px solid $color-shadow;
+		font-family: $font-monospace;
+		padding: 0.3em;
+		box-sizing: border-box;
+	}
+
+	input[type='text'] {
+		width: 22.2em;
+		font-size: 1em;
+		margin-right: 1em;
+		border-radius: $dimension-rounded-radius;
+	}
+
+	input[type='number'] {
+		width: 3em;
+		font-size: 1em;
+		margin-right: 1em;
+		border-radius: $dimension-rounded-radius;
+	}
+
+	input[type='checkbox'] {
+		margin-right: 0.5em;
+	}
+
+	select {
+		width: 22.2em;
+		font-weight: bold;
+		font-size: 1em;
+		margin-right: 1em;
+		border: 1px solid $color-shadow;
+		border-radius: $dimension-rounded-radius;
+		padding: 0.3em;
+		box-sizing: border-box;
+	}
+
+	.box {
+		padding-top: 0.25em;
+		padding-bottom: 0.25em;
+
+		&.border {
+			border-top: 2px solid $color-shadow;
+			border-bottom: 2px solid $color-shadow;
+		}
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: 25% 75%;
+		align-items: center;
+		justify-content: center;
+		line-height: 1.4em;
+		margin: 0.3em;
+
+		&.example {
+			font-size: 0.75em;
+
+			> .sub-title {
+				margin-right: 0.7em;
+				justify-self: flex-end;
+			}
+		}
+
+		> .linked {
+			grid-column-start: 2;
+		}
+
+		> .score-import {
+			grid-column-start: 2;
+
+			> label {
+				margin-right: 1em;
+				cursor: pointer;
+			}
+		}
+
+		> .title {
+			font-weight: bold;
+			margin-right: 0.7em;
+			justify-self: flex-end;
+		}
+
+		> .is-disabled {
+			color: $color-text-disabled;
+		}
+
+		> .flex-container {
+			display: flex;
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		margin-top: 3em;
+
+		> .repository--button {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+		}
+	}
+}
