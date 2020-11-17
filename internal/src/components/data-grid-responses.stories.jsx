@@ -3,8 +3,21 @@ import React from 'react'
 import DataGridResponses from './data-grid-responses'
 
 export default {
-	component: DataGridResponses,
 	title: 'DataGridResponses',
+	component: DataGridResponses,
+	argTypes: {
+		onSelect: {
+			description:
+				'callback for when a selection is made. arg is all the data from the selected index'
+		},
+		columns: {
+			description: 'See react-table columns'
+		},
+		data: {
+			description:
+				'If null then the data is loading and the DataGridResponses will be in a loading state. Otherwise this is the data source of the items in the list.'
+		}
+	},
 	parameters: {
 		controls: {
 			expanded: true
@@ -14,8 +27,18 @@ export default {
 
 const Template = args => <DataGridResponses {...args} />
 
-export const Example = Template.bind({})
-Example.args = {
+export const Loading = Template.bind({})
+Loading.args = {
+	data: null
+}
+
+export const NoData = Template.bind({})
+NoData.args = {
+	responses: []
+}
+
+export const Data = Template.bind({})
+Data.args = {
 	responses: [
 		{
 			userName: 'Chris Lowe',

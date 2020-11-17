@@ -17,6 +17,12 @@ TextButton.args = {
 	type: 'text'
 }
 
+export const BoldTextButton = Template.bind({})
+BoldTextButton.args = {
+	text: 'Button',
+	type: 'text-bold'
+}
+
 export const SmallButton = Template.bind({})
 SmallButton.args = {
 	text: 'Button',

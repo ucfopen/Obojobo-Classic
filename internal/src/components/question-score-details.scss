@@ -1,0 +1,44 @@
+@import '_includes.scss';
+
+.repository--question-score-details {
+	font-family: $font-default;
+	padding: 0.6em;
+
+	> .data-and-responses-content {
+		display: flex;
+		// align-items: center;
+		justify-content: space-between;
+
+		> .left-sidebar {
+			width: 40%;
+
+			> .def-list {
+				margin-left: 0.7em;
+			}
+		}
+
+		> .right-content {
+			// margin-left: 0.7em;
+			height: 100%;
+			width: 60%;
+
+			> header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+
+				p {
+					font-weight: bolder;
+				}
+			}
+		}
+	}
+
+	> .question-preview-container {
+		padding: 0.5em;
+
+		> .question-preview {
+			margin: 0 auto;
+		}
+	}
+}
