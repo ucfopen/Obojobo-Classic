@@ -89,6 +89,10 @@ const RepositoryPage = () => {
 	const [selectedInstanceIndex, setSelectedInstanceIndex] = useState(null)
 	const [modal, setModal] = useState(null)
 	const [scoresForInstance, setScoresForInstance] = useState(null)
+	const [isShowingBanner, setIsShowingBanner] = useState(
+		typeof window.localStorage.hideBanner === 'undefined' ||
+			window.localStorage.hideBanner === 'false'
+	)
 
 	if (isError) return <span>Error: {error.message}</span>
 
@@ -137,11 +141,15 @@ const RepositoryPage = () => {
 	}
 
 	const onClickHeaderAboutOrBannerLink = () => {
-		alert('onClickHeaderAboutOrBannerLink')
+		setModal({
+			type: 'aboutObojoboNext',
+			props: {}
+		})
 	}
 
 	const onClickHeaderCloseBanner = () => {
-		alert('onClickHeaderCloseBanner')
+		window.localStorage.hideBanner = 'true'
+		setIsShowingBanner(false)
 	}
 
 	const onClickLogOut = async () => {
@@ -220,6 +228,7 @@ const RepositoryPage = () => {
 	return (
 		<div id="repository" className="repository">
 			<Header
+				isShowingBanner={isShowingBanner}
 				onClickAboutOrBannerLink={onClickHeaderAboutOrBannerLink}
 				onClickCloseBanner={onClickHeaderCloseBanner}
 				onClickLogOut={onClickLogOut}

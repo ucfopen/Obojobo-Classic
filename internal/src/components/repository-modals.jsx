@@ -7,6 +7,7 @@ import Button from './button'
 import ModalInstanceDetails from './modal-instance-details'
 import ModalScoreDetails from './modal-score-details'
 import ModalScoresByQuestion from './modal-scores-by-question'
+import ModalAboutObojoboNext from './modal-about-obojobo-next'
 
 const getModal = (modalType, modalProps, onCloseModal) => {
 	switch (modalType) {
@@ -21,6 +22,9 @@ const getModal = (modalType, modalProps, onCloseModal) => {
 
 		case 'scoresByQuestion':
 			return <ModalScoresByQuestion {...modalProps} onClose={onCloseModal} />
+
+		case 'aboutObojoboNext':
+			return <ModalAboutObojoboNext {...modalProps} onClose={onCloseModal} />
 	}
 
 	return null

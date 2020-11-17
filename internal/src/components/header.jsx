@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default function Header({
+	isShowingBanner,
 	userName,
 	onClickAboutOrBannerLink,
 	onClickCloseBanner,
@@ -20,18 +21,20 @@ export default function Header({
 					</button>
 				</div>
 
-				<div className="banner-header">
-					<span>What&apos;s different?</span>
-					<button
-						className="banner-header--modal-button"
-						onClick={e => onClickAboutOrBannerLink(e)}
-					>
-						Click here to find out about the new look and our new version
-					</button>
-					<button className="banner-header--close-button" onClick={onClickCloseBanner}>
-						&#10005;
-					</button>
-				</div>
+				{isShowingBanner ? (
+					<div className="banner-header">
+						<span>What&apos;s different?</span>
+						<button
+							className="banner-header--modal-button"
+							onClick={e => onClickAboutOrBannerLink(e)}
+						>
+							Click here to find out about the new look and our new version
+						</button>
+						<button className="banner-header--close-button" onClick={onClickCloseBanner}>
+							&#10005;
+						</button>
+					</div>
+				) : null}
 
 				<div className="obo-header--right-side">
 					<p>{userName}</p>
