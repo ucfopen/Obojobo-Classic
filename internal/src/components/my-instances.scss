@@ -1,0 +1,18 @@
+.repository--my-instances {
+	display: flex;
+	flex-direction: column;
+
+	> .filter {
+		display: flex;
+		align-items: center;
+		margin-bottom: 0.5em;
+
+		> .repository--search-field {
+			flex-grow: 1;
+		}
+	}
+
+	> .repository--data-grid-instances {
+		flex-grow: 1;
+	}
+}

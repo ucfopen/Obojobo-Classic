@@ -1,8 +1,30 @@
-import React from 'react'
+import './my-instances.scss'
+
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import DataGridInstances from './data-grid-instances'
 import RefreshButton from './refresh-button'
 import SearchField from './search-field'
+
+const getFilteredInstances = (instances, search) => {
+	if (!instances) {
+		return []
+	}
+
+	return instances.filter(instance => {
+		if (!search) {
+			return instances
+		}
+
+		search = search.toLowerCase()
+
+		return (
+			instance.name.toLowerCase().indexOf(search) > -1 ||
+			instance.courseID.toLowerCase().indexOf(search) > -1 ||
+			instance.instID.indexOf(search) > -1
+		)
+	})
+}
 
 export default function MyInstances({
 	instances,
@@ -10,13 +32,26 @@ export default function MyInstances({
 	onSelect,
 	onClickRefresh
 }) {
+	const [search, setSearch] = useState('')
+
+	const selectedInstance =
+		instances === null || selectedInstanceIndex === null ? null : instances[selectedInstanceIndex]
+	const filteredInstances = getFilteredInstances(instances, search)
+	const selectedIndex = filteredInstances.indexOf(selectedInstance)
+
 	return (
-		<div>
-			<SearchField />
-			<RefreshButton onClick={onClickRefresh} />
+		<div className="repository--my-instances">
+			<div className="filter">
+				<SearchField
+					placeholder="Search by title, course or id"
+					value={search}
+					onChange={s => setSearch(s)}
+				/>
+				<RefreshButton onClick={onClickRefresh} />
+			</div>
 			<DataGridInstances
-				data={instances}
-				selectedIndex={selectedInstanceIndex}
+				data={filteredInstances}
+				selectedIndex={selectedIndex === -1 ? null : selectedInstanceIndex}
 				onSelect={onSelect}
 			/>
 		</div>
@@ -28,6 +63,7 @@ MyInstances.propTypes = {
 		null,
 		PropTypes.arrayOf(
 			PropTypes.shape({
+				instID: PropTypes.string.isRequired,
 				name: PropTypes.string.isRequired,
 				courseID: PropTypes.string.isRequired,
 				startTime: PropTypes.string.isRequired,
