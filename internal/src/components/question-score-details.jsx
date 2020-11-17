@@ -42,7 +42,6 @@ export default function QuestionScoreDetails(props) {
 	let sum = 0,
 		mean = 0,
 		numCorrectAnswers = 0,
-		indexCorrectAnswer = -1,
 		foundCorrectAnswer = false
 
 	const dataForGraph = []
@@ -68,7 +67,6 @@ export default function QuestionScoreDetails(props) {
 				if (responses[i].score === 100) {
 					dataForGraph[currAnswerChoice].isCorrect = true
 					foundCorrectAnswer = true
-					indexCorrectAnswer = i
 				}
 			}
 		}
@@ -94,7 +92,6 @@ export default function QuestionScoreDetails(props) {
 				if (responses[i].score === 100) {
 					dataForGraph[1].isCorrect = true
 					foundCorrectAnswer = true
-					indexCorrectAnswer = i
 				}
 			}
 
@@ -145,11 +142,9 @@ export default function QuestionScoreDetails(props) {
 			value: getFormattedNumberOfResponses()
 		}
 	]
-	let response
 
 	if (questionType === MC) {
 		items.push({ label: 'Std Dev', value: getStdDev() })
-		response = indexCorrectAnswer !== -1 ? props.question.answers[indexCorrectAnswer].answerID : ''
 	} else if (questionType === QA) {
 		items.push({ label: 'Accuracy', value: (getAccuracy() * 100).toString() + '%' })
 	} else {
@@ -178,11 +173,7 @@ export default function QuestionScoreDetails(props) {
 			</div>
 
 			<div className="question-preview-container">
-				<QuestionPreview
-					className="question-preview"
-					question={props.question}
-					response={response}
-				/>
+				<QuestionPreview className="question-preview" question={props.question} />
 			</div>
 		</div>
 	)
