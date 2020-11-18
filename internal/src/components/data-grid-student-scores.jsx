@@ -37,7 +37,13 @@ const columns = [
 
 const DataGridStudentScores = ({ data, selectedIndex, onSelect }) => (
 	<div className="repository--data-grid-student-scores">
-		<DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
+		<DataGrid
+			data={data}
+			columns={columns}
+			selectedIndex={selectedIndex}
+			onSelect={onSelect}
+			sortable={false}
+		/>
 	</div>
 )
 

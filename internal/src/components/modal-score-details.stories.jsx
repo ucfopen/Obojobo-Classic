@@ -16,196 +16,335 @@ const Template = args => <ModalScoreDetails {...args} />
 
 export const Example = Template.bind({})
 Example.args = {
-	data: [
+	userName: 'Example, John Q.',
+	questions: [
 		{
-			questionNumber: {
-				displayNumber: 1,
-				altNumber: 1,
-				totalAlts: 2
-			},
-			questionAlternateNumber: 1,
-			type: 'MC',
-			questionItems: [
+			questionID: '5',
+			userID: 1,
+			itemType: 'MC',
+			answers: [
 				{
-					pageItemID: 0,
-					component: 'TextArea',
-					data:
-						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">MC Question with text</FONT></P></TEXTFORMAT>',
-					media: [],
-					advancedEdit: 0,
-					options: null,
-					_explicitType: 'obo\\lo\\PageItem'
-				}
-			],
-			score: 100
-		},
-		{
-			questionNumber: {
-				displayNumber: 1,
-				altNumber: 2,
-				totalAlts: 2
-			},
-			type: 'QA',
-			questionItems: [
-				{
-					pageItemID: 0,
-					component: 'TextArea',
-					data:
-						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">SA question, split</FONT></P></TEXTFORMAT>',
-					media: [],
-					advancedEdit: 0,
-					options: null,
-					_explicitType: 'obo\\lo\\PageItem'
+					answerID: '16288766825fb54ddf5a8499.61727163',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect choice</FONT></P></TEXTFORMAT>',
+					weight: 0,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
 				},
 				{
-					pageItemID: 0,
-					component: 'MediaView',
-					data: '',
-					media: [
-						{
-							mediaID: 3341,
-							auth: '6661',
-							title: 'The Pride',
-							itemType: 'pic',
-							descText: 'Photo from Flickr 2',
-							createTime: 1344543906,
-							copyright:
-								'Photo used under Creative Commons from <U><A HREF="event:http://www.flickr.com/photos/79723524@N03/7745511508">AbdillahAbi</A></U>',
-							thumb: '0',
-							url: 'The_Pride.jpg',
-							size: '174927',
-							length: '0',
-							perms: null,
-							height: 417,
-							width: 514.8,
-							meta: 0,
-							attribution: 1,
-							_explicitType: 'obo\\lo\\Media'
-						}
-					],
-					advancedEdit: 0,
-					options: null,
-					_explicitType: 'obo\\lo\\PageItem'
+					answerID: '1392844035fb54ddf5a85b6.08770266',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Correct choice</FONT></P></TEXTFORMAT>',
+					weight: 100,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
 				}
 			],
-			score: 50
-		},
-		{
-			questionNumber: {
-				displayNumber: 2,
-				altNumber: 1,
-				totalAlts: 1
-			},
-			type: 'Media',
-			questionItems: [
-				{
-					pageItemID: 0,
-					component: 'MediaView',
-					data: '',
-					media: [
-						{
-							mediaID: 3341,
-							auth: '6661',
-							title: 'The Pride',
-							itemType: 'pic',
-							descText: 'Photo from Flickr 2',
-							createTime: 1344543906,
-							copyright:
-								'Photo used under Creative Commons from <U><A HREF="event:http://www.flickr.com/photos/79723524@N03/7745511508">AbdillahAbi</A></U>',
-							thumb: '0',
-							url: 'The_Pride.jpg',
-							size: '174927',
-							length: '0',
-							perms: null,
-							height: 417,
-							width: 514.8,
-							meta: 0,
-							attribution: 1,
-							_explicitType: 'obo\\lo\\Media'
-						}
-					],
-					advancedEdit: 0,
-					options: null,
-					_explicitType: 'obo\\lo\\PageItem'
-				}
-			],
-			score: null
-		},
-		{
-			questionNumber: {
-				displayNumber: 3,
-				altNumber: 1,
-				totalAlts: 1
-			},
-			type: 'MC',
-			questionItems: [
+			perms: 0,
+			items: [
 				{
 					pageItemID: 0,
 					component: 'TextArea',
 					data:
-						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">MC Question with text</FONT></P></TEXTFORMAT>',
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">Example MC Question</FONT></P></TEXTFORMAT>',
 					media: [],
 					advancedEdit: 0,
 					options: null,
 					_explicitType: 'obo\\lo\\PageItem'
 				}
 			],
-			score: 0
+			questionIndex: 1,
+			feedback: { correct: '', incorrect: '' },
+			_explicitType: 'obo\\lo\\Question'
+		},
+		{
+			questionID: '6',
+			userID: 1,
+			itemType: 'QA',
+			answers: [
+				{
+					answerID: '7065301805fb54ddf5c9934.36102607',
+					userID: 0,
+					answer: 'Example correct answer',
+					weight: 0,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				},
+				{
+					answerID: '8859340545fb54ddf5c9a42.08885525',
+					userID: 0,
+					answer: 'Example correct answer 2',
+					weight: 0,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				}
+			],
+			perms: 0,
+			items: [
+				{
+					pageItemID: 0,
+					component: 'TextArea',
+					data:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">Example short answer question</FONT></P></TEXTFORMAT>',
+					media: [],
+					advancedEdit: 0,
+					options: null,
+					_explicitType: 'obo\\lo\\PageItem'
+				}
+			],
+			questionIndex: 1,
+			feedback: { correct: '', incorrect: '' },
+			_explicitType: 'obo\\lo\\Question'
+		},
+		{
+			questionID: '7',
+			userID: 1,
+			itemType: 'MC',
+			answers: [
+				{
+					answerID: '11006114235fb54ddf5cd183.98347312',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect choice</FONT></P></TEXTFORMAT>',
+					weight: 0,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				},
+				{
+					answerID: '15194973475fb54ddf5cd272.93374547',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Correct choice</FONT></P></TEXTFORMAT>',
+					weight: 100,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				}
+			],
+			perms: 0,
+			items: [
+				{
+					pageItemID: 0,
+					component: 'TextArea',
+					data:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">Example MC Question 2</FONT></P></TEXTFORMAT>',
+					media: [],
+					advancedEdit: 0,
+					options: null,
+					_explicitType: 'obo\\lo\\PageItem'
+				}
+			],
+			questionIndex: 1,
+			feedback: { correct: '', incorrect: '' },
+			_explicitType: 'obo\\lo\\Question'
+		},
+		{
+			questionID: '8',
+			userID: 1,
+			itemType: 'MC',
+			answers: [
+				{
+					answerID: '3460367205fb54ddf5d2257.82234754',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect choice</FONT></P></TEXTFORMAT>',
+					weight: 0,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				},
+				{
+					answerID: '5370639865fb54ddf5d2346.31587389',
+					userID: 0,
+					answer:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Correct choice</FONT></P></TEXTFORMAT>',
+					weight: 100,
+					feedback: '',
+					_explicitType: 'obo\\lo\\Answer'
+				}
+			],
+			perms: 0,
+			items: [
+				{
+					pageItemID: 0,
+					component: 'TextArea',
+					data:
+						'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">Example MC Question 3</FONT></P></TEXTFORMAT>',
+					media: [],
+					advancedEdit: 0,
+					options: null,
+					_explicitType: 'obo\\lo\\PageItem'
+				}
+			],
+			questionIndex: 0,
+			feedback: { correct: '', incorrect: '' },
+			_explicitType: 'obo\\lo\\Question'
 		}
 	],
-	question: {
-		questionID: '19683',
-		userID: 6661,
-		itemType: 'MC',
-		answers: [
-			{
-				answerID: '13223835175f9adeced6c001.08892275',
-				userID: 0,
-				answer:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Correct Answer</FONT></P></TEXTFORMAT>',
-				weight: 100,
-				feedback:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Correct Feedback</FONT></P></TEXTFORMAT>',
-				_explicitType: 'obo\\lo\\Answer'
+	attemptLogs: [
+		{
+			attempt: {
+				attemptID: '4',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '3',
+				score: '100',
+				unalteredScore: null,
+				startTime: '1605717509',
+				endTime: '1605717515',
+				qOrder: '8,7',
+				linkedAttemptID: '0'
 			},
-			{
-				answerID: '3168872425f9adeced6c065.10467592',
-				userID: 0,
-				answer:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Partially Correct Answer</FONT></P></TEXTFORMAT>',
-				weight: 50,
-				feedback:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect Feedback</FONT></P></TEXTFORMAT>',
-				_explicitType: 'obo\\lo\\Answer'
+			scores: [
+				{
+					itemType: 'q',
+					itemID: '7',
+					answerID: '15194973475',
+					answer: '15194973475fb54ddf5cd272.93374547',
+					score: '100'
+				},
+				{
+					itemType: 'q',
+					itemID: '8',
+					answerID: '5370639865',
+					answer: '5370639865fb54ddf5d2346.31587389',
+					score: '100'
+				}
+			]
+		},
+		{
+			attempt: {
+				attemptID: '5',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '3',
+				score: '0',
+				unalteredScore: null,
+				startTime: '1605717517',
+				endTime: '1605717525',
+				qOrder: '7,8',
+				linkedAttemptID: '0'
 			},
-			{
-				answerID: '3168872425f9adeced6c065.10467593',
-				userID: 0,
-				answer:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect Answer</FONT></P></TEXTFORMAT>',
-				weight: 0,
-				feedback:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#313131" LETTERSPACING="0" KERNING="0">Incorrect Feedback</FONT></P></TEXTFORMAT>',
-				_explicitType: 'obo\\lo\\Answer'
-			}
-		],
-		perms: 0,
-		items: [
-			{
-				pageItemID: 0,
-				component: 'TextArea',
-				data:
-					'<TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><FONT FACE="Arial" SIZE="14" COLOR="#383838" LETTERSPACING="0" KERNING="0">MC Question with text</FONT></P></TEXTFORMAT>',
-				media: [],
-				advancedEdit: 0,
-				options: null,
-				_explicitType: 'obo\\lo\\PageItem'
-			}
-		],
-		questionIndex: 0,
-		feedback: { correct: '', incorrect: '' },
-		createTime: 0,
-		_explicitType: 'obo\\lo\\Question'
-	},
-	response: '13223835175f9adeced6c001.08892275'
+			scores: [
+				{
+					itemType: 'q',
+					itemID: '8',
+					answerID: '3460367205',
+					answer: '3460367205fb54ddf5d2257.82234754',
+					score: '0'
+				}
+			]
+		},
+		{
+			attempt: {
+				attemptID: '6',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '3',
+				score: '100',
+				unalteredScore: null,
+				startTime: '1605717527',
+				endTime: '1605717532',
+				qOrder: '7,8',
+				linkedAttemptID: '0'
+			},
+			scores: [
+				{
+					itemType: 'q',
+					itemID: '7',
+					answerID: '15194973475',
+					answer: '15194973475fb54ddf5cd272.93374547',
+					score: '100'
+				},
+				{
+					itemType: 'q',
+					itemID: '8',
+					answerID: '5370639865',
+					answer: '5370639865fb54ddf5d2346.31587389',
+					score: '100'
+				}
+			]
+		},
+		{
+			attempt: {
+				attemptID: '7',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '4',
+				score: '0',
+				unalteredScore: null,
+				startTime: '1605717546',
+				endTime: '1605717549',
+				qOrder: '8,7',
+				linkedAttemptID: '0'
+			},
+			scores: []
+		},
+		{
+			attempt: {
+				attemptID: '8',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '4',
+				score: '100',
+				unalteredScore: null,
+				startTime: '1605717551',
+				endTime: '1605717556',
+				qOrder: '8,5',
+				linkedAttemptID: '0'
+			},
+			scores: [
+				{
+					itemType: 'q',
+					itemID: '5',
+					answerID: '1392844035',
+					answer: '1392844035fb54ddf5a85b6.08770266',
+					score: '100'
+				},
+				{
+					itemType: 'q',
+					itemID: '8',
+					answerID: '5370639865',
+					answer: '5370639865fb54ddf5d2346.31587389',
+					score: '100'
+				}
+			]
+		},
+		{
+			attempt: {
+				attemptID: '9',
+				userID: '1',
+				instID: '4',
+				loID: '7',
+				qGroupID: '4',
+				visitID: '4',
+				score: '50',
+				unalteredScore: null,
+				startTime: '1605717558',
+				endTime: '1605717570',
+				qOrder: '8,6',
+				linkedAttemptID: '0'
+			},
+			scores: [
+				{ itemType: 'q', itemID: '6', answerID: '0', answer: 'my response', score: '0' },
+				{
+					itemType: 'q',
+					itemID: '8',
+					answerID: '5370639865',
+					answer: '5370639865fb54ddf5d2346.31587389',
+					score: '100'
+				}
+			]
+		}
+	]
 }

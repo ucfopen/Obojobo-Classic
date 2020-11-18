@@ -1,20 +1,25 @@
 @import 'includes';
 
-$color-modal-bg: #f7f7f7;
+// $color-modal-bg: #f7f7f7;
 
 .modal-score-details {
+	$color-hover: #e6edf6;
+	$color-selected: #ccdaeb;
+
 	display: flex;
-	background-color: $color-modal-bg;
+	background-color: $color-bg2;
 	height: 90vh;
 
 	.left-pane {
 		flex: 1.1;
 		padding: 1em;
-		overflow: auto;
+		padding-right: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.modal-title {
-		margin-bottom: 4em;
+		margin-bottom: 2em;
 
 		h3 {
 			font-weight: bold;
@@ -25,13 +30,34 @@ $color-modal-bg: #f7f7f7;
 		}
 	}
 
-	.sort-attempts {
-		margin-bottom: 0.5em;
+	.attempt-row {
+		text-align: center;
+		cursor: pointer;
+		padding: 1em;
+		background: $color-bg;
+
+		&:hover {
+			background: $color-hover;
+		}
+
+		&.is-selected,
+		&:hover.is-selected {
+			background: $color-selected;
+		}
+
+		h4 {
+			font-weight: bold;
+		}
+
+		span {
+			font-size: 0.8em;
+		}
 	}
 
 	.student-scores {
 		background-color: $color-bg;
 		overflow: auto;
+		height: 100%;
 	}
 
 	.radio-group {
@@ -57,10 +83,14 @@ $color-modal-bg: #f7f7f7;
 
 		.instructions {
 			position: absolute;
-			top: 20%;
+			top: 6.2em;
 
 			.label {
 				margin-bottom: 0.5em;
+			}
+
+			.instructions-flag {
+				margin-bottom: 5.7em;
 			}
 		}
 	}
