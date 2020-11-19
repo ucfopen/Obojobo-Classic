@@ -7,16 +7,45 @@
 	padding: 0.8em;
 
 	> .scores-by-question--left-sidebar {
-		width: 25%;
+		display: flex;
+		flex-direction: column;
+		margin-right: 1em;
 
 		> h2 {
 			font-weight: bolder;
 			color: $color-text;
 			margin-bottom: 0.6em;
 		}
+
+		> .wrapper {
+			background: $color-bg;
+			border: 1px solid $color-shadow;
+			flex: 1;
+			overflow: auto;
+
+			> .repository--data-grid-student-scores {
+				height: 100%;
+
+				thead th {
+					border-top: none;
+				}
+
+				th:first-child,
+				td:first-child {
+					border-left: none;
+				}
+
+				th:last-child,
+				td:last-child {
+					border-right: none;
+				}
+			}
+		}
 	}
 
 	> .score-details-right-content {
-		width: 75%;
+		flex: 1;
+		background: $color-bg;
+		border-radius: $dimension-rounded-radius;
 	}
 }
