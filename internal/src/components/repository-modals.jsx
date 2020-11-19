@@ -41,7 +41,7 @@ const RepositoryModals = ({ instanceName, modalType, modalProps, onCloseModal })
 		<ReactModal
 			isOpen={true}
 			contentLabel={instanceName}
-			className="repository--modal"
+			className={`repository--modal ${modalType}`}
 			overlayClassName="repository--modal-overlay"
 			onRequestClose={onCloseModal}
 		>

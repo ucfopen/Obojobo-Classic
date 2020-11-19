@@ -22,7 +22,7 @@ const DataGridAssessmentScores = ({
 	const getStudentScoreCell = ({ value, row }) => (
 		<DataGridStudentScoreCell
 			{...value}
-			onClickScoreDetails={() => onClickScoreDetails(row.original.userID)}
+			onClickScoreDetails={() => onClickScoreDetails(row.original.user, row.original.userID)}
 		/>
 	)
 

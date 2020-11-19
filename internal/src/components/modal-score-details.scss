@@ -2,6 +2,14 @@
 
 // $color-modal-bg: #f7f7f7;
 
+.repository--modal.scoreDetails {
+	width: calc(100% - 2em);
+
+	.modal-content {
+		padding: 0;
+	}
+}
+
 .modal-score-details {
 	$color-hover: #e6edf6;
 	$color-selected: #ccdaeb;
@@ -58,6 +66,15 @@
 		background-color: $color-bg;
 		overflow: auto;
 		height: 100%;
+		border: 1px solid $color-shadow;
+
+		th:first-child,
+		th:last-child,
+		td:first-child,
+		td:last-child {
+			border-left: none;
+			border-right: none;
+		}
 	}
 
 	.radio-group {

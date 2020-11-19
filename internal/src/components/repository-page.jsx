@@ -5,9 +5,12 @@ import { useQuery, useQueryCache } from 'react-query'
 import {
 	apiGetInstances,
 	apiGetLO,
+	apiGetLOMeta,
 	apiGetScoresForInstance,
 	apiEditExtraAttempts,
-	apiLogout
+	apiGetVisitTrackingData,
+	apiLogout,
+	apiGetUser
 } from '../util/api'
 import MyInstances from './my-instances'
 import InstanceSection from './instance-section'
@@ -102,7 +105,7 @@ const RepositoryPage = () => {
 
 	const onClickAboutThisLO = async () => {
 		//@TODO: Is this how to do this?
-		const loMeta = await apiGetLO(selectedInstance.loID)
+		const loMeta = await apiGetLOMeta(selectedInstance.loID)
 
 		setModal({
 			type: 'aboutThisLO',
@@ -176,8 +179,16 @@ const RepositoryPage = () => {
 		)
 	}
 
-	const onClickScoreDetails = userID => {
-		setModal({ type: 'scoreDetails', props: {} })
+	const onClickScoreDetails = async (userName, userID) => {
+		const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
+		const lo = await apiGetLO(selectedInstance.loID)
+
+		const attemptLogs = trackingData.visitLog
+			.map(visitLogs => visitLogs.logs.filter(log => log.itemType === 'StartAttempt'))
+			.flat()
+			.map(startAttemptLog => startAttemptLog.attemptData)
+
+		setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
 	}
 
 	const onClickPreview = () => {

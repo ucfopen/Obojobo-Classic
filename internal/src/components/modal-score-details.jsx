@@ -56,7 +56,12 @@ const getResponseDataByAttempt = (questions, attemptLogs) => {
 			data: []
 		}
 
-		const questionOrder = attemptLog.attempt.qOrder.split(',')
+		// If alternates are enabled then qOrder is a comma-separated list of question IDs, representing
+		// the order of questions shown. Otherwise it's an empty-string, in which case we assume the
+		// natural order of questions
+		const questionOrder = attemptLog.attempt.qOrder
+			? attemptLog.attempt.qOrder.split(',')
+			: questions.map(q => q.questionID)
 		questionOrder.forEach(questionID => {
 			const scoreLogForQuestion = attemptLog.scores.find(scoreLog => scoreLog.itemID === questionID)
 
@@ -83,6 +88,8 @@ export default function ModalScoreDetails({ questions, attemptLogs, userName }) 
 		questions,
 		attemptLogs
 	)
+
+	console.log('got', attemptLogs, questions, responseDataByAttempt)
 
 	const [selectedItem, setSelectedItem] = useState({})
 
