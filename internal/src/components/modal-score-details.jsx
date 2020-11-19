@@ -46,8 +46,6 @@ export default function ModalScoreDetails({ questions, attemptLogs, userName }) 
 
 	const responseDataByAttempt = getResponseDataByAttempt(questionsByID, attemptLogs)
 
-	console.log('got', attemptLogs, questions, responseDataByAttempt)
-
 	const [selectedItem, setSelectedItem] = useState({})
 
 	const renderPreview = () => {

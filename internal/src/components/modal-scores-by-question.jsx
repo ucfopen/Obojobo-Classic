@@ -47,8 +47,11 @@ export default function ModalScoresByQuestion({ questions, submitQuestionLogsByU
 
 		return {
 			...questionsByID[q.questionID],
-			responses: scoreData.answers,
-			score: scoreData.answers.length === 0 ? null : scoreData.totalScore / scoreData.answers.length
+			responses: scoreData ? scoreData.answers : [],
+			score:
+				!scoreData || scoreData.answers.length === 0
+					? null
+					: scoreData.totalScore / scoreData.answers.length
 		}
 	})
 

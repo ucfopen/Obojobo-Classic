@@ -10,13 +10,36 @@ import {
 	apiEditExtraAttempts,
 	apiGetVisitTrackingData,
 	apiLogout,
-	apiGetUser
+	apiGetInstanceTrackingData,
+	apiGetUserNames
 } from '../util/api'
 import MyInstances from './my-instances'
 import InstanceSection from './instance-section'
 import Header from './header'
 import RepositoryModals from './repository-modals'
 import dayjs from 'dayjs'
+
+const getSubmitQuestionLogsForAssessment = logs => {
+	let foundAssessmentSubmitQuestionLogs = false
+	let responsesByQuestionID = {}
+	let foundLogs = []
+
+	logs.forEach(log => {
+		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
+			foundAssessmentSubmitQuestionLogs = true
+		} else if (log.itemType === 'EndAttempt') {
+			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
+			foundAssessmentSubmitQuestionLogs = false
+			responsesByQuestionID = {}
+		}
+
+		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'SubmitQuestion') {
+			responsesByQuestionID[log.valueA] = log
+		}
+	})
+
+	return foundLogs
+}
 
 const getFinalScoreFromAttemptScores = (attemptScores, scoringMethod) => {
 	switch (scoringMethod) {
@@ -136,10 +159,44 @@ const RepositoryPage = () => {
 		window.open(getCSVURLForInstance(selectedInstance))
 	}
 
-	const onClickViewScoresByQuestion = () => {
+	const onClickViewScoresByQuestion = async () => {
+		const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
+		const lo = await apiGetLO(selectedInstance.loID)
+
+		const submitQuestionLogsByUserID = {}
+		const userIDsToFetch = []
+
+		trackingData.visitLog.forEach(visitLog => {
+			if (!submitQuestionLogsByUserID[visitLog.userID]) {
+				userIDsToFetch.push(visitLog.userID)
+
+				submitQuestionLogsByUserID[visitLog.userID] = {
+					userName: `User #${visitLog.userID}`,
+					logs: []
+				}
+			}
+
+			submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
+				visitLog.userID
+			].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
+		})
+
+		if (userIDsToFetch.length > 0) {
+			const userNames = await apiGetUserNames(userIDsToFetch)
+			userNames.forEach(userItem => {
+				const user = userItem.userName
+				submitQuestionLogsByUserID[userItem.userID].userName = `${user.last}, ${user.first}${
+					user.mi ? ' ' + user.mi + '.' : ''
+				}`
+			})
+		}
+
 		setModal({
 			type: 'scoresByQuestion',
-			props: {}
+			props: {
+				submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
+				questions: lo.aGroup.kids
+			}
 		})
 	}
 

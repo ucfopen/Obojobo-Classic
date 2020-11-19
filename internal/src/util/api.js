@@ -30,6 +30,10 @@ export const apiEditExtraAttempts = (userID, instID, newCount) =>
 	fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
 export const apiGetVisitTrackingData = (userID, instID) =>
 	fetchGet(`/api/json.php/loRepository.getVisitTrackingData/${userID}/${instID}`)
+export const apiGetInstanceTrackingData = instID =>
+	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
+export const apiGetUserNames = userIDs =>
+	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)
 
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []

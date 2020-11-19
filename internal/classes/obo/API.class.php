@@ -133,6 +133,10 @@ class API extends \rocketD\db\DBEnabled
 
 	public function getUserNames($userIDs)
 	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
 		if($this->getSessionValid())
 		{
 			$UM = \rocketD\auth\AuthManager::getInstance();

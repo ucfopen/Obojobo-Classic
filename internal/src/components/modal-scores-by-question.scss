@@ -1,5 +1,24 @@
 @import '_includes.scss';
 
+.repository--modal.scoresByQuestion {
+	width: calc(100% - 2em);
+	height: calc(100% - 2em);
+
+	> div {
+		height: calc(100% - 4em);
+
+		> .modal-content {
+			padding: 0;
+			height: 100%;
+
+			> .modal-scores-by-question {
+				height: 100%;
+				border-radius: $dimension-rounded-radius;
+			}
+		}
+	}
+}
+
 .modal-scores-by-question {
 	font-family: $font-default;
 	display: flex;
