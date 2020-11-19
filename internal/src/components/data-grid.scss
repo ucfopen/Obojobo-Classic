@@ -30,11 +30,6 @@
 
 	th {
 		padding: 0.6em 0.4em;
-		cursor: pointer;
-
-		&:hover {
-			background-color: $color-header-hover;
-		}
 
 		svg {
 			margin: 0 0.4em;
@@ -73,6 +68,14 @@
 
 		tr.selected:hover {
 			background-color: $color-selected;
+		}
+	}
+
+	&.sortable th {
+		cursor: pointer;
+
+		&:hover {
+			background-color: $color-header-hover;
 		}
 	}
 }

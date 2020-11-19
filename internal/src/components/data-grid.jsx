@@ -9,7 +9,7 @@ import CaretDown from '../../../assets/images/viewer/caret-down.svg'
 import './data-grid.scss'
 import LoadingIndicator from './loading-indicator'
 
-const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
+const DataGrid = ({ data, columns, sortable, selectedIndex, onSelect }) => {
 	const isLoading = data === null
 
 	// setup react-table
@@ -24,12 +24,21 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
 	return (
-		<table {...getTableProps()} className={`repository--data-grid ${onSelect ? 'selectable' : ''}`}>
+		<table
+			{...getTableProps()}
+			className={`repository--data-grid ${onSelect ? 'selectable' : ''} ${
+				sortable ? 'sortable' : ''
+			}`}
+		>
 			<thead>
 				{headerGroups.map(headerGroup => (
 					<tr {...headerGroup.getHeaderGroupProps()}>
 						{headerGroup.headers.map(column => (
-							<th {...column.getHeaderProps(!isLoading ? column.getSortByToggleProps() : {})}>
+							<th
+								{...column.getHeaderProps(
+									sortable && !isLoading ? column.getSortByToggleProps() : {}
+								)}
+							>
 								{column.render('Header')}
 								{column.isSorted && column.isSortedDesc ? <CaretUp /> : null}
 								{column.isSorted && !column.isSortedDesc ? <CaretDown /> : null}
@@ -70,12 +79,14 @@ const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
 
 DataGrid.defaultProps = {
 	data: null,
-	columns: []
+	columns: [],
+	sortable: true
 }
 
 DataGrid.propTypes = {
 	data: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
 	columns: PropTypes.arrayOf(PropTypes.object),
+	sortable: PropTypes.bool,
 	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
 	onSelect: PropTypes.func.isRequired
 }
