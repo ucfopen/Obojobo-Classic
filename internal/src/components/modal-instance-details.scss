@@ -9,27 +9,40 @@ $color-text-disabled: lighten($color-text, 60%);
 		margin-bottom: 1em;
 	}
 
-	p {
-		margin-top: none;
-		margin-bottom: none;
+	input {
+		border: 1px solid $color-shadow;
+		font-family: $font-monospace;
+		padding: 0.3em;
+		box-sizing: border-box;
 	}
 
 	input[type='text'] {
-		width: 20em;
+		width: 22.2em;
 		font-size: 1em;
 		margin-right: 1em;
+		border-radius: $dimension-rounded-radius;
 	}
 
 	input[type='number'] {
 		width: 3em;
 		font-size: 1em;
 		margin-right: 1em;
+		border-radius: $dimension-rounded-radius;
+	}
+
+	input[type='checkbox'] {
+		margin-right: 0.5em;
 	}
 
 	select {
-		width: 15em;
+		width: 22.2em;
 		font-weight: bold;
+		font-size: 1em;
 		margin-right: 1em;
+		border: 1px solid $color-shadow;
+		border-radius: $dimension-rounded-radius;
+		padding: 0.3em;
+		box-sizing: border-box;
 	}
 
 	.box {
@@ -54,7 +67,7 @@ $color-text-disabled: lighten($color-text, 60%);
 			font-size: 0.75em;
 
 			> .sub-title {
-				margin-right: 0.4em;
+				margin-right: 0.7em;
 				justify-self: flex-end;
 			}
 		}
@@ -66,14 +79,15 @@ $color-text-disabled: lighten($color-text, 60%);
 		> .score-import {
 			grid-column-start: 2;
 
-			> span {
+			> label {
 				margin-right: 1em;
+				cursor: pointer;
 			}
 		}
 
 		> .title {
 			font-weight: bold;
-			margin-right: 0.4em;
+			margin-right: 0.7em;
 			justify-self: flex-end;
 		}
 
@@ -89,7 +103,7 @@ $color-text-disabled: lighten($color-text, 60%);
 	.buttons {
 		display: flex;
 		justify-content: center;
-		margin-top: 1em;
+		margin-top: 3em;
 
 		> .repository--button {
 			margin-left: 0.5em;

@@ -25,15 +25,11 @@ export default {
 
 const Template = args => <ModalInstanceDetails {...args} />
 
-export const Create = Template.bind({})
-Create.args = {
-	mode: 'create'
-}
-
 export const EditNonExternal = Template.bind({})
 EditNonExternal.args = {
-	mode: 'edit',
-	isExternallyLinked: false
+	isExternallyLinked: false,
+	startDate: 1455050437,
+	endDate: 1456050437
 }
 
 export const EditExternal = Template.bind({})

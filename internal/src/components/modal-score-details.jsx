@@ -5,51 +5,9 @@ import DataGridStudentScores from './data-grid-student-scores'
 import QuestionPreview from './question-preview'
 import InstructionsFlag from './instructions-flag'
 import AttemptDetails from './attempt-details'
+import getProcessedQuestionData from '../util/get-processed-question-data'
 
-const getResponseDataByAttempt = (questions, attemptLogs) => {
-	const questionsById = {}
-	let lastQuestionIndex = -1
-	let questionCounter = 0
-	let altCounter = 0
-	let numTotalQuestions = 0
-	const questionsWhichNeedATotalAltCounterUpdate = []
-
-	questions.forEach(q => {
-		if (q.questionIndex === 0 || lastQuestionIndex !== questionCounter) {
-			questionsWhichNeedATotalAltCounterUpdate.forEach(q => {
-				q.questionNumber.totalAlts = questionsWhichNeedATotalAltCounterUpdate.length
-			})
-			questionsWhichNeedATotalAltCounterUpdate.length = 0
-
-			questionCounter++
-			numTotalQuestions++
-			altCounter = 0
-		} else {
-			altCounter++
-		}
-
-		questionsById[q.questionID] = {
-			questionNumber: {
-				displayNumber: questionCounter,
-				altNumber: altCounter + 1,
-				totalAlts: 0
-			},
-			type: q.itemType,
-			questionItems: q.items,
-			originalQuestion: q
-		}
-
-		if (q.questionIndex !== 0) {
-			questionsWhichNeedATotalAltCounterUpdate.push(questionsById[q.questionID])
-		}
-
-		lastQuestionIndex = q.questionIndex
-	})
-
-	questionsWhichNeedATotalAltCounterUpdate.forEach(q => {
-		q.questionNumber.totalAlts = questionsWhichNeedATotalAltCounterUpdate.length
-	})
-
+const getResponseDataByAttempt = (questionsByID, attemptLogs) => {
 	const responseDataByAttempt = attemptLogs.map(attemptLog => {
 		const responseDataForAttempt = {
 			attempt: attemptLog,
@@ -69,7 +27,7 @@ const getResponseDataByAttempt = (questions, attemptLogs) => {
 				return
 			}
 
-			const question = questionsById[questionID]
+			const question = questionsByID[questionID]
 			responseDataForAttempt.data.push({
 				...question,
 				score: scoreLogForQuestion.score,
@@ -80,14 +38,13 @@ const getResponseDataByAttempt = (questions, attemptLogs) => {
 		return responseDataForAttempt
 	})
 
-	return [responseDataByAttempt, numTotalQuestions]
+	return responseDataByAttempt
 }
 
 export default function ModalScoreDetails({ questions, attemptLogs, userName }) {
-	const [responseDataByAttempt, numTotalQuestions] = getResponseDataByAttempt(
-		questions,
-		attemptLogs
-	)
+	const [questionsByID, numTotalQuestions] = getProcessedQuestionData(questions)
+
+	const responseDataByAttempt = getResponseDataByAttempt(questionsByID, attemptLogs)
 
 	console.log('got', attemptLogs, questions, responseDataByAttempt)
 

@@ -30,7 +30,7 @@ export default function ModalInstanceDetails(props) {
 				<div className="row example">
 					<span className="sub-title">Take Average Example:</span>
 					<span>
-						Score 1: 75%, Score 2: 90%, Score 3: 80%, <b>Final: 81.67%%</b>
+						Score 1: 75%, Score 2: 90%, Score 3: 80%, <b>Final: 82%</b>
 					</span>
 				</div>
 			)
@@ -72,7 +72,12 @@ export default function ModalInstanceDetails(props) {
 							value={instanceName}
 							onChange={event => setInstanceName(event.target.value)}
 						/>
-						<HelpButton />
+						<HelpButton>
+							<div>
+								Your published instance will be displayed to students as the name you input here. By
+								default this name is the same as the object name.
+							</div>
+						</HelpButton>
 					</div>
 				</div>
 				<div className="row">
@@ -83,7 +88,12 @@ export default function ModalInstanceDetails(props) {
 							value={courseName}
 							onChange={event => setCourseName(event.target.value)}
 						/>
-						<HelpButton />
+						<HelpButton>
+							<div>
+								This field shows the course for this instance. This field is for your organization
+								only - changing it won&apos;t impact how your instance functions.
+							</div>
+						</HelpButton>
 					</div>
 				</div>
 			</div>
@@ -94,7 +104,19 @@ export default function ModalInstanceDetails(props) {
 					</span>
 					<div className="flex-container">
 						<FormDateTime value={startDate} onChange={setStartDate} />
-						<HelpButton />
+						<HelpButton>
+							{props.isExternallyLinked ? (
+								<div>
+									Since this instance is linked to an external course you cannot set the start date.
+									Access to your module is reliant on settings in the external system.
+								</div>
+							) : (
+								<div>
+									This is the date when this instance will be opened to students. Before this date,
+									students will not be able to access the instance.
+								</div>
+							)}
+						</HelpButton>
 					</div>
 				</div>
 				<div className="row">
@@ -103,7 +125,20 @@ export default function ModalInstanceDetails(props) {
 					</span>
 					<div className="flex-container">
 						<FormDateTime value={endDate} onChange={setEndDate} />
-						<HelpButton />
+						<HelpButton>
+							{props.isExternallyLinked ? (
+								<div>
+									Since this instance is linked to an external course you cannot set the end date.
+									Access to your module is reliant on settings in the external system.
+								</div>
+							) : (
+								<div>
+									This is the date when the assessment will be closed to students. After this date,
+									students will not be able to take assessment attempts. They will still have access
+									to the content and practice.
+								</div>
+							)}
+						</HelpButton>
 					</div>
 				</div>
 				<div className="row">
@@ -119,37 +154,59 @@ export default function ModalInstanceDetails(props) {
 						<input
 							type="number"
 							value={numAttempts}
+							min="1"
+							max="255"
 							onChange={event => setNumAttempts(parseInt(event.target.value, 10))}
+							onBlur={() => setNumAttempts(Math.max(Math.min(numAttempts, 255), 1))}
 						/>
-						<HelpButton />
+						<HelpButton>
+							<div>
+								This is the number of tries a student will have to take the assessment quiz. If you
+								provide more than one assessment attempt then the final score is determined by the
+								&apos;Score Method&apos;. Students will be able to see how many attempts they have
+								before they begin the assessment quiz.
+							</div>
+						</HelpButton>
 					</div>
 				</div>
-				<div className="row">
-					<span className="title">Scoring:</span>
-					<div className="flex-container">
-						<select
-							name="scoringMethod"
-							value={scoringMethod}
-							onChange={event => setScoringMethod(event.target.value)}
-						>
-							<option value="highest">Take Highest Attempt</option>
-							<option value="average">Take Average Score</option>
-							<option value="last">Take Last Attempt</option>
-						</select>
-						<HelpButton />
-					</div>
-				</div>
-				{renderExample()}
+				{numAttempts > 1 ? (
+					<React.Fragment>
+						<div className="row">
+							<span className="title">Scoring:</span>
+							<div className="flex-container">
+								<select
+									name="scoringMethod"
+									value={scoringMethod}
+									onChange={event => setScoringMethod(event.target.value)}
+								>
+									<option value="highest">Take Highest Attempt</option>
+									<option value="average">Take Average Score</option>
+									<option value="last">Take Last Attempt</option>
+								</select>
+								<HelpButton>
+									<div>
+										This determines how the &apos;Final Score&apos; will be calculated by Obojobo
+										for instances with more than one attempt. The student will be able to see how
+										their score will be calculated before they begin the assessment quiz.
+									</div>
+								</HelpButton>
+							</div>
+						</div>
+						{renderExample()}
+					</React.Fragment>
+				) : null}
 				<div className="row">
 					<div className="score-import">
-						<input
-							type="checkbox"
-							name="isImportAllowed"
-							defaultChecked={isImportAllowed}
-							onClick={event => setIsImportAllowed(event.target.checked)}
-						/>
-						<span>Allow past scores to be imported</span>
-						<HelpButton />
+						<label onClick={event => setIsImportAllowed(event.target.checked)}>
+							<input type="checkbox" name="isImportAllowed" defaultChecked={isImportAllowed} />
+							<span>Allow past scores to be imported</span>
+						</label>
+						<HelpButton>
+							<div>
+								This option allows students who have already taken this learning object to import
+								their past highest attempt score instead of re-taking the object.
+							</div>
+						</HelpButton>
 					</div>
 				</div>
 				<div className="buttons">
@@ -175,11 +232,10 @@ ModalInstanceDetails.propTypes = {
 	onCancel: PropTypes.func.isRequired,
 	onSave: PropTypes.func.isRequired,
 	isExternallyLinked: PropTypes.bool.isRequired,
-	mode: PropTypes.oneOf(['create', 'edit']).isRequired,
 	instanceName: PropTypes.string,
 	courseName: PropTypes.string,
-	startDate: PropTypes.oneOfType([null, PropTypes.instanceOf(Date)]),
-	endDate: PropTypes.oneOfType([null, PropTypes.instanceOf(Date)]),
+	startDate: PropTypes.oneOfType([null, PropTypes.number]),
+	endDate: PropTypes.oneOfType([null, PropTypes.number]),
 	numAttempts: PropTypes.number,
 	scoringMethod: PropTypes.oneOf(['highest', 'average', 'last']),
 	isImportAllowed: PropTypes.bool
