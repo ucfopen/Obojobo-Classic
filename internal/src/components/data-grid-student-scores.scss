@@ -4,4 +4,12 @@
 		width: 1em;
 		text-align: center;
 	}
+
+	td {
+		overflow: hidden;
+	}
+
+	tr > td:nth-child(3) {
+		max-width: 10em;
+	}
 }

@@ -167,7 +167,7 @@ QuestionPreview.propTypes = {
 					PropTypes.shape({
 						mediaID: PropTypes.number,
 						title: PropTypes.string,
-						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3']),
+						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
 						descText: PropTypes.string,
 						width: PropTypes.number,
 						height: PropTypes.number

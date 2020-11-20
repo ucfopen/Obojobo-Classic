@@ -19,6 +19,29 @@ import Header from './header'
 import RepositoryModals from './repository-modals'
 import dayjs from 'dayjs'
 
+const getStartAttemptLogsForAssessment = logs => {
+	let foundAssessmentSubmitQuestionLogs = false
+	const foundLogs = []
+
+	logs.forEach(log => {
+		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
+			foundAssessmentSubmitQuestionLogs = true
+		} else if (
+			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
+			log.itemType === 'EndAttempt'
+		) {
+			foundAssessmentSubmitQuestionLogs = false
+		}
+		console.log(log, foundAssessmentSubmitQuestionLogs)
+
+		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'StartAttempt') {
+			foundLogs.push(log)
+		}
+	})
+
+	return foundLogs
+}
+
 const getSubmitQuestionLogsForAssessment = logs => {
 	let foundAssessmentSubmitQuestionLogs = false
 	let responsesByQuestionID = {}
@@ -27,7 +50,10 @@ const getSubmitQuestionLogsForAssessment = logs => {
 	logs.forEach(log => {
 		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
 			foundAssessmentSubmitQuestionLogs = true
-		} else if (log.itemType === 'EndAttempt') {
+		} else if (
+			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
+			log.itemType === 'EndAttempt'
+		) {
 			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
 			foundAssessmentSubmitQuestionLogs = false
 			responsesByQuestionID = {}
@@ -240,10 +266,18 @@ const RepositoryPage = () => {
 		const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
 		const lo = await apiGetLO(selectedInstance.loID)
 
-		const attemptLogs = trackingData.visitLog
-			.map(visitLogs => visitLogs.logs.filter(log => log.itemType === 'StartAttempt'))
-			.flat()
-			.map(startAttemptLog => startAttemptLog.attemptData)
+		console.log('td', trackingData)
+
+		const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
+		console.log('vl', visitLogs, getStartAttemptLogsForAssessment(visitLogs))
+		const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
+			startAttemptLog => startAttemptLog.attemptData
+		)
+
+		// const attemptLogs = trackingData.visitLog
+		// 	.map(visitLogs => visitLogs.logs.filter(log => log.itemType === 'StartAttempt'))
+		// 	.flat()
+		// 	.map(startAttemptLog => startAttemptLog.attemptData)
 
 		setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
 	}

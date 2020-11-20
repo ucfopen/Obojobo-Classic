@@ -38,6 +38,10 @@ export default function GraphResponses({ data, width, height }) {
 		domain: [Math.max(...data.map(y)), 0]
 	})
 
+	const isEmptyDataSet = data.every(record => record.value === 0)
+
+	console.log(data, isEmptyDataSet)
+
 	return (
 		<span className="graph-responses">
 			<svg width={width} height={height}>
@@ -63,20 +67,23 @@ export default function GraphResponses({ data, width, height }) {
 						labelProps={{}}
 						tickLabelProps={tickLabelPropsLeft}
 					/>
-					{data.map(d => {
-						const barWidth = xScale.bandwidth()
-						const barHeight = yMax - yScale(d.value)
-						return (
-							<Bar
-								key={`bar-${d.label}`}
-								x={xScale(d.label)}
-								y={yMax - barHeight}
-								width={barWidth}
-								height={barHeight}
-								className={d.isCorrect ? 'is-correct' : 'is-not-correct'}
-							/>
-						)
-					})}
+					{isEmptyDataSet
+						? null
+						: data.map(d => {
+								const barWidth = xScale.bandwidth()
+								const barHeight = yMax - yScale(d.value)
+
+								return (
+									<Bar
+										key={`bar-${d.label}`}
+										x={xScale(d.label)}
+										y={yMax - barHeight}
+										width={barWidth}
+										height={barHeight}
+										className={d.isCorrect ? 'is-correct' : 'is-not-correct'}
+									/>
+								)
+						  })}
 					<AxisBottom
 						scale={xScale}
 						label="Answer Choice"

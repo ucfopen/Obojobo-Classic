@@ -62,7 +62,7 @@ DataGridStudentScores.propTypes = {
 					media: PropTypes.arrayOf(
 						PropTypes.shape({
 							title: PropTypes.string,
-							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3'])
+							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube'])
 						})
 					)
 				})

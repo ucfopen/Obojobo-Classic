@@ -7,7 +7,7 @@ import InstructionsFlag from './instructions-flag'
 import AttemptDetails from './attempt-details'
 import getProcessedQuestionData from '../util/get-processed-question-data'
 
-const getResponseDataByAttempt = (questionsByID, attemptLogs) => {
+const getResponseDataByAttempt = (questions, questionsByID, attemptLogs) => {
 	const responseDataByAttempt = attemptLogs.map(attemptLog => {
 		const responseDataForAttempt = {
 			attempt: attemptLog,
@@ -44,7 +44,7 @@ const getResponseDataByAttempt = (questionsByID, attemptLogs) => {
 export default function ModalScoreDetails({ questions, attemptLogs, userName }) {
 	const [questionsByID, numTotalQuestions] = getProcessedQuestionData(questions)
 
-	const responseDataByAttempt = getResponseDataByAttempt(questionsByID, attemptLogs)
+	const responseDataByAttempt = getResponseDataByAttempt(questions, questionsByID, attemptLogs)
 
 	const [selectedItem, setSelectedItem] = useState({})
 
@@ -163,7 +163,7 @@ ModalScoreDetails.propTypes = {
 						PropTypes.shape({
 							mediaID: PropTypes.number,
 							title: PropTypes.string,
-							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3']),
+							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
 							descText: PropTypes.string,
 							width: PropTypes.number,
 							height: PropTypes.number

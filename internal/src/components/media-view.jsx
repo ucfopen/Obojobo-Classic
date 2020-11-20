@@ -18,10 +18,10 @@ const DeprecationNotice = () => {
 	)
 }
 
-const renderMediaItem = ({ mediaID, title, itemType, meta }) => {
+const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 	switch (itemType) {
 		case 'pic':
-			return <img className="pic" src={`https://obojobo.ucf.edu/media/${mediaID}`} />
+			return <img className="pic" src={`/media/${mediaID}`} />
 
 		case 'kogneato':
 			return (
@@ -57,7 +57,19 @@ const renderMediaItem = ({ mediaID, title, itemType, meta }) => {
 			)
 
 		case 'mp3':
-			return <audio className="mp3" src={`https://obojobo.ucf.edu/media/${mediaID}`} />
+			return <audio className="mp3" src={`/media/${mediaID}`} />
+
+		case 'youTube':
+			return (
+				<iframe
+					width="300"
+					height="169"
+					src={`https://www.youtube.com/embed/${url}`}
+					frameborder="0"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+					allowfullscreen
+				></iframe>
+			)
 	}
 }
 
@@ -69,7 +81,7 @@ MediaView.propTypes = {
 	media: PropTypes.shape({
 		mediaID: PropTypes.number,
 		title: PropTypes.string,
-		itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3']),
+		itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
 		meta: PropTypes.oneOfType([
 			PropTypes.number,
 			PropTypes.shape({

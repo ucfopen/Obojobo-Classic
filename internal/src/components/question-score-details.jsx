@@ -109,6 +109,10 @@ export default function QuestionScoreDetails(props) {
 	mean = sum / dataForGraph.length
 
 	const getStdDev = () => {
+		if (responses.length === 0) {
+			return '--'
+		}
+
 		let numerator = 0
 		for (let i = 0; i < responses.length; i++) {
 			const diff = dataForGraph[responses[i].response.charCodeAt(0) - 65].value - mean
@@ -121,7 +125,11 @@ export default function QuestionScoreDetails(props) {
 	}
 
 	const getAccuracy = () => {
-		return numCorrectAnswers / responses.length
+		if (responses.length === 0) {
+			return '--'
+		}
+
+		return (numCorrectAnswers / responses.length) * 100 + '%'
 	}
 
 	const getFormattedNumberOfResponses = () => {
@@ -146,10 +154,12 @@ export default function QuestionScoreDetails(props) {
 	if (questionType === MC) {
 		items.push({ label: 'Std Dev', value: getStdDev() })
 	} else if (questionType === QA) {
-		items.push({ label: 'Accuracy', value: (getAccuracy() * 100).toString() + '%' })
+		items.push({ label: 'Accuracy', value: getAccuracy() })
 	} else {
 		items.push({ label: 'Mean', value: mean.toString() + '%' })
 	}
+
+	console.log('dataForGraph', dataForGraph)
 
 	return (
 		<div className="repository--question-score-details">
@@ -197,7 +207,7 @@ QuestionScoreDetails.propTypes = {
 					PropTypes.shape({
 						mediaID: PropTypes.number,
 						title: PropTypes.string,
-						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3']),
+						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
 						descText: PropTypes.string,
 						width: PropTypes.number,
 						height: PropTypes.number
