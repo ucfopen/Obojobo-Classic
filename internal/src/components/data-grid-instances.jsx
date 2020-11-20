@@ -11,8 +11,10 @@ const columns = [
 ]
 
 const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
-	<div className="repository--data-grid-instances">
-		<DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
+	<div style={{width: '90vw', height: '90vh', overflow: 'scroll'}}>
+		<div className="repository--data-grid-instances">
+			<DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
+		</div>
 	</div>
 )
 

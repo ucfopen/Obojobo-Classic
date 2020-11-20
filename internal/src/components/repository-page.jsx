@@ -144,7 +144,7 @@ const RepositoryPage = () => {
 	}, null)
 	const { isError, data, error } = useQuery('getInstances', apiGetInstances, {
 		initialStale: true,
-		staleTime: 0
+		staleTime: Infinity
 	})
 	const [selectedInstanceIndex, setSelectedInstanceIndex] = useState(null)
 	const [modal, setModal] = useState(null)
