@@ -40,8 +40,6 @@ export default function GraphResponses({ data, width, height }) {
 
 	const isEmptyDataSet = data.every(record => record.value === 0)
 
-	console.log(data, isEmptyDataSet)
-
 	return (
 		<span className="graph-responses">
 			<svg width={width} height={height}>

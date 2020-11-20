@@ -32,7 +32,6 @@ const getStartAttemptLogsForAssessment = logs => {
 		) {
 			foundAssessmentSubmitQuestionLogs = false
 		}
-		console.log(log, foundAssessmentSubmitQuestionLogs)
 
 		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'StartAttempt') {
 			foundLogs.push(log)
