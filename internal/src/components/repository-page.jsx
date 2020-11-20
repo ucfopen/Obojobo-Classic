@@ -11,9 +11,12 @@ import {
 	apiGetVisitTrackingData,
 	apiLogout,
 	apiGetInstanceTrackingData,
-	apiGetUserNames
+	apiGetInstancePerms,
+	apiGetUser
 } from '../util/api'
+import getUsers from '../util/get-users'
 import MyInstances from './my-instances'
+import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
 import RepositoryModals from './repository-modals'
@@ -128,6 +131,12 @@ const getCSVURLForInstance = ({ instID, name, courseID, scoreMethod }) => {
 }
 
 const RepositoryPage = () => {
+	const [user, setUser] = useState(null)
+	useEffect(async () => {
+		const user = await apiGetUser()
+		setUser(user)
+	}, [])
+
 	const queryCache = useQueryCache()
 	const reloadInstances = useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
@@ -139,6 +148,7 @@ const RepositoryPage = () => {
 	})
 	const [selectedInstanceIndex, setSelectedInstanceIndex] = useState(null)
 	const [modal, setModal] = useState(null)
+	const [usersWithAccess, setUsersWithAccessForInstance] = useState(null)
 	const [scoresForInstance, setScoresForInstance] = useState(null)
 	const [isShowingBanner, setIsShowingBanner] = useState(
 		typeof window.localStorage.hideBanner === 'undefined' ||
@@ -149,7 +159,7 @@ const RepositoryPage = () => {
 
 	const selectedInstance = selectedInstanceIndex === null ? null : data[selectedInstanceIndex]
 
-	console.log('selectedInstance', selectedInstance)
+	console.log('selectedInstance', selectedInstance, user)
 
 	const onClickAboutThisLO = async () => {
 		//@TODO: Is this how to do this?
@@ -206,15 +216,10 @@ const RepositoryPage = () => {
 			].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
 		})
 
-		if (userIDsToFetch.length > 0) {
-			const userNames = await apiGetUserNames(userIDsToFetch)
-			userNames.forEach(userItem => {
-				const user = userItem.userName
-				submitQuestionLogsByUserID[userItem.userID].userName = `${user.last}, ${user.first}${
-					user.mi ? ' ' + user.mi + '.' : ''
-				}`
-			})
-		}
+		const users = await getUsers(userIDsToFetch)
+		users.forEach(userItem => {
+			submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
+		})
 
 		setModal({
 			type: 'scoresByQuestion',
@@ -290,13 +295,23 @@ const RepositoryPage = () => {
 	}
 
 	const onSelectInstance = async row => {
-		// setScoresForInstance(null)
-
 		const scores = getAssessmentScoresFromAPIResult(
 			await apiGetScoresForInstance(data[row].instID),
 			data[row].scoreMethod,
 			parseInt(data[row].attemptCount, 10)
 		)
+
+		const perms = await apiGetInstancePerms(data[row].instID)
+		const managerUserIDs = []
+		Object.keys(perms).forEach(userID => {
+			if (perms[userID].indexOf('20') > -1) {
+				managerUserIDs.push(userID)
+			}
+		})
+
+		const users = await getUsers(managerUserIDs)
+
+		setUsersWithAccessForInstance(users)
 
 		setScoresForInstance(scores)
 
@@ -324,6 +339,10 @@ const RepositoryPage = () => {
 				)
 			)
 		})
+	}
+
+	if (!user) {
+		return <LoadingIndicator isLoading={true} />
 	}
 
 	return (
@@ -355,6 +374,8 @@ const RepositoryPage = () => {
 						onClickScoreDetails={onClickScoreDetails}
 						instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
 						scores={scoresForInstance}
+						usersWithAccess={usersWithAccess}
+						user={user}
 					/>
 				</div>
 			</main>

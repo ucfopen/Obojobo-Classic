@@ -34,6 +34,8 @@ export const apiGetInstanceTrackingData = instID =>
 	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
 export const apiGetUserNames = userIDs =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)
+export const apiGetInstancePerms = instID =>
+	fetchGet(`/api/json.php/loRepository.getItemPerms/${instID}/1`)
 
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []

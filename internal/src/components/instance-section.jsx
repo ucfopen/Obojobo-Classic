@@ -44,6 +44,8 @@ const getDurationText = (startTime, endTime) => {
 export default function InstanceSection({
 	instance,
 	scores,
+	usersWithAccess,
+	user,
 	onClickAboutThisLO,
 	onClickPreview,
 	onClickEditInstanceDetails,
@@ -130,7 +132,15 @@ export default function InstanceSection({
 
 			<SectionHeader label="Ownership &amp; Access" />
 			<div className="ownership">
-				<span>(@TODO - Put ownership text here)</span>
+				<ul>
+					{usersWithAccess.map(userItem => {
+						return (
+							<li key={userItem.userID}>{`${userItem.userString}${
+								userItem.userID === user.userID ? ' (You)' : ''
+							}`}</li>
+						)
+					})}
+				</ul>
 				<Button onClick={onClickManageAccess} type="small" text="Manage access" />
 			</div>
 
