@@ -270,18 +270,10 @@ const RepositoryPage = () => {
 		const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
 		const lo = await apiGetLO(selectedInstance.loID)
 
-		console.log('td', trackingData)
-
 		const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
-		console.log('vl', visitLogs, getStartAttemptLogsForAssessment(visitLogs))
 		const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
 			startAttemptLog => startAttemptLog.attemptData
 		)
-
-		// const attemptLogs = trackingData.visitLog
-		// 	.map(visitLogs => visitLogs.logs.filter(log => log.itemType === 'StartAttempt'))
-		// 	.flat()
-		// 	.map(startAttemptLog => startAttemptLog.attemptData)
 
 		setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
 	}

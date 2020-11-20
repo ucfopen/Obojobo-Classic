@@ -16,7 +16,5 @@ export default async userIDs => {
 		})
 	}
 
-	console.log('getUsers', userIDs, users)
-
 	return userIDs.map(userID => users[userID])
 }
