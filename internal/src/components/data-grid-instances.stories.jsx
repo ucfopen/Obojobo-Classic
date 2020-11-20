@@ -76,3 +76,36 @@ Data.args = {
 		}
 	]
 }
+
+const getRandomInt = max => Math.floor(Math.random() * Math.floor(max))
+
+const generateData = howMany => {
+	const data = []
+	for(let i = 0; i < howMany; i++){
+		data.push({
+			instID: i+'',
+			loID: getRandomInt(1500000)+'',
+			userID: getRandomInt(5000)+'',
+			userName: 'Zachary A Berry',
+			name: 'Conducting a Literature Review For College Students ' + getRandomInt(5000),
+			courseID: 'the_id_of_a_course',
+			createTime: getRandomInt(1500000000)+'',
+			startTime: getRandomInt(1500000000)+'',
+			endTime: getRandomInt(1500000000)+'',
+			attemptCount: '1',
+			scoreMethod: 'h',
+			allowScoreImport: '1',
+			perms: [],
+			courseData: { type: 'none' },
+			externalLink: null,
+			originalID: 0,
+			_explicitType: 'obo\\lo\\InstanceData'
+		})
+	}
+	return data
+}
+
+export const HugeData = Template.bind({})
+HugeData.args = {
+	data: generateData(5000)
+}
