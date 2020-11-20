@@ -9,14 +9,14 @@ import './modal-instance-details.scss'
 export default function ModalInstanceDetails(props) {
 	const [instanceName, setInstanceName] = useState(props.instanceName)
 	const [courseName, setCourseName] = useState(props.courseName)
-	const [startDate, setStartDate] = useState(props.startDate)
-	const [endDate, setEndDate] = useState(props.endDate)
+	const [startTime, setStartTime] = useState(props.startTime)
+	const [endTime, setEndTime] = useState(props.endTime)
 	const [numAttempts, setNumAttempts] = useState(props.numAttempts)
 	const [scoringMethod, setScoringMethod] = useState(props.scoringMethod)
 	const [isImportAllowed, setIsImportAllowed] = useState(props.isImportAllowed)
 
 	const renderExample = () => {
-		if (scoringMethod === 'highest') {
+		if (scoringMethod === 'h') {
 			return (
 				<div className="row example">
 					<span className="sub-title">Take Highest Example:</span>
@@ -25,7 +25,7 @@ export default function ModalInstanceDetails(props) {
 					</span>
 				</div>
 			)
-		} else if (scoringMethod === 'average') {
+		} else if (scoringMethod === 'm') {
 			return (
 				<div className="row example">
 					<span className="sub-title">Take Average Example:</span>
@@ -34,7 +34,7 @@ export default function ModalInstanceDetails(props) {
 					</span>
 				</div>
 			)
-		} else if (scoringMethod === 'last') {
+		} else if (scoringMethod === 'r') {
 			return (
 				<div className="row example">
 					<span className="sub-title">Take Last Example:</span>
@@ -47,17 +47,15 @@ export default function ModalInstanceDetails(props) {
 	}
 
 	const onSave = () => {
-		const state = {
+		props.onSave({
 			instanceName,
 			courseName,
-			startDate,
-			endDate,
+			startTime,
+			endTime,
 			numAttempts,
 			scoringMethod,
 			isImportAllowed
-		}
-
-		props.onSave(state)
+		})
 	}
 
 	return (
@@ -103,7 +101,7 @@ export default function ModalInstanceDetails(props) {
 						Start Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={startDate} onChange={setStartDate} />
+						<FormDateTime value={startTime} onChange={setStartTime} />
 						<HelpButton>
 							{props.isExternallyLinked ? (
 								<div>
@@ -124,7 +122,7 @@ export default function ModalInstanceDetails(props) {
 						End Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={endDate} onChange={setEndDate} />
+						<FormDateTime value={endTime} onChange={setEndTime} />
 						<HelpButton>
 							{props.isExternallyLinked ? (
 								<div>
@@ -179,9 +177,9 @@ export default function ModalInstanceDetails(props) {
 									value={scoringMethod}
 									onChange={event => setScoringMethod(event.target.value)}
 								>
-									<option value="highest">Take Highest Attempt</option>
-									<option value="average">Take Average Score</option>
-									<option value="last">Take Last Attempt</option>
+									<option value="h">Take Highest Attempt</option>
+									<option value="m">Take Average Score</option>
+									<option value="r">Take Last Attempt</option>
 								</select>
 								<HelpButton>
 									<div>
@@ -210,7 +208,7 @@ export default function ModalInstanceDetails(props) {
 					</div>
 				</div>
 				<div className="buttons">
-					<Button text="Cancel" type="alt" onClick={props.onCancel} />
+					<Button text="Cancel" type="alt" onClick={props.onClose} />
 					<Button text="Save" type="small" onClick={onSave} />
 				</div>
 			</div>
@@ -221,10 +219,10 @@ export default function ModalInstanceDetails(props) {
 ModalInstanceDetails.defaultProps = {
 	instanceName: '',
 	courseName: '',
-	startDate: null,
-	endDate: null,
+	startTime: null,
+	endTime: null,
 	numAttempts: 1,
-	scoringMethod: 'highest',
+	scoringMethod: 'h',
 	isImportAllowed: true
 }
 
@@ -234,9 +232,9 @@ ModalInstanceDetails.propTypes = {
 	isExternallyLinked: PropTypes.bool.isRequired,
 	instanceName: PropTypes.string,
 	courseName: PropTypes.string,
-	startDate: PropTypes.oneOfType([null, PropTypes.number]),
-	endDate: PropTypes.oneOfType([null, PropTypes.number]),
+	startTime: PropTypes.oneOfType([null, PropTypes.number]),
+	endTime: PropTypes.oneOfType([null, PropTypes.number]),
 	numAttempts: PropTypes.number,
-	scoringMethod: PropTypes.oneOf(['highest', 'average', 'last']),
+	scoringMethod: PropTypes.oneOf(['h', 'm', 'r']),
 	isImportAllowed: PropTypes.bool
 }
