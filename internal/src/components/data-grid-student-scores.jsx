@@ -52,7 +52,7 @@ DataGridStudentScores.propTypes = {
 		PropTypes.shape({
 			questionNumber: PropTypes.shape({
 				displayNumber: PropTypes.number,
-				altNumber: PropTypes.oneOfType([null, PropTypes.number])
+				altNumber: PropTypes.number
 			}),
 			type: PropTypes.oneOf(['MC', 'QA', 'Media']),
 			questionItems: PropTypes.arrayOf(
@@ -67,10 +67,10 @@ DataGridStudentScores.propTypes = {
 					)
 				})
 			),
-			score: PropTypes.oneOfType([null, PropTypes.number])
+			score: PropTypes.number
 		})
 	),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	selectedIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired
 }
 

@@ -17,7 +17,7 @@ const DataGridDateCell = ({ value: timestamp }) => {
 				'/' +
 				(date.getDate() > 9 ? date.getDate() : '0' + date.getDate()),
 			year: date.getFullYear(),
-			iso: date.toISOString
+			iso: date.toISOString()
 		}
 	})
 
@@ -30,7 +30,7 @@ const DataGridDateCell = ({ value: timestamp }) => {
 }
 
 DataGridDateCell.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number])
+	value: PropTypes.string
 }
 
 export default DataGridDateCell

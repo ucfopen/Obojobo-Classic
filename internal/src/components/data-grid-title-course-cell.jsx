@@ -18,7 +18,7 @@ const DataTitleCourseCell = ({
 }
 
 DataTitleCourseCell.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number])
+	value: PropTypes.string
 }
 
 export default DataTitleCourseCell

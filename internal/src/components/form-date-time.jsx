@@ -56,6 +56,6 @@ export default function FormDateTime({ value, onChange }) {
 }
 
 FormDateTime.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired,
+	value: PropTypes.number,
 	onChange: PropTypes.func.isRequired
 }

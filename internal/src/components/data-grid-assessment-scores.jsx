@@ -73,10 +73,10 @@ DataGridAssessmentScores.propTypes = {
 			user: PropTypes.string.isRequired,
 			userID: PropTypes.string.isRequired,
 			score: PropTypes.shape({
-				value: PropTypes.oneOfType([null, PropTypes.number]),
+				value: PropTypes.number,
 				isScoreImported: PropTypes.bool
 			}).isRequired,
-			lastSubmitted: PropTypes.oneOfType([null, PropTypes.string]).isRequired,
+			lastSubmitted: PropTypes.string,
 			attempts: PropTypes.shape({
 				numAttemptsTaken: PropTypes.number.isRequired,
 				numAdditionalAttemptsAdded: PropTypes.number.isRequired,
@@ -85,7 +85,7 @@ DataGridAssessmentScores.propTypes = {
 			})
 		})
 	),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	selectedIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
 	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,

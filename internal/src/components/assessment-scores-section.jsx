@@ -59,10 +59,10 @@ AssessmentScoresSection.propTypes = {
 			user: PropTypes.string.isRequired,
 			userID: PropTypes.string.isRequired,
 			score: PropTypes.shape({
-				value: PropTypes.oneOfType([null, PropTypes.number]),
+				value: PropTypes.number,
 				isScoreImported: PropTypes.bool
 			}).isRequired,
-			lastSubmitted: PropTypes.oneOfType([null, PropTypes.string]).isRequired,
+			lastSubmitted: PropTypes.string,
 			attempts: PropTypes.shape({
 				numAttemptsTaken: PropTypes.number.isRequired,
 				numAdditionalAttemptsAdded: PropTypes.number.isRequired,
@@ -71,7 +71,7 @@ AssessmentScoresSection.propTypes = {
 			})
 		})
 	),
-	selectedStudentIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	selectedStudentIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired,
 	onClickDownloadScores: PropTypes.func.isRequired,

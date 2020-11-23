@@ -22,7 +22,7 @@ DataGridStudentScoreCell.defaultProps = {
 }
 
 DataGridStudentScoreCell.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired,
+	value: PropTypes.number,
 	isScoreImported: PropTypes.bool.isRequired,
 	onClickScoreDetails: PropTypes.func.isRequired
 }

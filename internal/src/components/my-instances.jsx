@@ -52,19 +52,16 @@ export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 }
 
 MyInstances.propTypes = {
-	instances: PropTypes.oneOfType([
-		null,
-		PropTypes.arrayOf(
-			PropTypes.shape({
-				instID: PropTypes.string.isRequired,
-				name: PropTypes.string.isRequired,
-				courseID: PropTypes.string.isRequired,
-				startTime: PropTypes.string.isRequired,
-				endTime: PropTypes.string.isRequired
-			})
-		)
-	]),
-	selectedInstanceIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	instances: PropTypes.arrayOf(
+		PropTypes.shape({
+			instID: PropTypes.string.isRequired,
+			name: PropTypes.string.isRequired,
+			courseID: PropTypes.string.isRequired,
+			startTime: PropTypes.string.isRequired,
+			endTime: PropTypes.string.isRequired
+		})
+	),
+	selectedInstanceIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired
 }

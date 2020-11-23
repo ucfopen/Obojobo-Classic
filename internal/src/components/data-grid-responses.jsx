@@ -32,6 +32,6 @@ DataGridResponses.propTypes = {
 			time: PropTypes.number
 		})
 	),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	selectedIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired
 }

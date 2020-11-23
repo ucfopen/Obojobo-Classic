@@ -23,18 +23,15 @@ const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
 )
 
 DataGridInstances.propTypes = {
-	data: PropTypes.oneOfType([
-		null,
-		PropTypes.arrayOf(
-			PropTypes.shape({
-				name: PropTypes.string.isRequired,
-				courseID: PropTypes.string.isRequired,
-				startTime: PropTypes.string.isRequired,
-				endTime: PropTypes.string.isRequired
-			})
-		)
-	]),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	data: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string.isRequired,
+			courseID: PropTypes.string.isRequired,
+			startTime: PropTypes.string.isRequired,
+			endTime: PropTypes.string.isRequired
+		})
+	),
+	selectedIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired
 }
 

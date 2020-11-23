@@ -176,5 +176,5 @@ QuestionPreview.propTypes = {
 			})
 		)
 	}).isRequired,
-	response: PropTypes.oneOfType([null, PropTypes.string])
+	response: PropTypes.string
 }

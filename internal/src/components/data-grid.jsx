@@ -114,10 +114,10 @@ DataGrid.defaultProps = {
 }
 
 DataGrid.propTypes = {
-	data: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
+	data: PropTypes.arrayOf(PropTypes.object),
 	columns: PropTypes.arrayOf(PropTypes.object),
 	sortable: PropTypes.bool,
-	selectedRow: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
+	selectedRow: PropTypes.arrayOf(PropTypes.object),
 	onSelect: PropTypes.func.isRequired,
 	idColumn: PropTypes.string
 }

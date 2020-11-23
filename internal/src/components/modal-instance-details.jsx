@@ -232,8 +232,8 @@ ModalInstanceDetails.propTypes = {
 	isExternallyLinked: PropTypes.bool.isRequired,
 	instanceName: PropTypes.string,
 	courseName: PropTypes.string,
-	startTime: PropTypes.oneOfType([null, PropTypes.number]),
-	endTime: PropTypes.oneOfType([null, PropTypes.number]),
+	startTime: PropTypes.number,
+	endTime: PropTypes.number,
 	numAttempts: PropTypes.number,
 	scoringMethod: PropTypes.oneOf(['h', 'm', 'r']),
 	isImportAllowed: PropTypes.bool

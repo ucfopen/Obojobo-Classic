@@ -13,5 +13,5 @@ export default function DataGridScoreCell({ value }) {
 }
 
 DataGridScoreCell.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired
+	value: PropTypes.number
 }

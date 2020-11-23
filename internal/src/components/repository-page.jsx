@@ -133,9 +133,14 @@ const getCSVURLForInstance = ({ instID, name, courseID, scoreMethod }) => {
 
 const RepositoryPage = () => {
 	const [user, setUser] = useState(null)
-	useEffect(async () => {
-		const user = await apiGetUser()
-		setUser(user)
+
+	// Load the user
+	useEffect(() => {
+		async function fetchUser(){
+			const user = await apiGetUser()
+			setUser(user)
+		}
+		fetchUser()
 	}, [])
 
 	const queryCache = useQueryCache()
@@ -358,6 +363,7 @@ const RepositoryPage = () => {
 				onClickAboutOrBannerLink={onClickHeaderAboutOrBannerLink}
 				onClickCloseBanner={onClickHeaderCloseBanner}
 				onClickLogOut={onClickLogOut}
+				userName={user.login}
 			/>
 			<main>
 				<div className="wrapper">

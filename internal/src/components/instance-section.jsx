@@ -164,8 +164,8 @@ export default function InstanceSection({
 }
 
 InstanceSection.propTypes = {
-	instance: PropTypes.oneOfType([null, PropTypes.object]),
-	scores: PropTypes.oneOfType([null, PropTypes.object]),
+	instance: PropTypes.object,
+	scores: PropTypes.object,
 	onClickDownloadScores: PropTypes.func.isRequired,
 	onClickEditInstanceDetails: PropTypes.func.isRequired,
 	onClickManageAccess: PropTypes.func.isRequired,
