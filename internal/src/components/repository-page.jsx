@@ -1,6 +1,6 @@
 import './repository-page.scss'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React from 'react'
 import { useQuery, useQueryCache } from 'react-query'
 import {
 	apiGetInstances,
@@ -132,30 +132,28 @@ const getCSVURLForInstance = ({ instID, name, courseID, scoreMethod }) => {
 }
 
 const RepositoryPage = () => {
-	const [user, setUser] = useState(null)
-
-	// Load the user
-	useEffect(() => {
-		async function fetchUser(){
-			const user = await apiGetUser()
-			setUser(user)
-		}
-		fetchUser()
-	}, [])
 
 	const queryCache = useQueryCache()
-	const reloadInstances = useCallback(() => {
+	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
 	}, null)
+
+	// load user
+	const { isError: qUserIsError, data: user, error: qUserError } = useQuery('getUser', apiGetUser, {
+		initialStale: true,
+		staleTime: Infinity
+	})
+
+	// load instances
 	const { isError, data, error } = useQuery('getInstances', apiGetInstances, {
 		initialStale: true,
 		staleTime: Infinity
 	})
-	const [selectedInstance, setSelectedInstance] = useState(null)
-	const [modal, setModal] = useState(null)
-	const [usersWithAccess, setUsersWithAccessForInstance] = useState(null)
-	const [scoresForInstance, setScoresForInstance] = useState(null)
-	const [isShowingBanner, setIsShowingBanner] = useState(
+	const [selectedInstance, setSelectedInstance] = React.useState(null)
+	const [modal, setModal] = React.useState(null)
+	const [usersWithAccess, setUsersWithAccessForInstance] = React.useState(null)
+	const [scoresForInstance, setScoresForInstance] = React.useState(null)
+	const [isShowingBanner, setIsShowingBanner] = React.useState(
 		typeof window.localStorage.hideBanner === 'undefined' ||
 			window.localStorage.hideBanner === 'false'
 	)
