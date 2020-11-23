@@ -12,7 +12,8 @@ import {
 	apiLogout,
 	apiGetInstanceTrackingData,
 	apiGetInstancePerms,
-	apiGetUser
+	apiGetUser,
+	apiEditInstance
 } from '../util/api'
 import getUsers from '../util/get-users'
 import MyInstances from './my-instances'
@@ -74,7 +75,7 @@ const getFinalScoreFromAttemptScores = (attemptScores, scoringMethod) => {
 		case 'h':
 			return Math.max.apply(null, attemptScores)
 
-		case 'l':
+		case 'r':
 			return attemptScores[attemptScores.length - 1]
 
 		case 'm':
@@ -177,7 +178,27 @@ const RepositoryPage = () => {
 	const onClickEditInstanceDetails = () => {
 		setModal({
 			type: 'instanceDetails',
-			props: selectedInstance
+			props: {
+				instanceName: selectedInstance.name,
+				courseName: selectedInstance.courseID,
+				startTime: selectedInstance.startTime,
+				endTime: selectedInstance.endTime,
+				numAttempts: parseInt(selectedInstance.attemptCount, 10),
+				scoringMethod: selectedInstance.scoreMethod,
+				isImportAllowed: selectedInstance.allowScoreImport === '1',
+				onSave: async values => {
+					values.instID = selectedInstance.instID
+
+					console.log('values', values)
+
+					const oldSelectedInstanceIndex = selectedInstanceIndex
+
+					await apiEditInstance(values)
+					setModal(null)
+					await reloadInstances()
+					setSelectedInstanceIndex(oldSelectedInstanceIndex)
+				}
+			}
 		})
 	}
 

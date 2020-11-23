@@ -36,7 +36,21 @@ export const apiGetUserNames = userIDs =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)
 export const apiGetInstancePerms = instID =>
 	fetchGet(`/api/json.php/loRepository.getItemPerms/${instID}/1`)
-
+export const apiEditInstance = ({
+	instanceName,
+	courseName,
+	instID,
+	startTime,
+	endTime,
+	numAttempts,
+	scoringMethod,
+	isImportAllowed
+}) =>
+	fetchGet(
+		`/api/json.php/loRepository.editInstance/${instanceName}/${instID}/${courseName}/${startTime}/${endTime}/${numAttempts}/${scoringMethod}/${
+			isImportAllowed ? '1' : '0'
+		}`
+	)
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []
 

@@ -623,6 +623,12 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $removeExternalLink = false)
 	{
+		// @TODO: For now these are added to work with the GET api.
+		// @TODO: Find a better solution here
+		$name = rawurldecode($name);
+		$course = rawurldecode($course);
+		$allowScoreImport = (bool)$allowScoreImport;
+
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
