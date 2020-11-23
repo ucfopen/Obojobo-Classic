@@ -7,10 +7,15 @@ import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 
 const getFilteredInstances = (instances, search) => {
+	// is still loading?
+	if (instances === null) return null
+
+	// empty
 	if (!instances) {
 		return []
 	}
 
+	// data loaded, filter
 	return instances.filter(instance => {
 		if (!search) {
 			return instances
@@ -28,16 +33,12 @@ const getFilteredInstances = (instances, search) => {
 
 export default function MyInstances({
 	instances,
-	selectedInstanceIndex,
 	onSelect,
 	onClickRefresh
 }) {
 	const [search, setSearch] = useState('')
 
-	const selectedInstance =
-		instances === null || selectedInstanceIndex === null ? null : instances[selectedInstanceIndex]
 	const filteredInstances = getFilteredInstances(instances, search)
-	const selectedIndex = filteredInstances.indexOf(selectedInstance)
 
 	return (
 		<div className="repository--my-instances">
@@ -52,7 +53,6 @@ export default function MyInstances({
 			</div>
 			<DataGridInstances
 				data={filteredInstances}
-				selectedIndex={selectedIndex === -1 ? null : selectedInstanceIndex}
 				onSelect={onSelect}
 			/>
 		</div>

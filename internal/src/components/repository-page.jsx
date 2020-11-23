@@ -140,13 +140,12 @@ const RepositoryPage = () => {
 	const queryCache = useQueryCache()
 	const reloadInstances = useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
-		setSelectedInstanceIndex(null)
 	}, null)
 	const { isError, data, error } = useQuery('getInstances', apiGetInstances, {
 		initialStale: true,
 		staleTime: Infinity
 	})
-	const [selectedInstanceIndex, setSelectedInstanceIndex] = useState(null)
+	const [selectedInstance, setSelectedInstance] = useState(null)
 	const [modal, setModal] = useState(null)
 	const [usersWithAccess, setUsersWithAccessForInstance] = useState(null)
 	const [scoresForInstance, setScoresForInstance] = useState(null)
@@ -156,10 +155,6 @@ const RepositoryPage = () => {
 	)
 
 	if (isError) return <span>Error: {error.message}</span>
-
-	const selectedInstance = selectedInstanceIndex === null ? null : data[selectedInstanceIndex]
-
-	console.log('selectedInstance', selectedInstance, user)
 
 	const onClickAboutThisLO = async () => {
 		//@TODO: Is this how to do this?
@@ -187,7 +182,7 @@ const RepositoryPage = () => {
 	}
 
 	const onClickManageAccess = () => {
-		alert('onClickManageAccess')
+		window.alert('onClickManageAccess')
 	}
 
 	const onClickDownloadScores = () => {
@@ -256,7 +251,7 @@ const RepositoryPage = () => {
 
 	const onClickRemoveAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
 		if (numAdditionalAttemptsAdded === 0) {
-			alert('Unable to remove attempt!')
+			window.alert('Unable to remove attempt!')
 			return
 		}
 
@@ -279,21 +274,21 @@ const RepositoryPage = () => {
 	}
 
 	const onClickPreview = () => {
-		if (selectedInstanceIndex === null) {
+		if (selectedInstance === null) {
 			return
 		}
 
 		window.open(`/preview/${selectedInstance.loID}`, '_blank')
 	}
 
-	const onSelectInstance = async row => {
+	const onSelectInstance = async (selectedInstance) => {
 		const scores = getAssessmentScoresFromAPIResult(
-			await apiGetScoresForInstance(data[row].instID),
-			data[row].scoreMethod,
-			parseInt(data[row].attemptCount, 10)
+			await apiGetScoresForInstance(selectedInstance.instID),
+			data.scoreMethod,
+			parseInt(data.attemptCount, 10)
 		)
 
-		const perms = await apiGetInstancePerms(data[row].instID)
+		const perms = await apiGetInstancePerms(selectedInstance.instID)
 		const managerUserIDs = []
 		Object.keys(perms).forEach(userID => {
 			if (perms[userID].indexOf('20') > -1) {
@@ -304,10 +299,8 @@ const RepositoryPage = () => {
 		const users = await getUsers(managerUserIDs)
 
 		setUsersWithAccessForInstance(users)
-
 		setScoresForInstance(scores)
-
-		setSelectedInstanceIndex(row)
+		setSelectedInstance(selectedInstance)
 	}
 
 	const onClickRefreshScores = () => {
@@ -349,7 +342,6 @@ const RepositoryPage = () => {
 				<div className="wrapper">
 					<MyInstances
 						instances={data}
-						selectedInstanceIndex={selectedInstanceIndex}
 						onSelect={onSelectInstance}
 						onClickRefresh={() => reloadInstances()}
 					/>
@@ -364,7 +356,7 @@ const RepositoryPage = () => {
 						onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
 						onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
 						onClickScoreDetails={onClickScoreDetails}
-						instance={selectedInstanceIndex !== null ? data[selectedInstanceIndex] : null}
+						instance={selectedInstance}
 						scores={scoresForInstance}
 						usersWithAccess={usersWithAccess}
 						user={user}
