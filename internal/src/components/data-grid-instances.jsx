@@ -1,18 +1,24 @@
 import React from 'react'
 import DataGrid from './data-grid'
-import DataGridTimestampCell from './data-grid-timestamp-cell'
+import DataGridDateCell from './data-grid-date-cell'
+import TitleCourseCell from './data-grid-title-course-cell'
 import PropTypes from 'prop-types'
 
-const dateW = 77 // width of DataGridTimeStampCell
 const columns = [
-	{ accessor: 'name', Header: 'Title', width: 200 },
-	{ accessor: 'courseID', Header: 'Course', width: 100 },
-	{ accessor: 'endTime', Header: 'End', Cell: DataGridTimestampCell, width: dateW }
+	{ accessor: 'name', Header: 'Title & Course', Cell: TitleCourseCell, width: 320 },
+	{ accessor: 'startTime', Header: 'Start', Cell: DataGridDateCell, width: 40 },
+	{ accessor: 'endTime', Header: 'End', Cell: DataGridDateCell, width: 40 }
 ]
 
 const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
-	<div className="repository--data-grid-instances" style={{width: '100%', height: '90vh'}}>
-		<DataGrid idColumn='instID' data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
+	<div className="repository--data-grid-instances" style={{ width: '400px', height: '90vh' }}>
+		<DataGrid
+			idColumn="instID"
+			data={data}
+			columns={columns}
+			selectedIndex={selectedIndex}
+			onSelect={onSelect}
+		/>
 	</div>
 )
 

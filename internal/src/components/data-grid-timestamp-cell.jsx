@@ -18,7 +18,7 @@ const formatAMPM = (date, showSeconds) => {
 }
 
 const DataGridTimestampCell = ({ value: timestamp, display, showSeconds }) => {
-	if (timestamp === null) {
+	if (!timestamp || timestamp === '0') {
 		return <div className={`repository--date-time-cell is-display-blank`}>--</div>
 	}
 

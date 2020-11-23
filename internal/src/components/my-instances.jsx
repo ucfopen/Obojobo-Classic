@@ -31,15 +31,10 @@ const getFilteredInstances = (instances, search) => {
 	})
 }
 
-export default function MyInstances({
-	instances,
-	onSelect,
-	onClickRefresh
-}) {
+export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 	const [search, setSearch] = useState('')
 
 	const filteredInstances = getFilteredInstances(instances, search)
-
 	return (
 		<div className="repository--my-instances">
 			<h1>My Instances</h1>
@@ -51,10 +46,7 @@ export default function MyInstances({
 				/>
 				<RefreshButton onClick={onClickRefresh} />
 			</div>
-			<DataGridInstances
-				data={filteredInstances}
-				onSelect={onSelect}
-			/>
+			<DataGridInstances data={filteredInstances} onSelect={onSelect} />
 		</div>
 	)
 }
