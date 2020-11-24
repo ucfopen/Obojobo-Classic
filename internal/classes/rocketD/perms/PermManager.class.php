@@ -120,7 +120,7 @@ abstract class PermManager extends \rocketD\db\DBEnabled
 		return $allItems;
 	}
 
-	public function duplictePermsToNewItem($itemType, $oldItemID, $newItemId)
+	public function duplicatePermsToNewItem($itemType, $oldItemID, $newItemId)
 	{
 		/** Validate Input **/
 		if(!\obo\util\Validator::isPosInt($oldItemID)) return \rocketD\util\Error::getError(2);

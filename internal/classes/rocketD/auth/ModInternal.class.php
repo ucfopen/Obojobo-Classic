@@ -300,7 +300,7 @@ class ModInternal extends AuthModule
 
 			$salt    = $this->createSalt();
 			$saltSet = $this->setMetaField($userID, 'salt', $salt);
-			$pwSet   = $this->setMetaField($userID, 'password', md5("$salt$password"));
+			$pwSet   = $this->setMetaField($userID, 'password', md5("$salt$newPassword"));
 			$pwTime  = $this->setMetaField($userID, 'lastPassChange', time());
 
 			return $saltSet && $pwSet && $pwTime;

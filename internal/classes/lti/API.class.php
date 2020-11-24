@@ -262,7 +262,7 @@ class API
 			// In some cases, this is a bad idea (old instructor passes batton to new instructor)
 			// but, if we don't do this - it doesn't behave like ANYONE expects - making a ghost instance
 			$PM = \obo\perms\PermManager::getInstance();
-			$PM->duplictePermsToNewItem(\cfg_core_Perm::TYPE_INSTANCE, $originalInstId, $newInstId);
+			$PM->duplicatePermsToNewItem(\cfg_core_Perm::TYPE_INSTANCE, $originalInstId, $newInstId);
 		}
 
 		return $newInstId;
