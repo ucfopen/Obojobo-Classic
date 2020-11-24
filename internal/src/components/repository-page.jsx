@@ -328,9 +328,7 @@ const RepositoryPage = () => {
 	}
 
 	const onClickRefreshScores = () => {
-		//@TODO: Should be able to set this to null but for whatever reason this is causing a
-		//max call stack size exceeded error
-		setScoresForInstance([])
+		setScoresForInstance(null)
 
 		const selectedInstID = selectedInstance.instID
 		apiGetScoresForInstance(selectedInstID).then(scores => {

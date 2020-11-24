@@ -13,23 +13,16 @@ const getTimestampCell = ({ value }) => (
 
 const DataGridAssessmentScores = ({
 	data,
-	selectedIndex,
-	onSelect,
 	onClickAddAdditionalAttempt,
 	onClickRemoveAdditionalAttempt,
 	onClickScoreDetails
 }) => {
-	const getStudentScoreCell = ({ value, row }) => (
-		<DataGridStudentScoreCell
-			{...value}
-			onClickScoreDetails={() => onClickScoreDetails(row.original.user, row.original.userID)}
-		/>
-	)
 
-	const getDataGridAttemptsCell = ({ value, row }) => {
+	const getDataGridAttemptsCell = React.useMemo(() => ({ value, row }) => {
 		return (
 			<DataGridAttemptsCell
 				{...value}
+
 				onClickAddAdditionalAttempt={() => {
 					onClickAddAdditionalAttempt(
 						row.original.userID,
@@ -44,24 +37,29 @@ const DataGridAssessmentScores = ({
 				}
 			/>
 		)
-	}
+	})
+
+	const getStudentScoreCell = React.useMemo(() => ({ value, row }) => (
+		<DataGridStudentScoreCell
+			{...value}
+			onClickScoreDetails={() => onClickScoreDetails(row.original.user, row.original.userID)}
+		/>
+	))
+
+	const columns = React.useMemo(() => [
+		{ accessor: 'user', Header: 'User' },
+		{ accessor: 'score', Header: 'Score', Cell: getStudentScoreCell },
+		{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
+		{ accessor: 'attempts', Header: 'Attempts', Cell: getDataGridAttemptsCell }
+	])
+
 
 	return (
 		<div className="repository--data-grid-assessment-scores">
 			<DataGrid
 				data={data}
-				columns={[
-					{ accessor: 'user', Header: 'User' },
-					{ accessor: 'score', Header: 'Score', Cell: getStudentScoreCell },
-					{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
-					{
-						accessor: 'attempts',
-						Header: 'Attempts',
-						Cell: getDataGridAttemptsCell
-					}
-				]}
-				selectedIndex={selectedIndex}
-				onSelect={onSelect}
+				idColumn='userID'
+				columns={columns}
 			/>
 		</div>
 	)
@@ -85,8 +83,6 @@ DataGridAssessmentScores.propTypes = {
 			})
 		})
 	),
-	selectedIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
 	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
 	onClickScoreDetails: PropTypes.func.isRequired

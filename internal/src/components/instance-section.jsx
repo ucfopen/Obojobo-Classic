@@ -5,9 +5,6 @@ import PropTypes from 'prop-types'
 import Button from './button'
 import SectionHeader from './section-header'
 import DefList from './def-list'
-import AssessmentScoresSummary from './assessment-scores-summary'
-import SearchField from './search-field'
-import DataGridAssessmentScores from './data-grid-assessment-scores'
 import AssessmentScoresSection from './assessment-scores-section'
 import HelpButton from './help-button'
 import InstructionsFlag from './instructions-flag'
@@ -165,7 +162,7 @@ export default function InstanceSection({
 
 InstanceSection.propTypes = {
 	instance: PropTypes.object,
-	scores: PropTypes.object,
+	scores: PropTypes.array,
 	onClickDownloadScores: PropTypes.func.isRequired,
 	onClickEditInstanceDetails: PropTypes.func.isRequired,
 	onClickManageAccess: PropTypes.func.isRequired,

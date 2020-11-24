@@ -50,8 +50,10 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 			const selectedClass = row.id === selectedId ? 'selected' : ''
 			const evenOddClass = index % 2 ? 'odd' : ''
 			const onClick = () => {
-				setSelectedId(row.id)
-				if (onSelect) onSelect(row.original)
+				if (onSelect) {
+					setSelectedId(row.id)
+					onSelect(row.original)
+				}
 			}
 			return (
 				<div {...row.getRowProps({style})} onClick={onClick} className={`row ${selectedClass} ${evenOddClass}`}>
@@ -110,7 +112,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 DataGrid.defaultProps = {
 	data: null,
 	columns: [],
-	sortable: true
+	sortable: true,
 }
 
 DataGrid.propTypes = {
@@ -118,8 +120,8 @@ DataGrid.propTypes = {
 	columns: PropTypes.arrayOf(PropTypes.object),
 	sortable: PropTypes.bool,
 	selectedRow: PropTypes.arrayOf(PropTypes.object),
-	onSelect: PropTypes.func.isRequired,
-	idColumn: PropTypes.string
+	onSelect: PropTypes.func,
+	idColumn: PropTypes.string.isRequired
 }
 
 export default DataGrid

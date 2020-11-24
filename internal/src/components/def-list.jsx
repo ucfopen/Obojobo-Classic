@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 export default function DefList(props) {
 	return (
 		<div className="repository--def-list">
-			{props.items.map(item => (
-				<div className="row" key={item.label}>
+			{props.items.map((item, index) => (
+				<div className="row" key={item.label || `i-${index}`}>
 					<p className="label">{item.label}</p>
 					<p className="value">{item.value}</p>
 				</div>

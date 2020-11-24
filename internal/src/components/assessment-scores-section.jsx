@@ -10,7 +10,6 @@ import SearchField from './search-field'
 export default function AssessmentScoresSection({
 	assessmentScores,
 	selectedStudentIndex,
-	onSelect,
 	onClickRefresh,
 	onClickDownloadScores,
 	onClickAddAdditionalAttempt,
@@ -20,6 +19,7 @@ export default function AssessmentScoresSection({
 	const scores = assessmentScores
 		? assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
 		: []
+
 
 	return (
 		<div className="repository--assessment-scores-section">
@@ -31,12 +31,11 @@ export default function AssessmentScoresSection({
 				<hr className="section-divider" />
 				<div className="assessment-score-search">
 					<p className="title">Scores by student</p>
-					<SearchField placeholder="Search for a name" />
+					<SearchField placeholder="Search for a name" onChange={() => {}} />
 				</div>
 				<DataGridAssessmentScores
 					data={assessmentScores || null}
 					selectedIndex={selectedStudentIndex}
-					onSelect={onSelect}
 					onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
 					onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
 					onClickScoreDetails={onClickScoreDetails}
@@ -72,7 +71,6 @@ AssessmentScoresSection.propTypes = {
 		})
 	),
 	selectedStudentIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired,
 	onClickDownloadScores: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
