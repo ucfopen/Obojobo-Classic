@@ -308,8 +308,8 @@ const RepositoryPage = () => {
 	const onSelectInstance = async (selectedInstance) => {
 		const scores = getAssessmentScoresFromAPIResult(
 			await apiGetScoresForInstance(selectedInstance.instID),
-			data.scoreMethod,
-			parseInt(data.attemptCount, 10)
+			selectedInstance.scoreMethod,
+			parseInt(selectedInstance.attemptCount, 10)
 		)
 
 		const perms = await apiGetInstancePerms(selectedInstance.instID)
