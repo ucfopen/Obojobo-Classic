@@ -136,19 +136,21 @@ const RepositoryPage = () => {
 	const queryCache = useQueryCache()
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
-	}, null)
+	}, [])
 
 	// load user
 	const { isError: qUserIsError, data: user, error: qUserError } = useQuery('getUser', apiGetUser, {
 		initialStale: true,
-		staleTime: Infinity
+		staleTime: Infinity,
 	})
 
 	// load instances
-	const { isError, data, error } = useQuery('getInstances', apiGetInstances, {
+	const { isError, data, error, isFetching } = useQuery('getInstances', apiGetInstances, {
 		initialStale: true,
-		staleTime: Infinity
+		staleTime: Infinity,
+		initialData: null
 	})
+
 	const [selectedInstance, setSelectedInstance] = React.useState(null)
 	const [modal, setModal] = React.useState(null)
 	const [usersWithAccess, setUsersWithAccessForInstance] = React.useState(null)
@@ -196,7 +198,7 @@ const RepositoryPage = () => {
 
 					await apiEditInstance(values)
 					setModal(null)
-					await reloadInstances()
+					reloadInstances()
 					setSelectedInstanceIndex(oldSelectedInstanceIndex)
 				}
 			}
@@ -362,7 +364,7 @@ const RepositoryPage = () => {
 			<main>
 				<div className="wrapper">
 					<MyInstances
-						instances={data}
+						instances={isFetching ? null : data}
 						onSelect={onSelectInstance}
 						onClickRefresh={() => reloadInstances()}
 					/>
