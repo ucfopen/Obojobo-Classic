@@ -13,7 +13,7 @@ import LoadingIndicator from './loading-indicator'
 
 const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 	const isLoading = data === null
-
+	const [selectedId, setSelectedId] = React.useState(null)
 	const getRowId = React.useCallback(row => row[idColumn], [])
 
 	const defaultColumn = React.useMemo(
@@ -32,13 +32,12 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 			defaultColumn,
 			columns,
 			data: data || [],
-			getRowId
+			getRowId,
+			autoResetSortBy: false // https://github.com/tannerlinsley/react-table/issues/2369#issuecomment-644481605
 		},
 		useSortBy,
 		useFlexLayout
 	)
-
-	const [selectedId, setSelectedId] = React.useState(null)
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
@@ -66,6 +65,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 	)
 
 	return (
+
 		<div className={`repository--data-grid ${onSelect ? 'selectable' : ''}`} {...getTableProps()}>
 			<div className="data-grid-head">
 				{headerGroups.map(headerGroup => (

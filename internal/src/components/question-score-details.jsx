@@ -159,8 +159,6 @@ export default function QuestionScoreDetails(props) {
 		items.push({ label: 'Mean', value: mean.toString() + '%' })
 	}
 
-	console.log('dataForGraph', dataForGraph)
-
 	return (
 		<div className="repository--question-score-details">
 			<div className="data-and-responses-content">

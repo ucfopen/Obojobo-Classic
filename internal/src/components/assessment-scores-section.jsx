@@ -16,6 +16,7 @@ export default function AssessmentScoresSection({
 	onClickRemoveAdditionalAttempt,
 	onClickScoreDetails
 }) {
+
 	const scores = assessmentScores
 		? assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
 		: []

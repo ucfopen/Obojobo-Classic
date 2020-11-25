@@ -192,8 +192,6 @@ const RepositoryPage = () => {
 				onSave: async values => {
 					values.instID = selectedInstance.instID
 
-					console.log('values', values)
-
 					const oldSelectedInstanceIndex = selectedInstanceIndex
 
 					await apiEditInstance(values)
@@ -327,26 +325,26 @@ const RepositoryPage = () => {
 		setSelectedInstance(selectedInstance)
 	}
 
-	const onClickRefreshScores = () => {
+	const onClickRefreshScores = React.useMemo(() => async () => {
 		setScoresForInstance(null)
 
 		const selectedInstID = selectedInstance.instID
-		apiGetScoresForInstance(selectedInstID).then(scores => {
-			if (selectedInstance.instID !== selectedInstID) {
-				// The user has selected a different instance before we could return the results.
-				// Ignore the return.
-				return
-			}
+		const scores = await apiGetScoresForInstance(selectedInstID)
+		if (selectedInstance.instID !== selectedInstID) {
+			// The user has selected a different instance before we could return the results.
+			// Ignore the return.
+			return
+		}
 
-			setScoresForInstance(
-				getAssessmentScoresFromAPIResult(
-					scores,
-					selectedInstance.scoreMethod,
-					parseInt(selectedInstance.attemptCount, 10)
-				)
-			)
-		})
-	}
+		const formattedScores = getAssessmentScoresFromAPIResult(
+			scores,
+			selectedInstance.scoreMethod,
+			parseInt(selectedInstance.attemptCount, 10)
+		)
+
+		setScoresForInstance(formattedScores)
+
+	}, [selectedInstance])
 
 	if (!user) {
 		return <LoadingIndicator isLoading={true} />
