@@ -19,6 +19,6 @@ DefList.defaultProps = {}
 
 DefList.propTypes = {
 	items: PropTypes.arrayOf(
-		PropTypes.shape({ label: PropTypes.string, value: PropTypes.string.isRequired })
+		PropTypes.shape({ label: PropTypes.string, value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]) })
 	)
 }

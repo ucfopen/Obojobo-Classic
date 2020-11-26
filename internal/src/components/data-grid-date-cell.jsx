@@ -30,7 +30,7 @@ const DataGridDateCell = ({ value: timestamp }) => {
 }
 
 DataGridDateCell.propTypes = {
-	value: PropTypes.string
+	value: PropTypes.number
 }
 
 export default DataGridDateCell

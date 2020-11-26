@@ -9,36 +9,33 @@ import './modal-about-lo.scss'
 export default function ModalAboutLO(props) {
 	const items = [
 		{ label: 'Learn Time', value: props.learnTime.toString() },
-		{ label: 'Language', value: props.language },
-		{ label: 'Content', value: props.numContentPages.toString() },
-		{ label: 'Practice', value: props.numPracticeQuestions.toString() },
-		{ label: 'Assessment', value: props.numAssessmentQuestions.toString() },
-		{ label: 'Author Notes', value: props.authorNotes }
+		{ label: 'Language', value: props.languageID == 1 ? 'English' : '' },
+		{ label: 'Content', value: props.contentSize.toString() },
+		{ label: 'Practice', value: props.practiceSize.toString() },
+		{ label: 'Assessment', value: props.assessmentSize.toString() },
+		{ label: 'Author Notes', value: props.notes }
 	]
 
 	return (
 		<div className="modal-about-learning-object">
 			<SectionHeader label={'About this learning object'} />
-
 			<DefList className="def-list" items={items} />
-
 			<SectionHeader label={'Learning Objective'} />
-
 			<div className="flash-html-container">
-				<FlashHTML value={props.learningObjective} />
+				<FlashHTML value={props.objective} />
 			</div>
-
 			<Button text="Close" type="text" onClick={props.onClose} />
 		</div>
 	)
 }
 
 ModalAboutLO.propTypes = {
+	onClose: PropTypes.func.isRequired,
 	learnTime: PropTypes.number.isRequired,
-	language: PropTypes.string.isRequired,
-	numContentPages: PropTypes.number.isRequired,
-	numPracticeQuestions: PropTypes.number.isRequired,
-	numAssessmentQuestions: PropTypes.number.isRequired,
-	authorNotes: PropTypes.string.isRequired,
-	learningObjective: PropTypes.string.isRequired
+	languageID: PropTypes.number.isRequired,
+	contentSize: PropTypes.string.isRequired,
+	practiceSize: PropTypes.string.isRequired,
+	assessmentSize: PropTypes.string.isRequired,
+	notes: PropTypes.string.isRequired,
+	objective: PropTypes.string.isRequired
 }

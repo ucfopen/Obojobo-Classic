@@ -8,25 +8,16 @@ import SearchField from './search-field'
 
 const getFilteredInstances = (instances, search) => {
 	// is still loading?
-	if (instances === null) return null
-
-	// empty
-	if (!instances) {
-		return []
-	}
+	if (!instances) return null
+	if (!search) return instances
+	search = search.toLowerCase()
 
 	// data loaded, filter
 	return instances.filter(instance => {
-		if (!search) {
-			return instances
-		}
-
-		search = search.toLowerCase()
-
 		return (
 			instance.name.toLowerCase().indexOf(search) > -1 ||
 			instance.courseID.toLowerCase().indexOf(search) > -1 ||
-			instance.instID.indexOf(search) > -1
+			String(instance.instID).indexOf(search) > -1
 		)
 	})
 }
@@ -34,7 +25,8 @@ const getFilteredInstances = (instances, search) => {
 export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 	const [search, setSearch] = useState('')
 
-	const filteredInstances = getFilteredInstances(instances, search)
+	const filteredInstances = React.useMemo(() => getFilteredInstances(instances, search), [instances, search])
+
 	return (
 		<div className="repository--my-instances">
 			<h1>My Instances</h1>
@@ -42,7 +34,7 @@ export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 				<SearchField
 					placeholder="Search by title, course or id"
 					value={search}
-					onChange={s => setSearch(s)}
+					onChange={setSearch}
 				/>
 				<RefreshButton onClick={onClickRefresh} />
 			</div>
@@ -54,11 +46,11 @@ export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 MyInstances.propTypes = {
 	instances: PropTypes.arrayOf(
 		PropTypes.shape({
-			instID: PropTypes.string.isRequired,
+			instID: PropTypes.number.isRequired,
 			name: PropTypes.string.isRequired,
 			courseID: PropTypes.string.isRequired,
-			startTime: PropTypes.string.isRequired,
-			endTime: PropTypes.string.isRequired
+			startTime: PropTypes.number.isRequired,
+			endTime: PropTypes.number.isRequired
 		})
 	),
 	selectedInstanceIndex: PropTypes.number,

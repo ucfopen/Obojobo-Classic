@@ -20,11 +20,20 @@ const handleErrors = async resp => {
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
 export const apiGetUser = () => fetchGet('/api/json.php/loRepository.getUser')
-export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getInstances')
+export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
+		// normalize the data we're getting back
+		const castToInt = ['createTime', 'attemptCount', 'allowScoreImport', 'startTime', 'endTime', 'attemptCount', 'userID', 'instID']
+		instances.forEach(i => {
+			castToInt.forEach(key => { i[key] = parseInt(i[key], 10) })
+			i.allowScoreImport = i.allowScoreImport === '1'
+			i.externalLink = i.externalLink != null
+		})
+		return instances
+	})
 export const apiLogout = () => fetchGet('/api/json.php/loRepository.doLogout')
-export const apiGetLOMeta = loID => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
+export const apiGetLOMeta = (r, loID) => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
 export const apiGetLO = loID => fetchGet(`/api/json.php/loRepository.getLO/${loID}`)
-export const apiGetScoresForInstance = instID =>
+export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`)
 export const apiEditExtraAttempts = (userID, instID, newCount) =>
 	fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
@@ -32,22 +41,22 @@ export const apiGetVisitTrackingData = (userID, instID) =>
 	fetchGet(`/api/json.php/loRepository.getVisitTrackingData/${userID}/${instID}`)
 export const apiGetInstanceTrackingData = instID =>
 	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
-export const apiGetUserNames = userIDs =>
+export const apiGetUserNames = (r, ...userIDs) =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)
-export const apiGetInstancePerms = instID =>
+export const apiGetInstancePerms = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getItemPerms/${instID}/1`)
 export const apiEditInstance = ({
-	instanceName,
-	courseName,
+	name,
+	courseID,
 	instID,
 	startTime,
 	endTime,
-	numAttempts,
-	scoringMethod,
+	attemptCount,
+	scoreMethod,
 	isImportAllowed
 }) =>
 	fetchGet(
-		`/api/json.php/loRepository.editInstance/${instanceName}/${instID}/${courseName}/${startTime}/${endTime}/${numAttempts}/${scoringMethod}/${
+		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${
 			isImportAllowed ? '1' : '0'
 		}`
 	)

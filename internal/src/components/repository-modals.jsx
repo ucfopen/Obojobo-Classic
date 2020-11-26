@@ -1,6 +1,7 @@
 import './repository-modals.scss'
 
 import React, { useEffect } from 'react'
+import ReactDom from 'react-dom'
 import ReactModal from 'react-modal'
 import ModalAboutLO from './modal-about-lo'
 import Button from './button'
@@ -8,11 +9,40 @@ import ModalInstanceDetails from './modal-instance-details'
 import ModalScoreDetails from './modal-score-details'
 import ModalScoresByQuestion from './modal-scores-by-question'
 import ModalAboutObojoboNext from './modal-about-obojobo-next'
+import { useQuery, useQueryCache } from 'react-query'
+import { apiGetLOMeta } from '../util/api'
+
+
+const ModalAboutLOWithAPI = ({onClose, loID}) => {
+	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
+		initialStale: true,
+		staleTime: Infinity,
+	})
+
+	const props = React.useMemo(() => {
+		if(isFetching) return {}
+		const {learnTime, languageID, notes, summary, objective } = data
+		const {contentSize, practiceSize, assessmentSize} = summary
+		return {
+			learnTime,
+			languageID,
+			contentSize,
+			practiceSize,
+			assessmentSize,
+			notes,
+			objective
+		}
+	}, [onClose, loID, data, isFetching])
+
+	if(isFetching) return null
+	if(isError) return <div>Error Loading Data</div>
+	return <ModalAboutLO {...props} onClose={onClose} />
+}
 
 const getModal = (modalType, modalProps, onCloseModal) => {
 	switch (modalType) {
 		case 'aboutThisLO':
-			return <ModalAboutLO {...modalProps} onClose={onCloseModal} />
+			return <ModalAboutLOWithAPI onClose={onCloseModal} loID={modalProps.loID} />
 
 		case 'instanceDetails':
 			return <ModalInstanceDetails {...modalProps} onClose={onCloseModal} />
@@ -25,9 +55,11 @@ const getModal = (modalType, modalProps, onCloseModal) => {
 
 		case 'aboutObojoboNext':
 			return <ModalAboutObojoboNext {...modalProps} onClose={onCloseModal} />
+
+		default:
+			return null
 	}
 
-	return null
 }
 
 const RepositoryModals = ({ instanceName, modalType, modalProps, onCloseModal }) => {
@@ -55,5 +87,7 @@ const RepositoryModals = ({ instanceName, modalType, modalProps, onCloseModal })
 		</ReactModal>
 	) : null
 }
+
+ReactModal.setAppElement('#react-app');
 
 export default RepositoryModals

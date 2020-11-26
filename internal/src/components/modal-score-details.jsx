@@ -178,8 +178,8 @@ ModalScoreDetails.propTypes = {
 			attempt: PropTypes.shape({
 				attemptID: PropTypes.string.isRequired,
 				score: PropTypes.string.isRequired,
-				startTime: PropTypes.string.isRequired,
-				endTime: PropTypes.string.isRequired,
+				startTime: PropTypes.number.isRequired,
+				endTime: PropTypes.number.isRequired,
 				qOrder: PropTypes.string.isRequired
 			}),
 			scores: PropTypes.arrayOf(

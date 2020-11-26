@@ -11,16 +11,17 @@ export default function AssessmentScoresSection({
 	assessmentScores,
 	selectedStudentIndex,
 	onClickRefresh,
-	onClickDownloadScores,
 	onClickAddAdditionalAttempt,
 	onClickRemoveAdditionalAttempt,
-	onClickScoreDetails
+	onClickScoreDetails,
+	onClickDownloadScores
 }) {
 
-	const scores = assessmentScores
-		? assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
-		: []
-
+	// filter any null scores
+	const scores = React.useMemo(() => {
+		if(!assessmentScores) return []
+		return assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
+	}, [assessmentScores])
 
 	return (
 		<div className="repository--assessment-scores-section">

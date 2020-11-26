@@ -16,6 +16,13 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 	const [selectedId, setSelectedId] = React.useState(null)
 	const getRowId = React.useCallback(row => row[idColumn], [])
 
+	// reset selected if the id isnt in the data
+	React.useEffect(() => {
+		if(!data) return
+		const containsSelected = data.find(i => getRowId(i) == selectedId)
+		if(!containsSelected) setSelectedId(null)
+	}, [data])
+
 	const defaultColumn = React.useMemo(
 		() => ({
 		  // When using the useFlexLayout:

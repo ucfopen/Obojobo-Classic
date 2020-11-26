@@ -16,7 +16,6 @@ const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
 			idColumn="instID"
 			data={data}
 			columns={columns}
-			selectedIndex={selectedIndex}
 			onSelect={onSelect}
 		/>
 	</div>
@@ -27,8 +26,8 @@ DataGridInstances.propTypes = {
 		PropTypes.shape({
 			name: PropTypes.string.isRequired,
 			courseID: PropTypes.string.isRequired,
-			startTime: PropTypes.string.isRequired,
-			endTime: PropTypes.string.isRequired
+			startTime: PropTypes.number.isRequired,
+			endTime: PropTypes.number.isRequired
 		})
 	),
 	selectedIndex: PropTypes.number,

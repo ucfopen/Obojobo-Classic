@@ -7,53 +7,36 @@ import Button from './button'
 import './modal-instance-details.scss'
 
 export default function ModalInstanceDetails(props) {
-	const [instanceName, setInstanceName] = useState(props.instanceName)
-	const [courseName, setCourseName] = useState(props.courseName)
+	const [name, setName] = useState(props.name)
+	const [courseID, setCourseID] = useState(props.courseID)
 	const [startTime, setStartTime] = useState(props.startTime)
 	const [endTime, setEndTime] = useState(props.endTime)
-	const [numAttempts, setNumAttempts] = useState(props.numAttempts)
-	const [scoringMethod, setScoringMethod] = useState(props.scoringMethod)
+	const [attemptCount, setAttemptCount] = useState(props.attemptCount)
+	const [scoreMethod, setScoreMethod] = useState(props.scoreMethod)
 	const [isImportAllowed, setIsImportAllowed] = useState(props.isImportAllowed)
 
-	const renderExample = () => {
-		if (scoringMethod === 'h') {
-			return (
-				<div className="row example">
-					<span className="sub-title">Take Highest Example:</span>
-					<span>
-						Score 1: 75%, Score 2: 90%, Score 3: 80%, <b>Final: 90%</b>
-					</span>
-				</div>
-			)
-		} else if (scoringMethod === 'm') {
-			return (
-				<div className="row example">
-					<span className="sub-title">Take Average Example:</span>
-					<span>
-						Score 1: 75%, Score 2: 90%, Score 3: 80%, <b>Final: 82%</b>
-					</span>
-				</div>
-			)
-		} else if (scoringMethod === 'r') {
-			return (
-				<div className="row example">
-					<span className="sub-title">Take Last Example:</span>
-					<span>
-						Score 1: 75%, Score 2: 90%, Score 3: 80%, <b>Final: 80%</b>
-					</span>
-				</div>
-			)
+	const [exScoreMethod, exFinalScore] = React.useMemo(() => {
+		switch(scoreMethod){
+			case 'h':
+				return ['Highest', 90]
+			case 'm':
+				return ['Average', 82]
+			case 'r':
+				return ['Last', 80]
+			default:
+				return ['', '']
 		}
-	}
+	}, [scoreMethod])
 
 	const onSave = () => {
 		props.onSave({
-			instanceName,
-			courseName,
+			instID: props.instID,
+			name,
+			courseID,
 			startTime,
 			endTime,
-			numAttempts,
-			scoringMethod,
+			attemptCount,
+			scoreMethod,
 			isImportAllowed
 		})
 	}
@@ -67,8 +50,8 @@ export default function ModalInstanceDetails(props) {
 					<div className="flex-container">
 						<input
 							type="text"
-							value={instanceName}
-							onChange={event => setInstanceName(event.target.value)}
+							value={name}
+							onChange={e => setName(e.target.value)}
 						/>
 						<HelpButton>
 							<div>
@@ -83,8 +66,8 @@ export default function ModalInstanceDetails(props) {
 					<div className="flex-container">
 						<input
 							type="text"
-							value={courseName}
-							onChange={event => setCourseName(event.target.value)}
+							value={courseID}
+							onChange={e => setCourseID(e.target.value)}
 						/>
 						<HelpButton>
 							<div>
@@ -151,11 +134,11 @@ export default function ModalInstanceDetails(props) {
 					<div className="flex-container">
 						<input
 							type="number"
-							value={numAttempts}
+							value={attemptCount}
 							min="1"
 							max="255"
-							onChange={event => setNumAttempts(parseInt(event.target.value, 10))}
-							onBlur={() => setNumAttempts(Math.max(Math.min(numAttempts, 255), 1))}
+							onChange={e => setAttemptCount(parseInt(e.target.value, 10))}
+							onBlur={() => setAttemptCount(Math.max(Math.min(attemptCount, 255), 1))}
 						/>
 						<HelpButton>
 							<div>
@@ -167,15 +150,15 @@ export default function ModalInstanceDetails(props) {
 						</HelpButton>
 					</div>
 				</div>
-				{numAttempts > 1 ? (
+				{attemptCount > 1 ? (
 					<React.Fragment>
 						<div className="row">
 							<span className="title">Scoring:</span>
 							<div className="flex-container">
 								<select
 									name="scoringMethod"
-									value={scoringMethod}
-									onChange={event => setScoringMethod(event.target.value)}
+									value={scoreMethod}
+									onChange={e => setScoreMethod(e.target.value)}
 								>
 									<option value="h">Take Highest Attempt</option>
 									<option value="m">Take Average Score</option>
@@ -190,12 +173,15 @@ export default function ModalInstanceDetails(props) {
 								</HelpButton>
 							</div>
 						</div>
-						{renderExample()}
+						<div className="row example">
+							<span className="sub-title">Example:</span>
+							<span>Given 3 attempts: 75, 90, 80. The <b>{exScoreMethod} score is: {exFinalScore}%</b></span>
+						</div>
 					</React.Fragment>
 				) : null}
 				<div className="row">
 					<div className="score-import">
-						<label onClick={event => setIsImportAllowed(event.target.checked)}>
+						<label onClick={e => setIsImportAllowed(e.target.checked)}>
 							<input type="checkbox" name="isImportAllowed" defaultChecked={isImportAllowed} />
 							<span>Allow past scores to be imported</span>
 						</label>
@@ -217,24 +203,26 @@ export default function ModalInstanceDetails(props) {
 }
 
 ModalInstanceDetails.defaultProps = {
-	instanceName: '',
-	courseName: '',
+	instID: null,
+	name: '',
+	courseID: '',
 	startTime: null,
 	endTime: null,
-	numAttempts: 1,
+	attemptCount: 1,
 	scoringMethod: 'h',
 	isImportAllowed: true
 }
 
 ModalInstanceDetails.propTypes = {
-	onCancel: PropTypes.func.isRequired,
+	onClose: PropTypes.func.isRequired,
 	onSave: PropTypes.func.isRequired,
+	instID: PropTypes.number.isRequired,
 	isExternallyLinked: PropTypes.bool.isRequired,
-	instanceName: PropTypes.string,
-	courseName: PropTypes.string,
+	name: PropTypes.string,
+	courseID: PropTypes.string,
 	startTime: PropTypes.number,
 	endTime: PropTypes.number,
-	numAttempts: PropTypes.number,
-	scoringMethod: PropTypes.oneOf(['h', 'm', 'r']),
+	attemptCount: PropTypes.number,
+	scoreMethod: PropTypes.oneOf(['h', 'm', 'r']),
 	isImportAllowed: PropTypes.bool
 }

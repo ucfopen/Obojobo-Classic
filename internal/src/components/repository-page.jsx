@@ -1,18 +1,18 @@
 import './repository-page.scss'
 
 import React from 'react'
-import { useQuery, useQueryCache } from 'react-query'
+import { useMutation, useQuery, useQueryCache } from 'react-query'
 import {
-	apiGetInstances,
+	apiGetInstances, /* ! */
 	apiGetLO,
-	apiGetLOMeta,
 	apiGetScoresForInstance,
 	apiEditExtraAttempts,
 	apiGetVisitTrackingData,
 	apiLogout,
 	apiGetInstanceTrackingData,
+	apiGetUserNames,
 	apiGetInstancePerms,
-	apiGetUser,
+	apiGetUser, /* ! */
 	apiEditInstance
 } from '../util/api'
 import getUsers from '../util/get-users'
@@ -103,7 +103,7 @@ const getAssessmentScoresFromAPIResult = (scoresByUser, scoringMethod, attemptCo
 			attempts: {
 				numAttemptsTaken: score.attempts.length,
 				numAdditionalAttemptsAdded: parseInt(score.additional, 10),
-				numAttempts: attemptCount,
+				numAttempts: parseInt(attemptCount, 10),
 				isAttemptInProgress: !lastAttempt.submitted
 			}
 		}
@@ -123,131 +123,285 @@ const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptC
 	})
 }
 
-const getCSVURLForInstance = ({ instID, name, courseID, scoreMethod }) => {
-	const instName = encodeURI(name.replace(/ /g, '_'))
-	const courseName = encodeURI(courseID.replace(/ /g, '_'))
-	const date = dayjs().format('MM-DD-YY')
-
-	return `/assets/csv.php?function=scores&instID=${instID}&filename=${instName}_-_${courseName}_-_${date}&method=${scoreMethod}`
-}
 
 const RepositoryPage = () => {
-
+	const [selectedInstance, setSelectedInstance] = React.useState(null)
+	const instID = React.useMemo(() => selectedInstance ? selectedInstance.instID : null, [selectedInstance]) // caches testing if selectedInstance is null or not
+	const [modal, setModal] = React.useState(null)
+	const [users, setUsers] = React.useState({})
+	const [isShowingBanner, setIsShowingBanner] = React.useState(
+		typeof window.localStorage.hideBanner === 'undefined' ||
+			window.localStorage.hideBanner === 'false'
+	)
 	const queryCache = useQueryCache()
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
 	}, [])
 
-	// load user
-	const { isError: qUserIsError, data: user, error: qUserError } = useQuery('getUser', apiGetUser, {
+	// Initial API calls
+
+	// load current user
+	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery('getUser', apiGetUser, {
 		initialStale: true,
 		staleTime: Infinity,
 	})
+
 
 	// load instances
 	const { isError, data, error, isFetching } = useQuery('getInstances', apiGetInstances, {
 		initialStale: true,
 		staleTime: Infinity,
-		initialData: null
+		initialData: null,
+		enabled: currentUser // load after user loads
 	})
 
-	const [selectedInstance, setSelectedInstance] = React.useState(null)
-	const [modal, setModal] = React.useState(null)
-	const [usersWithAccess, setUsersWithAccessForInstance] = React.useState(null)
-	const [scoresForInstance, setScoresForInstance] = React.useState(null)
-	const [isShowingBanner, setIsShowingBanner] = React.useState(
-		typeof window.localStorage.hideBanner === 'undefined' ||
-			window.localStorage.hideBanner === 'false'
+	//	load perms to selected instance
+	const { isError: qPermsIsError, data: qPermsData, error: qPermsError, isFetching: qPermsIsFetching } = useQuery(
+		['getInstancePerms', instID ],
+		apiGetInstancePerms, {
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: null,
+			enabled: instID // load only after selectedInstance loads
+		}
 	)
 
-	if (isError) return <span>Error: {error.message}</span>
+	const managerUserIDs = React.useMemo(() => {
+		// extract list of user ids that can edit this instance
+		// { <userID>: [<perm>, <perm>], ... } becomes [<userID>, <userID>]
+		if (!qPermsData) return []
+		const userIds = Object.keys(qPermsData)
+		return userIds.filter(id => qPermsData[id].includes('20'))
+	}, [qPermsData])
 
-	const onClickAboutThisLO = async () => {
-		//@TODO: Is this how to do this?
-		const loMeta = await apiGetLOMeta(selectedInstance.loID)
 
-		setModal({
-			type: 'aboutThisLO',
-			props: {
-				learnTime: loMeta.learnTime,
-				language: loMeta.language,
-				numContentPages: loMeta.summary.contentSize,
-				numPracticeQuestions: loMeta.summary.practiceSize,
-				numAssessmentQuestions: loMeta.summary.assessmentSize,
-				authorNotes: loMeta.notes,
-				learningObjective: loMeta.objective
+	// ====== BEGIN STEPS TO LOAD AND CACHE USERS
+	// determine if there are any users we need to load
+	const usersToLoad = React.useMemo(() => {
+		return managerUserIDs.filter(id => !users[id])
+	}, [managerUserIDs, users])
+
+	//	load user info for managers
+	const { isError: qUsersIsError, data: qUsers, error: qUsersError, isFetching: qUsersIsFetching } = useQuery(
+		['getUserNames', ...usersToLoad],
+		apiGetUserNames, {
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: [],
+			enabled: usersToLoad.length // load only after selectedInstance loads
+		}
+	)
+
+	React.useMemo(() => {
+		// add a display string for each user
+		const newUsers = {}
+		qUsers.forEach(u => {
+			newUsers[u.userID] = {
+				...u,
+				userString: `${u.userName.last}, ${u.userName.first}${u.userName.mi ? ' ' + u.userName.mi + '.' : ''}`
 			}
 		})
-	}
 
-	const onClickEditInstanceDetails = () => {
-		setModal({
-			type: 'instanceDetails',
-			props: {
-				instanceName: selectedInstance.name,
-				courseName: selectedInstance.courseID,
-				startTime: selectedInstance.startTime,
-				endTime: selectedInstance.endTime,
-				numAttempts: parseInt(selectedInstance.attemptCount, 10),
-				scoringMethod: selectedInstance.scoreMethod,
-				isImportAllowed: selectedInstance.allowScoreImport === '1',
-				onSave: async values => {
-					values.instID = selectedInstance.instID
+		// add them to the cache for all loaded users
+		setUsers({...users, ...newUsers})
 
-					const oldSelectedInstanceIndex = selectedInstanceIndex
+	}, [qUsers])
 
-					await apiEditInstance(values)
-					setModal(null)
+	// ====== END STEPS TO LOAD AND CACHE USERS
+
+
+	const instanceManagers = React.useMemo(() => {
+		const peeps = []
+		managerUserIDs.forEach(id => {
+			if(users[id]) peeps.push(users[id])
+		})
+		return peeps
+	}, [managerUserIDs, users])
+
+
+
+	const { data: qScores, isFetching: qScoresIsFetching } = useQuery(
+		['getScoresForInstance', instID],
+		apiGetScoresForInstance, {
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: [],
+			enabled: instID // load only after selectedInstance loads
+		}
+	)
+
+	const scoresForInstance = React.useMemo(() => {
+		if(!instID || qScoresIsFetching) return null
+		return getAssessmentScoresFromAPIResult(qScores, selectedInstance.scoreMethod, selectedInstance.attemptCount)
+	}, [qScores, qScoresIsFetching])
+
+
+	const [mutateInstance] = useMutation(apiEditInstance)
+
+	// all the my instance props use
+	const instanceSectionCallbacks = React.useMemo(() => ({
+		onClickEditInstanceDetails: () => {
+			const onSave = async (values) => {
+				try{
+					await mutateInstance(values)
+
+					// update 'data' in place
+					// we have to do this because calling reloadInstances
+					// doesnt update selectedInstance
+					// which in turn doesnt update the instance details
+					// till the user clicks on the current item in the instance datagrid
+					const keys = Object.keys(values)
+
+					const index = data.findIndex(d => d.instID == values.instID)
+					const selected = data[index]
+					keys.forEach(k => {selected[k] = values[k]})
+					// data[index] = {...selected}
+
+					// trying to populate cache with updated data, but no dice
+					// queryCache.setQueryData('getInstances', [...data])
+
+					// only way I can get the dang instance list to update
 					reloadInstances()
-					setSelectedInstanceIndex(oldSelectedInstanceIndex)
-				}
-			}
-		})
-	}
-
-	const onClickManageAccess = () => {
-		window.alert('onClickManageAccess')
-	}
-
-	const onClickDownloadScores = () => {
-		window.open(getCSVURLForInstance(selectedInstance))
-	}
-
-	const onClickViewScoresByQuestion = async () => {
-		const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
-		const lo = await apiGetLO(selectedInstance.loID)
-
-		const submitQuestionLogsByUserID = {}
-		const userIDsToFetch = []
-
-		trackingData.visitLog.forEach(visitLog => {
-			if (!submitQuestionLogsByUserID[visitLog.userID]) {
-				userIDsToFetch.push(visitLog.userID)
-
-				submitQuestionLogsByUserID[visitLog.userID] = {
-					userName: `User #${visitLog.userID}`,
-					logs: []
+					setModal(null)
+				} catch (error){
+					console.error(error)
 				}
 			}
 
-			submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
-				visitLog.userID
-			].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
-		})
+			const {instID, name, courseID, startTime, endTime, attemptCount, externalLink, scoreMethod, allowScoreImport} = selectedInstance
 
-		const users = await getUsers(userIDsToFetch)
-		users.forEach(userItem => {
-			submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
-		})
+			setModal({
+				type: 'instanceDetails',
+				props: {
+					onSave,
+					instID,
+					name,
+					courseID,
+					startTime,
+					endTime,
+					attemptCount,
+					scoreMethod,
+					isExternallyLinked: externalLink,
+					isImportAllowed: allowScoreImport
+				}
+			})
+		},
 
-		setModal({
-			type: 'scoresByQuestion',
-			props: {
-				submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
-				questions: lo.aGroup.kids
+		onClickAboutThisLO: () => {
+			setModal({
+				type: 'aboutThisLO',
+				props: { loID: selectedInstance.loID }
+			})
+		},
+
+		onClickPreview: (url) => {
+			window.open(url, '_blank')
+		},
+
+		onClickManageAccess: () => {
+			window.alert('onClickManageAccess')
+		},
+
+		onClickDownloadScores: (url) => {
+			window.open(url)
+		},
+
+		onClickEditInstanceDetail: () => {
+			setModal({
+				type: 'instanceDetails',
+				props: {
+					instanceName: selectedInstance.name,
+					courseName: selectedInstance.courseID,
+					startTime: selectedInstance.startTime,
+					endTime: selectedInstance.endTime,
+					numAttempts: selectedInstance.attemptCount,
+					scoringMethod: selectedInstance.scoreMethod,
+					isImportAllowed: selectedInstance.allowScoreImport === '1',
+					onSave: async values => {
+						values.instID = selectedInstance.instID
+
+						const oldSelectedInstanceIndex = selectedInstanceIndex
+						await apiEditInstance(values)
+						setModal(null)
+						reloadInstances()
+						// setSelectedInstanceIndex(oldSelectedInstanceIndex)
+					}
+				}
+			})
+		},
+
+		onClickViewScoresByQuestion: async () => {
+			const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
+			const lo = await apiGetLO(selectedInstance.loID)
+
+			const submitQuestionLogsByUserID = {}
+			const userIDsToFetch = []
+
+			trackingData.visitLog.forEach(visitLog => {
+				if (!submitQuestionLogsByUserID[visitLog.userID]) {
+					userIDsToFetch.push(visitLog.userID)
+
+					submitQuestionLogsByUserID[visitLog.userID] = {
+						userName: `User #${visitLog.userID}`,
+						logs: []
+					}
+				}
+
+				submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
+					visitLog.userID
+				].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
+			})
+
+			const users = await getUsers(userIDsToFetch)
+			users.forEach(userItem => {
+				submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
+			})
+
+			setModal({
+				type: 'scoresByQuestion',
+				props: {
+					submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
+					questions: lo.aGroup.kids
+				}
+			})
+		},
+
+		onClickRefreshScores: () => {
+			queryCache.invalidateQueries(['getScoresForInstance', instID])
+		},
+
+		onClickAddAdditionalAttempt: (userID, numAdditionalAttemptsAdded) => {
+			apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded + 1)
+			setScoresForInstance(
+				getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded + 1)
+			)
+		},
+
+		onClickRemoveAdditionalAttempt: (userID, numAdditionalAttemptsAdded) => {
+			if (numAdditionalAttemptsAdded === 0) {
+				window.alert('Unable to remove attempt!')
+				return
 			}
-		})
-	}
+
+			apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded - 1)
+			setScoresForInstance(
+				getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded - 1)
+			)
+		},
+
+		onClickScoreDetails: async (userName, userID) => {
+			const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
+			const lo = await apiGetLO(selectedInstance.loID)
+
+			const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
+			const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
+				startAttemptLog => startAttemptLog.attemptData
+			)
+
+			setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
+		}
+
+	}), [selectedInstance])
 
 	const onClickHeaderAboutOrBannerLink = () => {
 		setModal({
@@ -266,91 +420,9 @@ const RepositoryPage = () => {
 		window.location = window.location
 	}
 
-	const onClickAddAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
-		apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded + 1)
-		setScoresForInstance(
-			getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded + 1)
-		)
-	}
 
-	const onClickRemoveAdditionalAttempt = (userID, numAdditionalAttemptsAdded) => {
-		if (numAdditionalAttemptsAdded === 0) {
-			window.alert('Unable to remove attempt!')
-			return
-		}
-
-		apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded - 1)
-		setScoresForInstance(
-			getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded - 1)
-		)
-	}
-
-	const onClickScoreDetails = async (userName, userID) => {
-		const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
-		const lo = await apiGetLO(selectedInstance.loID)
-
-		const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
-		const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
-			startAttemptLog => startAttemptLog.attemptData
-		)
-
-		setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
-	}
-
-	const onClickPreview = () => {
-		if (selectedInstance === null) {
-			return
-		}
-
-		window.open(`/preview/${selectedInstance.loID}`, '_blank')
-	}
-
-	const onSelectInstance = async (selectedInstance) => {
-		const scores = getAssessmentScoresFromAPIResult(
-			await apiGetScoresForInstance(selectedInstance.instID),
-			selectedInstance.scoreMethod,
-			parseInt(selectedInstance.attemptCount, 10)
-		)
-
-		const perms = await apiGetInstancePerms(selectedInstance.instID)
-		const managerUserIDs = []
-		Object.keys(perms).forEach(userID => {
-			if (perms[userID].indexOf('20') > -1) {
-				managerUserIDs.push(userID)
-			}
-		})
-
-		const users = await getUsers(managerUserIDs)
-
-		setUsersWithAccessForInstance(users)
-		setScoresForInstance(scores)
-		setSelectedInstance(selectedInstance)
-	}
-
-	const onClickRefreshScores = React.useMemo(() => async () => {
-		setScoresForInstance(null)
-
-		const selectedInstID = selectedInstance.instID
-		const scores = await apiGetScoresForInstance(selectedInstID)
-		if (selectedInstance.instID !== selectedInstID) {
-			// The user has selected a different instance before we could return the results.
-			// Ignore the return.
-			return
-		}
-
-		const formattedScores = getAssessmentScoresFromAPIResult(
-			scores,
-			selectedInstance.scoreMethod,
-			parseInt(selectedInstance.attemptCount, 10)
-		)
-
-		setScoresForInstance(formattedScores)
-
-	}, [selectedInstance])
-
-	if (!user) {
-		return <LoadingIndicator isLoading={true} />
-	}
+	if (isError) return <span>Error: {error.message}</span>
+	if (!currentUser) return <LoadingIndicator isLoading={true} />
 
 	return (
 		<div id="repository" className="repository">
@@ -359,30 +431,21 @@ const RepositoryPage = () => {
 				onClickAboutOrBannerLink={onClickHeaderAboutOrBannerLink}
 				onClickCloseBanner={onClickHeaderCloseBanner}
 				onClickLogOut={onClickLogOut}
-				userName={user.login}
+				userName={currentUser.login}
 			/>
 			<main>
 				<div className="wrapper">
 					<MyInstances
 						instances={isFetching ? null : data}
-						onSelect={onSelectInstance}
-						onClickRefresh={() => reloadInstances()}
+						onSelect={setSelectedInstance}
+						onClickRefresh={reloadInstances}
 					/>
 					<InstanceSection
-						onClickAboutThisLO={onClickAboutThisLO}
-						onClickPreview={onClickPreview}
-						onClickEditInstanceDetails={onClickEditInstanceDetails}
-						onClickManageAccess={onClickManageAccess}
-						onClickDownloadScores={onClickDownloadScores}
-						onClickViewScoresByQuestion={onClickViewScoresByQuestion}
-						onClickRefreshScores={onClickRefreshScores}
-						onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
-						onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
-						onClickScoreDetails={onClickScoreDetails}
+						{...instanceSectionCallbacks}
 						instance={selectedInstance}
 						scores={scoresForInstance}
-						usersWithAccess={usersWithAccess}
-						user={user}
+						usersWithAccess={instanceManagers}
+						user={currentUser}
 					/>
 				</div>
 			</main>

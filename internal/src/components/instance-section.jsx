@@ -38,6 +38,8 @@ const getDurationText = (startTime, endTime) => {
 	return 'This instance closes in ' + humanizeDuration(endTime - now, { largest: 2 })
 }
 
+const noOp = () => {}
+
 export default function InstanceSection({
 	instance,
 	scores,
@@ -52,7 +54,7 @@ export default function InstanceSection({
 	onClickRefreshScores,
 	onClickAddAdditionalAttempt,
 	onClickRemoveAdditionalAttempt,
-	onClickScoreDetails
+	onClickScoreDetails,
 }) {
 	if (!instance) {
 		return (
@@ -61,6 +63,21 @@ export default function InstanceSection({
 			</div>
 		)
 	}
+
+	const onClickDownloadScoresWithUrl = React.useCallback(() => {
+		if(!instance) return noOp
+		const { instID, name, courseID, scoreMethod } = instance
+		const instName = encodeURI(name.replace(/ /g, '_'))
+		const courseName = encodeURI(courseID.replace(/ /g, '_'))
+		const date = dayjs().format('MM-DD-YY')
+		const url = `/assets/csv.php?function=scores&instID=${instID}&filename=${instName}_-_${courseName}_-_${date}&method=${scoreMethod}`
+		onClickDownloadScores(url)
+	}, [instance])
+
+	const onClickPreviewWithUrl = React.useCallback(() => {
+		if(!instance) return noOp
+		onClickPreview(`/preview/${instance.loID}`)
+	}, [instance])
 
 	const startTime = dayjs(instance.startTime * 1000)
 	const endTime = dayjs(instance.endTime * 1000)
@@ -73,7 +90,7 @@ export default function InstanceSection({
 					<h2>{`Course: ${instance.courseID}`}</h2>
 				</div>
 				<Button onClick={onClickAboutThisLO} type="text" text="About this learning object..." />
-				<Button onClick={onClickPreview} type="large" text="Preview" />
+				<Button onClick={onClickPreviewWithUrl} type="large" text="Preview" />
 			</div>
 
 			<div className="link">
@@ -142,7 +159,7 @@ export default function InstanceSection({
 			</div>
 
 			<AssessmentScoresSection
-				onClickDownloadScores={onClickDownloadScores}
+				onClickDownloadScores={onClickDownloadScoresWithUrl}
 				assessmentScores={scores}
 				onClickRefresh={onClickRefreshScores}
 				onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
