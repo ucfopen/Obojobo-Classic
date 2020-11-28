@@ -3,6 +3,9 @@
 .repository--question-preview {
 	$color-partially-correct: lighten($color-correct, 0.2);
 
+	h1{
+		margin-bottom: 1.5em;
+	}
 	.question-body {
 		display: flex;
 

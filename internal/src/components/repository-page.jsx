@@ -97,7 +97,7 @@ const getAssessmentScoresFromAPIResult = (scoresByUser, scoringMethod, attemptCo
 					score.attempts.map(attempt => parseFloat(attempt.score)),
 					scoringMethod
 				),
-				isScoreImported: lastAttempt.linkedAttempt !== '0'
+				isScoreImported: lastAttempt.linkedAttempt !== 0
 			},
 			lastSubmitted: lastAttempt.submitDate,
 			attempts: {
@@ -124,11 +124,53 @@ const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptC
 }
 
 
+const useCachedUsers = (neededUsers) => {
+	const [users, setUsers] = React.useState({})
+
+	// filter out any users we already have in the cache
+	const usersToLoad = React.useMemo(() => {
+		return neededUsers.filter(id => !users[id])
+	}, [neededUsers, users])
+
+	//	load user info for managers
+	const { isError, data, isFetching } = useQuery(
+		['getUserNames', ...usersToLoad],
+		apiGetUserNames, {
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: [],
+			enabled: usersToLoad.length // load only after selectedInstance loads
+		}
+	)
+
+	React.useMemo(() => {
+		// add a display string for each user
+		const defaultUserName = {
+			first: 'Unknown',
+			last: 'User',
+			mi: ''
+		}
+
+		const newUsers = {}
+		data.forEach(user => {
+			const u = {...user}
+			u.userName = {...defaultUserName, ...u.userName}
+			u.userString = `${u.userName.last}, ${u.userName.first}${u.userName.mi ? ' ' + u.userName.mi + '.' : ''}`
+			newUsers[u.userID] = u
+		})
+
+		// add them to the cache for all loaded users
+		setUsers({...users, ...newUsers})
+
+	}, [data])
+
+	return { users, isError, isFetching }
+}
+
 const RepositoryPage = () => {
 	const [selectedInstance, setSelectedInstance] = React.useState(null)
 	const instID = React.useMemo(() => selectedInstance ? selectedInstance.instID : null, [selectedInstance]) // caches testing if selectedInstance is null or not
 	const [modal, setModal] = React.useState(null)
-	const [users, setUsers] = React.useState({})
 	const [isShowingBanner, setIsShowingBanner] = React.useState(
 		typeof window.localStorage.hideBanner === 'undefined' ||
 			window.localStorage.hideBanner === 'false'
@@ -174,41 +216,7 @@ const RepositoryPage = () => {
 		return userIds.filter(id => qPermsData[id].includes('20'))
 	}, [qPermsData])
 
-
-	// ====== BEGIN STEPS TO LOAD AND CACHE USERS
-	// determine if there are any users we need to load
-	const usersToLoad = React.useMemo(() => {
-		return managerUserIDs.filter(id => !users[id])
-	}, [managerUserIDs, users])
-
-	//	load user info for managers
-	const { isError: qUsersIsError, data: qUsers, error: qUsersError, isFetching: qUsersIsFetching } = useQuery(
-		['getUserNames', ...usersToLoad],
-		apiGetUserNames, {
-			initialStale: true,
-			staleTime: Infinity,
-			initialData: [],
-			enabled: usersToLoad.length // load only after selectedInstance loads
-		}
-	)
-
-	React.useMemo(() => {
-		// add a display string for each user
-		const newUsers = {}
-		qUsers.forEach(u => {
-			newUsers[u.userID] = {
-				...u,
-				userString: `${u.userName.last}, ${u.userName.first}${u.userName.mi ? ' ' + u.userName.mi + '.' : ''}`
-			}
-		})
-
-		// add them to the cache for all loaded users
-		setUsers({...users, ...newUsers})
-
-	}, [qUsers])
-
-	// ====== END STEPS TO LOAD AND CACHE USERS
-
+	const { users } = useCachedUsers(managerUserIDs)
 
 	const instanceManagers = React.useMemo(() => {
 		const peeps = []
@@ -389,16 +397,24 @@ const RepositoryPage = () => {
 			)
 		},
 
-		onClickScoreDetails: async (userName, userID) => {
-			const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
-			const lo = await apiGetLO(selectedInstance.loID)
+		onClickScoreDetails: (userName, userID) => {
+			// const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
+			// const lo = await apiGetLO(selectedInstance.loID)
 
-			const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
-			const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
-				startAttemptLog => startAttemptLog.attemptData
-			)
+			// const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
+			// const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
+			// 	startAttemptLog => startAttemptLog.attemptData
+			// )
 
-			setModal({ type: 'scoreDetails', props: { userName, attemptLogs, questions: lo.aGroup.kids } })
+			setModal({
+				type: 'scoreDetails',
+				props: {
+					userName,
+					userID,
+					instID: selectedInstance.instID,
+					loID: selectedInstance.loID
+				}
+			})
 		}
 
 	}), [selectedInstance])

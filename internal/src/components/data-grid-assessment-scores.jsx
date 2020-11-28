@@ -73,7 +73,7 @@ DataGridAssessmentScores.propTypes = {
 				value: PropTypes.number,
 				isScoreImported: PropTypes.bool
 			}).isRequired,
-			lastSubmitted: PropTypes.string,
+			lastSubmitted: PropTypes.number,
 			attempts: PropTypes.shape({
 				numAttemptsTaken: PropTypes.number.isRequired,
 				numAdditionalAttemptsAdded: PropTypes.number.isRequired,

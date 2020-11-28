@@ -70,6 +70,10 @@ export default function AssessmentScoresSummary(props) {
 
 	const items = [
 		{
+			label: 'Scores',
+			value: scores.length
+		},
+		{
 			label: 'Mean',
 			value: scores.length > 0 ? mean.toFixed(2) : '--'
 		},
@@ -156,7 +160,7 @@ export default function AssessmentScoresSummary(props) {
 												className="vx-bar"
 											/>
 										)
-								  })
+								})
 								: null}
 							<AxisBottom
 								scale={xScale}

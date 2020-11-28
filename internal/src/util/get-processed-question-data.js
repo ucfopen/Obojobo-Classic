@@ -1,46 +1,33 @@
-export default questions => {
+export default (aGroup) => {
+	// first run through all the the questions and total up the alternates
+	const altCounts = []
+	aGroup.kids.forEach(q => {
+		if(typeof altCounts[q.questionIndex] == 'undefined') altCounts[q.questionIndex] = 1
+		else altCounts[q.questionIndex] = altCounts[q.questionIndex] + 1
+	})
+
 	const questionsById = {}
-	let lastQuestionIndex = -1
-	let questionCounter = 0
-	let altCounter = 0
-	let numTotalQuestions = 0
-	const questionsWhichNeedATotalAltCounterUpdate = []
-
-	questions.forEach(q => {
-		if (q.questionIndex === 0 || lastQuestionIndex !== questionCounter) {
-			questionsWhichNeedATotalAltCounterUpdate.forEach(q => {
-				q.questionNumber.totalAlts = questionsWhichNeedATotalAltCounterUpdate.length
-			})
-			questionsWhichNeedATotalAltCounterUpdate.length = 0
-
-			questionCounter++
-			numTotalQuestions++
-			altCounter = 0
+	let currentQuestionIndex = -1
+	let currentAltIndex
+	aGroup.kids.forEach(q => {
+		if(q.questionIndex !== currentQuestionIndex){
+			// reset the counters if q.questionInex changes
+			currentQuestionIndex = q.questionIndex
+			currentAltIndex = 1
 		} else {
-			altCounter++
+			// same question as before, increment alt index
+			currentAltIndex++
 		}
 
 		questionsById[q.questionID] = {
-			questionNumber: {
-				displayNumber: questionCounter,
-				altNumber: altCounter + 1,
-				totalAlts: 0
-			},
+			questionNumber: currentQuestionIndex,
+			altNumber: currentAltIndex,
+			altTotal: altCounts[q.questionIndex],
 			type: q.itemType,
 			questionItems: q.items,
 			originalQuestion: q
 		}
-
-		if (q.questionIndex !== 0) {
-			questionsWhichNeedATotalAltCounterUpdate.push(questionsById[q.questionID])
-		}
-
-		lastQuestionIndex = q.questionIndex
 	})
 
-	questionsWhichNeedATotalAltCounterUpdate.forEach(q => {
-		q.questionNumber.totalAlts = questionsWhichNeedATotalAltCounterUpdate.length
-	})
-
-	return [questionsById, numTotalQuestions]
+	return questionsById
 }

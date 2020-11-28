@@ -14,7 +14,11 @@ import LoadingIndicator from './loading-indicator'
 const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 	const isLoading = data === null
 	const [selectedId, setSelectedId] = React.useState(null)
-	const getRowId = React.useCallback(row => row[idColumn], [])
+	const getRowId = React.useCallback((row, relIndex, parent) => {
+		// if row[idColumn] exists, use it
+		// otherwise fall back on the default query-table function
+		return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
+	}, [])
 
 	// reset selected if the id isnt in the data
 	React.useEffect(() => {
@@ -42,7 +46,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 			getRowId,
 			autoResetSortBy: false // https://github.com/tannerlinsley/react-table/issues/2369#issuecomment-644481605
 		},
-		useSortBy,
+		sortable ? useSortBy : null,
 		useFlexLayout
 	)
 
@@ -128,7 +132,7 @@ DataGrid.propTypes = {
 	sortable: PropTypes.bool,
 	selectedRow: PropTypes.arrayOf(PropTypes.object),
 	onSelect: PropTypes.func,
-	idColumn: PropTypes.string.isRequired
+	idColumn: PropTypes.string
 }
 
 export default DataGrid

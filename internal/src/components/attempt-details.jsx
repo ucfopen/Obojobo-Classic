@@ -18,7 +18,7 @@ export default function AttemptDetails({
 		const startD = dayjs(startTime * 1000)
 		const endD = dayjs(endTime * 1000)
 		const items = [
-			{ label: 'Score', value: score },
+			{ label: 'Attempt Score', value: `${score}%` },
 			{ label: 'Answered Questions', value: `${numAnsweredQuestions} out of ${numTotalQuestions}` },
 			{ label: 'Start Time', value: startD.format('MM/DD/YY - hh:mm:ss A') },
 			{ label: 'End Time', value: endD.format('MM/DD/YY - hh:mm:ss A') },

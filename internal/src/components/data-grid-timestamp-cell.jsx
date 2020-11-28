@@ -49,7 +49,7 @@ DataGridTimestampCell.defaultProps = {
 
 DataGridTimestampCell.propTypes = {
 	display: PropTypes.oneOf(['horizontal', 'vertical']),
-	value: PropTypes.string,
+	value: PropTypes.number,
 	showSeconds: PropTypes.bool.isRequired
 }
 

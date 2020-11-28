@@ -6,17 +6,17 @@ import FlashHTML from './flash-html'
 import MediaView from './media-view'
 
 const renderQuestionBody = items => {
-	return items.map(item => {
+	return items.map((item, index) => {
 		switch (item.component) {
 			case 'TextArea':
 				return (
-					<div className="text-area">
+					<div key={index} className="text-area">
 						<FlashHTML value={item.data} />
 					</div>
 				)
 
 			case 'MediaView':
-				return <MediaView media={item.media[0]} />
+				return <MediaView key={index} media={item.media[0]} />
 		}
 
 		return null
@@ -115,20 +115,18 @@ const renderQuestionAnswers = ({ itemType, answers }, response = null) => {
 	}
 }
 
-export default function QuestionPreview({ question, response }) {
+export default function QuestionPreview({ question, score, response }) {
+
 	return (
-		<div className={`repository--question-preview is-type-${question.itemType}`}>
+		<section className={`repository--question-preview is-type-${question.itemType}`}>
+			<h1>Question {question.questionIndex}</h1>
+			<div className="student-score">
+				Student's Question Score: <b>{score}%</b>
+			</div>
 			{question.itemType === 'Media' ? (
-				<React.Fragment>
 					<div className="question-body">
 						<MediaView media={question.items[0].media[0]} />
 					</div>
-					{response ? (
-						<div className="student-score">
-							Recorded Score: <b>{response}</b>
-						</div>
-					) : null}
-				</React.Fragment>
 			) : (
 				<React.Fragment>
 					<div
@@ -141,7 +139,7 @@ export default function QuestionPreview({ question, response }) {
 					<div className="question-answers">{renderQuestionAnswers(question, response)}</div>
 				</React.Fragment>
 			)}
-		</div>
+		</section>
 	)
 }
 

@@ -98,6 +98,9 @@
 		border-radius: $dimension-rounded-radius;
 		position: relative;
 
+		hr{
+			margin: 2em 0;
+		}
 		.instructions {
 			position: absolute;
 			top: 6.2em;

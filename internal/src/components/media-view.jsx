@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 const DeprecationNotice = () => {
 	return (
 		<div className="deprecation-notice">
-			This item can&apos;t be previewed as Flash is no longer supported.{' '}
+			This media can&apos;t be viewed as Flash has been retired.{' '}
 			<a
 				target="_blank"
 				rel="noreferrer"
@@ -21,11 +21,11 @@ const DeprecationNotice = () => {
 const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 	switch (itemType) {
 		case 'pic':
-			return <img className="pic" src={`/media/${mediaID}`} />
+			return <img className={itemType} src={`/media/${mediaID}`} />
 
 		case 'kogneato':
 			return (
-				<div className="kogneato">
+				<div className={itemType}>
 					<img src={meta.img} width="60" />
 					<span>
 						Materia Widget: <b>{title}</b>
@@ -38,9 +38,9 @@ const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 
 		case 'swf':
 			return (
-				<div className="swf">
+				<div className={itemType}>
 					<div className="about">
-						Flash SWF: <b>{title}</b>
+						Flash Media: <b>{title}</b>
 					</div>
 					<DeprecationNotice />
 				</div>
@@ -48,20 +48,21 @@ const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 
 		case 'flv':
 			return (
-				<div className="flv">
+				<div className={itemType}>
 					<div className="about">
-						FLV Video: <b>{title}</b>
+						Flash Video: <b>{title}</b>
 					</div>
 					<DeprecationNotice />
 				</div>
 			)
 
 		case 'mp3':
-			return <audio className="mp3" src={`/media/${mediaID}`} />
+			return <audio className={itemType} src={`/media/${mediaID}`} />
 
 		case 'youTube':
 			return (
 				<iframe
+					className={itemType}
 					width="300"
 					height="169"
 					src={`https://www.youtube.com/embed/${url}`}
