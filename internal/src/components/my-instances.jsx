@@ -7,7 +7,6 @@ import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 
 const getFilteredInstances = (instances, search) => {
-	// is still loading?
 	if (!instances) return null
 	if (!search) return instances
 	search = search.toLowerCase()

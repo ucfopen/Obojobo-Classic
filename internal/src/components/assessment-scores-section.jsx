@@ -11,8 +11,7 @@ export default function AssessmentScoresSection({
 	assessmentScores,
 	selectedStudentIndex,
 	onClickRefresh,
-	onClickAddAdditionalAttempt,
-	onClickRemoveAdditionalAttempt,
+	onClickSetAdditionalAttempt,
 	onClickScoreDetails,
 	onClickDownloadScores
 }) {
@@ -20,7 +19,7 @@ export default function AssessmentScoresSection({
 	// filter any null scores
 	const scores = React.useMemo(() => {
 		if(!assessmentScores) return []
-		return assessmentScores.map(assessment => assessment.score.value).filter(score => score !== null)
+		return assessmentScores.map(assessment => assessment.score).filter(score => score !== null)
 	}, [assessmentScores])
 
 	return (
@@ -38,8 +37,7 @@ export default function AssessmentScoresSection({
 				<DataGridAssessmentScores
 					data={assessmentScores || null}
 					selectedIndex={selectedStudentIndex}
-					onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
-					onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
+					onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
 					onClickScoreDetails={onClickScoreDetails}
 				/>
 				<div className="download-button">
@@ -66,7 +64,7 @@ AssessmentScoresSection.propTypes = {
 			lastSubmitted: PropTypes.number,
 			attempts: PropTypes.shape({
 				numAttemptsTaken: PropTypes.number.isRequired,
-				numAdditionalAttemptsAdded: PropTypes.number.isRequired,
+				additional: PropTypes.number.isRequired,
 				numAttempts: PropTypes.number.isRequired,
 				isAttemptInProgress: PropTypes.bool
 			})

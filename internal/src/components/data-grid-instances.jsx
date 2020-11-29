@@ -6,20 +6,22 @@ import PropTypes from 'prop-types'
 
 const columns = [
 	{ accessor: 'name', Header: 'Title & Course', Cell: TitleCourseCell, width: 320 },
-	{ accessor: 'startTime', Header: 'Start', Cell: DataGridDateCell, width: 40 },
-	{ accessor: 'endTime', Header: 'End', Cell: DataGridDateCell, width: 40 }
+	{ accessor: 'startTime', Header: 'Open', Cell: DataGridDateCell, width: 40 },
+	{ accessor: 'endTime', Header: 'Close', Cell: DataGridDateCell, width: 40 }
 ]
 
-const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
-	<div className="repository--data-grid-instances" style={{ width: '400px', height: '90vh' }}>
-		<DataGrid
-			idColumn="instID"
-			data={data}
-			columns={columns}
-			onSelect={onSelect}
-		/>
-	</div>
-)
+const DataGridInstances = ({ data, onSelect }) => {
+	return (
+		<div className="repository--data-grid-instances" style={{ width: '400px', height: '90vh' }}>
+			<DataGrid
+				idColumn="instID"
+				data={data}
+				columns={columns}
+				onSelect={onSelect}
+			/>
+		</div>
+	)
+}
 
 DataGridInstances.propTypes = {
 	data: PropTypes.arrayOf(

@@ -40,6 +40,7 @@ export default function AssessmentScoresSummary(props) {
 		lowestScore = 100,
 		highestScore = 0
 	const scores = props.scores
+
 	for (let i = 0; i < scores.length; i++) {
 		// Edge case:
 		if (scores[i] === 100) {

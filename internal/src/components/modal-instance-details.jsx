@@ -81,7 +81,7 @@ export default function ModalInstanceDetails(props) {
 			<div className="box border">
 				<div className="row">
 					<span className={`title ${props.isExternallyLinked ? 'is-disabled' : 'is-not-disabled'}`}>
-						Start Date:
+						Open Date:
 					</span>
 					<div className="flex-container">
 						<FormDateTime value={startTime} onChange={setStartTime} />
@@ -102,7 +102,7 @@ export default function ModalInstanceDetails(props) {
 				</div>
 				<div className="row">
 					<span className={`title ${props.isExternallyLinked ? 'is-disabled' : 'is-not-disabled'}`}>
-						End Date:
+						Close Date:
 					</span>
 					<div className="flex-container">
 						<FormDateTime value={endTime} onChange={setEndTime} />

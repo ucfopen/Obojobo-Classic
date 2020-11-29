@@ -10,9 +10,9 @@ export default function ModalAboutLO(props) {
 	const items = [
 		{ label: 'Learn Time', value: props.learnTime.toString() },
 		{ label: 'Language', value: props.languageID == 1 ? 'English' : '' },
-		{ label: 'Content', value: props.contentSize.toString() },
-		{ label: 'Practice', value: props.practiceSize.toString() },
-		{ label: 'Assessment', value: props.assessmentSize.toString() },
+		{ label: 'Content Pages', value: props.contentSize.toString() },
+		{ label: 'Practice Questions', value: props.practiceSize.toString() },
+		{ label: 'Assessment Questions', value: props.assessmentSize.toString() },
 		{ label: 'Author Notes', value: props.notes }
 	]
 

@@ -8,6 +8,7 @@ const fetchOptions = () => ({
 	credentials: 'include'
 })
 
+// checks response for errors and decodes json
 const handleErrors = async resp => {
 	if (!resp.ok) throw Error(resp.statusText)
 	const data = await resp.json()
@@ -34,7 +35,6 @@ export const apiLogout = () => fetchGet('/api/json.php/loRepository.doLogout')
 export const apiGetLOMeta = (r, loID) => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
 export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/${loID}`).then(lo => {
 	// normalize the data we're getting back
-
 	const castToInt2 = ['qGroupID', 'userID']
 	castToInt2.forEach(key => { lo.aGroup[key] = parseInt(lo.aGroup[key], 10) })
 	castToInt2.forEach(key => { lo.pGroup[key] = parseInt(lo.pGroup[key], 10) })
@@ -45,8 +45,6 @@ export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/
 	lo.createTime = parseInt(lo.createTime, 10)
 	lo.allowScoreImport = lo.allowScoreImport === '1'
 	lo.externalLink = lo.externalLink != null
-
-
 	lo.aGroup.kids.forEach(k => {
 		k.questionID = parseInt(k.questionID, 10)
 	})
@@ -55,19 +53,21 @@ export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/
 	})
 	return lo
 })
-export const apiGetScoresForInstance = (r, instID) => fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scores => {
+export const apiGetScoresForInstance = (r, instID) => fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
 	// normalize the data we're getting back
 	const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']
-	scores.forEach(s => {
-		s.attempts.forEach(a => {
+	scoresByUser.forEach(u => {
+		u.additional = parseInt(u.additional, 10)
+		u.attempts.forEach(a => {
 			castToInt.forEach(key => { a[key] = parseInt(a[key], 10) })
 		})
 	})
-	return scores
+	return scoresByUser
 })
 
-export const apiEditExtraAttempts = (userID, instID, newCount) =>
-	fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
+export const apiEditExtraAttempts = ({userID, instID, newCount}) => {
+	return fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
+}
 export const apiGetVisitTrackingData = (r, userID, instID) =>
 	fetchGet(`/api/json.php/loRepository.getVisitTrackingData/${userID}/${instID}`).then(data => {
 		data.visitLog.forEach(visit => {
@@ -78,12 +78,6 @@ export const apiGetVisitTrackingData = (r, userID, instID) =>
 				const attempt = l?.attemptData?.attempt
 				const scores = l?.attemptData?.scores
 				if(attempt){
-
-
-					// convenience method to make an ordered array of questionIds
-					attempt.questionOrder = attempt.qOrder
-						? attempt.qOrder.split(',').map(id => parseInt(id, 10)) // alternates in use
-						: '' // natural order of questions
 
 					// castToInt
 					const castToInt2 = ['attemptID', 'endTime', 'instID', 'linkedAttemptID', 'loID', 'qGroupID', 'score', 'startTime', 'userID', 'visitID']

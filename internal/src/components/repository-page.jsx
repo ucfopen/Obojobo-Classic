@@ -3,16 +3,17 @@ import './repository-page.scss'
 import React from 'react'
 import { useMutation, useQuery, useQueryCache } from 'react-query'
 import {
-	apiGetInstances, /* ! */
-	apiGetLO,
-	apiGetScoresForInstance,
-	apiEditExtraAttempts,
-	apiGetVisitTrackingData,
+	// not using react-query yet
 	apiLogout,
+	apiGetLO,
+	apiEditExtraAttempts,
 	apiGetInstanceTrackingData,
+	// api below are all using react-query
+	apiGetInstances,
+	apiGetScoresForInstance,
 	apiGetUserNames,
 	apiGetInstancePerms,
-	apiGetUser, /* ! */
+	apiGetUser,
 	apiEditInstance
 } from '../util/api'
 import getUsers from '../util/get-users'
@@ -21,7 +22,6 @@ import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
 import RepositoryModals from './repository-modals'
-import dayjs from 'dayjs'
 
 const getStartAttemptLogsForAssessment = logs => {
 	let foundAssessmentSubmitQuestionLogs = false
@@ -70,45 +70,23 @@ const getSubmitQuestionLogsForAssessment = logs => {
 	return foundLogs
 }
 
-const getFinalScoreFromAttemptScores = (attemptScores, scoringMethod) => {
-	switch (scoringMethod) {
-		case 'h':
-			return Math.max.apply(null, attemptScores)
+const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
+	switch (scoreMethod) {
+		case 'h': // highest
+			return Math.max.apply(null, scores)
 
-		case 'r':
-			return attemptScores[attemptScores.length - 1]
+		case 'r': // most recent
+			return scores[scores.length - 1]
 
-		case 'm':
-			return attemptScores.reduce((acc, score) => acc + score, 0) / attemptScores.length
+		case 'm': // average
+			const sum = scores.reduce((acc, score) => acc + score, 0)
+			return parseFloat(sum) / scores.length
 	}
 
 	return 0
 }
 
-const getAssessmentScoresFromAPIResult = (scoresByUser, scoringMethod, attemptCount) => {
-	return scoresByUser.map(score => {
-		const lastAttempt = score.attempts[score.attempts.length - 1]
 
-		return {
-			user: `${score.user.last}, ${score.user.first}${score.user.mi ? ` ${score.user.mi}.` : ''}`,
-			userID: score.userID,
-			score: {
-				value: getFinalScoreFromAttemptScores(
-					score.attempts.map(attempt => parseFloat(attempt.score)),
-					scoringMethod
-				),
-				isScoreImported: lastAttempt.linkedAttempt !== 0
-			},
-			lastSubmitted: lastAttempt.submitDate,
-			attempts: {
-				numAttemptsTaken: score.attempts.length,
-				numAdditionalAttemptsAdded: parseInt(score.additional, 10),
-				numAttempts: parseInt(attemptCount, 10),
-				isAttemptInProgress: !lastAttempt.submitted
-			}
-		}
-	})
-}
 
 const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptCount) => {
 	return scoresForInstance.map(score => {
@@ -118,21 +96,21 @@ const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptC
 
 		return {
 			...score,
-			attempts: { ...score.attempts, numAdditionalAttemptsAdded: newAttemptCount }
+			attempts: { ...score.attempts, additional: newAttemptCount }
 		}
 	})
 }
 
-
-const useCachedUsers = (neededUsers) => {
+// hook used to load / cache users
+const useApiGetUsersCached = (neededUserIDs) => {
 	const [users, setUsers] = React.useState({})
 
 	// filter out any users we already have in the cache
 	const usersToLoad = React.useMemo(() => {
-		return neededUsers.filter(id => !users[id])
-	}, [neededUsers, users])
+		return neededUserIDs.filter(id => !users[id])
+	}, [neededUserIDs, users])
 
-	//	load user info for managers
+	//	load users
 	const { isError, data, isFetching } = useQuery(
 		['getUserNames', ...usersToLoad],
 		apiGetUserNames, {
@@ -143,6 +121,7 @@ const useCachedUsers = (neededUsers) => {
 		}
 	)
 
+	// process loaded users
 	React.useMemo(() => {
 		// add a display string for each user
 		const defaultUserName = {
@@ -161,7 +140,6 @@ const useCachedUsers = (neededUsers) => {
 
 		// add them to the cache for all loaded users
 		setUsers({...users, ...newUsers})
-
 	}, [data])
 
 	return { users, isError, isFetching }
@@ -180,17 +158,14 @@ const RepositoryPage = () => {
 		queryCache.invalidateQueries('getInstances')
 	}, [])
 
-	// Initial API calls
-
 	// load current user
 	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery('getUser', apiGetUser, {
 		initialStale: true,
 		staleTime: Infinity,
 	})
 
-
 	// load instances
-	const { isError, data, error, isFetching } = useQuery('getInstances', apiGetInstances, {
+	const { isError, data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
 		initialStale: true,
 		staleTime: Infinity,
 		initialData: null,
@@ -208,15 +183,17 @@ const RepositoryPage = () => {
 		}
 	)
 
+	// extract list of user ids that can edit this instance
 	const managerUserIDs = React.useMemo(() => {
-		// extract list of user ids that can edit this instance
-		// { <userID>: [<perm>, <perm>], ... } becomes [<userID>, <userID>]
 		if (!qPermsData) return []
+		// { <userID>: [<perm>, <perm>], ... } becomes [<userID>, <userID>]
 		const userIds = Object.keys(qPermsData)
+		// filter out any users that don't have '20' in perms
 		return userIds.filter(id => qPermsData[id].includes('20'))
 	}, [qPermsData])
 
-	const { users } = useCachedUsers(managerUserIDs)
+	// get any users we don't already have
+	const { users } = useApiGetUsersCached(managerUserIDs)
 
 	const instanceManagers = React.useMemo(() => {
 		const peeps = []
@@ -240,18 +217,38 @@ const RepositoryPage = () => {
 
 	const scoresForInstance = React.useMemo(() => {
 		if(!instID || qScoresIsFetching) return null
-		return getAssessmentScoresFromAPIResult(qScores, selectedInstance.scoreMethod, selectedInstance.attemptCount)
+		return qScores.map(u => {
+			const lastAttempt = u.attempts[u.attempts.length - 1]
+			const scores = u.attempts.map(a => a.score)
+			const finished = u.attempts.filter(a => Boolean(a.submitDate))
+			const lastSubmitted = finished[finished.length - 1]?.submitDate
+			const score = getFinalScoreFromAttemptScores(scores, selectedInstance.scoreMethod)
+
+			return {
+				user: `${u.user.last}, ${u.user.first}${u.user.mi ? ` ${u.user.mi}.` : ''}`,
+				userID: u.userID,
+				score,
+				isScoreImported: lastAttempt.linkedAttempt !== 0,
+				lastSubmitted,
+				numAttemptsTaken: u.attempts.length,
+				additional: u.additional,
+				attemptCount: selectedInstance.attemptCount,
+				isAttemptInProgress: !lastAttempt.submitted
+			}
+		})
 	}, [qScores, qScoresIsFetching])
 
 
 	const [mutateInstance] = useMutation(apiEditInstance)
+	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
+
 
 	// all the my instance props use
 	const instanceSectionCallbacks = React.useMemo(() => ({
 		onClickEditInstanceDetails: () => {
 			const onSave = async (values) => {
 				try{
-					await mutateInstance(values)
+					await mutateInstance(values, {throwOnError: true})
 
 					// update 'data' in place
 					// we have to do this because calling reloadInstances
@@ -263,15 +260,16 @@ const RepositoryPage = () => {
 					const index = data.findIndex(d => d.instID == values.instID)
 					const selected = data[index]
 					keys.forEach(k => {selected[k] = values[k]})
-					// data[index] = {...selected}
+					data[index] = {...selected}
 
 					// trying to populate cache with updated data, but no dice
-					// queryCache.setQueryData('getInstances', [...data])
-
+					// queryCache.setQueryData(['getInstances'], [...data])
 					// only way I can get the dang instance list to update
 					reloadInstances()
+
 					setModal(null)
 				} catch (error){
+					console.error('Error changing Instance Details')
 					console.error(error)
 				}
 			}
@@ -314,30 +312,6 @@ const RepositoryPage = () => {
 			window.open(url)
 		},
 
-		onClickEditInstanceDetail: () => {
-			setModal({
-				type: 'instanceDetails',
-				props: {
-					instanceName: selectedInstance.name,
-					courseName: selectedInstance.courseID,
-					startTime: selectedInstance.startTime,
-					endTime: selectedInstance.endTime,
-					numAttempts: selectedInstance.attemptCount,
-					scoringMethod: selectedInstance.scoreMethod,
-					isImportAllowed: selectedInstance.allowScoreImport === '1',
-					onSave: async values => {
-						values.instID = selectedInstance.instID
-
-						const oldSelectedInstanceIndex = selectedInstanceIndex
-						await apiEditInstance(values)
-						setModal(null)
-						reloadInstances()
-						// setSelectedInstanceIndex(oldSelectedInstanceIndex)
-					}
-				}
-			})
-		},
-
 		onClickViewScoresByQuestion: async () => {
 			const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
 			const lo = await apiGetLO(selectedInstance.loID)
@@ -378,34 +352,17 @@ const RepositoryPage = () => {
 			queryCache.invalidateQueries(['getScoresForInstance', instID])
 		},
 
-		onClickAddAdditionalAttempt: (userID, numAdditionalAttemptsAdded) => {
-			apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded + 1)
-			setScoresForInstance(
-				getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded + 1)
-			)
-		},
-
-		onClickRemoveAdditionalAttempt: (userID, numAdditionalAttemptsAdded) => {
-			if (numAdditionalAttemptsAdded === 0) {
-				window.alert('Unable to remove attempt!')
-				return
+		onClickSetAdditionalAttempt: async (userID, attempts) => {
+			try{
+				await mutateExtraAttempts({userID, instID, newCount: attempts}, {throwOnError: true})
+				queryCache.invalidateQueries(['getScoresForInstance', instID])
+			} catch(e){
+				console.error('Error setting extra attempts')
+				console.error(e)
 			}
-
-			apiEditExtraAttempts(userID, selectedInstance.instID, numAdditionalAttemptsAdded - 1)
-			setScoresForInstance(
-				getScoresDataWithNewAttemptCount(scoresForInstance, userID, numAdditionalAttemptsAdded - 1)
-			)
 		},
 
 		onClickScoreDetails: (userName, userID) => {
-			// const trackingData = await apiGetVisitTrackingData(userID, selectedInstance.instID)
-			// const lo = await apiGetLO(selectedInstance.loID)
-
-			// const visitLogs = trackingData.visitLog.map(visitLog => visitLog.logs).flat()
-			// const attemptLogs = getStartAttemptLogsForAssessment(visitLogs).map(
-			// 	startAttemptLog => startAttemptLog.attemptData
-			// )
-
 			setModal({
 				type: 'scoreDetails',
 				props: {

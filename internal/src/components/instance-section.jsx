@@ -52,8 +52,7 @@ export default function InstanceSection({
 	onClickDownloadScores,
 	onClickViewScoresByQuestion,
 	onClickRefreshScores,
-	onClickAddAdditionalAttempt,
-	onClickRemoveAdditionalAttempt,
+	onClickSetAdditionalAttempt,
 	onClickScoreDetails,
 }) {
 	if (!instance) {
@@ -121,11 +120,11 @@ export default function InstanceSection({
 				<DefList
 					items={[
 						{
-							label: 'Instance Open',
+							label: 'Open Date',
 							value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A') + ' EST'
 						},
 						{
-							label: 'Close',
+							label: 'Close Date',
 							value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A') + ' EST'
 						},
 						{
@@ -133,7 +132,7 @@ export default function InstanceSection({
 								? '(This instance is being used in an external system)'
 								: getDurationText(startTime, endTime)
 						},
-						{ label: 'Attempts', value: instance.attemptCount },
+						{ label: 'Attempts Allowed', value: instance.attemptCount },
 						{ label: 'Scoring Method', value: getScoringMethodText(instance.scoreMethod) },
 						{
 							label: 'Score Import',
@@ -162,8 +161,7 @@ export default function InstanceSection({
 				onClickDownloadScores={onClickDownloadScoresWithUrl}
 				assessmentScores={scores}
 				onClickRefresh={onClickRefreshScores}
-				onClickAddAdditionalAttempt={onClickAddAdditionalAttempt}
-				onClickRemoveAdditionalAttempt={onClickRemoveAdditionalAttempt}
+				onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
 				onClickScoreDetails={onClickScoreDetails}
 			/>
 

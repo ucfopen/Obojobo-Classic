@@ -11,6 +11,13 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import './data-grid.scss'
 import LoadingIndicator from './loading-indicator'
 
+const defaultColumn = () => ({
+	// When using the useFlexLayout:
+	minWidth: 30, // minWidth is only used as a limit for resizing
+	width: 150, // width is used for both the flex-basis and flex-grow
+	maxWidth: 200, // maxWidth is only used as a limit for resizing
+})
+
 const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 	const isLoading = data === null
 	const [selectedId, setSelectedId] = React.useState(null)
@@ -18,7 +25,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 		// if row[idColumn] exists, use it
 		// otherwise fall back on the default query-table function
 		return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
-	}, [])
+	}, [idColumn])
 
 	// reset selected if the id isnt in the data
 	React.useEffect(() => {
@@ -26,16 +33,6 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 		const containsSelected = data.find(i => getRowId(i) == selectedId)
 		if(!containsSelected) setSelectedId(null)
 	}, [data])
-
-	const defaultColumn = React.useMemo(
-		() => ({
-		  // When using the useFlexLayout:
-		  minWidth: 30, // minWidth is only used as a limit for resizing
-		  width: 150, // width is used for both the flex-basis and flex-grow
-		  maxWidth: 200, // maxWidth is only used as a limit for resizing
-		}),
-		[]
-	)
 
 	// setup react-table
 	const instanceTable = useTable(
