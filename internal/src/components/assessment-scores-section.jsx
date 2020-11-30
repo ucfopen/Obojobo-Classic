@@ -1,5 +1,5 @@
 import './assessment-scores-section.scss'
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import SectionHeader from './section-header'
 import AssessmentScoresSummary from './assessment-scores-summary'
@@ -15,12 +15,20 @@ export default function AssessmentScoresSection({
 	onClickScoreDetails,
 	onClickDownloadScores
 }) {
+	const [search, setSearch] = useState('')
 
 	// filter any null scores
 	const scores = React.useMemo(() => {
-		if(!assessmentScores) return []
+		if (!assessmentScores) return []
 		return assessmentScores.map(assessment => assessment.score).filter(score => score !== null)
 	}, [assessmentScores])
+
+	const assessmentScoresDataGridData = React.useMemo(() => {
+		if (!assessmentScores) return []
+		if (search === '') return [...assessmentScores]
+
+		return assessmentScores.filter(assessment => assessment.user.toLowerCase().indexOf(search) > -1)
+	}, [assessmentScores, search])
 
 	return (
 		<div className="repository--assessment-scores-section">
@@ -32,10 +40,10 @@ export default function AssessmentScoresSection({
 				<hr className="section-divider" />
 				<div className="assessment-score-search">
 					<p className="title">Scores by student</p>
-					<SearchField placeholder="Search for a name" onChange={() => {}} />
+					<SearchField value={search} placeholder="Search for a name" onChange={setSearch} />
 				</div>
 				<DataGridAssessmentScores
-					data={assessmentScores || null}
+					data={assessmentScoresDataGridData || null}
 					selectedIndex={selectedStudentIndex}
 					onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
 					onClickScoreDetails={onClickScoreDetails}
