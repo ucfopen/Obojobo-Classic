@@ -116,17 +116,16 @@ const renderQuestionAnswers = ({ itemType, answers }, response = null) => {
 }
 
 export default function QuestionPreview({ question, score, response }) {
-
 	return (
 		<section className={`repository--question-preview is-type-${question.itemType}`}>
 			<h1>Question {question.questionIndex}</h1>
 			<div className="student-score">
-				Student's Question Score: <b>{score}%</b>
+				Student&apos;s Question Score: <b>{score}%</b>
 			</div>
 			{question.itemType === 'Media' ? (
-					<div className="question-body">
-						<MediaView media={question.items[0].media[0]} />
-					</div>
+				<div className="question-body">
+					<MediaView media={question.items[0].media[0]} />
+				</div>
 			) : (
 				<React.Fragment>
 					<div

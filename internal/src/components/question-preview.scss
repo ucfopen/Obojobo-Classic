@@ -3,9 +3,14 @@
 .repository--question-preview {
 	$color-partially-correct: lighten($color-correct, 0.2);
 
-	h1{
+	h1 {
 		margin-bottom: 1.5em;
 	}
+
+	.student-score {
+		margin-bottom: 1em;
+	}
+
 	.question-body {
 		display: flex;
 

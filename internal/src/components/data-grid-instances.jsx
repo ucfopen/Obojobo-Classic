@@ -5,20 +5,15 @@ import TitleCourseCell from './data-grid-title-course-cell'
 import PropTypes from 'prop-types'
 
 const columns = [
-	{ accessor: 'name', Header: 'Title & Course', Cell: TitleCourseCell, width: 320 },
-	{ accessor: 'startTime', Header: 'Open', Cell: DataGridDateCell, width: 40 },
-	{ accessor: 'endTime', Header: 'Close', Cell: DataGridDateCell, width: 40 }
+	{ accessor: 'name', Header: 'Title & Course', Cell: TitleCourseCell, width: 240 },
+	{ accessor: 'startTime', Header: 'Open', Cell: DataGridDateCell, width: 80 },
+	{ accessor: 'endTime', Header: 'Close', Cell: DataGridDateCell, width: 80 }
 ]
 
 const DataGridInstances = ({ data, onSelect }) => {
 	return (
-		<div className="repository--data-grid-instances" style={{ width: '400px', height: '90vh' }}>
-			<DataGrid
-				idColumn="instID"
-				data={data}
-				columns={columns}
-				onSelect={onSelect}
-			/>
+		<div className="repository--data-grid-instances" style={{ width: '402px', height: '90vh' }}>
+			<DataGrid idColumn="instID" data={data} columns={columns} onSelect={onSelect} />
 		</div>
 	)
 }

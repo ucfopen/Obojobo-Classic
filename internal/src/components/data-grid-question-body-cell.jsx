@@ -52,11 +52,11 @@ export default function DataGridQuestionBodyCell({ items }) {
 		case 2:
 			return (
 				<div className="repository--data-grid-question-body-cell is-multiple-items">
-					<div className="row">
+					<div className="item-row">
 						<span className="label">L:</span>
 						{renderItem(items[0])}
 					</div>
-					<div className="row">
+					<div className="item-row">
 						<span className="label">R:</span>
 						{renderItem(items[1])}
 					</div>

@@ -66,7 +66,6 @@
 		background-color: $color-bg;
 		overflow: auto;
 		height: 100%;
-		border: 1px solid $color-shadow;
 
 		th:first-child,
 		th:last-child,
@@ -98,7 +97,7 @@
 		border-radius: $dimension-rounded-radius;
 		position: relative;
 
-		hr{
+		hr {
 			margin: 2em 0;
 		}
 		.instructions {
