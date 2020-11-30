@@ -53,7 +53,7 @@ export default function InstanceSection({
 	onClickViewScoresByQuestion,
 	onClickRefreshScores,
 	onClickSetAdditionalAttempt,
-	onClickScoreDetails,
+	onClickScoreDetails
 }) {
 	if (!instance) {
 		return (
@@ -64,7 +64,7 @@ export default function InstanceSection({
 	}
 
 	const onClickDownloadScoresWithUrl = React.useCallback(() => {
-		if(!instance) return noOp
+		if (!instance) return noOp
 		const { instID, name, courseID, scoreMethod } = instance
 		const instName = encodeURI(name.replace(/ /g, '_'))
 		const courseName = encodeURI(courseID.replace(/ /g, '_'))
@@ -74,7 +74,7 @@ export default function InstanceSection({
 	}, [instance])
 
 	const onClickPreviewWithUrl = React.useCallback(() => {
-		if(!instance) return noOp
+		if (!instance) return noOp
 		onClickPreview(`/preview/${instance.loID}`)
 	}, [instance])
 
@@ -158,6 +158,7 @@ export default function InstanceSection({
 			</div>
 
 			<AssessmentScoresSection
+				instID={instance.instID}
 				onClickDownloadScores={onClickDownloadScoresWithUrl}
 				assessmentScores={scores}
 				onClickRefresh={onClickRefreshScores}

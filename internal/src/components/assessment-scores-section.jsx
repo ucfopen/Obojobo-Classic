@@ -8,14 +8,19 @@ import Button from './button'
 import SearchField from './search-field'
 
 export default function AssessmentScoresSection({
+	instID,
 	assessmentScores,
-	selectedStudentIndex,
 	onClickRefresh,
 	onClickSetAdditionalAttempt,
 	onClickScoreDetails,
 	onClickDownloadScores
 }) {
 	const [search, setSearch] = useState('')
+
+	// reset search filter when looking at a new instance
+	React.useEffect(() => {
+		setSearch('')
+	}, [instID])
 
 	// filter any null scores
 	const scores = React.useMemo(() => {
@@ -24,10 +29,13 @@ export default function AssessmentScoresSection({
 	}, [assessmentScores])
 
 	const assessmentScoresDataGridData = React.useMemo(() => {
-		if (!assessmentScores) return []
-		if (search === '') return [...assessmentScores]
-
-		return assessmentScores.filter(assessment => assessment.user.toLowerCase().indexOf(search) > -1)
+		if (!assessmentScores) return null // loading
+		if (search === '') return [...assessmentScores] // show all
+		// filter by user name
+		const lowerCaseSearch = search.toLowerCase()
+		return assessmentScores.filter(
+			assessment => assessment.user.toLowerCase().indexOf(lowerCaseSearch) > -1
+		)
 	}, [assessmentScores, search])
 
 	return (
@@ -44,7 +52,6 @@ export default function AssessmentScoresSection({
 				</div>
 				<DataGridAssessmentScores
 					data={assessmentScoresDataGridData || null}
-					selectedIndex={selectedStudentIndex}
 					onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
 					onClickScoreDetails={onClickScoreDetails}
 				/>
@@ -61,6 +68,7 @@ export default function AssessmentScoresSection({
 }
 
 AssessmentScoresSection.propTypes = {
+	instID: PropTypes.number.isRequired,
 	assessmentScores: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,
@@ -78,7 +86,6 @@ AssessmentScoresSection.propTypes = {
 			})
 		})
 	),
-	selectedStudentIndex: PropTypes.number,
 	onClickRefresh: PropTypes.func.isRequired,
 	onClickDownloadScores: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
