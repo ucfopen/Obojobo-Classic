@@ -5,9 +5,7 @@ import { useMutation, useQuery, useQueryCache } from 'react-query'
 import {
 	// not using react-query yet
 	apiLogout,
-	apiGetLO,
 	apiEditExtraAttempts,
-	apiGetInstanceTrackingData,
 	// api below are all using react-query
 	apiGetInstances,
 	apiGetScoresForInstance,
@@ -15,35 +13,12 @@ import {
 	apiGetUser,
 	apiEditInstance
 } from '../util/api'
-import getUsers from '../util/get-users'
 import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
 import MyInstances from './my-instances'
 import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
 import RepositoryModals from './repository-modals'
-
-const getStartAttemptLogsForAssessment = logs => {
-	let foundAssessmentSubmitQuestionLogs = false
-	const foundLogs = []
-
-	logs.forEach(log => {
-		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
-			foundAssessmentSubmitQuestionLogs = true
-		} else if (
-			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
-			log.itemType === 'EndAttempt'
-		) {
-			foundAssessmentSubmitQuestionLogs = false
-		}
-
-		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'StartAttempt') {
-			foundLogs.push(log)
-		}
-	})
-
-	return foundLogs
-}
 
 const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	switch (scoreMethod) {
@@ -59,19 +34,6 @@ const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	}
 
 	return 0
-}
-
-const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptCount) => {
-	return scoresForInstance.map(score => {
-		if (score.userID !== userID) {
-			return score
-		}
-
-		return {
-			...score,
-			attempts: { ...score.attempts, additional: newAttemptCount }
-		}
-	})
 }
 
 const getUserString = n => {
