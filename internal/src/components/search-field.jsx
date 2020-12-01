@@ -3,16 +3,24 @@ import PropTypes from 'prop-types'
 
 import './search-field.scss'
 
-export default function SearchField(props) {
+export default function SearchField({ value, onChange, placeholder }) {
+	const handleChange = React.useCallback(
+		e => {
+			if (onChange) onChange(e.target.value)
+		},
+		[onChange]
+	)
+
 	return (
-		<div className="repository--search-field">
+		<div className={'repository--search-field ' + (value ? 'is-not-empty' : 'is-empty')}>
 			<i className="magnifier-icon"></i>
 			<input
 				className="search-field"
-				type="text"
-				placeholder={props.placeholder}
-				value={props.value}
-				onChange={event => props.onChange(event.target.value)}
+				type="search"
+				name="search"
+				placeholder={placeholder}
+				value={value}
+				onChange={handleChange}
 			/>
 		</div>
 	)
