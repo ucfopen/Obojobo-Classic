@@ -72,7 +72,7 @@ export default function AssessmentScoresSummary(props) {
 	const items = [
 		{
 			label: 'Scores',
-			value: scores.length
+			value: scores?.length || '--'
 		},
 		{
 			label: 'Mean',

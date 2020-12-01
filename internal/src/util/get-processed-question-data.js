@@ -12,6 +12,7 @@ export default aGroup => {
 		else altCounts[q.questionIndex] = altCounts[q.questionIndex] + 1
 	})
 
+	// now run through them once more to build objects
 	const questionsById = {}
 	let currentQuestionIndex = -1
 	let currentAltIndex

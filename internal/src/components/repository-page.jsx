@@ -11,12 +11,12 @@ import {
 	// api below are all using react-query
 	apiGetInstances,
 	apiGetScoresForInstance,
-	apiGetUserNames,
 	apiGetInstancePerms,
 	apiGetUser,
 	apiEditInstance
 } from '../util/api'
 import getUsers from '../util/get-users'
+import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
 import MyInstances from './my-instances'
 import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
@@ -45,30 +45,7 @@ const getStartAttemptLogsForAssessment = logs => {
 	return foundLogs
 }
 
-const getSubmitQuestionLogsForAssessment = logs => {
-	let foundAssessmentSubmitQuestionLogs = false
-	let responsesByQuestionID = {}
-	let foundLogs = []
 
-	logs.forEach(log => {
-		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
-			foundAssessmentSubmitQuestionLogs = true
-		} else if (
-			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
-			log.itemType === 'EndAttempt'
-		) {
-			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
-			foundAssessmentSubmitQuestionLogs = false
-			responsesByQuestionID = {}
-		}
-
-		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'SubmitQuestion') {
-			responsesByQuestionID[log.valueA] = log
-		}
-	})
-
-	return foundLogs
-}
 
 const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	switch (scoreMethod) {
@@ -99,51 +76,8 @@ const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptC
 	})
 }
 
-// hook used to load / cache users
-const useApiGetUsersCached = neededUserIDs => {
-	const [users, setUsers] = React.useState({})
-
-	// filter out any users we already have in the cache
-	const usersToLoad = React.useMemo(() => {
-		return neededUserIDs.filter(id => !users[id])
-	}, [neededUserIDs, users])
-
-	//	load users
-	const { isError, data, isFetching } = useQuery(
-		['getUserNames', ...usersToLoad],
-		apiGetUserNames,
-		{
-			initialStale: true,
-			staleTime: Infinity,
-			initialData: [],
-			enabled: usersToLoad.length // load only after selectedInstance loads
-		}
-	)
-
-	// process loaded users
-	React.useMemo(() => {
-		// add a display string for each user
-		const defaultUserName = {
-			first: 'Unknown',
-			last: 'User',
-			mi: ''
-		}
-
-		const newUsers = {}
-		data.forEach(user => {
-			const u = { ...user }
-			u.userName = { ...defaultUserName, ...u.userName }
-			u.userString = `${u.userName.last}, ${u.userName.first}${
-				u.userName.mi ? ' ' + u.userName.mi + '.' : ''
-			}`
-			newUsers[u.userID] = u
-		})
-
-		// add them to the cache for all loaded users
-		setUsers({ ...users, ...newUsers })
-	}, [data])
-
-	return { users, isError, isFetching }
+const getUserString = n => {
+	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
 }
 
 const RepositoryPage = () => {
@@ -223,6 +157,7 @@ const RepositoryPage = () => {
 		}
 	)
 
+	// process scores for instance
 	const scoresForInstance = React.useMemo(() => {
 		if (!instID || qScoresIsFetching) return null
 		return qScores.map(u => {
@@ -233,7 +168,7 @@ const RepositoryPage = () => {
 			const score = getFinalScoreFromAttemptScores(scores, selectedInstance.scoreMethod)
 
 			return {
-				user: `${u.user.last}, ${u.user.first}${u.user.mi ? ` ${u.user.mi}.` : ''}`,
+				user: getUserString(u.user),
 				userID: u.userID,
 				score,
 				isScoreImported: lastAttempt.linkedAttempt !== 0,
@@ -292,62 +227,40 @@ const RepositoryPage = () => {
 					attemptCount,
 					externalLink,
 					scoreMethod,
-					allowScoreImport
-				} = selectedInstance
+					isExternallyLinked: externalLink,
+					isImportAllowed: allowScoreImport
+				}
+			})
+		},
 
-				setModal({
-					type: 'instanceDetails',
-					props: {
-						onSave,
-						instID,
-						name,
-						courseID,
-						startTime,
-						endTime,
-						attemptCount,
-						scoreMethod,
-						isExternallyLinked: externalLink,
-						isImportAllowed: allowScoreImport
-					}
-				})
-			},
+		onClickAboutThisLO: () => {
+			setModal({
+				type: 'aboutThisLO',
+				props: { loID: selectedInstance.loID }
+			})
+		},
 
-			onClickAboutThisLO: () => {
-				setModal({
-					type: 'aboutThisLO',
-					props: { loID: selectedInstance.loID }
-				})
-			},
+		onClickPreview: (url) => {
+			window.open(url, '_blank')
+		},
 
-			onClickPreview: url => {
-				window.open(url, '_blank')
-			},
+		onClickManageAccess: () => {
+			window.alert('onClickManageAccess')
+		},
 
-			onClickManageAccess: () => {
-				window.alert('onClickManageAccess')
-			},
+		onClickDownloadScores: (url) => {
+			window.open(url)
+		},
 
-			onClickDownloadScores: url => {
-				window.open(url)
-			},
-
-			onClickViewScoresByQuestion: async () => {
-				console.log('si', selectedInstance)
-				const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
-				const lo = await apiGetLO(selectedInstance.loID)
-
-				const submitQuestionLogsByUserID = {}
-				const userIDsToFetch = []
-
-				trackingData.visitLog.forEach(visitLog => {
-					if (!submitQuestionLogsByUserID[visitLog.userID]) {
-						userIDsToFetch.push(visitLog.userID)
-
-						submitQuestionLogsByUserID[visitLog.userID] = {
-							userName: `User #${visitLog.userID}`,
-							logs: []
-						}
-					}
+		onClickViewScoresByQuestion: async () => {
+			setModal({
+				type: 'scoresByQuestion',
+				props: {
+					loID: selectedInstance.loID,
+					instID: selectedInstance.instID
+				}
+			})
+		},
 
 					submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
 						visitLog.userID

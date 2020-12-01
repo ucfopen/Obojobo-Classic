@@ -2,6 +2,7 @@
 
 .repository--button {
 	$color-button-bg: lighten($color-action, 9%);
+	$color-button-bg-disabled: desaturate($color-button-bg, 100%);
 
 	display: inline-block;
 	user-select: none;
@@ -65,6 +66,13 @@
 
 		&:hover {
 			background: linear-gradient(darken($color-bg2, 20%), darken($color-bg2, 10%));
+		}
+	}
+
+	&.is-disabled {
+		&,
+		&:hover {
+			background: linear-gradient(darken($color-button-bg-disabled, 10%), $color-button-bg-disabled);
 		}
 	}
 }
