@@ -9,7 +9,7 @@ import getProcessedQuestionData from '../util/get-processed-question-data'
 const getScoreDataByQuestionID = submitQuestionLogsByUser => {
 	const logDataByQuestionID = {}
 
-	for(let userID in submitQuestionLogsByUser){
+	for (const userID in submitQuestionLogsByUser) {
 		const submitQuestionLogsForUser = submitQuestionLogsByUser[userID]
 		submitQuestionLogsForUser.logs.forEach(log => {
 			if (!logDataByQuestionID[log.valueA]) {
@@ -41,7 +41,10 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 	const [selectedItem, setSelectedItem] = React.useState()
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 
-	const scoreDataByQuestionID = React.useMemo(() => getScoreDataByQuestionID(submitQuestionLogsByUser), [submitQuestionLogsByUser])
+	const scoreDataByQuestionID = React.useMemo(
+		() => getScoreDataByQuestionID(submitQuestionLogsByUser),
+		[submitQuestionLogsByUser]
+	)
 
 	const data = React.useMemo(() => {
 		return aGroup.kids.map(q => {
@@ -56,7 +59,7 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 						: scoreData.totalScore / scoreData.answers.length
 			}
 		})
-	}, [aGroup, submitQuestionLogsByUser] )
+	}, [aGroup, submitQuestionLogsByUser])
 
 	return (
 		<div className="modal-scores-by-question">
@@ -64,6 +67,7 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 				<h2>Scores By Question</h2>
 				<div className="wrapper">
 					<DataGridStudentScores
+						showAttemptColumn={false}
 						data={data}
 						onSelect={row => {
 							setSelectedItem(row)
@@ -75,6 +79,8 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 			<div className="score-details-right-content">
 				{selectedItem ? (
 					<QuestionScoreDetails
+						questionNumber={selectedItem.questionNumber}
+						altNumber={selectedItem.altNumber}
 						question={selectedItem.originalQuestion}
 						responses={selectedItem.responses}
 					/>

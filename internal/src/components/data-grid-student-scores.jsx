@@ -7,43 +7,48 @@ import DataGridScoreCell from './data-grid-score-cell'
 import DataGridQuestionBodyCell from './data-grid-question-body-cell'
 import DataGridQuestionNumberCell from './data-grid-question-number-cell'
 
-const getType = ({ value }) => {
-	switch (value) {
-		case 'MC':
-			return 'Multiple choice'
-
-		case 'QA':
-			return 'Fill in the blank'
-
-		case 'Media':
-			return 'Media'
-	}
-
-	return ''
-}
-
 const getQuestionBodyCell = ({ value }) => <DataGridQuestionBodyCell items={value} />
 
-const columns = [
-	{ accessor: 'attemptIndex', Header: 'Attempt', width: 70},
-	{ accessor: 'questionNumber', Header: 'Question #', Cell: DataGridQuestionNumberCell, width: 90},
-	// { accessor: 'type', Header: 'Type', Cell: getType },
-	{ accessor: 'questionItems', Header: 'Question Content', Cell: getQuestionBodyCell },
-	{ accessor: 'score', Header: 'Score', Cell: DataGridScoreCell, width: 55 }
-]
+const getColumns = showAttemptColumn => {
+	if (showAttemptColumn) {
+		return [
+			{ accessor: 'attemptIndex', Header: 'Attempt', width: 70 },
+			{
+				accessor: 'questionNumber',
+				Header: 'Question #',
+				Cell: DataGridQuestionNumberCell,
+				width: 90
+			},
+			{ accessor: 'questionItems', Header: 'Question Content', Cell: getQuestionBodyCell },
+			{ accessor: 'score', Header: 'Score', Cell: DataGridScoreCell, width: 55 }
+		]
+	}
 
-const DataGridStudentScores = ({ data, selectedIndex, onSelect }) => (
-	<div className="repository--data-grid-student-scores"  style={{ width: '100%', height: '100%' }}>
-		<DataGrid
-			// idColumn={'questionID'}
-			data={data}
-			columns={columns}
-			selectedIndex={selectedIndex}
-			onSelect={onSelect}
-			sortable={true}
-		/>
-	</div>
-)
+	return [
+		{
+			accessor: 'questionNumber',
+			Header: 'Question #',
+			Cell: DataGridQuestionNumberCell,
+			width: 90
+		},
+		{ accessor: 'questionItems', Header: 'Question Content', Cell: getQuestionBodyCell },
+		{ accessor: 'score', Header: 'Score', Cell: DataGridScoreCell, width: 55 }
+	]
+}
+
+const DataGridStudentScores = ({ data, selectedIndex, onSelect, showAttemptColumn }) => {
+	return (
+		<div className="repository--data-grid-student-scores" style={{ width: '100%', height: '100%' }}>
+			<DataGrid
+				data={data}
+				columns={getColumns(showAttemptColumn)}
+				selectedIndex={selectedIndex}
+				onSelect={onSelect}
+				sortable={true}
+			/>
+		</div>
+	)
+}
 
 DataGridStudentScores.propTypes = {
 	data: PropTypes.arrayOf(
@@ -68,7 +73,8 @@ DataGridStudentScores.propTypes = {
 		})
 	),
 	selectedIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired
+	onSelect: PropTypes.func.isRequired,
+	showAttemptColumn: PropTypes.bool.isRequired
 }
 
 export default DataGridStudentScores

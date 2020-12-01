@@ -88,6 +88,7 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 
 				<div className="student-scores">
 					<DataGridStudentScores
+						showAttemptColumn={true}
 						data={answeredQuestions}
 						onSelect={row => {
 							setSelectedItem(row)

@@ -181,7 +181,12 @@ export default function QuestionScoreDetails(props) {
 			</div>
 
 			<div className="question-preview-container">
-				<QuestionPreview className="question-preview" question={props.question} />
+				<QuestionPreview
+					className="question-preview"
+					question={props.question}
+					questionNumber={props.questionNumber}
+					altNumber={props.altNumber}
+				/>
 			</div>
 		</div>
 	)
@@ -221,5 +226,7 @@ QuestionScoreDetails.propTypes = {
 			score: PropTypes.number,
 			time: PropTypes.number
 		})
-	).isRequired
+	).isRequired,
+	questionNumber: PropTypes.number.isRequired,
+	altNumber: PropTypes.number.isRequired
 }
