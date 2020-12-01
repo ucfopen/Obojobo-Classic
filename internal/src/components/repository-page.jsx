@@ -45,8 +45,6 @@ const getStartAttemptLogsForAssessment = logs => {
 	return foundLogs
 }
 
-
-
 const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	switch (scoreMethod) {
 		case 'h': // highest
@@ -227,56 +225,51 @@ const RepositoryPage = () => {
 					attemptCount,
 					externalLink,
 					scoreMethod,
-					isExternallyLinked: externalLink,
-					isImportAllowed: allowScoreImport
-				}
-			})
-		},
+					allowScoreImport
+				} = selectedInstance
 
-		onClickAboutThisLO: () => {
-			setModal({
-				type: 'aboutThisLO',
-				props: { loID: selectedInstance.loID }
-			})
-		},
-
-		onClickPreview: (url) => {
-			window.open(url, '_blank')
-		},
-
-		onClickManageAccess: () => {
-			window.alert('onClickManageAccess')
-		},
-
-		onClickDownloadScores: (url) => {
-			window.open(url)
-		},
-
-		onClickViewScoresByQuestion: async () => {
-			setModal({
-				type: 'scoresByQuestion',
-				props: {
-					loID: selectedInstance.loID,
-					instID: selectedInstance.instID
-				}
-			})
-		},
-
-					submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
-						visitLog.userID
-					].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
+				setModal({
+					type: 'instanceDetails',
+					props: {
+						onSave,
+						instID,
+						name,
+						courseID,
+						startTime,
+						endTime,
+						attemptCount,
+						scoreMethod,
+						isExternallyLinked: externalLink,
+						isImportAllowed: allowScoreImport
+					}
 				})
+			},
 
-				const users = await getUsers(userIDsToFetch)
-				users.forEach(userItem => {
-					submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
+			onClickAboutThisLO: () => {
+				setModal({
+					type: 'aboutThisLO',
+					props: { loID: selectedInstance.loID }
 				})
+			},
 
+			onClickPreview: url => {
+				window.open(url, '_blank')
+			},
+
+			onClickManageAccess: () => {
+				window.alert('onClickManageAccess')
+			},
+
+			onClickDownloadScores: url => {
+				window.open(url)
+			},
+
+			onClickViewScoresByQuestion: async () => {
 				setModal({
 					type: 'scoresByQuestion',
 					props: {
-						submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
-						questions: lo.aGroup.kids
+						loID: selectedInstance.loID,
+						instID: selectedInstance.instID
 					}
 				})
 			},
