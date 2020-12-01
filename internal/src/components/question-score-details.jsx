@@ -170,11 +170,7 @@ export default function QuestionScoreDetails(props) {
 				<div className="right-content">
 					<header>
 						<p>Student Responses</p>
-						<SearchField
-							placeholder={'Search for a name'}
-							value={query}
-							onChange={q => setQuery(q.target.value)}
-						/>
+						<SearchField placeholder={'Search for a name'} value={query} onChange={setQuery} />
 					</header>
 					<DataGridResponses responses={filteredResponses} />
 				</div>
