@@ -13,6 +13,7 @@ const DataGridTimestampCellWithSeconds = props => (
 
 const DataGridAssessmentScores = ({
 	data,
+	rowCount,
 	onClickSetAdditionalAttempt,
 	onClickScoreDetails
 }) => {
@@ -24,8 +25,15 @@ const DataGridAssessmentScores = ({
 		{ accessor: 'numAttemptsTaken', Header: 'Attempts', Cell: DataGridAttemptsCell, onClick: onClickSetAdditionalAttempt }
 	], [onClickSetAdditionalAttempt, onClickScoreDetails])
 
+	const height = React.useMemo(() => {
+		const rowHeight = 58
+		const min = 3
+		const max = 25
+		return Math.min(Math.max(rowCount + 1, min), max) * rowHeight
+	}, [data])
+
 	return (
-		<div className="repository--data-grid-assessment-scores">
+		<div className="repository--data-grid-assessment-scores" style={{height: `${height}px`}}>
 			<DataGrid
 				data={data}
 				idColumn='userID'

@@ -3,8 +3,8 @@ import './button.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Button = ({ text, type, onClick }) => (
-	<div className={`repository--button is-type-${type}`} onClick={onClick}>
+const Button = ({ text, type, onClick, disabled = false}) => (
+	<div className={`repository--button is-type-${type} is-${disabled ? 'disabled' : 'enabled' }`} onClick={disabled ? () => {} : onClick}>
 		{text}
 	</div>
 )

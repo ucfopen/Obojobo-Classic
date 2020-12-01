@@ -11,7 +11,7 @@ import ModalScoresByQuestion from './modal-scores-by-question'
 import ModalAboutObojoboNext from './modal-about-obojobo-next'
 import { useQuery, useQueryCache } from 'react-query'
 import { apiGetLOMeta, apiGetLO, apiGetInstanceTrackingData, apiGetVisitTrackingData } from '../util/api'
-
+import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
 
 const ModalAboutLOWithAPI = ({onClose, loID}) => {
 	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
@@ -86,6 +86,91 @@ const ModalScoreDetailsWithAPI = ({onClose, userName, userID, instID, loID}) => 
 	return <ModalScoreDetails {...props} onClose={onClose} />
 }
 
+const getSubmitQuestionLogsForAssessment = logs => {
+	let foundAssessmentSubmitQuestionLogs = false
+	let responsesByQuestionID = {}
+	let foundLogs = []
+
+	logs.forEach(log => {
+		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
+			foundAssessmentSubmitQuestionLogs = true
+		} else if (
+			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
+			log.itemType === 'EndAttempt'
+		) {
+			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
+			foundAssessmentSubmitQuestionLogs = false
+			responsesByQuestionID = {}
+		}
+
+		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'SubmitQuestion') {
+			responsesByQuestionID[log.valueA] = log
+		}
+	})
+
+	return foundLogs
+}
+
+const ModalScoresByQuestionWithAPI = ({onClose, instID, loID}) => {
+	const { isError, data, isFetching } = useQuery(['getInstanceTrackingData', instID], apiGetInstanceTrackingData, {
+		initialStale: true,
+		staleTime: Infinity,
+	})
+
+	// process tracking data
+	const submitQuestionLogsByUserID = React.useMemo(() => {
+		if(isFetching || isError || !data) return {}
+		const result = {}
+		data.visitLog.forEach(visit => {
+			const {userID, logs} = visit
+			// first encounter, create object
+			if (!result[userID]) {
+				result[userID] = {
+					userName: `User #${userID}`,
+					logs: []
+				}
+			}
+
+			const submitLogs = getSubmitQuestionLogsForAssessment(logs)
+			result[userID].logs = result[userID].logs.concat(submitLogs)
+		})
+		return result
+	}, [data])
+
+	// load user data
+	const usersToLoad = React.useMemo(() => Object.keys(submitQuestionLogsByUserID), [submitQuestionLogsByUserID])
+	const { users, isError: isUserError, isFetching: isUserFetching } = useApiGetUsersCached(usersToLoad)
+
+	// populate userNames in the logs
+	React.useEffect(() => {
+		if(isUserFetching || isUserError) return
+		usersToLoad.forEach(userID => {
+			submitQuestionLogsByUserID[userID].userName = users[userID].userString
+		})
+	}, [users, submitQuestionLogsByUserID])
+
+	// load lo
+	const { isError: isLOError, data: loData, isFetching: isLOFetching } = useQuery(['getLO', loID], apiGetLO, {
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null,
+		enabled: submitQuestionLogsByUserID
+	})
+
+
+	const ready = !isFetching && !isLOFetching && loData && data
+
+	if(!ready) return <div>Loading</div>
+	if(isError) return <div>Error Loading Data</div>
+	return (
+		<ModalScoresByQuestion
+			submitQuestionLogsByUser={submitQuestionLogsByUserID}
+			aGroup={loData?.aGroup || {}}
+			onClose={onClose}
+		/>
+	)
+}
+
 const getModal = (modalType, modalProps, onCloseModal) => {
 	switch (modalType) {
 		case 'aboutThisLO':
@@ -98,7 +183,7 @@ const getModal = (modalType, modalProps, onCloseModal) => {
 			return <ModalScoreDetailsWithAPI {...modalProps} onClose={onCloseModal} />
 
 		case 'scoresByQuestion':
-			return <ModalScoresByQuestion {...modalProps} onClose={onCloseModal} />
+			return <ModalScoresByQuestionWithAPI {...modalProps} onClose={onCloseModal} />
 
 		case 'aboutObojoboNext':
 			return <ModalAboutObojoboNext {...modalProps} onClose={onCloseModal} />

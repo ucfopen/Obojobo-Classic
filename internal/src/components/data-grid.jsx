@@ -19,6 +19,7 @@ const defaultColumn = () => ({
 })
 
 const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
+	const rowHeight = 58
 	const isLoading = data === null
 	const [selectedId, setSelectedId] = React.useState(null)
 	const getRowId = React.useCallback((row, relIndex, parent) => {
@@ -103,7 +104,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 							<FixedSizeList
 								height={height}
 								itemCount={rows.length}
-								itemSize={58}
+								itemSize={rowHeight}
 								width={width}
 							>
 								{RenderRow}

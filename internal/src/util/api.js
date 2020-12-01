@@ -96,7 +96,7 @@ export const apiGetVisitTrackingData = (r, userID, instID) =>
 		})
 		return data
 	})
-export const apiGetInstanceTrackingData = instID =>
+export const apiGetInstanceTrackingData = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
 export const apiGetUserNames = (r, ...userIDs) =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)

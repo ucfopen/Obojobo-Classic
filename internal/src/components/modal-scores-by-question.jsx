@@ -1,6 +1,6 @@
 import './modal-scores-by-question.scss'
 
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import QuestionScoreDetails from './question-score-details'
 import DataGridStudentScores from './data-grid-student-scores'
@@ -9,7 +9,8 @@ import getProcessedQuestionData from '../util/get-processed-question-data'
 const getScoreDataByQuestionID = submitQuestionLogsByUser => {
 	const logDataByQuestionID = {}
 
-	submitQuestionLogsByUser.forEach(submitQuestionLogsForUser => {
+	for(let userID in submitQuestionLogsByUser){
+		const submitQuestionLogsForUser = submitQuestionLogsByUser[userID]
 		submitQuestionLogsForUser.logs.forEach(log => {
 			if (!logDataByQuestionID[log.valueA]) {
 				logDataByQuestionID[log.valueA] = {
@@ -31,31 +32,31 @@ const getScoreDataByQuestionID = submitQuestionLogsByUser => {
 				time: parseInt(log.createTime, 10)
 			})
 		})
-	})
+	}
 
 	return logDataByQuestionID
 }
 
-export default function ModalScoresByQuestion({ questions, submitQuestionLogsByUser }) {
-	const [selectedIndex, setSelectedIndex] = useState(null)
+export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser }) {
+	const [selectedItem, setSelectedItem] = React.useState()
+	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 
-	const [questionsByID] = getProcessedQuestionData(questions)
-	const scoreDataByQuestionID = getScoreDataByQuestionID(submitQuestionLogsByUser)
+	const scoreDataByQuestionID = React.useMemo(() => getScoreDataByQuestionID(submitQuestionLogsByUser), [submitQuestionLogsByUser])
 
-	const data = questions.map(q => {
-		const scoreData = scoreDataByQuestionID[q.questionID]
+	const data = React.useMemo(() => {
+		return aGroup.kids.map(q => {
+			const scoreData = scoreDataByQuestionID[q.questionID]
 
-		return {
-			...questionsByID[q.questionID],
-			responses: scoreData ? scoreData.answers : [],
-			score:
-				!scoreData || scoreData.answers.length === 0
-					? null
-					: scoreData.totalScore / scoreData.answers.length
-		}
-	})
-
-	const selectedItem = selectedIndex === null ? null : data[selectedIndex]
+			return {
+				...questionsByID[q.questionID],
+				responses: scoreData ? scoreData.answers : [],
+				score:
+					!scoreData || scoreData.answers.length === 0
+						? null
+						: scoreData.totalScore / scoreData.answers.length
+			}
+		})
+	}, [aGroup, submitQuestionLogsByUser] )
 
 	return (
 		<div className="modal-scores-by-question">
@@ -64,16 +65,15 @@ export default function ModalScoresByQuestion({ questions, submitQuestionLogsByU
 				<div className="wrapper">
 					<DataGridStudentScores
 						data={data}
-						selectedIndex={selectedIndex}
-						onSelect={index => {
-							setSelectedIndex(index)
+						onSelect={row => {
+							setSelectedItem(row)
 						}}
 					/>
 				</div>
 			</div>
 
 			<div className="score-details-right-content">
-				{selectedItem !== null ? (
+				{selectedItem ? (
 					<QuestionScoreDetails
 						question={selectedItem.originalQuestion}
 						responses={selectedItem.responses}
@@ -85,7 +85,7 @@ export default function ModalScoresByQuestion({ questions, submitQuestionLogsByU
 }
 
 ModalScoresByQuestion.propTypes = {
-	questions: PropTypes.arrayOf(
+	aGroup: PropTypes.arrayOf(
 		PropTypes.shape({
 			questionID: PropTypes.string,
 			itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),

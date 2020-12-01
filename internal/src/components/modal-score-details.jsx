@@ -1,5 +1,5 @@
 import './modal-score-details.scss'
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import DataGridStudentScores from './data-grid-student-scores'
 import QuestionPreview from './question-preview'
@@ -41,7 +41,7 @@ const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 	const answeredQuestions = React.useMemo(() => getAnsweredQuestions(questionsByID, attemptLogs), [aGroup, attemptLogs, userName])
-	const [selectedItem, setSelectedItem] = useState()
+	const [selectedItem, setSelectedItem] = React.useState()
 
 	const renderPreview = () => {
 		if(!selectedItem){

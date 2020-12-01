@@ -38,6 +38,8 @@ export default function AssessmentScoresSection({
 		)
 	}, [assessmentScores, search])
 
+	const scoreCount = React.useMemo(() => assessmentScores?.length || 0)
+
 	return (
 		<div className="repository--assessment-scores-section">
 			<SectionHeader label="Assessment Scores" />
@@ -52,6 +54,7 @@ export default function AssessmentScoresSection({
 				</div>
 				<DataGridAssessmentScores
 					data={assessmentScoresDataGridData || null}
+					rowCount={scoreCount}
 					onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
 					onClickScoreDetails={onClickScoreDetails}
 				/>
@@ -59,7 +62,8 @@ export default function AssessmentScoresSection({
 					<Button
 						onClick={onClickDownloadScores}
 						type="small"
-						text="Download these scores as a CSV file"
+						text={`Download ${scoreCount} scores as a CSV file`}
+						disabled={scoreCount < 1}
 					/>
 				</div>
 			</div>
