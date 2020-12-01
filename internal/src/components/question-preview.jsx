@@ -115,10 +115,13 @@ const renderQuestionAnswers = ({ itemType, answers }, response = null) => {
 	}
 }
 
-export default function QuestionPreview({ question, score, response }) {
+export default function QuestionPreview({ questionNumber, altNumber, question, score, response }) {
 	return (
 		<section className={`repository--question-preview is-type-${question.itemType}`}>
-			<h1>Question {question.questionIndex}</h1>
+			<h1>
+				Question {questionNumber}
+				{altNumber > 1 ? ` (Alt ${String.fromCharCode(altNumber + 64)})` : ''}
+			</h1>
 			<div className="student-score">
 				Student&apos;s Question Score: <b>{score}%</b>
 			</div>
@@ -147,6 +150,8 @@ QuestionPreview.defaultProps = {
 }
 
 QuestionPreview.propTypes = {
+	questionNumber: PropTypes.number.isRequired,
+	altNumber: PropTypes.number.isRequired,
 	question: PropTypes.shape({
 		itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),
 		answers: PropTypes.arrayOf(
@@ -173,5 +178,6 @@ QuestionPreview.propTypes = {
 			})
 		)
 	}).isRequired,
+	score: PropTypes.number,
 	response: PropTypes.string
 }

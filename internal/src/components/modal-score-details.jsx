@@ -24,7 +24,7 @@ const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 				score: scoreLogForQuestion.score,
 				answer: scoreLogForQuestion.answer,
 				attempt: attemptLog.attempt,
-				attemptIndex: index+1,
+				attemptIndex: index + 1,
 				answersSavedForAttempt: attemptLog.scores.length
 			})
 		})
@@ -33,21 +33,24 @@ const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 	// return the list, sorted by attemptIndex, questionNumber
 	return answeredQuestions.sort((a, b) => {
 		const attemptOrder = a.attemptIndex - b.attemptIndex
-		if(attemptOrder !== 0) return attemptOrder
+		if (attemptOrder !== 0) return attemptOrder
 		return a.questionNumber - b.questionNumber
 	})
 }
 
 export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
-	const answeredQuestions = React.useMemo(() => getAnsweredQuestions(questionsByID, attemptLogs), [aGroup, attemptLogs, userName])
+	const answeredQuestions = React.useMemo(() => getAnsweredQuestions(questionsByID, attemptLogs), [
+		aGroup,
+		attemptLogs,
+		userName
+	])
 	const [selectedItem, setSelectedItem] = React.useState()
 
 	const renderPreview = () => {
-		if(!selectedItem){
+		if (!selectedItem) {
 			return (
 				<div className="instructions">
-					<InstructionsFlag text="Select an attempt row to see details about that attempt" />
 					<InstructionsFlag text="Select a question to see how the student answered" />
 				</div>
 			)
@@ -56,15 +59,21 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 		return (
 			<div>
 				<AttemptDetails
-					attemptNumber={selectedItem.attemptIndex }
+					attemptNumber={selectedItem.attemptIndex}
 					score={selectedItem.attempt.score}
 					numAnsweredQuestions={selectedItem.answersSavedForAttempt}
 					numTotalQuestions={aGroup.quizSize}
 					startTime={selectedItem.attempt.startTime}
 					endTime={selectedItem.attempt.endTime}
 				/>
-				<hr/>
-				<QuestionPreview question={selectedItem.originalQuestion} score={selectedItem.score} response={selectedItem.answer} />
+				<hr />
+				<QuestionPreview
+					questionNumber={selectedItem.questionNumber}
+					altNumber={selectedItem.altNumber}
+					question={selectedItem.originalQuestion}
+					score={selectedItem.score}
+					response={selectedItem.answer}
+				/>
 			</div>
 		)
 	}
@@ -78,12 +87,12 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 				</div>
 
 				<div className="student-scores">
-						<DataGridStudentScores
-							data={answeredQuestions}
-							onSelect={row => {
-								setSelectedItem(row)
-							}}
-						/>
+					<DataGridStudentScores
+						data={answeredQuestions}
+						onSelect={row => {
+							setSelectedItem(row)
+						}}
+					/>
 				</div>
 			</div>
 			<div className="right-pane">{renderPreview()}</div>
