@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 
 import React from 'react'
-import { useTable, useSortBy, useFlexLayout} from 'react-table'
+import { useTable, useSortBy, useFlexLayout } from 'react-table'
 import PropTypes from 'prop-types'
 import CaretUp from '../../../assets/images/viewer/caret-up.svg'
 import CaretDown from '../../../assets/images/viewer/caret-down.svg'
@@ -15,23 +15,26 @@ const defaultColumn = () => ({
 	// When using the useFlexLayout:
 	minWidth: 30, // minWidth is only used as a limit for resizing
 	width: 150, // width is used for both the flex-basis and flex-grow
-	maxWidth: 200, // maxWidth is only used as a limit for resizing
+	maxWidth: 200 // maxWidth is only used as a limit for resizing
 })
 
-const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
+const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 	const isLoading = data === null
 	const [selectedId, setSelectedId] = React.useState(null)
-	const getRowId = React.useCallback((row, relIndex, parent) => {
-		// if row[idColumn] exists, use it
-		// otherwise fall back on the default query-table function
-		return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
-	}, [idColumn])
+	const getRowId = React.useCallback(
+		(row, relIndex, parent) => {
+			// if row[idColumn] exists, use it
+			// otherwise fall back on the default query-table function
+			return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
+		},
+		[idColumn]
+	)
 
 	// reset selected if the id isnt in the data
 	React.useEffect(() => {
-		if(!data) return
+		if (!data) return
 		const containsSelected = data.find(i => getRowId(i) == selectedId)
-		if(!containsSelected) setSelectedId(null)
+		if (!containsSelected) setSelectedId(null)
 	}, [data])
 
 	// setup react-table
@@ -49,31 +52,32 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
-	const RenderRow = React.useCallback(
-		({index, style}) => {
-			const row = rows[index]
-			prepareRow(row)
+	const RenderRow = React.useCallback(({ index, style }) => {
+		const row = rows[index]
+		prepareRow(row)
 
-			const selectedClass = row.id === selectedId ? 'selected' : ''
-			const evenOddClass = index % 2 ? 'odd' : ''
-			const onClick = () => {
-				if (onSelect) {
-					setSelectedId(row.id)
-					onSelect(row.original)
-				}
+		const selectedClass = row.id === selectedId ? 'selected' : ''
+		const evenOddClass = index % 2 ? 'odd' : ''
+		const onClick = () => {
+			if (onSelect) {
+				setSelectedId(row.id)
+				onSelect(row.original)
 			}
-			return (
-				<div {...row.getRowProps({style})} onClick={onClick} className={`row ${selectedClass} ${evenOddClass}`}>
-					{row.cells.map(cell => (
-						<div {...cell.getCellProps()}>{cell.render('Cell')}</div>
-					))}
-				</div>
-			)
 		}
-	)
+		return (
+			<div
+				{...row.getRowProps({ style })}
+				onClick={onClick}
+				className={`row ${selectedClass} ${evenOddClass}`}
+			>
+				{row.cells.map(cell => (
+					<div {...cell.getCellProps()}>{cell.render('Cell')}</div>
+				))}
+			</div>
+		)
+	})
 
 	return (
-
 		<div className={`repository--data-grid ${onSelect ? 'selectable' : ''}`} {...getTableProps()}>
 			<div className="data-grid-head">
 				{headerGroups.map(headerGroup => (
@@ -99,19 +103,13 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 					</div>
 				) : (
 					<AutoSizer>
-						{({ height, width}) => (
-							<FixedSizeList
-								height={height}
-								itemCount={rows.length}
-								itemSize={58}
-								width={width}
-							>
+						{({ height, width }) => (
+							<FixedSizeList height={height} itemCount={rows.length} itemSize={58} width={width}>
 								{RenderRow}
 							</FixedSizeList>
 						)}
 					</AutoSizer>
 				)}
-
 			</div>
 		</div>
 	)
@@ -120,7 +118,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect}) => {
 DataGrid.defaultProps = {
 	data: null,
 	columns: [],
-	sortable: true,
+	sortable: true
 }
 
 DataGrid.propTypes = {

@@ -86,8 +86,6 @@ const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	return 0
 }
 
-
-
 const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptCount) => {
 	return scoresForInstance.map(score => {
 		if (score.userID !== userID) {
@@ -102,7 +100,7 @@ const getScoresDataWithNewAttemptCount = (scoresForInstance, userID, newAttemptC
 }
 
 // hook used to load / cache users
-const useApiGetUsersCached = (neededUserIDs) => {
+const useApiGetUsersCached = neededUserIDs => {
 	const [users, setUsers] = React.useState({})
 
 	// filter out any users we already have in the cache
@@ -113,7 +111,8 @@ const useApiGetUsersCached = (neededUserIDs) => {
 	//	load users
 	const { isError, data, isFetching } = useQuery(
 		['getUserNames', ...usersToLoad],
-		apiGetUserNames, {
+		apiGetUserNames,
+		{
 			initialStale: true,
 			staleTime: Infinity,
 			initialData: [],
@@ -132,14 +131,16 @@ const useApiGetUsersCached = (neededUserIDs) => {
 
 		const newUsers = {}
 		data.forEach(user => {
-			const u = {...user}
-			u.userName = {...defaultUserName, ...u.userName}
-			u.userString = `${u.userName.last}, ${u.userName.first}${u.userName.mi ? ' ' + u.userName.mi + '.' : ''}`
+			const u = { ...user }
+			u.userName = { ...defaultUserName, ...u.userName }
+			u.userString = `${u.userName.last}, ${u.userName.first}${
+				u.userName.mi ? ' ' + u.userName.mi + '.' : ''
+			}`
 			newUsers[u.userID] = u
 		})
 
 		// add them to the cache for all loaded users
-		setUsers({...users, ...newUsers})
+		setUsers({ ...users, ...newUsers })
 	}, [data])
 
 	return { users, isError, isFetching }
@@ -147,7 +148,9 @@ const useApiGetUsersCached = (neededUserIDs) => {
 
 const RepositoryPage = () => {
 	const [selectedInstance, setSelectedInstance] = React.useState(null)
-	const instID = React.useMemo(() => selectedInstance ? selectedInstance.instID : null, [selectedInstance]) // caches testing if selectedInstance is null or not
+	const instID = React.useMemo(() => (selectedInstance ? selectedInstance.instID : null), [
+		selectedInstance
+	]) // caches testing if selectedInstance is null or not
 	const [modal, setModal] = React.useState(null)
 	const [isShowingBanner, setIsShowingBanner] = React.useState(
 		typeof window.localStorage.hideBanner === 'undefined' ||
@@ -159,10 +162,14 @@ const RepositoryPage = () => {
 	}, [])
 
 	// load current user
-	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery('getUser', apiGetUser, {
-		initialStale: true,
-		staleTime: Infinity,
-	})
+	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery(
+		'getUser',
+		apiGetUser,
+		{
+			initialStale: true,
+			staleTime: Infinity
+		}
+	)
 
 	// load instances
 	const { isError, data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
@@ -173,15 +180,17 @@ const RepositoryPage = () => {
 	})
 
 	//	load perms to selected instance
-	const { isError: qPermsIsError, data: qPermsData, error: qPermsError, isFetching: qPermsIsFetching } = useQuery(
-		['getInstancePerms', instID ],
-		apiGetInstancePerms, {
-			initialStale: true,
-			staleTime: Infinity,
-			initialData: null,
-			enabled: instID // load only after selectedInstance loads
-		}
-	)
+	const {
+		isError: qPermsIsError,
+		data: qPermsData,
+		error: qPermsError,
+		isFetching: qPermsIsFetching
+	} = useQuery(['getInstancePerms', instID], apiGetInstancePerms, {
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null,
+		enabled: instID // load only after selectedInstance loads
+	})
 
 	// extract list of user ids that can edit this instance
 	const managerUserIDs = React.useMemo(() => {
@@ -198,16 +207,15 @@ const RepositoryPage = () => {
 	const instanceManagers = React.useMemo(() => {
 		const peeps = []
 		managerUserIDs.forEach(id => {
-			if(users[id]) peeps.push(users[id])
+			if (users[id]) peeps.push(users[id])
 		})
 		return peeps
 	}, [managerUserIDs, users])
 
-
-
 	const { data: qScores, isFetching: qScoresIsFetching } = useQuery(
 		['getScoresForInstance', instID],
-		apiGetScoresForInstance, {
+		apiGetScoresForInstance,
+		{
 			initialStale: true,
 			staleTime: Infinity,
 			initialData: [],
@@ -216,7 +224,7 @@ const RepositoryPage = () => {
 	)
 
 	const scoresForInstance = React.useMemo(() => {
-		if(!instID || qScoresIsFetching) return null
+		if (!instID || qScoresIsFetching) return null
 		return qScores.map(u => {
 			const lastAttempt = u.attempts[u.attempts.length - 1]
 			const scores = u.attempts.map(a => a.score)
@@ -238,143 +246,156 @@ const RepositoryPage = () => {
 		})
 	}, [qScores, qScoresIsFetching])
 
-
 	const [mutateInstance] = useMutation(apiEditInstance)
 	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
 
-
 	// all the my instance props use
-	const instanceSectionCallbacks = React.useMemo(() => ({
-		onClickEditInstanceDetails: () => {
-			const onSave = async (values) => {
-				try{
-					await mutateInstance(values, {throwOnError: true})
+	const instanceSectionCallbacks = React.useMemo(
+		() => ({
+			onClickEditInstanceDetails: () => {
+				const onSave = async values => {
+					try {
+						await mutateInstance(values, { throwOnError: true })
 
-					// update 'data' in place
-					// we have to do this because calling reloadInstances
-					// doesnt update selectedInstance
-					// which in turn doesnt update the instance details
-					// till the user clicks on the current item in the instance datagrid
-					const keys = Object.keys(values)
+						// update 'data' in place
+						// we have to do this because calling reloadInstances
+						// doesnt update selectedInstance
+						// which in turn doesnt update the instance details
+						// till the user clicks on the current item in the instance datagrid
+						const keys = Object.keys(values)
 
-					const index = data.findIndex(d => d.instID == values.instID)
-					const selected = data[index]
-					keys.forEach(k => {selected[k] = values[k]})
-					data[index] = {...selected}
+						const index = data.findIndex(d => d.instID == values.instID)
+						const selected = data[index]
+						keys.forEach(k => {
+							selected[k] = values[k]
+						})
+						data[index] = { ...selected }
 
-					// trying to populate cache with updated data, but no dice
-					// queryCache.setQueryData(['getInstances'], [...data])
-					// only way I can get the dang instance list to update
-					reloadInstances()
+						// trying to populate cache with updated data, but no dice
+						// queryCache.setQueryData(['getInstances'], [...data])
+						// only way I can get the dang instance list to update
+						reloadInstances()
 
-					setModal(null)
-				} catch (error){
-					console.error('Error changing Instance Details')
-					console.error(error)
+						setModal(null)
+					} catch (error) {
+						console.error('Error changing Instance Details')
+						console.error(error)
+					}
 				}
-			}
 
-			const {instID, name, courseID, startTime, endTime, attemptCount, externalLink, scoreMethod, allowScoreImport} = selectedInstance
-
-			setModal({
-				type: 'instanceDetails',
-				props: {
-					onSave,
+				const {
 					instID,
 					name,
 					courseID,
 					startTime,
 					endTime,
 					attemptCount,
+					externalLink,
 					scoreMethod,
-					isExternallyLinked: externalLink,
-					isImportAllowed: allowScoreImport
-				}
-			})
-		},
+					allowScoreImport
+				} = selectedInstance
 
-		onClickAboutThisLO: () => {
-			setModal({
-				type: 'aboutThisLO',
-				props: { loID: selectedInstance.loID }
-			})
-		},
-
-		onClickPreview: (url) => {
-			window.open(url, '_blank')
-		},
-
-		onClickManageAccess: () => {
-			window.alert('onClickManageAccess')
-		},
-
-		onClickDownloadScores: (url) => {
-			window.open(url)
-		},
-
-		onClickViewScoresByQuestion: async () => {
-			const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
-			const lo = await apiGetLO(selectedInstance.loID)
-
-			const submitQuestionLogsByUserID = {}
-			const userIDsToFetch = []
-
-			trackingData.visitLog.forEach(visitLog => {
-				if (!submitQuestionLogsByUserID[visitLog.userID]) {
-					userIDsToFetch.push(visitLog.userID)
-
-					submitQuestionLogsByUserID[visitLog.userID] = {
-						userName: `User #${visitLog.userID}`,
-						logs: []
+				setModal({
+					type: 'instanceDetails',
+					props: {
+						onSave,
+						instID,
+						name,
+						courseID,
+						startTime,
+						endTime,
+						attemptCount,
+						scoreMethod,
+						isExternallyLinked: externalLink,
+						isImportAllowed: allowScoreImport
 					}
-				}
+				})
+			},
 
-				submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
-					visitLog.userID
-				].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
-			})
+			onClickAboutThisLO: () => {
+				setModal({
+					type: 'aboutThisLO',
+					props: { loID: selectedInstance.loID }
+				})
+			},
 
-			const users = await getUsers(userIDsToFetch)
-			users.forEach(userItem => {
-				submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
-			})
+			onClickPreview: url => {
+				window.open(url, '_blank')
+			},
 
-			setModal({
-				type: 'scoresByQuestion',
-				props: {
-					submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
-					questions: lo.aGroup.kids
-				}
-			})
-		},
+			onClickManageAccess: () => {
+				window.alert('onClickManageAccess')
+			},
 
-		onClickRefreshScores: () => {
-			queryCache.invalidateQueries(['getScoresForInstance', instID])
-		},
+			onClickDownloadScores: url => {
+				window.open(url)
+			},
 
-		onClickSetAdditionalAttempt: async (userID, attempts) => {
-			try{
-				await mutateExtraAttempts({userID, instID, newCount: attempts}, {throwOnError: true})
+			onClickViewScoresByQuestion: async () => {
+				console.log('si', selectedInstance)
+				const trackingData = await apiGetInstanceTrackingData(selectedInstance.instID)
+				const lo = await apiGetLO(selectedInstance.loID)
+
+				const submitQuestionLogsByUserID = {}
+				const userIDsToFetch = []
+
+				trackingData.visitLog.forEach(visitLog => {
+					if (!submitQuestionLogsByUserID[visitLog.userID]) {
+						userIDsToFetch.push(visitLog.userID)
+
+						submitQuestionLogsByUserID[visitLog.userID] = {
+							userName: `User #${visitLog.userID}`,
+							logs: []
+						}
+					}
+
+					submitQuestionLogsByUserID[visitLog.userID].logs = submitQuestionLogsByUserID[
+						visitLog.userID
+					].logs.concat(getSubmitQuestionLogsForAssessment(visitLog.logs))
+				})
+
+				const users = await getUsers(userIDsToFetch)
+				users.forEach(userItem => {
+					submitQuestionLogsByUserID[userItem.userID].userName = userItem.userString
+				})
+
+				setModal({
+					type: 'scoresByQuestion',
+					props: {
+						submitQuestionLogsByUser: Object.values(submitQuestionLogsByUserID),
+						questions: lo.aGroup.kids
+					}
+				})
+			},
+
+			onClickRefreshScores: () => {
 				queryCache.invalidateQueries(['getScoresForInstance', instID])
-			} catch(e){
-				console.error('Error setting extra attempts')
-				console.error(e)
-			}
-		},
+			},
 
-		onClickScoreDetails: (userName, userID) => {
-			setModal({
-				type: 'scoreDetails',
-				props: {
-					userName,
-					userID,
-					instID: selectedInstance.instID,
-					loID: selectedInstance.loID
+			onClickSetAdditionalAttempt: async (userID, attempts) => {
+				try {
+					await mutateExtraAttempts({ userID, instID, newCount: attempts }, { throwOnError: true })
+					queryCache.invalidateQueries(['getScoresForInstance', instID])
+				} catch (e) {
+					console.error('Error setting extra attempts')
+					console.error(e)
 				}
-			})
-		}
+			},
 
-	}), [selectedInstance])
+			onClickScoreDetails: (userName, userID) => {
+				setModal({
+					type: 'scoreDetails',
+					props: {
+						userName,
+						userID,
+						instID: selectedInstance.instID,
+						loID: selectedInstance.loID
+					}
+				})
+			}
+		}),
+		[selectedInstance]
+	)
 
 	const onClickHeaderAboutOrBannerLink = () => {
 		setModal({
@@ -392,7 +413,6 @@ const RepositoryPage = () => {
 		await apiLogout()
 		window.location = window.location
 	}
-
 
 	if (isError) return <span>Error: {error.message}</span>
 	if (!currentUser) return <LoadingIndicator isLoading={true} />
