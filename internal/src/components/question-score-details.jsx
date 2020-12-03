@@ -206,7 +206,7 @@ QuestionScoreDetails.propTypes = {
 					PropTypes.shape({
 						mediaID: PropTypes.number,
 						title: PropTypes.string,
-						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
+						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
 						descText: PropTypes.string,
 						width: PropTypes.number,
 						height: PropTypes.number

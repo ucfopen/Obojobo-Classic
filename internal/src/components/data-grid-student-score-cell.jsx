@@ -13,7 +13,7 @@ export default function DataGridStudentScoreCell({ value, row, column }) {
 
 	return (
 		<div className="data-grid-student-score-cell">
-			<span className="data-grid-student-score-cell--score">{value ?? '--'}</span>
+			<span className="data-grid-student-score-cell--score">{`${Math.round(value)}%` ?? '--'}</span>
 			{row.original.isScoreImported ? (
 				<span className="data-grid-student-score-cell--imported-text">(Imported)</span>
 			) : (

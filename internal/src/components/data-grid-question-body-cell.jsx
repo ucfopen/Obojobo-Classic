@@ -15,9 +15,6 @@ const renderMediaItem = ({ title, itemType }) => {
 		case 'flv':
 			return 'Video: ' + title
 
-		case 'mp3':
-			return 'Audio: ' + title
-
 		case 'kogneato':
 			return 'Materia: ' + title
 
@@ -73,7 +70,7 @@ DataGridQuestionBodyCell.propTypes = {
 			media: PropTypes.arrayOf(
 				PropTypes.shape({
 					title: PropTypes.string,
-					itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube'])
+					itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube'])
 				})
 			)
 		})
