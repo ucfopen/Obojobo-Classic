@@ -219,7 +219,17 @@ const RepositoryPage = () => {
 			},
 
 			onClickManageAccess: () => {
-				window.alert('onClickManageAccess')
+				setModal({
+					type: 'peopleSearch',
+					props: {
+						currentUserId: 10,
+						clearPeopleSearchResults: () => {},
+						onSelectPerson: () => {},
+						onClose: () => {},
+						onSearchChange: () => {},
+						people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
+					}
+				})
 			},
 
 			onClickDownloadScores: url => {

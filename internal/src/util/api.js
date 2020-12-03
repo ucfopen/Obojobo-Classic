@@ -53,6 +53,10 @@ export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/
 	})
 	return lo
 })
+
+export const apiGetUsersMatchingUsername = (r, search) => fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${search}`).then(users => {console.log(users); return users})
+
+
 export const apiGetScoresForInstance = (r, instID) => fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
 	// normalize the data we're getting back
 	const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']

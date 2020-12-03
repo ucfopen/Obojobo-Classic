@@ -12,6 +12,7 @@ import ModalAboutObojoboNext from './modal-about-obojobo-next'
 import { useQuery, useQueryCache } from 'react-query'
 import { apiGetLOMeta, apiGetLO, apiGetInstanceTrackingData, apiGetVisitTrackingData } from '../util/api'
 import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
+import PeopleSearchDialog from './people-search-dialog'
 
 const ModalAboutLOWithAPI = ({onClose, loID}) => {
 	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
@@ -187,6 +188,9 @@ const getModal = (modalType, modalProps, onCloseModal) => {
 
 		case 'aboutObojoboNext':
 			return <ModalAboutObojoboNext {...modalProps} onClose={onCloseModal} />
+
+		case 'peopleSearch':
+			return <PeopleSearchDialog {...modalProps} onClose={onCloseModal} />
 
 		default:
 			return null

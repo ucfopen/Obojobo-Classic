@@ -6,9 +6,11 @@ import Button from './button'
 
 export default function DataGridStudentScoreCell({ value, row, column }) {
 	const { onClick } = column
+
 	const click = React.useCallback(() => {
 		onClick(row.original.user, row.original.userID)
 	}, [row, onClick])
+
 	return (
 		<div className="data-grid-student-score-cell">
 			<span className="data-grid-student-score-cell--score">{value ?? '--'}</span>

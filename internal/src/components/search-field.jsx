@@ -39,5 +39,6 @@ SearchField.defaultProps = {
 SearchField.propTypes = {
 	value: PropTypes.string,
 	placeholder: PropTypes.string.isRequired,
-	onChange: PropTypes.func.isRequired
+	onChange: PropTypes.func.isRequired,
+	focusOnMount: PropTypes.bool
 }

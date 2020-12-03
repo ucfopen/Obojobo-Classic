@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const Button = ({ text, type, onClick, disabled = false}) => (
-	<div className={`repository--button is-type-${type} is-${disabled ? 'disabled' : 'enabled' }`} onClick={disabled ? () => {} : onClick}>
+	<div className={`repository--button is-type-${type} is-${disabled ? 'disabled' : 'enabled' }`} onClick={disabled ? null : onClick}>
 		{text}
 	</div>
 )

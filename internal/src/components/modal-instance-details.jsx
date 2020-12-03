@@ -84,7 +84,7 @@ export default function ModalInstanceDetails(props) {
 						Open Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={startTime} onChange={setStartTime} />
+						<FormDateTime value={props.isExternallyLinked ? null : startTime} onChange={setStartTime} />
 						<HelpButton>
 							{props.isExternallyLinked ? (
 								<div>
@@ -105,7 +105,7 @@ export default function ModalInstanceDetails(props) {
 						Close Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={endTime} onChange={setEndTime} />
+						<FormDateTime value={props.isExternallyLinked ? null : startTime} onChange={setEndTime} />
 						<HelpButton>
 							{props.isExternallyLinked ? (
 								<div>
