@@ -46,10 +46,6 @@ const RepositoryPage = () => {
 		selectedInstance
 	]) // caches testing if selectedInstance is null or not
 	const [modal, setModal] = React.useState(null)
-	const [isShowingBanner, setIsShowingBanner] = React.useState(
-		typeof window.localStorage.hideBanner === 'undefined' ||
-			window.localStorage.hideBanner === 'false'
-	)
 	const queryCache = useQueryCache()
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
@@ -265,16 +261,11 @@ const RepositoryPage = () => {
 		[selectedInstance]
 	)
 
-	const onClickHeaderAboutOrBannerLink = () => {
+	const onClickHeaderBanner = () => {
 		setModal({
 			type: 'aboutObojoboNext',
 			props: {}
 		})
-	}
-
-	const onClickHeaderCloseBanner = () => {
-		window.localStorage.hideBanner = 'true'
-		setIsShowingBanner(false)
 	}
 
 	const onClickLogOut = async () => {
@@ -288,9 +279,7 @@ const RepositoryPage = () => {
 	return (
 		<div id="repository" className="repository">
 			<Header
-				isShowingBanner={isShowingBanner}
-				onClickAboutOrBannerLink={onClickHeaderAboutOrBannerLink}
-				onClickCloseBanner={onClickHeaderCloseBanner}
+				onClickBanner={onClickHeaderBanner}
 				onClickLogOut={onClickLogOut}
 				userName={currentUser.login}
 			/>

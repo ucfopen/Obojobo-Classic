@@ -121,29 +121,6 @@ Materia.args = {
 	}
 }
 
-export const Audio = Template.bind({})
-Audio.args = {
-	media: {
-		mediaID: 4680,
-		auth: '6661',
-		title: 'bybr-dm-alt-italo-6.mp3',
-		itemType: 'mp3',
-		descText: '',
-		createTime: 1466617494,
-		copyright: 'Copyright 2016 Zachary A. Berry.',
-		thumb: '0',
-		url: 'bybr-dm-alt-italo-6.mp3',
-		size: '5765141',
-		length: '0',
-		perms: null,
-		height: 0,
-		width: 0,
-		meta: 0,
-		attribution: 0,
-		_explicitType: 'obo\\lo\\Media'
-	}
-}
-
 export const Flash = Template.bind({})
 Flash.args = {
 	media: {

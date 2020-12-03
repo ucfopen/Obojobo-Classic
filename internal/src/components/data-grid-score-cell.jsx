@@ -7,7 +7,7 @@ export default function DataGridScoreCell({ value }) {
 	const className = value === null ? '' : 'score-' + value
 	return (
 		<div className="data-grid-score-cell">
-			<div className={className}>{value === null ? '--' : value + '%'}</div>
+			<div className={className}>{value === null ? '--' : Math.round(value) + '%'}</div>
 		</div>
 	)
 }

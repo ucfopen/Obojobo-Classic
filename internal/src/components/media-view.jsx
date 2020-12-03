@@ -3,7 +3,7 @@ import './media-view.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const DeprecationNotice = () => {
+const DeprecationNotice = ({ mediaID }) => {
 	return (
 		<div className="deprecation-notice">
 			This media can&apos;t be viewed as Flash has been retired.{' '}
@@ -13,6 +13,9 @@ const DeprecationNotice = () => {
 				href="https://www.adobe.com/products/flashplayer/end-of-life.html"
 			>
 				More info...
+			</a>
+			<a className="download-link" target="_blank" rel="noreferrer" href={`/media/${mediaID}`}>
+				Download
 			</a>
 		</div>
 	)
@@ -42,7 +45,7 @@ const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 					<div className="about">
 						Flash Media: <b>{title}</b>
 					</div>
-					<DeprecationNotice />
+					<DeprecationNotice mediaID={mediaID} />
 				</div>
 			)
 
@@ -52,12 +55,9 @@ const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 					<div className="about">
 						Flash Video: <b>{title}</b>
 					</div>
-					<DeprecationNotice />
+					<DeprecationNotice mediaID={mediaID} />
 				</div>
 			)
-
-		case 'mp3':
-			return <audio className={itemType} src={`/media/${mediaID}`} />
 
 		case 'youTube':
 			return (
@@ -82,7 +82,7 @@ MediaView.propTypes = {
 	media: PropTypes.shape({
 		mediaID: PropTypes.number,
 		title: PropTypes.string,
-		itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3', 'youTube']),
+		itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
 		meta: PropTypes.oneOfType([
 			PropTypes.number,
 			PropTypes.shape({

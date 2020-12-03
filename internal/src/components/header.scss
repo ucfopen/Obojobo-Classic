@@ -23,11 +23,6 @@
 				width: 8em;
 				margin-right: 0.5em;
 			}
-
-			> button {
-				margin-left: 0.3em;
-				font-family: $font-default;
-			}
 		}
 
 		> .banner-header {
@@ -59,11 +54,6 @@
 				font-weight: bold;
 				text-decoration: underline;
 				margin: 0 0.4em;
-			}
-
-			> .banner-header--close-button {
-				color: $color-banner-text;
-				font-size: 0.6em;
 			}
 		}
 

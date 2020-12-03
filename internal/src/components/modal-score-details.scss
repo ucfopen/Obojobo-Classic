@@ -96,6 +96,7 @@
 		background-color: $color-bg;
 		border-radius: $dimension-rounded-radius;
 		position: relative;
+		overflow: auto;
 
 		hr {
 			margin: 2em 0;
