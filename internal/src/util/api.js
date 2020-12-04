@@ -12,7 +12,7 @@ const fetchOptions = () => ({
 const handleErrors = async resp => {
 	if (!resp.ok) throw Error(resp.statusText)
 	const data = await resp.json()
-	if (data.errorID) {
+	if (data?.errorID) {
 		throw Error(data.message)
 	}
 	return data
@@ -20,7 +20,8 @@ const handleErrors = async resp => {
 
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
-export const apiGetUser = () => fetchGet('/api/json.php/loRepository.getUser')
+export const apiVerifySession = () => fetchGet('/api/json.php/loRepository.getSessionValid')
+export const apiGetCurrentUser = () => fetchGet('/api/json.php/loRepository.getUser')
 export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
 		// normalize the data we're getting back
 		const castToInt = ['createTime', 'attemptCount', 'allowScoreImport', 'startTime', 'endTime', 'attemptCount', 'userID', 'instID']

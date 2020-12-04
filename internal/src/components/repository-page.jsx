@@ -10,8 +10,9 @@ import {
 	apiGetInstances,
 	apiGetScoresForInstance,
 	apiGetInstancePerms,
-	apiGetUser,
-	apiEditInstance
+	apiGetCurrentUser,
+	apiEditInstance,
+	apiVerifySession
 } from '../util/api'
 import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
 import MyInstances from './my-instances'
@@ -41,6 +42,8 @@ const getUserString = n => {
 }
 
 const RepositoryPage = () => {
+	const [sessionInterval, setSessionInterval] = React.useState(10000)
+	const [displayError, setDisplayError] = React.useState(false)
 	const [selectedInstance, setSelectedInstance] = React.useState(null)
 	const instID = React.useMemo(() => (selectedInstance ? selectedInstance.instID : null), [
 		selectedInstance
@@ -51,15 +54,30 @@ const RepositoryPage = () => {
 		queryCache.invalidateQueries('getInstances')
 	}, [])
 
-	// load current user
-	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery(
-		'getUser',
-		apiGetUser,
+	const { data: qSessionData, error: qSessionError } = useQuery(
+		'apiVerifySession',
+		apiVerifySession,
 		{
 			initialStale: true,
-			staleTime: Infinity
+			staleTime: 5000,
+			refetchInterval: sessionInterval,
+			refetchIntervalInBackground: sessionInterval * 3,
+			notifyOnStatusChange: true,
+			enabled: displayError === false || qSessionData === false
 		}
 	)
+
+	// load current user
+	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery(
+		'apiGetCurrentUser',
+		apiGetCurrentUser,
+		{
+			initialStale: true,
+			staleTime: Infinity,
+			enabled: qSessionData
+		}
+	)
+
 
 	// load instances
 	const { isError, data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
@@ -102,7 +120,7 @@ const RepositoryPage = () => {
 		return peeps
 	}, [managerUserIDs, users])
 
-	const { data: qScores, isFetching: qScoresIsFetching } = useQuery(
+	const { data: qScores, isFetching: qScoresIsFetching, error: qScoresError } = useQuery(
 		['getScoresForInstance', instID],
 		apiGetScoresForInstance,
 		{
@@ -278,12 +296,24 @@ const RepositoryPage = () => {
 		})
 	}
 
-	const onClickLogOut = async () => {
+	const onClickLogOut = React.useCallback(async () => {
 		await apiLogout()
-		window.location = window.location
-	}
+		window.location.reload(false)
+	}, [])
 
-	if (isError) return <span>Error: {error.message}</span>
+
+	const theError = qSessionError || qUserError || error || qPermsError || qScoresError || null
+	if(!displayError && theError){
+		setDisplayError(theError)
+	}
+	if(sessionInterval && (displayError || qSessionData === false)){
+		setSessionInterval(false)
+	}
+	if (displayError) return <span>Error: {displayError?.message ?? displayError}</span>
+	if (qSessionData === false) {
+		onClickLogOut()
+		return <span>Not Logged in</span>
+	}
 	if (!currentUser) return <LoadingIndicator isLoading={true} />
 
 	return (

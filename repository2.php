@@ -1,11 +1,10 @@
 <?php
 require_once('internal/app.php');
-require('internal/includes/login.php');
 
-if ( !$loggedIn)
+// redirect to login form
+if ( ! \obo\API::getInstance()->getSessionValid())
 {
-	$title = 'Obojobo Repository';
-	include("assets/templates/login.php");
+	header("Location: /repository-login.php");
 	exit;
 }
 
