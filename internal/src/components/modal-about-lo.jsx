@@ -4,7 +4,35 @@ import DefList from './def-list'
 import PropTypes from 'prop-types'
 import FlashHTML from './flash-html'
 import SectionHeader from './section-header'
+import { useQuery } from 'react-query'
+import { apiGetLOMeta } from '../util/api'
 import './modal-about-lo.scss'
+
+export function ModalAboutLOWithAPI({onClose, loID}){
+	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
+		initialStale: true,
+		staleTime: Infinity,
+	})
+
+	const props = React.useMemo(() => {
+		if(isFetching || isError) return {}
+		const {learnTime, languageID, notes, summary, objective } = data
+		const {contentSize, practiceSize, assessmentSize} = summary
+		return {
+			learnTime,
+			languageID,
+			contentSize,
+			practiceSize,
+			assessmentSize,
+			notes,
+			objective
+		}
+	}, [onClose, loID, data, isFetching])
+
+	if(isFetching) return null
+	if(isError) return <div>Error Loading Data</div>
+	return <ModalAboutLO {...props} onClose={onClose} />
+}
 
 export default function ModalAboutLO(props) {
 	const items = [

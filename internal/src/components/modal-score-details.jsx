@@ -6,6 +6,55 @@ import QuestionPreview from './question-preview'
 import InstructionsFlag from './instructions-flag'
 import AttemptDetails from './attempt-details'
 import getProcessedQuestionData from '../util/get-processed-question-data'
+import { useQuery } from 'react-query'
+import { apiGetLO, apiGetVisitTrackingData } from '../util/api'
+
+const extractAssessmentAttemptData = (logs, aGroup) => {
+	const foundLogs = []
+	logs.forEach(log => {
+		if (log.itemType === 'StartAttempt' && log.attemptData.attempt.qGroupID === aGroup.qGroupID) {
+			// convenience method to make an ordered array of questionIds
+			log.attemptData.attempt.questionOrder = log.attemptData.attempt.qOrder
+				? log.attemptData.attempt.qOrder.split(',').map(id => parseInt(id, 10)) // alternates in use
+				: aGroup.kids.map(q => q.questionID) // order is just as it is in the LO
+
+			foundLogs.push(log.attemptData)
+		}
+	})
+	return foundLogs
+}
+
+export function ModalScoreDetailsWithAPI({onClose, userName, userID, instID, loID}){
+	const { isError: isVisitDataError, data: visitData, isFetching: isVisitDataFetching } = useQuery(['visitTrackingData', userID, instID], apiGetVisitTrackingData, {
+		initialStale: true,
+		initialData: null,
+		staleTime: Infinity
+	})
+
+	// note, can return cached value before visitData loads
+	const { isError: isLOError, data: loData, isFetching: isLOFetching } = useQuery(['getLO', loID], apiGetLO, {
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null,
+		enabled: visitData
+	})
+
+	// merge some api states
+	const isFetching = isVisitDataFetching || isLOFetching
+	const isError = isVisitDataError || isLOError
+	const ready = !isFetching && loData && visitData
+
+	const props = React.useMemo(() => {
+		if(isFetching || isError || !visitData || !loData) return {}
+		const visitLogs = visitData.visitLog.map(vLog => vLog.logs).flat()
+		const attemptLogs = extractAssessmentAttemptData(visitLogs, loData.aGroup)
+		return { userName, attemptLogs, aGroup: loData.aGroup}
+	}, [onClose, visitData, loData, isFetching])
+
+	if(!ready) return <div>Loading</div>
+	if(isError) return <div>Error Loading Data</div>
+	return <ModalScoreDetails {...props} onClose={onClose} />
+}
 
 const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 	const answeredQuestions = []

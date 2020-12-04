@@ -12,7 +12,7 @@ const fetchOptions = () => ({
 const handleErrors = async resp => {
 	if (!resp.ok) throw Error(resp.statusText)
 	const data = await resp.json()
-	if (data.errorID) {
+	if (data?.errorID) {
 		throw Error(data.message)
 	}
 	return data
@@ -20,7 +20,8 @@ const handleErrors = async resp => {
 
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
-export const apiGetUser = () => fetchGet('/api/json.php/loRepository.getUser')
+export const apiVerifySession = () => fetchGet('/api/json.php/loRepository.getSessionValid')
+export const apiGetCurrentUser = () => fetchGet('/api/json.php/loRepository.getUser')
 export const apiGetInstances = () =>
 	fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
 		// normalize the data we're getting back
@@ -68,11 +69,12 @@ export const apiGetLO = (r, loID) =>
 		lo.pGroup.kids.forEach(k => {
 			k.questionID = parseInt(k.questionID, 10)
 		})
+
 		return lo
 	})
 
 export const apiGetUsersMatchingUsername = (r, search) =>
-	fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${search}`)
+	fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${encodeURIComponent(search)}`)
 
 export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
@@ -151,12 +153,20 @@ export const apiEditInstance = ({
 	attemptCount,
 	scoreMethod,
 	isImportAllowed
-}) =>
-	fetchGet(
-		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${
-			isImportAllowed ? '1' : '0'
-		}`
+}) => {
+	name = encodeURIComponent(name)
+	instID = encodeURIComponent(instID)
+	courseID = encodeURIComponent(courseID)
+	startTime = encodeURIComponent(startTime)
+	endTime = encodeURIComponent(endTime)
+	attemptCount = encodeURIComponent(attemptCount)
+	scoreMethod = encodeURIComponent(scoreMethod)
+	isImportAllowed = isImportAllowed ? '1' : '0'
+
+	return fetchGet(
+		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${isImportAllowed}`
 	)
+}
 export const apiAddUsersToInstance = ({ instID, userIDs }) =>
 	fetchGet(`/api/json.php/loRepository.addUsersToInstance/${instID}/${userIDs.join(',')}`)
 export const apiRemoveUsersFromInstance = ({ instID, userIDs }) =>

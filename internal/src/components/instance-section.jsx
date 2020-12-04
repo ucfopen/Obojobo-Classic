@@ -10,6 +10,12 @@ import HelpButton from './help-button'
 import InstructionsFlag from './instructions-flag'
 import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
+import { ModalAboutLOWithAPI } from './modal-about-lo'
+import ModalInstanceDetails from './modal-instance-details'
+import { apiEditInstance } from '../util/api'
+import { useMutation, useQueryCache } from 'react-query'
+import PeopleSearchDialog from './people-search-dialog'
+import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
 
 const getScoringMethodText = scoreMethod => {
 	switch (scoreMethod) {
@@ -38,23 +44,94 @@ const getDurationText = (startTime, endTime) => {
 	return 'This instance closes in ' + humanizeDuration(endTime - now, { largest: 2 })
 }
 
-const noOp = () => {}
-
 export default function InstanceSection({
 	instance,
-	scores,
 	usersWithAccess,
 	user,
-	onClickAboutThisLO,
-	onClickPreview,
-	onClickEditInstanceDetails,
-	onClickManageAccess,
-	onClickDownloadScores,
-	onClickViewScoresByQuestion,
-	onClickRefreshScores,
-	onClickSetAdditionalAttempt,
-	onClickScoreDetails
+	setModal
 }) {
+	const queryCache = useQueryCache()
+	const [mutateInstance] = useMutation(apiEditInstance)
+
+
+	const onClickPreviewWithUrl = React.useCallback(() => {
+		window.open(`/preview/${instance.loID}`, '_blank')
+	}, [instance])
+
+	const startTime = React.useMemo(() => dayjs(instance?.startTime * 1000), [instance?.startTime])
+	const endTime = React.useMemo(() => dayjs(instance?.endTime * 1000), [instance?.endTime])
+
+	const onClickAboutThisLO = React.useCallback(() => {
+		setModal({
+			component: ModalAboutLOWithAPI,
+			className: 'aboutThisLO',
+			props: {
+				loID: instance.loID
+			}
+		})
+	}, [instance])
+
+
+
+	const onClickEditInstanceDetails = React.useCallback(() => {
+
+		const onSave = async values => {
+			try {
+				await mutateInstance(values, { throwOnError: true })
+				// update 'data' in place
+				const keys = Object.keys(values)
+				keys.forEach(k => {
+					instance[k] = values[k]
+				})
+
+				// trying to populate cache with updated data, but no dice
+				const data = queryCache.getQueryData(['getInstances'])
+				const index = data.indexOf(instance)
+				data[index] = {...instance}
+				queryCache.setQueryData(['getInstances'], [...data])
+				queryCache.refetchQueries(['getInstances'], { exact: true })
+				setModal(null)
+			} catch (error) {
+				console.error('Error changing Instance Details')
+				console.error(error)
+			}
+		}
+
+		setModal({
+			component: ModalInstanceDetails,
+			className: 'instanceDetails',
+			props: {...instance, onSave }
+		})
+	}, [instance, mutateInstance, setModal])
+
+	const onClickManageAccess = React.useCallback(() => {
+		setModal({
+			component: PeopleSearchDialog,
+			className: 'peopleSearch',
+			props: {
+				currentUserId: user.userID,
+				clearPeopleSearchResults: () => {},
+				onSelectPerson: () => {},
+				onClose: () => {},
+				onSearchChange: () => {},
+				people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
+			}
+		})
+	}, [user, usersWithAccess])
+
+
+
+	const onClickViewScoresByQuestion = React.useCallback(() => {
+		setModal({
+			component: ModalScoresByQuestionWithAPI,
+			className: 'scoresByQuestion',
+			props: {
+				loID: instance.loID,
+				instID: instance.instID
+			}
+		})
+	}, [instance])
+
 	if (!instance) {
 		return (
 			<div className="repository--instance-section is-empty">
@@ -62,24 +139,6 @@ export default function InstanceSection({
 			</div>
 		)
 	}
-
-	const onClickDownloadScoresWithUrl = React.useCallback(() => {
-		if (!instance) return noOp
-		const { instID, name, courseID, scoreMethod } = instance
-		const instName = encodeURI(name.replace(/ /g, '_'))
-		const courseName = encodeURI(courseID.replace(/ /g, '_'))
-		const date = dayjs().format('MM-DD-YY')
-		const url = `/assets/csv.php?function=scores&instID=${instID}&filename=${instName}_-_${courseName}_-_${date}&method=${scoreMethod}`
-		onClickDownloadScores(url)
-	}, [instance])
-
-	const onClickPreviewWithUrl = React.useCallback(() => {
-		if (!instance) return noOp
-		onClickPreview(`/preview/${instance.loID}`)
-	}, [instance])
-
-	const startTime = dayjs(instance.startTime * 1000)
-	const endTime = dayjs(instance.endTime * 1000)
 
 	return (
 		<div className="repository--instance-section is-not-empty">
@@ -158,20 +217,12 @@ export default function InstanceSection({
 			</div>
 
 			<AssessmentScoresSection
-				instID={instance.instID}
-				onClickDownloadScores={onClickDownloadScoresWithUrl}
-				assessmentScores={scores}
-				onClickRefresh={onClickRefreshScores}
-				onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
-				onClickScoreDetails={onClickScoreDetails}
+				instance={instance}
+				setModal={setModal}
 			/>
 
-			<hr />
+			<Button onClick={onClickViewScoresByQuestion} type="small" text="Compare Scores by question..." />
 
-			<div className="scores-by-question">
-				<h4>Scores by question</h4>
-				<Button onClick={onClickViewScoresByQuestion} type="small" text="View..." />
-			</div>
 		</div>
 	)
 }
@@ -179,14 +230,6 @@ export default function InstanceSection({
 InstanceSection.propTypes = {
 	instance: PropTypes.object,
 	scores: PropTypes.array,
-	onClickDownloadScores: PropTypes.func.isRequired,
-	onClickEditInstanceDetails: PropTypes.func.isRequired,
-	onClickManageAccess: PropTypes.func.isRequired,
-	onClickViewScoresByQuestion: PropTypes.func.isRequired,
-	onClickAboutThisLO: PropTypes.func.isRequired,
-	onClickPreview: PropTypes.func.isRequired,
-	onClickRefreshScores: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
-	onClickScoreDetails: PropTypes.func.isRequired
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
 }

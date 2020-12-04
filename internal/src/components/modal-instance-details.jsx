@@ -13,7 +13,7 @@ export default function ModalInstanceDetails(props) {
 	const [endTime, setEndTime] = useState(props.endTime)
 	const [attemptCount, setAttemptCount] = useState(props.attemptCount)
 	const [scoreMethod, setScoreMethod] = useState(props.scoreMethod)
-	const [isImportAllowed, setIsImportAllowed] = useState(props.isImportAllowed)
+	const [allowScoreImport, setAllowScoreImport] = useState(props.allowScoreImport)
 
 	const [exScoreMethod, exFinalScore] = React.useMemo(() => {
 		switch(scoreMethod){
@@ -28,7 +28,7 @@ export default function ModalInstanceDetails(props) {
 		}
 	}, [scoreMethod])
 
-	const onSave = () => {
+	const onSave = React.useCallback(() => {
 		props.onSave({
 			instID: props.instID,
 			name,
@@ -37,9 +37,9 @@ export default function ModalInstanceDetails(props) {
 			endTime,
 			attemptCount,
 			scoreMethod,
-			isImportAllowed
+			allowScoreImport
 		})
-	}
+	}, [name, courseID, startTime, endTime, attemptCount, scoreMethod, allowScoreImport])
 
 	return (
 		<div className="modal-instance-details">
@@ -51,7 +51,7 @@ export default function ModalInstanceDetails(props) {
 						<input
 							type="text"
 							value={name}
-							onChange={e => setName(e.target.value)}
+							onChange={(e) => {setName(e.target.value)}}
 						/>
 						<HelpButton>
 							<div>
@@ -80,13 +80,13 @@ export default function ModalInstanceDetails(props) {
 			</div>
 			<div className="box border">
 				<div className="row">
-					<span className={`title ${props.isExternallyLinked ? 'is-disabled' : 'is-not-disabled'}`}>
+					<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
 						Open Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={props.isExternallyLinked ? null : startTime} onChange={setStartTime} />
+						<FormDateTime value={props.externalLink ? null : startTime} onChange={setStartTime} />
 						<HelpButton>
-							{props.isExternallyLinked ? (
+							{props.externalLink ? (
 								<div>
 									Since this instance is linked to an external course you cannot set the start date.
 									Access to your module is reliant on settings in the external system.
@@ -101,13 +101,13 @@ export default function ModalInstanceDetails(props) {
 					</div>
 				</div>
 				<div className="row">
-					<span className={`title ${props.isExternallyLinked ? 'is-disabled' : 'is-not-disabled'}`}>
+					<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
 						Close Date:
 					</span>
 					<div className="flex-container">
-						<FormDateTime value={props.isExternallyLinked ? null : startTime} onChange={setEndTime} />
+						<FormDateTime value={props.externalLink ? null : startTime} onChange={setEndTime} />
 						<HelpButton>
-							{props.isExternallyLinked ? (
+							{props.externalLink ? (
 								<div>
 									Since this instance is linked to an external course you cannot set the end date.
 									Access to your module is reliant on settings in the external system.
@@ -123,7 +123,7 @@ export default function ModalInstanceDetails(props) {
 					</div>
 				</div>
 				<div className="row">
-					{props.isExternallyLinked ? (
+					{props.externalLink ? (
 						<span className="linked">(Start/end dates are defined by the external system)</span>
 					) : null}
 				</div>
@@ -181,8 +181,8 @@ export default function ModalInstanceDetails(props) {
 				) : null}
 				<div className="row">
 					<div className="score-import">
-						<label onClick={e => setIsImportAllowed(e.target.checked)}>
-							<input type="checkbox" name="isImportAllowed" defaultChecked={isImportAllowed} />
+						<label onClick={e => setAllowScoreImport(e.target.checked)}>
+							<input type="checkbox" name="isImportAllowed" defaultChecked={allowScoreImport} />
 							<span>Allow past scores to be imported</span>
 						</label>
 						<HelpButton>
@@ -210,19 +210,19 @@ ModalInstanceDetails.defaultProps = {
 	endTime: null,
 	attemptCount: 1,
 	scoringMethod: 'h',
-	isImportAllowed: true
+	allowScoreImport: true
 }
 
 ModalInstanceDetails.propTypes = {
 	onClose: PropTypes.func.isRequired,
 	onSave: PropTypes.func.isRequired,
 	instID: PropTypes.number.isRequired,
-	isExternallyLinked: PropTypes.bool.isRequired,
+	externalLink: PropTypes.bool.isRequired,
 	name: PropTypes.string,
 	courseID: PropTypes.string,
 	startTime: PropTypes.number,
 	endTime: PropTypes.number,
 	attemptCount: PropTypes.number,
 	scoreMethod: PropTypes.oneOf(['h', 'm', 'r']),
-	isImportAllowed: PropTypes.bool
+	allowScoreImport: PropTypes.bool
 }
