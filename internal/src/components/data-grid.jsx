@@ -76,7 +76,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 				))}
 			</div>
 		)
-	})
+	}, [rows, selectedId])
 
 	return (
 		<div className={`repository--data-grid ${onSelect ? 'selectable' : ''}`} {...getTableProps()}>

@@ -38,7 +38,7 @@ export default function AssessmentScoresSection({
 		)
 	}, [assessmentScores, search])
 
-	const scoreCount = React.useMemo(() => assessmentScores?.length || 0)
+	const scoreCount = React.useMemo(() => assessmentScores?.length || 0, [assessmentScoresDataGridData])
 
 	return (
 		<div className="repository--assessment-scores-section">
