@@ -12,31 +12,10 @@ import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
 import { ModalAboutLOWithAPI } from './modal-about-lo'
 import ModalInstanceDetails from './modal-instance-details'
-import { apiGetScoresForInstance, apiEditInstance, apiEditExtraAttempts } from '../util/api'
-import { useQuery, useMutation, useQueryCache } from 'react-query'
+import { apiEditInstance } from '../util/api'
+import { useMutation, useQueryCache } from 'react-query'
 import PeopleSearchDialog from './people-search-dialog'
 import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
-import { ModalScoreDetailsWithAPI } from './modal-score-details'
-
-const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
-	switch (scoreMethod) {
-		case 'h': // highest
-			return Math.max.apply(null, scores)
-
-		case 'r': // most recent
-			return scores[scores.length - 1]
-
-		case 'm': // average
-			const sum = scores.reduce((acc, score) => acc + score, 0)
-			return parseFloat(sum) / scores.length
-	}
-
-	return 0
-}
-
-const getUserString = n => {
-	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
-}
 
 const getScoringMethodText = scoreMethod => {
 	switch (scoreMethod) {
@@ -65,8 +44,6 @@ const getDurationText = (startTime, endTime) => {
 	return 'This instance closes in ' + humanizeDuration(endTime - now, { largest: 2 })
 }
 
-const noOp = () => {}
-
 export default function InstanceSection({
 	instance,
 	usersWithAccess,
@@ -75,66 +52,7 @@ export default function InstanceSection({
 }) {
 	const queryCache = useQueryCache()
 	const [mutateInstance] = useMutation(apiEditInstance)
-	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
 
-	const { data, isFetching, error } = useQuery(
-		['getScoresForInstance', instance?.instID],
-		apiGetScoresForInstance,
-		{
-			initialStale: true,
-			staleTime: Infinity,
-			initialData: [],
-			enabled: instance // load only after instance loads
-		}
-	)
-
-	// process scores for instance
-	const scores = React.useMemo(() => {
-		if (!instance?.instID || isFetching) return null
-		return data.map(u => {
-			const lastAttempt = u.attempts[u.attempts.length - 1]
-			const scores = u.attempts.map(a => a.score)
-			const finished = u.attempts.filter(a => Boolean(a.submitDate))
-			const lastSubmitted = finished[finished.length - 1]?.submitDate
-			const score = getFinalScoreFromAttemptScores(scores, instance.scoreMethod)
-
-			return {
-				user: getUserString(u.user),
-				userID: u.userID,
-				score,
-				isScoreImported: lastAttempt.linkedAttempt !== 0,
-				lastSubmitted,
-				numAttemptsTaken: u.attempts.length,
-				additional: u.additional,
-				attemptCount: instance.attemptCount,
-				isAttemptInProgress: !lastAttempt.submitted
-			}
-		})
-	}, [data, isFetching, instance])
-
-	const onClickDownloadScoresWithUrl = React.useCallback(() => {
-		if (!instance) return noOp
-		const { instID, name, courseID, scoreMethod } = instance
-		const instName = encodeURI(name.replace(/ /g, '_'))
-		const courseName = encodeURI(courseID.replace(/ /g, '_'))
-		const date = dayjs().format('MM-DD-YY')
-		const url = `/assets/csv.php?function=scores&instID=${instID}&filename=${instName}_-_${courseName}_-_${date}&method=${scoreMethod}`
-		window.open(url)
-	}, [instance])
-
-	const onClickRefreshScores = React.useCallback( () => {
-		queryCache.refetchQueries(['getScoresForInstance', instance.instID], { exact: true })
-	}, [instance])
-
-	const onClickSetAdditionalAttempt = React.useCallback(async (userID, attempts) => {
-		try {
-			await mutateExtraAttempts({ userID, instID: instance.instID, newCount: attempts }, { throwOnError: true })
-			onClickRefreshScores()
-		} catch (e) {
-			console.error('Error setting extra attempts')
-			console.error(e)
-		}
-	}, [instance, mutateExtraAttempts, onClickRefreshScores])
 
 	const onClickPreviewWithUrl = React.useCallback(() => {
 		window.open(`/preview/${instance.loID}`, '_blank')
@@ -153,18 +71,7 @@ export default function InstanceSection({
 		})
 	}, [instance])
 
-	const onClickScoreDetails = React.useCallback((userName, userID) => {
-		setModal({
-			component: ModalScoreDetailsWithAPI,
-			className: 'scoreDetails',
-			props: {
-				userName,
-				userID,
-				instID: instance.instID,
-				loID: instance.loID
-			}
-		})
-	}, [instance])
+
 
 	const onClickEditInstanceDetails = React.useCallback(() => {
 
@@ -183,8 +90,6 @@ export default function InstanceSection({
 				data[index] = {...instance}
 				queryCache.setQueryData(['getInstances'], [...data])
 				queryCache.refetchQueries(['getInstances'], { exact: true })
-				// only way I can get the dang instance list to update
-
 				setModal(null)
 			} catch (error) {
 				console.error('Error changing Instance Details')
@@ -312,12 +217,8 @@ export default function InstanceSection({
 			</div>
 
 			<AssessmentScoresSection
-				instID={instance.instID}
-				onClickDownloadScores={onClickDownloadScoresWithUrl}
-				assessmentScores={scores}
-				onClickRefresh={onClickRefreshScores}
-				onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
-				onClickScoreDetails={onClickScoreDetails}
+				instance={instance}
+				setModal={setModal}
 			/>
 
 			<Button onClick={onClickViewScoresByQuestion} type="small" text="Compare Scores by question..." />
