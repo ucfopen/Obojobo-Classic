@@ -55,7 +55,7 @@ export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/
 	return lo
 })
 
-export const apiGetUsersMatchingUsername = (r, search) => fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${search}`).then(users => {console.log(users); return users})
+export const apiGetUsersMatchingUsername = (r, search) => fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${encodeURIComponent(search)}`)
 
 
 export const apiGetScoresForInstance = (r, instID) => fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
@@ -116,12 +116,22 @@ export const apiEditInstance = ({
 	attemptCount,
 	scoreMethod,
 	isImportAllowed
-}) =>
-	fetchGet(
-		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${
-			isImportAllowed ? '1' : '0'
-		}`
+}) =>{
+
+	name = encodeURIComponent(name)
+	instID = encodeURIComponent(instID)
+	courseID = encodeURIComponent(courseID)
+	startTime = encodeURIComponent(startTime)
+	endTime = encodeURIComponent(endTime)
+	attemptCount = encodeURIComponent(attemptCount)
+	scoreMethod = encodeURIComponent(scoreMethod)
+	isImportAllowed = isImportAllowed ? '1' : '0'
+
+	return fetchGet(
+		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${isImportAllowed}`
 	)
+}
+
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []
 

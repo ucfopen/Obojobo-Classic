@@ -4,7 +4,7 @@ $time = empty($title) ? '' : $title;
 ?><!DOCTYPE html>
 <html>
 <head>
-<title><?php echo $title; ?> | Obojobo Learning Object</title>
+<title><?php echo htmlspecialchars($title); ?> | Obojobo Learning Object</title>
 <?php if(\AppCfg::ENVIRONMENT == \AppCfgDefault::ENV_DEV) : ?>
 	<!-- DEV JAVASCRIPT LIBRARIES -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -101,10 +101,10 @@ function initLoginScreen()
 	<div id="wrapper">
 		<div id="login-box">
 			<header id="login-header">
-				<h1 title="<?php echo $title; ?>"><?php echo $title; ?></h1>
+				<h1 title="<?php echo htmlspecialchars($title); ?>"><?php echo htmlspecialchars($title); ?></h1>
 
 				<?php if (isset($course)): ?>
-					<h2>for <em><?php echo $course; ?></em> (<?php echo $instructor; ?>)</h2>
+					<h2>for <em><?php echo htmlspecialchars($course); ?></em> (<?php echo $instructor; ?>)</h2>
 				<?php endif; ?>
 
 				<?php if(isset($_REQUEST['loID']) || $hasTime) : ?>
