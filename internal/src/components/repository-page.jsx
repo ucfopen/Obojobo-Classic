@@ -218,12 +218,13 @@ const RepositoryPage = () => {
 				setModal({
 					type: 'peopleSearch',
 					props: {
-						currentUserId: 10,
+						instID: selectedInstance.instID,
+						currentUserId: currentUser.userID,
+						usersWithAccess: instanceManagers,
 						clearPeopleSearchResults: () => {},
 						onSelectPerson: () => {},
 						onClose: () => {},
-						onSearchChange: () => {},
-						people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
+						onSearchChange: () => {}
 					}
 				})
 			},
@@ -268,7 +269,7 @@ const RepositoryPage = () => {
 				})
 			}
 		}),
-		[selectedInstance]
+		[selectedInstance, instanceManagers]
 	)
 
 	const onClickHeaderBanner = () => {

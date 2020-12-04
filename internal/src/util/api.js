@@ -21,11 +21,23 @@ const handleErrors = async resp => {
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
 export const apiGetUser = () => fetchGet('/api/json.php/loRepository.getUser')
-export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
+export const apiGetInstances = () =>
+	fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
 		// normalize the data we're getting back
-		const castToInt = ['createTime', 'attemptCount', 'allowScoreImport', 'startTime', 'endTime', 'attemptCount', 'userID', 'instID']
+		const castToInt = [
+			'createTime',
+			'attemptCount',
+			'allowScoreImport',
+			'startTime',
+			'endTime',
+			'attemptCount',
+			'userID',
+			'instID'
+		]
 		instances.forEach(i => {
-			castToInt.forEach(key => { i[key] = parseInt(i[key], 10) })
+			castToInt.forEach(key => {
+				i[key] = parseInt(i[key], 10)
+			})
 			i.allowScoreImport = i.allowScoreImport === '1'
 			i.externalLink = i.externalLink != null
 		})
@@ -33,43 +45,51 @@ export const apiGetInstances = () => fetchGet('/api/json.php/loRepository.getIns
 	})
 export const apiLogout = () => fetchGet('/api/json.php/loRepository.doLogout')
 export const apiGetLOMeta = (r, loID) => fetchGet(`/api/json.php/loRepository.getLOMeta/${loID}`)
-export const apiGetLO = (r, loID) => fetchGet(`/api/json.php/loRepository.getLO/${loID}`).then(lo => {
-	// normalize the data we're getting back
-	const castToInt2 = ['qGroupID', 'userID']
-	castToInt2.forEach(key => { lo.aGroup[key] = parseInt(lo.aGroup[key], 10) })
-	castToInt2.forEach(key => { lo.pGroup[key] = parseInt(lo.pGroup[key], 10) })
-	lo.aGroup.allowAlts = lo.aGroup.allowAlts === '1'
-	lo.aGroup.rand = lo.aGroup.rand === '1'
-	lo.pGroup.allowAlts = lo.pGroup.allowAlts === '1'
-	lo.pGroup.rand = lo.pGroup.rand === '1'
-	lo.createTime = parseInt(lo.createTime, 10)
-	lo.allowScoreImport = lo.allowScoreImport === '1'
-	lo.externalLink = lo.externalLink != null
-	lo.aGroup.kids.forEach(k => {
-		k.questionID = parseInt(k.questionID, 10)
-	})
-	lo.pGroup.kids.forEach(k => {
-		k.questionID = parseInt(k.questionID, 10)
-	})
-	return lo
-})
-
-export const apiGetUsersMatchingUsername = (r, search) => fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${search}`).then(users => {console.log(users); return users})
-
-
-export const apiGetScoresForInstance = (r, instID) => fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
-	// normalize the data we're getting back
-	const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']
-	scoresByUser.forEach(u => {
-		u.additional = parseInt(u.additional, 10)
-		u.attempts.forEach(a => {
-			castToInt.forEach(key => { a[key] = parseInt(a[key], 10) })
+export const apiGetLO = (r, loID) =>
+	fetchGet(`/api/json.php/loRepository.getLO/${loID}`).then(lo => {
+		// normalize the data we're getting back
+		const castToInt2 = ['qGroupID', 'userID']
+		castToInt2.forEach(key => {
+			lo.aGroup[key] = parseInt(lo.aGroup[key], 10)
 		})
+		castToInt2.forEach(key => {
+			lo.pGroup[key] = parseInt(lo.pGroup[key], 10)
+		})
+		lo.aGroup.allowAlts = lo.aGroup.allowAlts === '1'
+		lo.aGroup.rand = lo.aGroup.rand === '1'
+		lo.pGroup.allowAlts = lo.pGroup.allowAlts === '1'
+		lo.pGroup.rand = lo.pGroup.rand === '1'
+		lo.createTime = parseInt(lo.createTime, 10)
+		lo.allowScoreImport = lo.allowScoreImport === '1'
+		lo.externalLink = lo.externalLink != null
+		lo.aGroup.kids.forEach(k => {
+			k.questionID = parseInt(k.questionID, 10)
+		})
+		lo.pGroup.kids.forEach(k => {
+			k.questionID = parseInt(k.questionID, 10)
+		})
+		return lo
 	})
-	return scoresByUser
-})
 
-export const apiEditExtraAttempts = ({userID, instID, newCount}) => {
+export const apiGetUsersMatchingUsername = (r, search) =>
+	fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${search}`)
+
+export const apiGetScoresForInstance = (r, instID) =>
+	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
+		// normalize the data we're getting back
+		const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']
+		scoresByUser.forEach(u => {
+			u.additional = parseInt(u.additional, 10)
+			u.attempts.forEach(a => {
+				castToInt.forEach(key => {
+					a[key] = parseInt(a[key], 10)
+				})
+			})
+		})
+		return scoresByUser
+	})
+
+export const apiEditExtraAttempts = ({ userID, instID, newCount }) => {
 	return fetchGet(`/api/json.php/loRepository.editExtraAttempts/${userID}/${instID}/${newCount}`)
 }
 export const apiGetVisitTrackingData = (r, userID, instID) =>
@@ -77,21 +97,37 @@ export const apiGetVisitTrackingData = (r, userID, instID) =>
 		data.visitLog.forEach(visit => {
 			visit.logs.forEach(l => {
 				const castToInt = ['trackingID', 'createTime', 'loID', 'visitID']
-				castToInt.forEach(key => { l[key] = parseInt(l[key], 10) })
+				castToInt.forEach(key => {
+					l[key] = parseInt(l[key], 10)
+				})
 
 				const attempt = l?.attemptData?.attempt
 				const scores = l?.attemptData?.scores
-				if(attempt){
-
+				if (attempt) {
 					// castToInt
-					const castToInt2 = ['attemptID', 'endTime', 'instID', 'linkedAttemptID', 'loID', 'qGroupID', 'score', 'startTime', 'userID', 'visitID']
-					castToInt2.forEach(key => { attempt[key] = parseInt(attempt[key], 10) })
+					const castToInt2 = [
+						'attemptID',
+						'endTime',
+						'instID',
+						'linkedAttemptID',
+						'loID',
+						'qGroupID',
+						'score',
+						'startTime',
+						'userID',
+						'visitID'
+					]
+					castToInt2.forEach(key => {
+						attempt[key] = parseInt(attempt[key], 10)
+					})
 				}
 
-				if(scores){
+				if (scores) {
 					const castToInt3 = ['score', 'itemID']
 					scores.forEach(s => {
-						castToInt3.forEach(key => { s[key] = parseInt(s[key], 10) })
+						castToInt3.forEach(key => {
+							s[key] = parseInt(s[key], 10)
+						})
 						// add the question index to each score
 						s.orderIndex = attempt.qOrder.indexOf(s.itemID)
 					})
@@ -121,6 +157,10 @@ export const apiEditInstance = ({
 			isImportAllowed ? '1' : '0'
 		}`
 	)
+export const apiAddUsersToInstance = ({ instID, userIDs }) =>
+	fetchGet(`/api/json.php/loRepository.addUsersToInstance/${instID}/${userIDs.join(',')}`)
+export const apiRemoveUsersFromInstance = ({ instID, userIDs }) =>
+	fetchGet(`/api/json.php/loRepository.removeUsersFromInstance/${instID}/${userIDs.join(',')}`)
 export const apiGetResponsesForInstance = async (key, { instID }) => {
 	if (!instID) return []
 

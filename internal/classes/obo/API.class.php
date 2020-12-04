@@ -768,6 +768,42 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 
+	public function addUsersToInstance($instID, $userIDs)
+	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
+		$permObjects = [];
+		foreach($userIDs as $userID)
+		{
+			$permObjects[] = (object) [
+				'userID' => $userID,
+				'perm' => '20'
+			];
+		}
+
+		return $this->editUsersPerms($permObjects, $instID, \cfg_core_Perm::TYPE_INSTANCE);
+	}
+
+	public function removeUsersFromInstance($instID, $userIDs)
+	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
+		$permObjects = [];
+		foreach($userIDs as $userID)
+		{
+			$permObjects[] = (object) [
+				'userID' => $userID,
+				'perm' => '20'
+			];
+		}
+
+		return $this->editUsersPerms([], $instID, \cfg_core_Perm::TYPE_INSTANCE, $permObjects);
+	}
+
 	public function editUsersPerms($permObjects, $itemID = 0, $itemType = 'l', $removePerms = 0)
 	{
 		if( ! \obo\util\Validator::isPosInt($itemID))
@@ -803,6 +839,7 @@ class API extends \rocketD\db\DBEnabled
 				default:
 					if( ! \obo\util\Validator::isItemType($itemType))
 					{
+
 						return \rocketD\util\Error::getError(2);
 					}
 
@@ -831,6 +868,10 @@ class API extends \rocketD\db\DBEnabled
 
 	public function removeUsersPerms($users, $itemID, $itemType)
 	{
+		if(is_string($users)) {
+			$users = explode(',', $users);
+		}
+
 		if(!\obo\util\Validator::isUserArray($users) || !\obo\util\Validator::isPosInt($itemID) || !\obo\util\Validator::isItemType($itemType))
 		{
 			return \rocketD\util\Error::getError(2);
