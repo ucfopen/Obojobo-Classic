@@ -5,6 +5,94 @@ import PropTypes from 'prop-types'
 import QuestionScoreDetails from './question-score-details'
 import DataGridStudentScores from './data-grid-student-scores'
 import getProcessedQuestionData from '../util/get-processed-question-data'
+import { useQuery } from 'react-query'
+import { apiGetLO, apiGetInstanceTrackingData } from '../util/api'
+import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
+
+const getSubmitQuestionLogsForAssessment = logs => {
+	let foundAssessmentSubmitQuestionLogs = false
+	let responsesByQuestionID = {}
+	let foundLogs = []
+
+	logs.forEach(log => {
+		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
+			foundAssessmentSubmitQuestionLogs = true
+		} else if (
+			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
+			log.itemType === 'EndAttempt'
+		) {
+			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
+			foundAssessmentSubmitQuestionLogs = false
+			responsesByQuestionID = {}
+		}
+
+		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'SubmitQuestion') {
+			responsesByQuestionID[log.valueA] = log
+		}
+	})
+
+	return foundLogs
+}
+
+export function ModalScoresByQuestionWithAPI({onClose, instID, loID}){
+	const { isError, data, isFetching } = useQuery(['getInstanceTrackingData', instID], apiGetInstanceTrackingData, {
+		initialStale: true,
+		staleTime: Infinity,
+	})
+console.log({data})
+	// process tracking data
+	const submitQuestionLogsByUserID = React.useMemo(() => {
+		if(isFetching || isError || !data) return {}
+		const result = {}
+		data.visitLog.forEach(visit => {
+			const {userID, logs} = visit
+			// first encounter, create object
+			if (!result[userID]) {
+				result[userID] = {
+					userName: `User #${userID}`,
+					logs: []
+				}
+			}
+
+			const submitLogs = getSubmitQuestionLogsForAssessment(logs)
+			result[userID].logs = result[userID].logs.concat(submitLogs)
+		})
+		return result
+	}, [data])
+
+	// load user data
+	const usersToLoad = React.useMemo(() => Object.keys(submitQuestionLogsByUserID), [submitQuestionLogsByUserID])
+	const { users, isError: isUserError, isFetching: isUserFetching } = useApiGetUsersCached(usersToLoad)
+
+	// populate userNames in the logs
+	React.useEffect(() => {
+		if(isUserFetching || isUserError) return
+		usersToLoad.forEach(userID => {
+			submitQuestionLogsByUserID[userID].userName = users[userID].userString
+		})
+	}, [users, submitQuestionLogsByUserID])
+
+	// load lo
+	const { isError: isLOError, data: loData, isFetching: isLOFetching } = useQuery(['getLO', loID], apiGetLO, {
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null,
+		enabled: submitQuestionLogsByUserID
+	})
+
+
+	const ready = !isFetching && !isLOFetching && loData && data
+
+	if(!ready) return <div>Loading</div>
+	if(isError) return <div>Error Loading Data</div>
+	return (
+		<ModalScoresByQuestion
+			submitQuestionLogsByUser={submitQuestionLogsByUserID}
+			aGroup={loData?.aGroup || {}}
+			onClose={onClose}
+		/>
+	)
+}
 
 const getScoreDataByQuestionID = submitQuestionLogsByUser => {
 	const logDataByQuestionID = {}

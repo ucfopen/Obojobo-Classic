@@ -1,17 +1,14 @@
 import './repository-page.scss'
 
 import React from 'react'
-import { useMutation, useQuery, useQueryCache } from 'react-query'
+import { useQuery, useQueryCache } from 'react-query'
 import {
 	// not using react-query yet
 	apiLogout,
-	apiEditExtraAttempts,
 	// api below are all using react-query
 	apiGetInstances,
-	apiGetScoresForInstance,
 	apiGetInstancePerms,
 	apiGetCurrentUser,
-	apiEditInstance,
 	apiVerifySession
 } from '../util/api'
 import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
@@ -20,26 +17,8 @@ import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
 import RepositoryModals from './repository-modals'
+import ModalAboutObojoboNext from './modal-about-obojobo-next'
 
-const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
-	switch (scoreMethod) {
-		case 'h': // highest
-			return Math.max.apply(null, scores)
-
-		case 'r': // most recent
-			return scores[scores.length - 1]
-
-		case 'm': // average
-			const sum = scores.reduce((acc, score) => acc + score, 0)
-			return parseFloat(sum) / scores.length
-	}
-
-	return 0
-}
-
-const getUserString = n => {
-	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
-}
 
 const RepositoryPage = () => {
 	const [sessionInterval, setSessionInterval] = React.useState(10000)
@@ -49,6 +28,7 @@ const RepositoryPage = () => {
 		selectedInstance
 	]) // caches testing if selectedInstance is null or not
 	const [modal, setModal] = React.useState(null)
+	const closeModal = React.useCallback(() => setModal(null), [])
 	const queryCache = useQueryCache()
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
@@ -80,12 +60,25 @@ const RepositoryPage = () => {
 
 
 	// load instances
-	const { isError, data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
+	const { data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
+		cacheTime: Infinity,
 		initialStale: true,
 		staleTime: Infinity,
 		initialData: null,
 		enabled: currentUser // load after user loads
 	})
+
+	// this is needed to detect when data is reloaded and selectedInstance is
+	// referencing an object from the old results.  This forces the update
+	// to the new selected instance data
+	React.useEffect(() => {
+		if(!data || !selectedInstance) return
+		if(data.indexOf(selectedInstance) == -1){
+			console.log('updated')
+			const newInstance = data.find(i => i.instID === selectedInstance.instID)
+			setSelectedInstance(newInstance)
+		}
+	}, [data, selectedInstance])
 
 	//	load perms to selected instance
 	const {
@@ -120,189 +113,20 @@ const RepositoryPage = () => {
 		return peeps
 	}, [managerUserIDs, users])
 
-	const { data: qScores, isFetching: qScoresIsFetching, error: qScoresError } = useQuery(
-		['getScoresForInstance', instID],
-		apiGetScoresForInstance,
-		{
-			initialStale: true,
-			staleTime: Infinity,
-			initialData: [],
-			enabled: instID // load only after selectedInstance loads
-		}
-	)
-
-	// process scores for instance
-	const scoresForInstance = React.useMemo(() => {
-		if (!instID || qScoresIsFetching) return null
-		return qScores.map(u => {
-			const lastAttempt = u.attempts[u.attempts.length - 1]
-			const scores = u.attempts.map(a => a.score)
-			const finished = u.attempts.filter(a => Boolean(a.submitDate))
-			const lastSubmitted = finished[finished.length - 1]?.submitDate
-			const score = getFinalScoreFromAttemptScores(scores, selectedInstance.scoreMethod)
-
-			return {
-				user: getUserString(u.user),
-				userID: u.userID,
-				score,
-				isScoreImported: lastAttempt.linkedAttempt !== 0,
-				lastSubmitted,
-				numAttemptsTaken: u.attempts.length,
-				additional: u.additional,
-				attemptCount: selectedInstance.attemptCount,
-				isAttemptInProgress: !lastAttempt.submitted
-			}
-		})
-	}, [qScores, qScoresIsFetching])
-
-	const [mutateInstance] = useMutation(apiEditInstance)
-	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
-
-	// all the my instance props use
-	const instanceSectionCallbacks = React.useMemo(
-		() => ({
-			onClickEditInstanceDetails: () => {
-				const onSave = async values => {
-					try {
-						await mutateInstance(values, { throwOnError: true })
-
-						// update 'data' in place
-						// we have to do this because calling reloadInstances
-						// doesnt update selectedInstance
-						// which in turn doesnt update the instance details
-						// till the user clicks on the current item in the instance datagrid
-						const keys = Object.keys(values)
-
-						const index = data.findIndex(d => d.instID == values.instID)
-						const selected = data[index]
-						keys.forEach(k => {
-							selected[k] = values[k]
-						})
-						data[index] = { ...selected }
-
-						// trying to populate cache with updated data, but no dice
-						// queryCache.setQueryData(['getInstances'], [...data])
-						// only way I can get the dang instance list to update
-						reloadInstances()
-
-						setModal(null)
-					} catch (error) {
-						console.error('Error changing Instance Details')
-						console.error(error)
-					}
-				}
-
-				const {
-					instID,
-					name,
-					courseID,
-					startTime,
-					endTime,
-					attemptCount,
-					externalLink,
-					scoreMethod,
-					allowScoreImport
-				} = selectedInstance
-
-				setModal({
-					type: 'instanceDetails',
-					props: {
-						onSave,
-						instID,
-						name,
-						courseID,
-						startTime,
-						endTime,
-						attemptCount,
-						scoreMethod,
-						isExternallyLinked: externalLink,
-						isImportAllowed: allowScoreImport
-					}
-				})
-			},
-
-			onClickAboutThisLO: () => {
-				setModal({
-					type: 'aboutThisLO',
-					props: { loID: selectedInstance.loID }
-				})
-			},
-
-			onClickPreview: url => {
-				window.open(url, '_blank')
-			},
-
-			onClickManageAccess: () => {
-				setModal({
-					type: 'peopleSearch',
-					props: {
-						currentUserId: 10,
-						clearPeopleSearchResults: () => {},
-						onSelectPerson: () => {},
-						onClose: () => {},
-						onSearchChange: () => {},
-						people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
-					}
-				})
-			},
-
-			onClickDownloadScores: url => {
-				window.open(url)
-			},
-
-			onClickViewScoresByQuestion: async () => {
-				setModal({
-					type: 'scoresByQuestion',
-					props: {
-						loID: selectedInstance.loID,
-						instID: selectedInstance.instID
-					}
-				})
-			},
-
-			onClickRefreshScores: () => {
-				queryCache.invalidateQueries(['getScoresForInstance', instID])
-			},
-
-			onClickSetAdditionalAttempt: async (userID, attempts) => {
-				try {
-					await mutateExtraAttempts({ userID, instID, newCount: attempts }, { throwOnError: true })
-					queryCache.invalidateQueries(['getScoresForInstance', instID])
-				} catch (e) {
-					console.error('Error setting extra attempts')
-					console.error(e)
-				}
-			},
-
-			onClickScoreDetails: (userName, userID) => {
-				setModal({
-					type: 'scoreDetails',
-					props: {
-						userName,
-						userID,
-						instID: selectedInstance.instID,
-						loID: selectedInstance.loID
-					}
-				})
-			}
-		}),
-		[selectedInstance]
-	)
-
-	const onClickHeaderBanner = () => {
+	const onClickHeaderBanner = React.useCallback(() => {
 		setModal({
-			type: 'aboutObojoboNext',
+			component: ModalAboutObojoboNext,
+			className: 'aboutObojoboNext',
 			props: {}
 		})
-	}
+	}, [])
 
 	const onClickLogOut = React.useCallback(async () => {
 		await apiLogout()
 		window.location.reload(false)
 	}, [])
 
-
-	const theError = qSessionError || qUserError || error || qPermsError || qScoresError || null
+	const theError = qSessionError || qUserError || error || qPermsError || null
 	if(!displayError && theError){
 		setDisplayError(theError)
 	}
@@ -331,20 +155,19 @@ const RepositoryPage = () => {
 						onClickRefresh={reloadInstances}
 					/>
 					<InstanceSection
-						{...instanceSectionCallbacks}
 						instance={selectedInstance}
-						scores={scoresForInstance}
 						usersWithAccess={instanceManagers}
 						user={currentUser}
+						setModal={setModal}
 					/>
 				</div>
 			</main>
 			{modal ? (
 				<RepositoryModals
-					instanceName={selectedInstance ? selectedInstance.name : ''}
-					modalType={modal.type}
-					modalProps={modal.props}
-					onCloseModal={() => setModal(null)}
+					modal={modal}
+					className={modal.className}
+					instanceName={selectedInstance?.name || ''}
+					onCloseModal={closeModal}
 				/>
 			) : null}
 		</div>

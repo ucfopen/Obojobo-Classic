@@ -10,6 +10,33 @@ import HelpButton from './help-button'
 import InstructionsFlag from './instructions-flag'
 import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
+import { ModalAboutLOWithAPI } from './modal-about-lo'
+import ModalInstanceDetails from './modal-instance-details'
+import { apiGetScoresForInstance, apiEditInstance, apiEditExtraAttempts } from '../util/api'
+import { useQuery, useMutation, useQueryCache } from 'react-query'
+import PeopleSearchDialog from './people-search-dialog'
+import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
+import { ModalScoreDetailsWithAPI } from './modal-score-details'
+
+const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
+	switch (scoreMethod) {
+		case 'h': // highest
+			return Math.max.apply(null, scores)
+
+		case 'r': // most recent
+			return scores[scores.length - 1]
+
+		case 'm': // average
+			const sum = scores.reduce((acc, score) => acc + score, 0)
+			return parseFloat(sum) / scores.length
+	}
+
+	return 0
+}
+
+const getUserString = n => {
+	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
+}
 
 const getScoringMethodText = scoreMethod => {
 	switch (scoreMethod) {
@@ -42,26 +69,48 @@ const noOp = () => {}
 
 export default function InstanceSection({
 	instance,
-	scores,
 	usersWithAccess,
 	user,
-	onClickAboutThisLO,
-	onClickPreview,
-	onClickEditInstanceDetails,
-	onClickManageAccess,
-	onClickDownloadScores,
-	onClickViewScoresByQuestion,
-	onClickRefreshScores,
-	onClickSetAdditionalAttempt,
-	onClickScoreDetails
+	setModal
 }) {
-	if (!instance) {
-		return (
-			<div className="repository--instance-section is-empty">
-				<InstructionsFlag text="Select an instance from the left" />
-			</div>
-		)
-	}
+	const queryCache = useQueryCache()
+	const [mutateInstance] = useMutation(apiEditInstance)
+	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
+
+	const { data, isFetching, error } = useQuery(
+		['getScoresForInstance', instance?.instID],
+		apiGetScoresForInstance,
+		{
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: [],
+			enabled: instance // load only after instance loads
+		}
+	)
+
+	// process scores for instance
+	const scores = React.useMemo(() => {
+		if (!instance?.instID || isFetching) return null
+		return data.map(u => {
+			const lastAttempt = u.attempts[u.attempts.length - 1]
+			const scores = u.attempts.map(a => a.score)
+			const finished = u.attempts.filter(a => Boolean(a.submitDate))
+			const lastSubmitted = finished[finished.length - 1]?.submitDate
+			const score = getFinalScoreFromAttemptScores(scores, instance.scoreMethod)
+
+			return {
+				user: getUserString(u.user),
+				userID: u.userID,
+				score,
+				isScoreImported: lastAttempt.linkedAttempt !== 0,
+				lastSubmitted,
+				numAttemptsTaken: u.attempts.length,
+				additional: u.additional,
+				attemptCount: instance.attemptCount,
+				isAttemptInProgress: !lastAttempt.submitted
+			}
+		})
+	}, [data, isFetching, instance])
 
 	const onClickDownloadScoresWithUrl = React.useCallback(() => {
 		if (!instance) return noOp
@@ -70,16 +119,121 @@ export default function InstanceSection({
 		const courseName = encodeURI(courseID.replace(/ /g, '_'))
 		const date = dayjs().format('MM-DD-YY')
 		const url = `/assets/csv.php?function=scores&instID=${instID}&filename=${instName}_-_${courseName}_-_${date}&method=${scoreMethod}`
-		onClickDownloadScores(url)
+		window.open(url)
 	}, [instance])
+
+	const onClickRefreshScores = React.useCallback( () => {
+		queryCache.refetchQueries(['getScoresForInstance', instance.instID], { exact: true })
+	}, [instance])
+
+	const onClickSetAdditionalAttempt = React.useCallback(async (userID, attempts) => {
+		try {
+			await mutateExtraAttempts({ userID, instID: instance.instID, newCount: attempts }, { throwOnError: true })
+			onClickRefreshScores()
+		} catch (e) {
+			console.error('Error setting extra attempts')
+			console.error(e)
+		}
+	}, [instance, mutateExtraAttempts, onClickRefreshScores])
 
 	const onClickPreviewWithUrl = React.useCallback(() => {
-		if (!instance) return noOp
-		onClickPreview(`/preview/${instance.loID}`)
+		window.open(`/preview/${instance.loID}`, '_blank')
 	}, [instance])
 
-	const startTime = dayjs(instance.startTime * 1000)
-	const endTime = dayjs(instance.endTime * 1000)
+	const startTime = React.useMemo(() => dayjs(instance?.startTime * 1000), [instance?.startTime])
+	const endTime = React.useMemo(() => dayjs(instance?.endTime * 1000), [instance?.endTime])
+
+	const onClickAboutThisLO = React.useCallback(() => {
+		setModal({
+			component: ModalAboutLOWithAPI,
+			className: 'aboutThisLO',
+			props: {
+				loID: instance.loID
+			}
+		})
+	}, [instance])
+
+	const onClickScoreDetails = React.useCallback((userName, userID) => {
+		setModal({
+			component: ModalScoreDetailsWithAPI,
+			className: 'scoreDetails',
+			props: {
+				userName,
+				userID,
+				instID: instance.instID,
+				loID: instance.loID
+			}
+		})
+	}, [instance])
+
+	const onClickEditInstanceDetails = React.useCallback(() => {
+
+		const onSave = async values => {
+			try {
+				await mutateInstance(values, { throwOnError: true })
+				// update 'data' in place
+				const keys = Object.keys(values)
+				keys.forEach(k => {
+					instance[k] = values[k]
+				})
+
+				// trying to populate cache with updated data, but no dice
+				const data = queryCache.getQueryData(['getInstances'])
+				const index = data.indexOf(instance)
+				data[index] = {...instance}
+				queryCache.setQueryData(['getInstances'], [...data])
+				queryCache.refetchQueries(['getInstances'], { exact: true })
+				// only way I can get the dang instance list to update
+
+				setModal(null)
+			} catch (error) {
+				console.error('Error changing Instance Details')
+				console.error(error)
+			}
+		}
+
+		setModal({
+			component: ModalInstanceDetails,
+			className: 'instanceDetails',
+			props: {...instance, onSave }
+		})
+	}, [instance, mutateInstance, setModal])
+
+	const onClickManageAccess = React.useCallback(() => {
+		setModal({
+			component: PeopleSearchDialog,
+			className: 'peopleSearch',
+			props: {
+				currentUserId: user.userID,
+				clearPeopleSearchResults: () => {},
+				onSelectPerson: () => {},
+				onClose: () => {},
+				onSearchChange: () => {},
+				people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
+			}
+		})
+	}, [user, usersWithAccess])
+
+
+
+	const onClickViewScoresByQuestion = React.useCallback(() => {
+		setModal({
+			component: ModalScoresByQuestionWithAPI,
+			className: 'scoresByQuestion',
+			props: {
+				loID: instance.loID,
+				instID: instance.instID
+			}
+		})
+	}, [instance])
+
+	if (!instance) {
+		return (
+			<div className="repository--instance-section is-empty">
+				<InstructionsFlag text="Select an instance from the left" />
+			</div>
+		)
+	}
 
 	return (
 		<div className="repository--instance-section is-not-empty">
@@ -166,12 +320,8 @@ export default function InstanceSection({
 				onClickScoreDetails={onClickScoreDetails}
 			/>
 
-			<hr />
+			<Button onClick={onClickViewScoresByQuestion} type="small" text="Compare Scores by question..." />
 
-			<div className="scores-by-question">
-				<h4>Scores by question</h4>
-				<Button onClick={onClickViewScoresByQuestion} type="small" text="View..." />
-			</div>
 		</div>
 	)
 }
@@ -179,14 +329,6 @@ export default function InstanceSection({
 InstanceSection.propTypes = {
 	instance: PropTypes.object,
 	scores: PropTypes.array,
-	onClickDownloadScores: PropTypes.func.isRequired,
-	onClickEditInstanceDetails: PropTypes.func.isRequired,
-	onClickManageAccess: PropTypes.func.isRequired,
-	onClickViewScoresByQuestion: PropTypes.func.isRequired,
-	onClickAboutThisLO: PropTypes.func.isRequired,
-	onClickPreview: PropTypes.func.isRequired,
-	onClickRefreshScores: PropTypes.func.isRequired,
 	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
-	onClickScoreDetails: PropTypes.func.isRequired
+	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
 }
