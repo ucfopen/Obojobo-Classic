@@ -224,6 +224,7 @@ export default function InstanceSection({
 				? <PeopleSearchDialog
 					instanceName={instance.name}
 					onClose={hideAccess}
+					instID={instance.instID}
 					currentUserId={currentUser.userID}
 					clearPeopleSearchResults={() => {}}
 					onSelectPerson={() => {}}

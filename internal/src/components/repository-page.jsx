@@ -13,7 +13,7 @@ import Header from './header'
 
 const RepositoryPage = () => {
 	useQueryCache()
-	const [sessionInterval, setSessionInterval] = React.useState(10000)
+	const [sessionInterval, setSessionInterval] = React.useState(15000)
 	const [displayError, setDisplayError] = React.useState(false)
 	const [instance, setInstance] = React.useState(null)
 

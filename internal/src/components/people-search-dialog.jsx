@@ -18,6 +18,7 @@ let updateSearchStringIntervalID
 const DEBOUNCE_INTERVAL_MS = 250
 
 export default function PeopleSearchDialog({instID, usersWithAccess, currentUserId, clearPeopleSearchResults, onSelectPerson, onClose, instanceName, onSearchChange}){
+	const queryCache = useQueryCache()
 	const [searchString, setSearchString] = React.useState('')
 	const [apiSearchString, setAPISearchString] = React.useState('')
 	const [isAdding, setIsAdding] = React.useState(false)
