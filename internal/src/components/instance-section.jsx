@@ -226,9 +226,6 @@ export default function InstanceSection({
 					onClose={hideAccess}
 					instID={instance.instID}
 					currentUserId={currentUser.userID}
-					clearPeopleSearchResults={() => {}}
-					onSelectPerson={() => {}}
-					onSearchChange={() => {}}
 					usersWithAccess={usersWithAccess}
 				/>
 				:null

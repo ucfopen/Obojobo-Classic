@@ -73,8 +73,8 @@ export const apiGetLO = (r, loID) =>
 		return lo
 	})
 
-export const apiGetUsersMatchingUsername = (r, search) =>
-	fetchGet(`/api/json.php/loRepository.getUsersMatchingUsername/${encodeURIComponent(search)}`)
+export const getUsersMatchingSearch = (r, search) =>
+	fetchGet(`/api/json.php/loRepository.getUsersMatchingSearch/${encodeURIComponent(search)}`)
 
 export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {

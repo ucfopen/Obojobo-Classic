@@ -232,12 +232,15 @@ class API extends \rocketD\db\DBEnabled
 		}
 	}
 
-	public function getUsersMatchingUsername($searchString)
+	public function getUsersMatchingSearch($searchString)
 	{
+		$searchString = rawurldecode($searchString);
 		if($this->getSessionValid())
 		{
+			$roleMan = \obo\perms\RoleManager::getInstance();
+			if(!$roleMan->isLibraryUser()) return \rocketD\util\Error::getError(1);
 			$UM = \rocketD\auth\AuthManager::getInstance();
-			$result = $UM->getUsersMatchingUsername($searchString);
+			$result = $UM->getUsersMatchingSearch($searchString);
 		}
 		else
 		{

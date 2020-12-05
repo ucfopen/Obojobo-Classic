@@ -7,7 +7,7 @@ import SearchField from './search-field'
 import Button from './button'
 import PeopleListItem  from './people-list-item'
 import {
-	apiGetUsersMatchingUsername,
+	getUsersMatchingSearch,
 	apiAddUsersToInstance,
 	apiRemoveUsersFromInstance
 } from '../util/api'
@@ -17,20 +17,15 @@ import LoadingIndicator from './loading-indicator'
 let updateSearchStringIntervalID
 const DEBOUNCE_INTERVAL_MS = 250
 
-export default function PeopleSearchDialog({instID, usersWithAccess, currentUserId, clearPeopleSearchResults, onSelectPerson, onClose, instanceName, onSearchChange}){
+export default function PeopleSearchDialog({instID, usersWithAccess, currentUserId, onClose, instanceName}){
 	const queryCache = useQueryCache()
 	const [searchString, setSearchString] = React.useState('')
 	const [apiSearchString, setAPISearchString] = React.useState('')
 	const [isAdding, setIsAdding] = React.useState(false)
 
-	// clear results on initial render
-	React.useEffect(() => {
-		clearPeopleSearchResults()
-	}, [])
-
 	const { isError, data, error, isFetching } = useQuery(
-		['getUsersMatchingUsername', apiSearchString],
-		apiGetUsersMatchingUsername,
+		['getUsersMatchingSearch', apiSearchString],
+		getUsersMatchingSearch,
 		{
 			initialStale: true,
 			staleTime: Infinity,
@@ -39,18 +34,6 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 		}
 	)
 
-	//people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
-	// {
-	// 	userID: '1',
-	// 	login: 'obojobo_admin',
-	// 	first: 'Obojobo',
-	// 	last: 'Admin',
-	// 	mi: '',
-	// 	email: 'mail@example.com',
-	// 	createTime: '1134416800',
-	// 	lastLogin: '1607033316',
-	// 	_explicitType: 'rocketD\\auth\\User'
-	// }
 	const [mutateAddUsersToInstance] = useMutation(apiAddUsersToInstance)
 	const [mutateRemoveUsersFromInstance] = useMutation(apiRemoveUsersFromInstance)
 
@@ -67,7 +50,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 			console.error('Error setting extra attempts')
 			console.error(e)
 		}
-	})
+	}, [])
 
 	const onClickRevoke = React.useCallback(async user => {
 		if (user.id === currentUserId) {
@@ -91,15 +74,20 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 			console.error('Error setting extra attempts')
 			console.error(e)
 		}
-	})
+	}, [])
 
-	const people = (data || []).map(user => ({
-		id: user.userID,
-		avatarUrl: '/assets/images/user-circle.svg',
-		firstName: user.first,
-		lastName: user.last,
-		username: 'User #' + user.userID
-	}))
+	const people = React.useMemo(() => {
+		if(!data) return []
+		return data.map(user => ({
+			id: user.userID,
+			avatarUrl: '/assets/images/user-circle.svg',
+			firstName: user.first,
+			lastName: user.last,
+			username: 'User #' + user.userID
+		}))
+	}, [data])
+
+
 
 	const usersWithAccess2 = usersWithAccess.map(user => ({
 		id: user.userID,
@@ -199,10 +187,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 
 PeopleSearchDialog.propTypes = {
 	currentUserId: PropTypes.number,
-	clearPeopleSearchResults: PropTypes.func,
-	onSelectPerson: PropTypes.func,
 	onClose: PropTypes.func,
-	onSearchChange: PropTypes.func,
 	people: PropTypes.arrayOf(
 		PropTypes.shape({
 			id: PropTypes.number.isRequired,
