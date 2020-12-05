@@ -5,28 +5,19 @@ import PropTypes from 'prop-types'
 import { useMutation, useQuery, useQueryCache } from 'react-query'
 import SearchField from './search-field'
 import Button from './button'
-import PeopleListItem from './people-list-item'
+import PeopleListItem  from './people-list-item'
 import {
 	apiGetUsersMatchingUsername,
 	apiAddUsersToInstance,
 	apiRemoveUsersFromInstance
 } from '../util/api'
+import RepositoryModal from './repository-modal'
 import LoadingIndicator from './loading-indicator'
 
 let updateSearchStringIntervalID
 const DEBOUNCE_INTERVAL_MS = 250
 
-export default function PeopleSearchDialog({
-	instID,
-	usersWithAccess,
-	currentUserId,
-	clearPeopleSearchResults,
-	onSelectPerson,
-	onClose,
-	onSearchChange
-}) {
-	const queryCache = useQueryCache()
-
+export default function PeopleSearchDialog({instID, usersWithAccess, currentUserId, clearPeopleSearchResults, onSelectPerson, onClose, instanceName, onSearchChange}){
 	const [searchString, setSearchString] = React.useState('')
 	const [apiSearchString, setAPISearchString] = React.useState('')
 	const [isAdding, setIsAdding] = React.useState(false)
@@ -120,82 +111,88 @@ export default function PeopleSearchDialog({
 	const userIDsWithAccess = usersWithAccess.map(user => user.userID).concat(currentUserId)
 
 	return (
-		<div className="people-search-dialog">
-			<div className="wrapper">
-				<h1 className="title">Users with access</h1>
-				<div className="sub-title">People who can manage this instance</div>
-			</div>
-
-			<div className="access-list-wrapper">
-				<ul className="access-list">
-					{usersWithAccess2.map(p => (
-						<PeopleListItem key={p.id} isMe={p.id === currentUserId} {...p}>
-							<Button type="text" text="Revoke access" onClick={() => onClickRevoke(p)} />
-						</PeopleListItem>
-					))}
-				</ul>
-			</div>
-
-			{isAdding ? (
-				<div>
-					<hr />
-					<div className="wrapper">
-						<h1 className="title">Find Users to Add:</h1>
-						<div className="sub-title">
-							Anyone you add will share the same access you do for this instance
-						</div>
-						<SearchField
-							onChange={searchString => {
-								setSearchString(searchString)
-
-								if (searchString.length < 3) {
-									setAPISearchString(searchString)
-								} else {
-									clearTimeout(updateSearchStringIntervalID)
-									updateSearchStringIntervalID = setTimeout(() => {
-										setAPISearchString(searchString)
-									}, DEBOUNCE_INTERVAL_MS)
-								}
-							}}
-							focusOnMount={true}
-							placeholder="Search for a name..."
-							value={searchString}
-						/>
-					</div>
-					<div className="access-list-wrapper">
-						<ul className="access-list">
-							{people.map(p => {
-								const isUserAlreadyAManager = userIDsWithAccess.indexOf(p.id) > -1
-
-								return (
-									<div className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}>
-										<PeopleListItem key={p.id} isMe={p.id === currentUserId} {...p}>
-											{isUserAlreadyAManager ? (
-												<span className="already-has-access">
-													{p.id === currentUserId
-														? '(You already have access)'
-														: '(Already has access)'}
-												</span>
-											) : (
-												<Button type="text" text="+ Grant access" onClick={() => onClickAdd(p)} />
-											)}
-										</PeopleListItem>
-									</div>
-								)
-							})}
-						</ul>
-						<LoadingIndicator
-							isLoading={
-								(searchString.length >= 3 && searchString !== apiSearchString && !data) ||
-								isFetching
-							}
-						/>
-					</div>
+		<RepositoryModal
+			className="peopleSearch"
+			instanceName={instanceName}
+			onCloseModal={onClose}
+			>
+			<div className="people-search-dialog">
+				<div className="wrapper">
+					<h1 className="title">Users with access</h1>
+					<div className="sub-title">People who can manage this instance</div>
 				</div>
-			) : (
-				<Button type="text" text="+ Add users..." onClick={() => setIsAdding(true)} />
-			)}
-		</div>
+
+				<div className="access-list-wrapper">
+					<ul className="access-list">
+						{usersWithAccess2.map(p => (
+							<PeopleListItem key={p.id} isMe={p.id === currentUserId} {...p}>
+								<Button type="text" text="Revoke access" onClick={() => onClickRevoke(p)} />
+							</PeopleListItem>
+						))}
+					</ul>
+				</div>
+
+				{isAdding ? (
+					<div>
+						<hr />
+						<div className="wrapper">
+							<h1 className="title">Find Users to Add:</h1>
+							<div className="sub-title">
+								Anyone you add will share the same access you do for this instance
+							</div>
+							<SearchField
+								onChange={searchString => {
+									setSearchString(searchString)
+
+									if (searchString.length < 3) {
+										setAPISearchString(searchString)
+									} else {
+										clearTimeout(updateSearchStringIntervalID)
+										updateSearchStringIntervalID = setTimeout(() => {
+											setAPISearchString(searchString)
+										}, DEBOUNCE_INTERVAL_MS)
+									}
+								}}
+								focusOnMount={true}
+								placeholder="Search for a name..."
+								value={searchString}
+							/>
+						</div>
+						<div className="access-list-wrapper">
+							<ul className="access-list">
+								{people.map(p => {
+									const isUserAlreadyAManager = userIDsWithAccess.indexOf(p.id) > -1
+
+									return (
+										<div className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}>
+											<PeopleListItem key={p.id} isMe={p.id === currentUserId} {...p}>
+												{isUserAlreadyAManager ? (
+													<span className="already-has-access">
+														{p.id === currentUserId
+															? '(You already have access)'
+															: '(Already has access)'}
+													</span>
+												) : (
+													<Button type="text" text="+ Grant access" onClick={() => onClickAdd(p)} />
+												)}
+											</PeopleListItem>
+										</div>
+									)
+								})}
+							</ul>
+							<LoadingIndicator
+								isLoading={
+									(searchString.length >= 3 && searchString !== apiSearchString && !data) ||
+									isFetching
+								}
+							/>
+						</div>
+					</div>
+				) : (
+					<Button type="text" text="+ Add users..." onClick={() => setIsAdding(true)} />
+				)}
+			</div>
+		</RepositoryModal>
 	)
 }
 

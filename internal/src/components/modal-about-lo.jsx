@@ -1,3 +1,5 @@
+import './modal-about-lo.scss'
+
 import React from 'react'
 import Button from './button'
 import DefList from './def-list'
@@ -6,7 +8,8 @@ import FlashHTML from './flash-html'
 import SectionHeader from './section-header'
 import { useQuery } from 'react-query'
 import { apiGetLOMeta } from '../util/api'
-import './modal-about-lo.scss'
+import RepositoryModal from './repository-modal'
+
 
 export function ModalAboutLOWithAPI({onClose, loID}){
 	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
@@ -45,15 +48,22 @@ export default function ModalAboutLO(props) {
 	]
 
 	return (
-		<div className="modal-about-learning-object">
-			<SectionHeader label={'About this learning object'} />
-			<DefList className="def-list" items={items} />
-			<SectionHeader label={'Learning Objective'} />
-			<div className="flash-html-container">
-				<FlashHTML value={props.objective} />
+		<RepositoryModal
+			className="aboutThisLO"
+			instanceName={props.instanceName}
+			onCloseModal={props.onClose}
+
+		>
+			<div className="modal-about-learning-object">
+				<SectionHeader label={'About this learning object'} />
+				<DefList className="def-list" items={items} />
+				<SectionHeader label={'Learning Objective'} />
+				<div className="flash-html-container">
+					<FlashHTML value={props.objective} />
+				</div>
+				<Button text="Close" type="text" onClick={props.onClose} />
 			</div>
-			<Button text="Close" type="text" onClick={props.onClose} />
-		</div>
+		</RepositoryModal>
 	)
 }
 

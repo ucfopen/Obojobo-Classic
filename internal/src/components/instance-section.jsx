@@ -12,10 +12,11 @@ import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
 import { ModalAboutLOWithAPI } from './modal-about-lo'
 import ModalInstanceDetails from './modal-instance-details'
-import { apiEditInstance } from '../util/api'
-import { useMutation, useQueryCache } from 'react-query'
+import { apiEditInstance, apiGetInstancePerms } from '../util/api'
+import { useQuery, useMutation, useQueryCache } from 'react-query'
 import PeopleSearchDialog from './people-search-dialog'
-import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
+import useToggleState from '../hooks/use-toggle-state'
+import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
 
 const getScoringMethodText = scoreMethod => {
 	switch (scoreMethod) {
@@ -44,16 +45,54 @@ const getDurationText = (startTime, endTime) => {
 	return 'This instance closes in ' + humanizeDuration(endTime - now, { largest: 2 })
 }
 
+// hook to load instance managers for a particular instance
+const useInstanceManagers = instID => {
+	//	load perms to selected instance
+	const {
+		isError: qPermsIsError,
+		data: qPermsData,
+		error: qPermsError,
+		isFetching: qPermsIsFetching
+	} = useQuery(['getInstancePerms', instID], apiGetInstancePerms, {
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null,
+		enabled: instID // load only after selectedInstance loads
+	})
+
+	// extract list of user ids that can edit this instance
+	const managerUserIDs = React.useMemo(() => {
+		if (!qPermsData) return []
+		// { <userID>: [<perm>, <perm>], ... } becomes [<userID>, <userID>]
+		const userIds = Object.keys(qPermsData)
+		// filter out any users that don't have '20' in perms
+		return userIds.filter(id => qPermsData[id].includes('20'))
+	}, [qPermsData])
+
+	// get any users we don't already have
+	const { users } = useApiGetUsersCached(managerUserIDs)
+
+	const instanceManagers = React.useMemo(() => {
+		const peeps = []
+		managerUserIDs.forEach(id => {
+			if (users[id]) peeps.push(users[id])
+		})
+		return peeps
+	}, [managerUserIDs, users])
+
+	return instanceManagers
+}
+
 export default function InstanceSection({
 	instance,
-	usersWithAccess,
-	user,
-	setModal
+	currentUser
 }) {
 	const queryCache = useQueryCache()
+	const [aboutVisible, hideAbout, showAbout] = useToggleState()
+	const [accessVisible, hideAccess, showAccess] = useToggleState()
+	const [editVisible, hideEdit, showEdit] = useToggleState()
+
 	const [mutateInstance] = useMutation(apiEditInstance)
-
-
 	const onClickPreviewWithUrl = React.useCallback(() => {
 		window.open(`/preview/${instance.loID}`, '_blank')
 	}, [instance])
@@ -61,76 +100,52 @@ export default function InstanceSection({
 	const startTime = React.useMemo(() => dayjs(instance?.startTime * 1000), [instance?.startTime])
 	const endTime = React.useMemo(() => dayjs(instance?.endTime * 1000), [instance?.endTime])
 
-	const onClickAboutThisLO = React.useCallback(() => {
-		setModal({
-			component: ModalAboutLOWithAPI,
-			className: 'aboutThisLO',
-			props: {
-				loID: instance.loID
-			}
-		})
-	}, [instance])
+	const usersWithAccess = useInstanceManagers(instance?.instID)
 
+	const updateInstance = React.useCallback(async values => {
+		try {
+			await mutateInstance(values, { throwOnError: true })
+			// update 'data' in place
+			const keys = Object.keys(values)
+			keys.forEach(k => {instance[k] = values[k]})
 
-
-	const onClickEditInstanceDetails = React.useCallback(() => {
-
-		const onSave = async values => {
-			try {
-				await mutateInstance(values, { throwOnError: true })
-				// update 'data' in place
-				const keys = Object.keys(values)
-				keys.forEach(k => {
-					instance[k] = values[k]
-				})
-
-				// trying to populate cache with updated data, but no dice
-				const data = queryCache.getQueryData(['getInstances'])
-				const index = data.indexOf(instance)
-				data[index] = {...instance}
-				queryCache.setQueryData(['getInstances'], [...data])
-				queryCache.refetchQueries(['getInstances'], { exact: true })
-				setModal(null)
-			} catch (error) {
-				console.error('Error changing Instance Details')
-				console.error(error)
-			}
+			// trying to populate cache with updated data, but no dice
+			const data = queryCache.getQueryData(['getInstances'])
+			const index = data.indexOf(instance)
+			data[index] = {...instance}
+			queryCache.setQueryData(['getInstances'], [...data])
+			queryCache.refetchQueries(['getInstances'], { exact: true })
+			hideEdit()
+		} catch (error) {
+			console.error('Error changing Instance Details')
+			console.error(error)
 		}
+	}, [instance, hideEdit])
 
-		setModal({
-			component: ModalInstanceDetails,
-			className: 'instanceDetails',
-			props: {...instance, onSave }
-		})
-	}, [instance, mutateInstance, setModal])
 
-	const onClickManageAccess = React.useCallback(() => {
-		setModal({
-			component: PeopleSearchDialog,
-			className: 'peopleSearch',
-			props: {
-				currentUserId: user.userID,
-				clearPeopleSearchResults: () => {},
-				onSelectPerson: () => {},
-				onClose: () => {},
-				onSearchChange: () => {},
-				usersWithAccess: usersWithAccess,
-				people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
+	const detailItems = React.useMemo(() => {
+		if(!instance) return []
+		return [
+			{
+				label: 'Open Date',
+				value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A') + ' EST'
+			},
+			{
+				label: 'Close Date',
+				value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A') + ' EST'
+			},
+			{
+				value: instance.externalLink
+					? '(This instance is being used in an external system)'
+					: getDurationText(startTime, endTime)
+			},
+			{ label: 'Attempts Allowed', value: instance.attemptCount },
+			{ label: 'Scoring Method', value: getScoringMethodText(instance.scoreMethod) },
+			{
+				label: 'Score Import',
+				value: instance.allowScoreImport === '1' ? 'Enabled' : 'Disabled'
 			}
-		})
-	}, [user, usersWithAccess])
-
-
-
-	const onClickViewScoresByQuestion = React.useCallback(() => {
-		setModal({
-			component: ModalScoresByQuestionWithAPI,
-			className: 'scoresByQuestion',
-			props: {
-				loID: instance.loID,
-				instID: instance.instID
-			}
-		})
+		]
 	}, [instance])
 
 	if (!instance) {
@@ -140,7 +155,6 @@ export default function InstanceSection({
 			</div>
 		)
 	}
-
 	return (
 		<div className="repository--instance-section is-not-empty">
 			<div className="header">
@@ -148,7 +162,7 @@ export default function InstanceSection({
 					<h1>{instance.name}</h1>
 					<h2>{`Course: ${instance.courseID}`}</h2>
 				</div>
-				<Button onClick={onClickAboutThisLO} type="text" text="About this learning object..." />
+				<Button onClick={showAbout} type="text" text="About this learning object..." />
 				<Button onClick={onClickPreviewWithUrl} type="large" text="Preview" />
 			</div>
 
@@ -177,30 +191,8 @@ export default function InstanceSection({
 
 			<SectionHeader label="Details" />
 			<div className="details">
-				<DefList
-					items={[
-						{
-							label: 'Open Date',
-							value: instance.externalLink ? '--' : startTime.format('MM/DD/YY - hh:mm A') + ' EST'
-						},
-						{
-							label: 'Close Date',
-							value: instance.externalLink ? '--' : endTime.format('MM/DD/YY - hh:mm A') + ' EST'
-						},
-						{
-							value: instance.externalLink
-								? '(This instance is being used in an external system)'
-								: getDurationText(startTime, endTime)
-						},
-						{ label: 'Attempts Allowed', value: instance.attemptCount },
-						{ label: 'Scoring Method', value: getScoringMethodText(instance.scoreMethod) },
-						{
-							label: 'Score Import',
-							value: instance.allowScoreImport === '1' ? 'Enabled' : 'Disabled'
-						}
-					]}
-				/>
-				<Button onClick={onClickEditInstanceDetails} type="small" text="Edit Details" />
+				<DefList items={detailItems} />
+				<Button onClick={showEdit} type="small" text="Edit Details" />
 			</div>
 
 			<SectionHeader label="Ownership &amp; Access" />
@@ -209,21 +201,47 @@ export default function InstanceSection({
 					{usersWithAccess.map(userItem => {
 						return (
 							<li key={userItem.userID}>{`${userItem.userString}${
-								userItem.userID === user.userID ? ' (You)' : ''
+								userItem.userID === currentUser.userID ? ' (You)' : ''
 							}`}</li>
 						)
 					})}
 				</ul>
-				<Button onClick={onClickManageAccess} type="small" text="Manage access" />
+				<Button onClick={showAccess} type="small" text="Manage access" />
 			</div>
 
-			<AssessmentScoresSection
-				instance={instance}
-				setModal={setModal}
-			/>
+			<AssessmentScoresSection instance={instance} />
 
-			<Button onClick={onClickViewScoresByQuestion} type="small" text="Compare Scores by question..." />
+			{aboutVisible
+				? <ModalAboutLOWithAPI
+						instanceName={instance.name}
+						onClose={hideAbout}
+						loID={instance.loID}
+					/>
+				: null
+			}
 
+			{accessVisible
+				? <PeopleSearchDialog
+					instanceName={instance.name}
+					onClose={hideAccess}
+					currentUserId={currentUser.userID}
+					clearPeopleSearchResults={() => {}}
+					onSelectPerson={() => {}}
+					onSearchChange={() => {}}
+					usersWithAccess={usersWithAccess}
+				/>
+				:null
+			}
+
+			{editVisible
+				?	<ModalInstanceDetails
+						onClose={hideEdit}
+						instanceName={instance.name}
+						{...instance}
+						onSave={updateInstance}
+					/>
+				: null
+			}
 		</div>
 	)
 }

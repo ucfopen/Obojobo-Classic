@@ -10,6 +10,7 @@ class API extends \rocketD\db\DBEnabled
 		parent::__construct();
 	}
 
+
 	/**
 	 * Verifies that the user has a current session and generates a new SESSID for them
 	 * @return (bool) true if user is logged in, false if not

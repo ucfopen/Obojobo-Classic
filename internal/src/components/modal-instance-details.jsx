@@ -1,10 +1,11 @@
+import './modal-instance-details.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import HelpButton from './help-button'
 import FormDateTime from './form-date-time'
 import Button from './button'
-
-import './modal-instance-details.scss'
+import RepositoryModal from './repository-modal'
 
 export default function ModalInstanceDetails(props) {
 	const [name, setName] = useState(props.name)
@@ -42,163 +43,169 @@ export default function ModalInstanceDetails(props) {
 	}, [name, courseID, startTime, endTime, attemptCount, scoreMethod, allowScoreImport])
 
 	return (
-		<div className="modal-instance-details">
-			<h1>{`${props.mode === 'create' ? 'Create' : 'Edit'} Instance Details`}</h1>
-			<div className="box">
-				<div className="row">
-					<span className="title">Instance Name:</span>
-					<div className="flex-container">
-						<input
-							type="text"
-							value={name}
-							onChange={(e) => {setName(e.target.value)}}
-						/>
-						<HelpButton>
-							<div>
-								Your published instance will be displayed to students as the name you input here. By
-								default this name is the same as the object name.
-							</div>
-						</HelpButton>
-					</div>
-				</div>
-				<div className="row">
-					<span className="title">Course Name:</span>
-					<div className="flex-container">
-						<input
-							type="text"
-							value={courseID}
-							onChange={e => setCourseID(e.target.value)}
-						/>
-						<HelpButton>
-							<div>
-								This field shows the course for this instance. This field is for your organization
-								only - changing it won&apos;t impact how your instance functions.
-							</div>
-						</HelpButton>
-					</div>
-				</div>
-			</div>
-			<div className="box border">
-				<div className="row">
-					<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
-						Open Date:
-					</span>
-					<div className="flex-container">
-						<FormDateTime value={props.externalLink ? null : startTime} onChange={setStartTime} />
-						<HelpButton>
-							{props.externalLink ? (
+		<RepositoryModal
+			className="instanceDetails"
+			instanceName={props.instanceName}
+			onCloseModal={props.onClose}
+		>
+			<div className="modal-instance-details">
+				<h1>{`${props.mode === 'create' ? 'Create' : 'Edit'} Instance Details`}</h1>
+				<div className="box">
+					<div className="row">
+						<span className="title">Instance Name:</span>
+						<div className="flex-container">
+							<input
+								type="text"
+								value={name}
+								onChange={(e) => {setName(e.target.value)}}
+							/>
+							<HelpButton>
 								<div>
-									Since this instance is linked to an external course you cannot set the start date.
-									Access to your module is reliant on settings in the external system.
+									Your published instance will be displayed to students as the name you input here. By
+									default this name is the same as the object name.
 								</div>
-							) : (
+							</HelpButton>
+						</div>
+					</div>
+					<div className="row">
+						<span className="title">Course Name:</span>
+						<div className="flex-container">
+							<input
+								type="text"
+								value={courseID}
+								onChange={e => setCourseID(e.target.value)}
+							/>
+							<HelpButton>
 								<div>
-									This is the date when this instance will be opened to students. Before this date,
-									students will not be able to access the instance.
+									This field shows the course for this instance. This field is for your organization
+									only - changing it won&apos;t impact how your instance functions.
 								</div>
-							)}
-						</HelpButton>
+							</HelpButton>
+						</div>
 					</div>
 				</div>
-				<div className="row">
-					<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
-						Close Date:
-					</span>
-					<div className="flex-container">
-						<FormDateTime value={props.externalLink ? null : startTime} onChange={setEndTime} />
-						<HelpButton>
-							{props.externalLink ? (
-								<div>
-									Since this instance is linked to an external course you cannot set the end date.
-									Access to your module is reliant on settings in the external system.
-								</div>
-							) : (
-								<div>
-									This is the date when the assessment will be closed to students. After this date,
-									students will not be able to take assessment attempts. They will still have access
-									to the content and practice.
-								</div>
-							)}
-						</HelpButton>
-					</div>
-				</div>
-				<div className="row">
-					{props.externalLink ? (
-						<span className="linked">(Start/end dates are defined by the external system)</span>
-					) : null}
-				</div>
-			</div>
-			<div className="box">
-				<div className="row">
-					<span className="title">Attempts:</span>
-					<div className="flex-container">
-						<input
-							type="number"
-							value={attemptCount}
-							min="1"
-							max="255"
-							onChange={e => setAttemptCount(parseInt(e.target.value, 10))}
-							onBlur={() => setAttemptCount(Math.max(Math.min(attemptCount, 255), 1))}
-						/>
-						<HelpButton>
-							<div>
-								This is the number of tries a student will have to take the assessment quiz. If you
-								provide more than one assessment attempt then the final score is determined by the
-								&apos;Score Method&apos;. Students will be able to see how many attempts they have
-								before they begin the assessment quiz.
-							</div>
-						</HelpButton>
-					</div>
-				</div>
-				{attemptCount > 1 ? (
-					<React.Fragment>
-						<div className="row">
-							<span className="title">Scoring:</span>
-							<div className="flex-container">
-								<select
-									name="scoringMethod"
-									value={scoreMethod}
-									onChange={e => setScoreMethod(e.target.value)}
-								>
-									<option value="h">Take Highest Attempt</option>
-									<option value="m">Take Average Score</option>
-									<option value="r">Take Last Attempt</option>
-								</select>
-								<HelpButton>
+				<div className="box border">
+					<div className="row">
+						<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
+							Open Date:
+						</span>
+						<div className="flex-container">
+							<FormDateTime value={props.externalLink ? null : startTime} onChange={setStartTime} />
+							<HelpButton>
+								{props.externalLink ? (
 									<div>
-										This determines how the &apos;Final Score&apos; will be calculated by Obojobo
-										for instances with more than one attempt. The student will be able to see how
-										their score will be calculated before they begin the assessment quiz.
+										Since this instance is linked to an external course you cannot set the start date.
+										Access to your module is reliant on settings in the external system.
 									</div>
-								</HelpButton>
-							</div>
+								) : (
+									<div>
+										This is the date when this instance will be opened to students. Before this date,
+										students will not be able to access the instance.
+									</div>
+								)}
+							</HelpButton>
 						</div>
-						<div className="row example">
-							<span className="sub-title">Example:</span>
-							<span>Given 3 attempts: 75, 90, 80. The <b>{exScoreMethod} score is: {exFinalScore}%</b></span>
+					</div>
+					<div className="row">
+						<span className={`title ${props.externalLink ? 'is-disabled' : 'is-not-disabled'}`}>
+							Close Date:
+						</span>
+						<div className="flex-container">
+							<FormDateTime value={props.externalLink ? null : startTime} onChange={setEndTime} />
+							<HelpButton>
+								{props.externalLink ? (
+									<div>
+										Since this instance is linked to an external course you cannot set the end date.
+										Access to your module is reliant on settings in the external system.
+									</div>
+								) : (
+									<div>
+										This is the date when the assessment will be closed to students. After this date,
+										students will not be able to take assessment attempts. They will still have access
+										to the content and practice.
+									</div>
+								)}
+							</HelpButton>
 						</div>
-					</React.Fragment>
-				) : null}
-				<div className="row">
-					<div className="score-import">
-						<label onClick={e => setAllowScoreImport(e.target.checked)}>
-							<input type="checkbox" name="isImportAllowed" defaultChecked={allowScoreImport} />
-							<span>Allow past scores to be imported</span>
-						</label>
-						<HelpButton>
-							<div>
-								This option allows students who have already taken this learning object to import
-								their past highest attempt score instead of re-taking the object.
-							</div>
-						</HelpButton>
+					</div>
+					<div className="row">
+						{props.externalLink ? (
+							<span className="linked">(Start/end dates are defined by the external system)</span>
+						) : null}
 					</div>
 				</div>
-				<div className="buttons">
-					<Button text="Cancel" type="alt" onClick={props.onClose} />
-					<Button text="Save" type="small" onClick={onSave} />
+				<div className="box">
+					<div className="row">
+						<span className="title">Attempts:</span>
+						<div className="flex-container">
+							<input
+								type="number"
+								value={attemptCount}
+								min="1"
+								max="255"
+								onChange={e => setAttemptCount(parseInt(e.target.value, 10))}
+								onBlur={() => setAttemptCount(Math.max(Math.min(attemptCount, 255), 1))}
+							/>
+							<HelpButton>
+								<div>
+									This is the number of tries a student will have to take the assessment quiz. If you
+									provide more than one assessment attempt then the final score is determined by the
+									&apos;Score Method&apos;. Students will be able to see how many attempts they have
+									before they begin the assessment quiz.
+								</div>
+							</HelpButton>
+						</div>
+					</div>
+					{attemptCount > 1 ? (
+						<React.Fragment>
+							<div className="row">
+								<span className="title">Scoring:</span>
+								<div className="flex-container">
+									<select
+										name="scoringMethod"
+										value={scoreMethod}
+										onChange={e => setScoreMethod(e.target.value)}
+									>
+										<option value="h">Take Highest Attempt</option>
+										<option value="m">Take Average Score</option>
+										<option value="r">Take Last Attempt</option>
+									</select>
+									<HelpButton>
+										<div>
+											This determines how the &apos;Final Score&apos; will be calculated by Obojobo
+											for instances with more than one attempt. The student will be able to see how
+											their score will be calculated before they begin the assessment quiz.
+										</div>
+									</HelpButton>
+								</div>
+							</div>
+							<div className="row example">
+								<span className="sub-title">Example:</span>
+								<span>Given 3 attempts: 75, 90, 80. The <b>{exScoreMethod} score is: {exFinalScore}%</b></span>
+							</div>
+						</React.Fragment>
+					) : null}
+					<div className="row">
+						<div className="score-import">
+							<label onClick={e => setAllowScoreImport(e.target.checked)}>
+								<input type="checkbox" name="isImportAllowed" defaultChecked={allowScoreImport} />
+								<span>Allow past scores to be imported</span>
+							</label>
+							<HelpButton>
+								<div>
+									This option allows students who have already taken this learning object to import
+									their past highest attempt score instead of re-taking the object.
+								</div>
+							</HelpButton>
+						</div>
+					</div>
+					<div className="buttons">
+						<Button text="Cancel" type="alt" onClick={props.onClose} />
+						<Button text="Save" type="small" onClick={onSave} />
+					</div>
 				</div>
 			</div>
-		</div>
+		</RepositoryModal>
 	)
 }
 

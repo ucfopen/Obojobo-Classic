@@ -1,4 +1,5 @@
 import './assessment-scores-section.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import SectionHeader from './section-header'
@@ -10,6 +11,9 @@ import dayjs from 'dayjs'
 import { useQuery, useMutation, useQueryCache } from 'react-query'
 import { apiGetScoresForInstance, apiEditExtraAttempts } from '../util/api'
 import { ModalScoreDetailsWithAPI } from './modal-score-details'
+import useToggleState from '../hooks/use-toggle-state'
+import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
+
 const noOp = () => {}
 
 const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
@@ -31,15 +35,14 @@ const getUserString = n => {
 	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
 }
 
-export default function AssessmentScoresSection({
-	instance,
-	setModal
-}) {
+export default function AssessmentScoresSection({instance}) {
 	const [search, setSearch] = useState('')
 	const queryCache = useQueryCache()
+	const [detailsVisible, hideDetails, showDetails, settings] = useToggleState()
+	const [scoresVisible, hideScores, showScores] = useToggleState()
 	const [mutateExtraAttempts] = useMutation(apiEditExtraAttempts)
 
-	// reset search filter when looking at a new instance
+	// reset search filter when instance changes
 	React.useEffect(() => {
 		setSearch('')
 	}, [instance])
@@ -51,37 +54,23 @@ export default function AssessmentScoresSection({
 			initialStale: true,
 			staleTime: Infinity,
 			initialData: [],
-			enabled: instance // load only after instance loads
+			enabled: instance // load only after instance is set
 		}
 	)
 
-	const onClickScoreDetails = React.useCallback((userName, userID) => {
-		setModal({
-			component: ModalScoreDetailsWithAPI,
-			className: 'scoreDetails',
-			props: {
-				userName,
-				userID,
-				instID: instance.instID,
-				loID: instance.loID
-			}
-		})
-	}, [instance])
-
-	const onClickRefresh = React.useCallback( () => {
+	const refreshScores = React.useCallback( () => {
 		queryCache.refetchQueries(['getScoresForInstance', instance.instID], { exact: true })
 	}, [instance])
-
 
 	const onClickSetAdditionalAttempt = React.useCallback(async (userID, attempts) => {
 		try {
 			await mutateExtraAttempts({ userID, instID: instance.instID, newCount: attempts }, { throwOnError: true })
-			onClickRefresh()
+			refreshScores()
 		} catch (e) {
 			console.error('Error setting extra attempts')
 			console.error(e)
 		}
-	}, [instance, mutateExtraAttempts, onClickRefresh])
+	}, [instance, mutateExtraAttempts, refreshScores])
 
 
 	// process scores for instance
@@ -141,7 +130,7 @@ export default function AssessmentScoresSection({
 			<SectionHeader label="Assessment Scores" />
 			<div className="assessment-section-body">
 				<div className="assessment-scores-summary">
-					<AssessmentScoresSummary scores={scores} onClickRefresh={onClickRefresh} />
+					<AssessmentScoresSummary scores={scores} onClickRefresh={refreshScores} />
 				</div>
 				<hr className="section-divider" />
 				<div className="assessment-score-search">
@@ -152,17 +141,46 @@ export default function AssessmentScoresSection({
 					data={assessmentScoresDataGridData || null}
 					rowCount={scoreCount}
 					onClickSetAdditionalAttempt={onClickSetAdditionalAttempt}
-					onClickScoreDetails={onClickScoreDetails}
+					onClickScoreDetails={showDetails}
 				/>
 				<div className="download-button">
 					<Button
 						onClick={onClickDownloadScores}
 						type="small"
-						text={`Download ${scoreCount} scores as a CSV file`}
+						text={`Download ${scoreCount} Scores as CSV file`}
 						disabled={scoreCount < 1}
 					/>
 				</div>
+				<div className="compare-button">
+					<Button
+						onClick={showScores}
+						type="small"
+						text="Compare Scores by Question..."
+						disabled={scoreCount < 1}
+					/>
+				</div>
+
 			</div>
+			{detailsVisible
+				? <ModalScoreDetailsWithAPI
+					onClose={hideDetails}
+					instanceName={instance.name}
+					userName={settings[0]}
+					userID={settings[1]}
+					instID={instance.instID}
+					loID={instance.loID}
+				/>
+				:null
+			}
+			{scoresVisible
+				?	<ModalScoresByQuestionWithAPI
+						onClose={hideScores}
+						instanceName={instance.name}
+						loID={instance.loID}
+						instID={instance.instID}
+					/>
+				: null
+			}
 		</div>
 	)
 }

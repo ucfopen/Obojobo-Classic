@@ -4,12 +4,12 @@ import React, { useEffect } from 'react'
 import ReactModal from 'react-modal'
 import Button from './button'
 
-const RepositoryModals = ({ instanceName, modal, onCloseModal, className = '' }) => {
+export default function RepositoryModal({ instanceName, children, onCloseModal, className = '' }){
 	useEffect(() => {
 		ReactModal.setAppElement('#repository')
 	}, [])
 
-	return modal ? (
+	return children ? (
 		<ReactModal
 			isOpen={true}
 			contentLabel={instanceName}
@@ -23,7 +23,7 @@ const RepositoryModals = ({ instanceName, modal, onCloseModal, className = '' })
 					<Button type="text" ariaLabel="Close" onClick={onCloseModal} text="×" />
 				</div>
 				<div className="modal-content">
-					<modal.component {...modal.props} onClose={onCloseModal} />
+					{children}
 				</div>
 			</div>
 		</ReactModal>
@@ -32,4 +32,3 @@ const RepositoryModals = ({ instanceName, modal, onCloseModal, className = '' })
 
 ReactModal.setAppElement('#react-app');
 
-export default RepositoryModals

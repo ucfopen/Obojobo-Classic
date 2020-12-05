@@ -1,4 +1,5 @@
 import './modal-score-details.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import DataGridStudentScores from './data-grid-student-scores'
@@ -8,6 +9,7 @@ import AttemptDetails from './attempt-details'
 import getProcessedQuestionData from '../util/get-processed-question-data'
 import { useQuery } from 'react-query'
 import { apiGetLO, apiGetVisitTrackingData } from '../util/api'
+import RepositoryModal from './repository-modal'
 
 const extractAssessmentAttemptData = (logs, aGroup) => {
 	const foundLogs = []
@@ -24,7 +26,7 @@ const extractAssessmentAttemptData = (logs, aGroup) => {
 	return foundLogs
 }
 
-export function ModalScoreDetailsWithAPI({onClose, userName, userID, instID, loID}){
+export function ModalScoreDetailsWithAPI({instanceName, onClose, userName, userID, instID, loID}){
 	const { isError: isVisitDataError, data: visitData, isFetching: isVisitDataFetching } = useQuery(['visitTrackingData', userID, instID], apiGetVisitTrackingData, {
 		initialStale: true,
 		initialData: null,
@@ -53,7 +55,7 @@ export function ModalScoreDetailsWithAPI({onClose, userName, userID, instID, loI
 
 	if(!ready) return <div>Loading</div>
 	if(isError) return <div>Error Loading Data</div>
-	return <ModalScoreDetails {...props} onClose={onClose} />
+	return <ModalScoreDetails {...props} instanceName={instanceName} onClose={onClose} />
 }
 
 const getAnsweredQuestions = (questionsByID, attemptLogs) => {
@@ -87,7 +89,7 @@ const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 	})
 }
 
-export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
+export default function ModalScoreDetails({ aGroup, attemptLogs, userName, instanceName, onClose }) {
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 	const answeredQuestions = React.useMemo(() => getAnsweredQuestions(questionsByID, attemptLogs), [
 		aGroup,
@@ -128,32 +130,36 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName }) {
 	}
 
 	return (
-		<div className="modal-score-details">
-			<div className="left-pane">
-				<div className="modal-title">
-					<h3>Student Score Details</h3>
-					<p>{userName}</p>
-				</div>
+		<RepositoryModal
+			className="scoreDetails"
+			instanceName={instanceName}
+			onCloseModal={onClose}
 
-				<div className="student-scores">
-					<DataGridStudentScores
-						showAttemptColumn={true}
-						data={answeredQuestions}
-						onSelect={row => {
-							setSelectedItem(row)
-						}}
-					/>
+		>
+			<div className="modal-score-details">
+				<div className="left-pane">
+					<div className="modal-title">
+						<h3>Student Score Details</h3>
+						<p>{userName}</p>
+					</div>
+
+					<div className="student-scores">
+						<DataGridStudentScores
+							showAttemptColumn={true}
+							data={answeredQuestions}
+							onSelect={row => {
+								setSelectedItem(row)
+							}}
+						/>
+					</div>
 				</div>
+				<div className="right-pane">{renderPreview()}</div>
 			</div>
-			<div className="right-pane">{renderPreview()}</div>
-		</div>
+		</RepositoryModal>
 	)
 }
 
 ModalScoreDetails.propTypes = {
-	// userID: PropTypes.string.isRequired,
-	// instID: PropTypes.string.isRequired,
-	// loID: PropTypes.string.isRequired
 	userName: PropTypes.string.isRequired,
 	questions: PropTypes.arrayOf(
 		PropTypes.shape({

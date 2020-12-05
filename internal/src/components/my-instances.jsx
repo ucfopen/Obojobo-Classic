@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'
 import DataGridInstances from './data-grid-instances'
 import RefreshButton from './refresh-button'
 import SearchField from './search-field'
+import { useQuery, queryCache } from 'react-query'
+import {apiGetInstances} from '../util/api'
 
 const getFilteredInstances = (instances, search) => {
 	if (!instances) return null
@@ -21,9 +23,39 @@ const getFilteredInstances = (instances, search) => {
 	})
 }
 
-export default function MyInstances({ instances, onSelect, onClickRefresh }) {
+export default function MyInstances({ onSelect }) {
 	const [search, setSearch] = useState('')
+	const [_selectedInstance, _setSelectedInstance] = React.useState(null)
+	const setSelectedInstance = React.useCallback(instance => {
+		_setSelectedInstance(instance)
+		onSelect(instance)
+	}, [onSelect])
 
+	const reloadInstances = React.useCallback(() => {
+		queryCache.invalidateQueries('getInstances')
+	}, [])
+
+	// load instances
+	const { data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
+		cacheTime: Infinity,
+		initialStale: true,
+		staleTime: Infinity,
+		initialData: null
+	})
+
+	// this is needed to detect when data is reloaded and _selectedInstance is
+	// referencing an object from the old results.  This forces the update
+	// to the new selected instance data
+	React.useEffect(() => {
+		if(!data || !_selectedInstance) return
+		if(data.indexOf(_selectedInstance) == -1){
+			const newInstance = data.find(i => i.instID === _selectedInstance.instID)
+			_setSelectedInstance(newInstance)
+		}
+	}, [data, _selectedInstance])
+
+
+	const instances = isFetching ? null : data
 	const filteredInstances = React.useMemo(() => getFilteredInstances(instances, search), [instances, search])
 
 	return (
@@ -35,9 +67,9 @@ export default function MyInstances({ instances, onSelect, onClickRefresh }) {
 					value={search}
 					onChange={setSearch}
 				/>
-				<RefreshButton onClick={onClickRefresh} />
+				<RefreshButton onClick={reloadInstances} />
 			</div>
-			<DataGridInstances data={filteredInstances} onSelect={onSelect} />
+			<DataGridInstances data={filteredInstances} onSelect={setSelectedInstance} />
 		</div>
 	)
 }
@@ -52,7 +84,7 @@ MyInstances.propTypes = {
 			endTime: PropTypes.number.isRequired
 		})
 	),
-	selectedInstanceIndex: PropTypes.number,
+	_selectedInstanceIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired,
 	onClickRefresh: PropTypes.func.isRequired
 }

@@ -8,6 +8,7 @@ import getProcessedQuestionData from '../util/get-processed-question-data'
 import { useQuery } from 'react-query'
 import { apiGetLO, apiGetInstanceTrackingData } from '../util/api'
 import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
+import RepositoryModal from './repository-modal'
 
 const getSubmitQuestionLogsForAssessment = logs => {
 	let foundAssessmentSubmitQuestionLogs = false
@@ -34,12 +35,12 @@ const getSubmitQuestionLogsForAssessment = logs => {
 	return foundLogs
 }
 
-export function ModalScoresByQuestionWithAPI({onClose, instID, loID}){
+export function ModalScoresByQuestionWithAPI({onClose, instanceName, instID, loID}){
 	const { isError, data, isFetching } = useQuery(['getInstanceTrackingData', instID], apiGetInstanceTrackingData, {
 		initialStale: true,
 		staleTime: Infinity,
 	})
-console.log({data})
+
 	// process tracking data
 	const submitQuestionLogsByUserID = React.useMemo(() => {
 		if(isFetching || isError || !data) return {}
@@ -87,6 +88,7 @@ console.log({data})
 	if(isError) return <div>Error Loading Data</div>
 	return (
 		<ModalScoresByQuestion
+			instanceName={instanceName}
 			submitQuestionLogsByUser={submitQuestionLogsByUserID}
 			aGroup={loData?.aGroup || {}}
 			onClose={onClose}
@@ -125,7 +127,7 @@ const getScoreDataByQuestionID = submitQuestionLogsByUser => {
 	return logDataByQuestionID
 }
 
-export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser }) {
+export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser, instanceName, onClose }) {
 	const [selectedItem, setSelectedItem] = React.useState()
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 
@@ -150,31 +152,38 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 	}, [aGroup, submitQuestionLogsByUser])
 
 	return (
-		<div className="modal-scores-by-question">
-			<div className="scores-by-question--left-sidebar">
-				<h2>Scores By Question</h2>
-				<div className="wrapper">
-					<DataGridStudentScores
-						showAttemptColumn={false}
-						data={data}
-						onSelect={row => {
-							setSelectedItem(row)
-						}}
-					/>
+		<RepositoryModal
+			className="scoresByQuestion"
+			instanceName={instanceName}
+			onCloseModal={onClose}
+
+		>
+			<div className="modal-scores-by-question">
+				<div className="scores-by-question--left-sidebar">
+					<h2>Scores By Question</h2>
+					<div className="wrapper">
+						<DataGridStudentScores
+							showAttemptColumn={false}
+							data={data}
+							onSelect={row => {
+								setSelectedItem(row)
+							}}
+						/>
+					</div>
+				</div>
+
+				<div className="score-details-right-content">
+					{selectedItem ? (
+						<QuestionScoreDetails
+							questionNumber={selectedItem.questionNumber}
+							altNumber={selectedItem.altNumber}
+							question={selectedItem.originalQuestion}
+							responses={selectedItem.responses}
+						/>
+					) : null}
 				</div>
 			</div>
-
-			<div className="score-details-right-content">
-				{selectedItem ? (
-					<QuestionScoreDetails
-						questionNumber={selectedItem.questionNumber}
-						altNumber={selectedItem.altNumber}
-						question={selectedItem.originalQuestion}
-						responses={selectedItem.responses}
-					/>
-				) : null}
-			</div>
-		</div>
+		</RepositoryModal>
 	)
 }
 
