@@ -114,6 +114,7 @@ export default function InstanceSection({
 				onSelectPerson: () => {},
 				onClose: () => {},
 				onSearchChange: () => {},
+				usersWithAccess: usersWithAccess,
 				people: [{id: 5, avatarUrl: '/assets/images/user-circle.svg', firstName: 'Demo', lastName: 'man', username: 'demoman'}]
 			}
 		})
