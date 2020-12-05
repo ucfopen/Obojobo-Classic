@@ -27,6 +27,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 		['getUsersMatchingSearch', apiSearchString],
 		getUsersMatchingSearch,
 		{
+			cacheTime: 10000,
 			initialStale: true,
 			staleTime: Infinity,
 			initialData: '',
@@ -50,7 +51,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 			console.error('Error setting extra attempts')
 			console.error(e)
 		}
-	}, [])
+	}, [instID])
 
 	const onClickRevoke = React.useCallback(async user => {
 		if (user.id === currentUserId) {
@@ -74,7 +75,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 			console.error('Error setting extra attempts')
 			console.error(e)
 		}
-	}, [])
+	}, [instID])
 
 	const people = React.useMemo(() => {
 		if(!data) return []
@@ -86,8 +87,6 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 			username: 'User #' + user.userID
 		}))
 	}, [data])
-
-
 
 	const usersWithAccess2 = usersWithAccess.map(user => ({
 		id: user.userID,
@@ -153,8 +152,8 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 									const isUserAlreadyAManager = userIDsWithAccess.indexOf(p.id) > -1
 
 									return (
-										<div className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}>
-											<PeopleListItem key={p.id} isMe={p.id === currentUserId} {...p}>
+										<div key={p.id} className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}>
+											<PeopleListItem isMe={p.id === currentUserId} {...p}>
 												{isUserAlreadyAManager ? (
 													<span className="already-has-access">
 														{p.id === currentUserId

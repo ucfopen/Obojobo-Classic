@@ -28,6 +28,7 @@ const extractAssessmentAttemptData = (logs, aGroup) => {
 
 export function ModalScoreDetailsWithAPI({instanceName, onClose, userName, userID, instID, loID}){
 	const { isError: isVisitDataError, data: visitData, isFetching: isVisitDataFetching } = useQuery(['visitTrackingData', userID, instID], apiGetVisitTrackingData, {
+		cacheTime: 30000,
 		initialStale: true,
 		initialData: null,
 		staleTime: Infinity
@@ -160,36 +161,11 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName, insta
 }
 
 ModalScoreDetails.propTypes = {
+	aGroup: PropTypes.object.isRequired,
+	attemptLogs: PropTypes.array.isRequired,
+	instanceName: PropTypes.string,
+	onClose: PropTypes.func.isRequired,
 	userName: PropTypes.string.isRequired,
-	questions: PropTypes.arrayOf(
-		PropTypes.shape({
-			questionID: PropTypes.number,
-			itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),
-			answers: PropTypes.arrayOf(
-				PropTypes.shape({
-					answerID: PropTypes.string,
-					answer: PropTypes.string,
-					weight: PropTypes.number
-				})
-			),
-			items: PropTypes.arrayOf(
-				PropTypes.shape({
-					component: PropTypes.oneOf(['TextArea', 'MediaView']),
-					data: PropTypes.string,
-					media: PropTypes.arrayOf(
-						PropTypes.shape({
-							mediaID: PropTypes.string,
-							title: PropTypes.string,
-							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
-							descText: PropTypes.string,
-							width: PropTypes.number,
-							height: PropTypes.number
-						})
-					)
-				})
-			)
-		})
-	),
 	attemptLogs: PropTypes.arrayOf(
 		PropTypes.shape({
 			attempt: PropTypes.shape({
@@ -202,7 +178,7 @@ ModalScoreDetails.propTypes = {
 			scores: PropTypes.arrayOf(
 				PropTypes.shape({
 					itemID: PropTypes.number.isRequired,
-					answerID: PropTypes.number.isRequired,
+					answerID: PropTypes.string.isRequired,
 					answer: PropTypes.string.isRequired,
 					score: PropTypes.number.isRequired
 				})

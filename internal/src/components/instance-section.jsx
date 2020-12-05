@@ -246,7 +246,7 @@ export default function InstanceSection({
 
 InstanceSection.propTypes = {
 	instance: PropTypes.object,
-	scores: PropTypes.array,
-	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
+	currentUser: PropTypes.shape({
+		userID: PropTypes.number.isRequired
+	}).isRequired
 }

@@ -21,7 +21,14 @@ const handleErrors = async resp => {
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
 export const apiVerifySession = () => fetchGet('/api/json.php/loRepository.getSessionValid')
-export const apiGetCurrentUser = () => fetchGet('/api/json.php/loRepository.getUser')
+export const apiGetCurrentUser = () => fetchGet('/api/json.php/loRepository.getUser').then(user => {
+	// normalize the data we're getting back
+	const castToInt = ['createTime', 'lastLogin', 'userID']
+	castToInt.forEach(key => {
+		user[key] = parseInt(user[key], 10)
+	})
+	return user
+})
 export const apiGetInstances = () =>
 	fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
 		// normalize the data we're getting back
@@ -65,16 +72,34 @@ export const apiGetLO = (r, loID) =>
 		lo.externalLink = lo.externalLink != null
 		lo.aGroup.kids.forEach(k => {
 			k.questionID = parseInt(k.questionID, 10)
+			if(k.items){
+				k.items.forEach(i => {
+					if(i.media){
+						i.media.forEach(m => {
+							m.mediaID = parseInt(m.mediaID, 10)
+							m.auth = parseInt(m.auth, 10)
+							m.createTime = parseInt(m.createTime, 10)
+							m.height = parseInt(m.height, 10)
+							m.width = parseInt(m.width, 10)
+							m.length = parseInt(m.length, 10)
+							m.size = parseInt(m.size, 10)
+						})
+					}
+				})
+			}
 		})
-		lo.pGroup.kids.forEach(k => {
-			k.questionID = parseInt(k.questionID, 10)
-		})
-
+		// lo.pGroup.kids.forEach(k => {
+		// 	k.questionID = parseInt(k.questionID, 10)
+		// })
+console.log({lo})
 		return lo
 	})
 
 export const getUsersMatchingSearch = (r, search) =>
-	fetchGet(`/api/json.php/loRepository.getUsersMatchingSearch/${encodeURIComponent(search)}`)
+	fetchGet(`/api/json.php/loRepository.getUsersMatchingSearch/${encodeURIComponent(search)}`).then(users => {
+		users.forEach(u => {u.userID = parseInt(u.userID, 10)})
+		return users
+	})
 
 export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
@@ -82,6 +107,7 @@ export const apiGetScoresForInstance = (r, instID) =>
 		const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']
 		scoresByUser.forEach(u => {
 			u.additional = parseInt(u.additional, 10)
+			u.userID = parseInt(u.userID, 10)
 			u.attempts.forEach(a => {
 				castToInt.forEach(key => {
 					a[key] = parseInt(a[key], 10)
@@ -141,7 +167,10 @@ export const apiGetVisitTrackingData = (r, userID, instID) =>
 export const apiGetInstanceTrackingData = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
 export const apiGetUserNames = (r, ...userIDs) =>
-	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`)
+	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`).then(users => {
+		users.forEach(u => {u.userID = parseInt(u.userID, 10)})
+		return users
+	})
 export const apiGetInstancePerms = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getItemPerms/${instID}/1`)
 export const apiEditInstance = ({

@@ -86,5 +86,4 @@ MyInstances.propTypes = {
 	),
 	_selectedInstanceIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired,
-	onClickRefresh: PropTypes.func.isRequired
 }

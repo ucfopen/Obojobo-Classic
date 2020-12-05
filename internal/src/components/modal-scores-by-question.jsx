@@ -188,46 +188,36 @@ export default function ModalScoresByQuestion({ aGroup, submitQuestionLogsByUser
 }
 
 ModalScoresByQuestion.propTypes = {
-	aGroup: PropTypes.arrayOf(
-		PropTypes.shape({
-			questionID: PropTypes.string,
-			itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),
-			answers: PropTypes.arrayOf(
-				PropTypes.shape({
-					answerID: PropTypes.string,
-					answer: PropTypes.string,
-					weight: PropTypes.number
-				})
-			),
-			items: PropTypes.arrayOf(
-				PropTypes.shape({
-					component: PropTypes.oneOf(['TextArea', 'MediaView']),
-					data: PropTypes.string,
-					media: PropTypes.arrayOf(
-						PropTypes.shape({
-							mediaID: PropTypes.number,
-							title: PropTypes.string,
-							itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
-							descText: PropTypes.string,
-							width: PropTypes.number,
-							height: PropTypes.number
-						})
-					)
-				})
-			)
-		})
-	),
-	submitQuestionLogsByUser: PropTypes.arrayOf(
-		PropTypes.shape({
-			userName: PropTypes.string.isRequired,
-			logs: PropTypes.arrayOf(
-				PropTypes.shape({
-					itemID: PropTypes.string.isRequired,
-					answerID: PropTypes.string.isRequired,
-					answer: PropTypes.string.isRequired,
-					score: PropTypes.string.isRequired
-				})
-			)
-		})
-	)
+	aGroup: PropTypes.shape({
+		kids: PropTypes.arrayOf(
+			PropTypes.shape({
+				questionID: PropTypes.number,
+				itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),
+				answers: PropTypes.arrayOf(
+					PropTypes.shape({
+						answerID: PropTypes.string,
+						answer: PropTypes.string,
+						weight: PropTypes.number
+					})
+				),
+				items: PropTypes.arrayOf(
+					PropTypes.shape({
+						component: PropTypes.oneOf(['TextArea', 'MediaView']),
+						data: PropTypes.string,
+						media: PropTypes.arrayOf(
+							PropTypes.shape({
+								mediaID: PropTypes.number,
+								title: PropTypes.string,
+								itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
+								descText: PropTypes.string,
+								width: PropTypes.number,
+								height: PropTypes.number
+							})
+						)
+					})
+				)
+			})
+		)
+	}),
+	submitQuestionLogsByUser: PropTypes.object
 }

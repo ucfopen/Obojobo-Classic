@@ -7,6 +7,7 @@ export default function DataGridAttemptsCell({value, row, column}) {
 	const { onClick } = column
 	const onAddClick = React.useCallback(() => {onClick(userID, additional+1)}, [onClick, userID, additional])
 	const onRemoveClick = React.useCallback(() => {onClick(userID, additional-1)}, [onClick, userID, additional])
+
 	return (
 		<div className="data-grid-attempts-cell">
 			<p className="attempts">
@@ -23,18 +24,17 @@ export default function DataGridAttemptsCell({value, row, column}) {
 	)
 }
 
-DataGridAttemptsCell.defaultProps = {
-	isAttemptInProgress: false
-}
-
 DataGridAttemptsCell.propTypes = {
 	value: PropTypes.number.isRequired,
 	row: PropTypes.shape({
-		additional: PropTypes.number.isRequired,
-		numAttempts: PropTypes.number.isRequired,
-		isAttemptInProgress: PropTypes.bool.isRequired
+		original: PropTypes.shape({
+			additional: PropTypes.number,
+			attemptCount: PropTypes.number.isRequired,
+			isAttemptInProgress: PropTypes.bool.isRequired,
+			userID: PropTypes.number.isRequired
+		})
 	}),
-	header: PropTypes.shape({
+	column: PropTypes.shape({
 		onClick: PropTypes.func.isRequired
 	})
 }

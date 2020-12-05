@@ -47,18 +47,14 @@ DataGridAssessmentScores.propTypes = {
 	data: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,
-			userID: PropTypes.string.isRequired,
-			score: PropTypes.shape({
-				value: PropTypes.number,
-				isScoreImported: PropTypes.bool
-			}).isRequired,
-			lastSubmitted: PropTypes.string,
-			attempts: PropTypes.shape({
-				numAttemptsTaken: PropTypes.number.isRequired,
-				numAdditionalAttemptsAdded: PropTypes.number.isRequired,
-				numAttempts: PropTypes.number.isRequired,
-				isAttemptInProgress: PropTypes.bool
-			})
+			userID: PropTypes.number.isRequired,
+			score: PropTypes.number.isRequired,
+			isScoreImported: PropTypes.bool.isRequired,
+			lastSubmitted: PropTypes.number,
+			numAttemptsTaken: PropTypes.number.isRequired,
+			additional: PropTypes.number.isRequired,
+			attemptCount: PropTypes.number.isRequired,
+			isAttemptInProgress: PropTypes.bool
 		})
 	),
 	onClickSetAdditionalAttempt: PropTypes.func.isRequired,
