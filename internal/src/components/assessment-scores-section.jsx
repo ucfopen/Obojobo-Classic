@@ -24,7 +24,8 @@ const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 		case 'r': // most recent
 			return scores[scores.length - 1]
 
-		case 'm': { // average
+		case 'm': {
+			// average
 			const sum = scores.reduce((acc, score) => acc + score, 0)
 			return parseFloat(sum) / scores.length
 		}
