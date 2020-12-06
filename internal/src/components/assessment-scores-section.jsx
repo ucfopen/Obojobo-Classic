@@ -24,9 +24,10 @@ const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 		case 'r': // most recent
 			return scores[scores.length - 1]
 
-		case 'm': // average
+		case 'm': { // average
 			const sum = scores.reduce((acc, score) => acc + score, 0)
 			return parseFloat(sum) / scores.length
+		}
 	}
 
 	return 0
@@ -35,7 +36,7 @@ const getUserString = n => {
 	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
 }
 
-export default function AssessmentScoresSection({instance}) {
+export default function AssessmentScoresSection({ instance }) {
 	const [search, setSearch] = useState('')
 	const queryCache = useQueryCache()
 	const [detailsVisible, hideDetails, showDetails, settings] = useToggleState()
@@ -47,7 +48,7 @@ export default function AssessmentScoresSection({instance}) {
 		setSearch('')
 	}, [instance])
 
-	const { data, isFetching, error } = useQuery(
+	const { data, isFetching } = useQuery(
 		['getScoresForInstance', instance?.instID],
 		apiGetScoresForInstance,
 		{
@@ -58,20 +59,25 @@ export default function AssessmentScoresSection({instance}) {
 		}
 	)
 
-	const refreshScores = React.useCallback( () => {
+	const refreshScores = React.useCallback(() => {
 		queryCache.refetchQueries(['getScoresForInstance', instance.instID], { exact: true })
 	}, [instance])
 
-	const onClickSetAdditionalAttempt = React.useCallback(async (userID, attempts) => {
-		try {
-			await mutateExtraAttempts({ userID, instID: instance.instID, newCount: attempts }, { throwOnError: true })
-			refreshScores()
-		} catch (e) {
-			console.error('Error setting extra attempts')
-			console.error(e)
-		}
-	}, [instance, mutateExtraAttempts, refreshScores])
-
+	const onClickSetAdditionalAttempt = React.useCallback(
+		async (userID, attempts) => {
+			try {
+				await mutateExtraAttempts(
+					{ userID, instID: instance.instID, newCount: attempts },
+					{ throwOnError: true }
+				)
+				refreshScores()
+			} catch (e) {
+				console.error('Error setting extra attempts') // eslint-disable-line no-console
+				console.error(e) // eslint-disable-line no-console
+			}
+		},
+		[instance, mutateExtraAttempts, refreshScores]
+	)
 
 	// process scores for instance
 	const assessmentScores = React.useMemo(() => {
@@ -113,7 +119,9 @@ export default function AssessmentScoresSection({instance}) {
 		)
 	}, [assessmentScores, search])
 
-	const scoreCount = React.useMemo(() => assessmentScores?.length || 0, [assessmentScoresDataGridData])
+	const scoreCount = React.useMemo(() => assessmentScores?.length || 0, [
+		assessmentScoresDataGridData
+	])
 
 	const onClickDownloadScores = React.useCallback(() => {
 		if (!instance) return noOp
@@ -159,10 +167,9 @@ export default function AssessmentScoresSection({instance}) {
 						disabled={scoreCount < 1}
 					/>
 				</div>
-
 			</div>
-			{detailsVisible
-				? <ModalScoreDetailsWithAPI
+			{detailsVisible ? (
+				<ModalScoreDetailsWithAPI
 					onClose={hideDetails}
 					instanceName={instance.name}
 					userName={settings[0]}
@@ -170,17 +177,15 @@ export default function AssessmentScoresSection({instance}) {
 					instID={instance.instID}
 					loID={instance.loID}
 				/>
-				:null
-			}
-			{scoresVisible
-				?	<ModalScoresByQuestionWithAPI
-						onClose={hideScores}
-						instanceName={instance.name}
-						loID={instance.loID}
-						instID={instance.instID}
-					/>
-				: null
-			}
+			) : null}
+			{scoresVisible ? (
+				<ModalScoresByQuestionWithAPI
+					onClose={hideScores}
+					instanceName={instance.name}
+					loID={instance.loID}
+					instID={instance.instID}
+				/>
+			) : null}
 		</div>
 	)
 }

@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Avatar from './avatar'
 
-const PeopleListItem = ({avatarUrl, firstName, lastName, isMe, username, children}) => (
+const PeopleListItem = ({ avatarUrl, firstName, lastName, isMe, username, children }) => (
 	<li className="people-list-item">
 		<Avatar avatarUrl={avatarUrl} />
 		<div className="user-info">
@@ -22,7 +22,6 @@ PeopleListItem.defaultProps = {
 	lastName: '',
 	isMe: false
 }
-
 
 PeopleListItem.propTypes = {
 	isMe: PropTypes.bool,

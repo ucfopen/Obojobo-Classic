@@ -12,7 +12,7 @@ const getUserString = n => {
 // and it will return all loaded user objects
 // it'll cache every user loaded,
 // preventing them from being requested multiple times
-const useApiGetUsersCached = (neededUserIDs) => {
+const useApiGetUsersCached = neededUserIDs => {
 	const [users, setUsers] = React.useState({})
 
 	// filter out any users we already have in the cache
@@ -23,7 +23,8 @@ const useApiGetUsersCached = (neededUserIDs) => {
 	//	load users
 	const { isError, data, isFetching } = useQuery(
 		['getUserNames', ...usersToLoad],
-		apiGetUserNames, {
+		apiGetUserNames,
+		{
 			initialStale: true,
 			staleTime: Infinity,
 			initialData: [],
@@ -42,18 +43,17 @@ const useApiGetUsersCached = (neededUserIDs) => {
 
 		const newUsers = {}
 		data.forEach(user => {
-			const u = {...user}
-			u.userName = {...defaultUserName, ...u.userName}
+			const u = { ...user }
+			u.userName = { ...defaultUserName, ...u.userName }
 			u.userString = getUserString(u.userName)
 			newUsers[u.userID] = u
 		})
 
 		// add them to the cache for all loaded users
-		setUsers({...users, ...newUsers})
+		setUsers({ ...users, ...newUsers })
 	}, [data])
 
 	return { users, isError, isFetching }
 }
 
 export default useApiGetUsersCached
-

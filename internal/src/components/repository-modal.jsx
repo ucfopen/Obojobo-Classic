@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import ReactModal from 'react-modal'
 import Button from './button'
 
-export default function RepositoryModal({ instanceName, children, onCloseModal, className = '' }){
+export default function RepositoryModal({ instanceName, children, onCloseModal, className = '' }) {
 	useEffect(() => {
 		ReactModal.setAppElement('#repository')
 	}, [])
@@ -22,13 +22,10 @@ export default function RepositoryModal({ instanceName, children, onCloseModal, 
 					<div className="module-title">{instanceName}</div>
 					<Button type="text" ariaLabel="Close" onClick={onCloseModal} text="×" />
 				</div>
-				<div className="modal-content">
-					{children}
-				</div>
+				<div className="modal-content">{children}</div>
 			</div>
 		</ReactModal>
 	) : null
 }
 
-ReactModal.setAppElement('#react-app');
-
+ReactModal.setAppElement('#react-app')

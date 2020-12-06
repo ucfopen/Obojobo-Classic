@@ -3,21 +3,22 @@ import PropTypes from 'prop-types'
 
 import './search-field.scss'
 
-export default function SearchField({ value, onChange, placeholder, focusOnMount}) {
+export default function SearchField({ value, onChange, placeholder, focusOnMount }) {
 	const inputEl = React.useRef(null)
 
-	const handleChange = React.useCallback(e => {
-		if (onChange) onChange(e.target.value)
-	}, [onChange])
+	const handleChange = React.useCallback(
+		e => {
+			if (onChange) onChange(e.target.value)
+		},
+		[onChange]
+	)
 
 	React.useEffect(() => {
 		if (focusOnMount === true) inputEl.current.focus()
 	}, [])
 
 	return (
-		<div
-			className={'repository--search-field ' + (value ? 'is-not-empty' : 'is-empty')}
-		>
+		<div className={'repository--search-field ' + (value ? 'is-not-empty' : 'is-empty')}>
 			<i className="magnifier-icon"></i>
 			<input
 				ref={inputEl}

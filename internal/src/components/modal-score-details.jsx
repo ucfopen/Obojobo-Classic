@@ -26,21 +26,36 @@ const extractAssessmentAttemptData = (logs, aGroup) => {
 	return foundLogs
 }
 
-export function ModalScoreDetailsWithAPI({instanceName, onClose, userName, userID, instID, loID}){
-	const { isError: isVisitDataError, data: visitData, isFetching: isVisitDataFetching } = useQuery(['visitTrackingData', userID, instID], apiGetVisitTrackingData, {
-		cacheTime: 30000,
-		initialStale: true,
-		initialData: null,
-		staleTime: Infinity
-	})
+export function ModalScoreDetailsWithAPI({
+	instanceName,
+	onClose,
+	userName,
+	userID,
+	instID,
+	loID
+}) {
+	const { isError: isVisitDataError, data: visitData, isFetching: isVisitDataFetching } = useQuery(
+		['visitTrackingData', userID, instID],
+		apiGetVisitTrackingData,
+		{
+			cacheTime: 30000,
+			initialStale: true,
+			initialData: null,
+			staleTime: Infinity
+		}
+	)
 
 	// note, can return cached value before visitData loads
-	const { isError: isLOError, data: loData, isFetching: isLOFetching } = useQuery(['getLO', loID], apiGetLO, {
-		initialStale: true,
-		staleTime: Infinity,
-		initialData: null,
-		enabled: visitData
-	})
+	const { isError: isLOError, data: loData, isFetching: isLOFetching } = useQuery(
+		['getLO', loID],
+		apiGetLO,
+		{
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: null,
+			enabled: visitData
+		}
+	)
 
 	// merge some api states
 	const isFetching = isVisitDataFetching || isLOFetching
@@ -48,14 +63,14 @@ export function ModalScoreDetailsWithAPI({instanceName, onClose, userName, userI
 	const ready = !isFetching && loData && visitData
 
 	const props = React.useMemo(() => {
-		if(isFetching || isError || !visitData || !loData) return {}
+		if (isFetching || isError || !visitData || !loData) return {}
 		const visitLogs = visitData.visitLog.map(vLog => vLog.logs).flat()
 		const attemptLogs = extractAssessmentAttemptData(visitLogs, loData.aGroup)
-		return { userName, attemptLogs, aGroup: loData.aGroup}
+		return { userName, attemptLogs, aGroup: loData.aGroup }
 	}, [onClose, visitData, loData, isFetching])
 
-	if(!ready) return <div>Loading</div>
-	if(isError) return <div>Error Loading Data</div>
+	if (!ready) return <div>Loading</div>
+	if (isError) return <div>Error Loading Data</div>
 	return <ModalScoreDetails {...props} instanceName={instanceName} onClose={onClose} />
 }
 
@@ -90,7 +105,13 @@ const getAnsweredQuestions = (questionsByID, attemptLogs) => {
 	})
 }
 
-export default function ModalScoreDetails({ aGroup, attemptLogs, userName, instanceName, onClose }) {
+export default function ModalScoreDetails({
+	aGroup,
+	attemptLogs,
+	userName,
+	instanceName,
+	onClose
+}) {
 	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
 	const answeredQuestions = React.useMemo(() => getAnsweredQuestions(questionsByID, attemptLogs), [
 		aGroup,
@@ -131,12 +152,7 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName, insta
 	}
 
 	return (
-		<RepositoryModal
-			className="scoreDetails"
-			instanceName={instanceName}
-			onCloseModal={onClose}
-
-		>
+		<RepositoryModal className="scoreDetails" instanceName={instanceName} onCloseModal={onClose}>
 			<div className="modal-score-details">
 				<div className="left-pane">
 					<div className="modal-title">
@@ -162,7 +178,6 @@ export default function ModalScoreDetails({ aGroup, attemptLogs, userName, insta
 
 ModalScoreDetails.propTypes = {
 	aGroup: PropTypes.object.isRequired,
-	attemptLogs: PropTypes.array.isRequired,
 	instanceName: PropTypes.string,
 	onClose: PropTypes.func.isRequired,
 	userName: PropTypes.string.isRequired,

@@ -10,17 +10,16 @@ import { useQuery } from 'react-query'
 import { apiGetLOMeta } from '../util/api'
 import RepositoryModal from './repository-modal'
 
-
-export function ModalAboutLOWithAPI({onClose, loID}){
+export function ModalAboutLOWithAPI({ onClose, loID }) {
 	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
 		initialStale: true,
-		staleTime: Infinity,
+		staleTime: Infinity
 	})
 
 	const props = React.useMemo(() => {
-		if(isFetching || isError) return {}
-		const {learnTime, languageID, notes, summary, objective } = data
-		const {contentSize, practiceSize, assessmentSize} = summary
+		if (isFetching || isError) return {}
+		const { learnTime, languageID, notes, summary, objective } = data
+		const { contentSize, practiceSize, assessmentSize } = summary
 		return {
 			learnTime,
 			languageID,
@@ -32,15 +31,15 @@ export function ModalAboutLOWithAPI({onClose, loID}){
 		}
 	}, [onClose, loID, data, isFetching])
 
-	if(isFetching) return null
-	if(isError) return <div>Error Loading Data</div>
+	if (isFetching) return null
+	if (isError) return <div>Error Loading Data</div>
 	return <ModalAboutLO {...props} onClose={onClose} />
 }
 
 export default function ModalAboutLO(props) {
 	const items = [
 		{ label: 'Learn Time', value: props.learnTime.toString() },
-		{ label: 'Language', value: props.languageID == 1 ? 'English' : '' },
+		{ label: 'Language', value: props.languageID === 1 ? 'English' : '' },
 		{ label: 'Content Pages', value: props.contentSize.toString() },
 		{ label: 'Practice Questions', value: props.practiceSize.toString() },
 		{ label: 'Assessment Questions', value: props.assessmentSize.toString() },
@@ -52,7 +51,6 @@ export default function ModalAboutLO(props) {
 			className="aboutThisLO"
 			instanceName={props.instanceName}
 			onCloseModal={props.onClose}
-
 		>
 			<div className="modal-about-learning-object">
 				<SectionHeader label={'About this learning object'} />

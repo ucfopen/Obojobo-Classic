@@ -48,12 +48,7 @@ const getDurationText = (startTime, endTime) => {
 // hook to load instance managers for a particular instance
 const useInstanceManagers = instID => {
 	//	load perms to selected instance
-	const {
-		isError: qPermsIsError,
-		data: qPermsData,
-		error: qPermsError,
-		isFetching: qPermsIsFetching
-	} = useQuery(['getInstancePerms', instID], apiGetInstancePerms, {
+	const { data: qPermsData } = useQuery(['getInstancePerms', instID], apiGetInstancePerms, {
 		initialStale: true,
 		staleTime: Infinity,
 		initialData: null,
@@ -83,10 +78,7 @@ const useInstanceManagers = instID => {
 	return instanceManagers
 }
 
-export default function InstanceSection({
-	instance,
-	currentUser
-}) {
+export default function InstanceSection({ instance, currentUser }) {
 	const queryCache = useQueryCache()
 	const [aboutVisible, hideAbout, showAbout] = useToggleState()
 	const [accessVisible, hideAccess, showAccess] = useToggleState()
@@ -102,29 +94,33 @@ export default function InstanceSection({
 
 	const usersWithAccess = useInstanceManagers(instance?.instID)
 
-	const updateInstance = React.useCallback(async values => {
-		try {
-			await mutateInstance(values, { throwOnError: true })
-			// update 'data' in place
-			const keys = Object.keys(values)
-			keys.forEach(k => {instance[k] = values[k]})
+	const updateInstance = React.useCallback(
+		async values => {
+			try {
+				await mutateInstance(values, { throwOnError: true })
+				// update 'data' in place
+				const keys = Object.keys(values)
+				keys.forEach(k => {
+					instance[k] = values[k]
+				})
 
-			// trying to populate cache with updated data, but no dice
-			const data = queryCache.getQueryData(['getInstances'])
-			const index = data.indexOf(instance)
-			data[index] = {...instance}
-			queryCache.setQueryData(['getInstances'], [...data])
-			queryCache.refetchQueries(['getInstances'], { exact: true })
-			hideEdit()
-		} catch (error) {
-			console.error('Error changing Instance Details')
-			console.error(error)
-		}
-	}, [instance, hideEdit])
-
+				// trying to populate cache with updated data, but no dice
+				const data = queryCache.getQueryData(['getInstances'])
+				const index = data.indexOf(instance)
+				data[index] = { ...instance }
+				queryCache.setQueryData(['getInstances'], [...data])
+				queryCache.refetchQueries(['getInstances'], { exact: true })
+				hideEdit()
+			} catch (error) {
+				console.error('Error changing Instance Details') // eslint-disable-line no-console
+				console.error(error) // eslint-disable-line no-console
+			}
+		},
+		[instance, hideEdit]
+	)
 
 	const detailItems = React.useMemo(() => {
-		if(!instance) return []
+		if (!instance) return []
 		return [
 			{
 				label: 'Open Date',
@@ -211,35 +207,32 @@ export default function InstanceSection({
 
 			<AssessmentScoresSection instance={instance} />
 
-			{aboutVisible
-				? <ModalAboutLOWithAPI
-						instanceName={instance.name}
-						onClose={hideAbout}
-						loID={instance.loID}
-					/>
-				: null
-			}
+			{aboutVisible ? (
+				<ModalAboutLOWithAPI
+					instanceName={instance.name}
+					onClose={hideAbout}
+					loID={instance.loID}
+				/>
+			) : null}
 
-			{accessVisible
-				? <PeopleSearchDialog
+			{accessVisible ? (
+				<PeopleSearchDialog
 					instanceName={instance.name}
 					onClose={hideAccess}
 					instID={instance.instID}
 					currentUserId={currentUser.userID}
 					usersWithAccess={usersWithAccess}
 				/>
-				:null
-			}
+			) : null}
 
-			{editVisible
-				?	<ModalInstanceDetails
-						onClose={hideEdit}
-						instanceName={instance.name}
-						{...instance}
-						onSave={updateInstance}
-					/>
-				: null
-			}
+			{editVisible ? (
+				<ModalInstanceDetails
+					onClose={hideEdit}
+					instanceName={instance.name}
+					{...instance}
+					onSave={updateInstance}
+				/>
+			) : null}
 		</div>
 	)
 }

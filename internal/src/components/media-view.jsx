@@ -66,9 +66,9 @@ const renderMediaItem = ({ mediaID, title, itemType, meta, url }) => {
 					width="300"
 					height="169"
 					src={`https://www.youtube.com/embed/${url}`}
-					frameborder="0"
+					frameBorder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					allowfullscreen
+					allowFullScreen
 				></iframe>
 			)
 	}

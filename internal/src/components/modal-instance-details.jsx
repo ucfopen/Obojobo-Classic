@@ -17,7 +17,7 @@ export default function ModalInstanceDetails(props) {
 	const [allowScoreImport, setAllowScoreImport] = useState(props.allowScoreImport)
 
 	const [exScoreMethod, exFinalScore] = React.useMemo(() => {
-		switch(scoreMethod){
+		switch (scoreMethod) {
 			case 'h':
 				return ['Highest', 90]
 			case 'm':
@@ -57,12 +57,14 @@ export default function ModalInstanceDetails(props) {
 							<input
 								type="text"
 								value={name}
-								onChange={(e) => {setName(e.target.value)}}
+								onChange={e => {
+									setName(e.target.value)
+								}}
 							/>
 							<HelpButton>
 								<div>
-									Your published instance will be displayed to students as the name you input here. By
-									default this name is the same as the object name.
+									Your published instance will be displayed to students as the name you input here.
+									By default this name is the same as the object name.
 								</div>
 							</HelpButton>
 						</div>
@@ -70,11 +72,7 @@ export default function ModalInstanceDetails(props) {
 					<div className="row">
 						<span className="title">Course Name:</span>
 						<div className="flex-container">
-							<input
-								type="text"
-								value={courseID}
-								onChange={e => setCourseID(e.target.value)}
-							/>
+							<input type="text" value={courseID} onChange={e => setCourseID(e.target.value)} />
 							<HelpButton>
 								<div>
 									This field shows the course for this instance. This field is for your organization
@@ -94,13 +92,13 @@ export default function ModalInstanceDetails(props) {
 							<HelpButton>
 								{props.externalLink ? (
 									<div>
-										Since this instance is linked to an external course you cannot set the start date.
-										Access to your module is reliant on settings in the external system.
+										Since this instance is linked to an external course you cannot set the start
+										date. Access to your module is reliant on settings in the external system.
 									</div>
 								) : (
 									<div>
-										This is the date when this instance will be opened to students. Before this date,
-										students will not be able to access the instance.
+										This is the date when this instance will be opened to students. Before this
+										date, students will not be able to access the instance.
 									</div>
 								)}
 							</HelpButton>
@@ -120,9 +118,9 @@ export default function ModalInstanceDetails(props) {
 									</div>
 								) : (
 									<div>
-										This is the date when the assessment will be closed to students. After this date,
-										students will not be able to take assessment attempts. They will still have access
-										to the content and practice.
+										This is the date when the assessment will be closed to students. After this
+										date, students will not be able to take assessment attempts. They will still
+										have access to the content and practice.
 									</div>
 								)}
 							</HelpButton>
@@ -148,10 +146,10 @@ export default function ModalInstanceDetails(props) {
 							/>
 							<HelpButton>
 								<div>
-									This is the number of tries a student will have to take the assessment quiz. If you
-									provide more than one assessment attempt then the final score is determined by the
-									&apos;Score Method&apos;. Students will be able to see how many attempts they have
-									before they begin the assessment quiz.
+									This is the number of tries a student will have to take the assessment quiz. If
+									you provide more than one assessment attempt then the final score is determined by
+									the &apos;Score Method&apos;. Students will be able to see how many attempts they
+									have before they begin the assessment quiz.
 								</div>
 							</HelpButton>
 						</div>
@@ -181,7 +179,12 @@ export default function ModalInstanceDetails(props) {
 							</div>
 							<div className="row example">
 								<span className="sub-title">Example:</span>
-								<span>Given 3 attempts: 75, 90, 80. The <b>{exScoreMethod} score is: {exFinalScore}%</b></span>
+								<span>
+									Given 3 attempts: 75, 90, 80. The{' '}
+									<b>
+										{exScoreMethod} score is: {exFinalScore}%
+									</b>
+								</span>
 							</div>
 						</React.Fragment>
 					) : null}

@@ -34,7 +34,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 	// reset selected if the id isnt in the data
 	React.useEffect(() => {
 		if (!data) return
-		const containsSelected = data.find(i => getRowId(i) == selectedId)
+		const containsSelected = data.find(i => getRowId(i) === selectedId)
 		if (!containsSelected) setSelectedId(null)
 	}, [data])
 
@@ -53,30 +53,33 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
-	const RenderRow = React.useCallback(({ index, style }) => {
-		const row = rows[index]
-		prepareRow(row)
+	const RenderRow = React.useCallback(
+		({ index, style }) => {
+			const row = rows[index]
+			prepareRow(row)
 
-		const selectedClass = row.id === selectedId ? 'selected' : ''
-		const evenOddClass = index % 2 ? 'odd' : ''
-		const onClick = () => {
-			if (onSelect) {
-				setSelectedId(row.id)
-				onSelect(row.original)
+			const selectedClass = row.id === selectedId ? 'selected' : ''
+			const evenOddClass = index % 2 ? 'odd' : ''
+			const onClick = () => {
+				if (onSelect) {
+					setSelectedId(row.id)
+					onSelect(row.original)
+				}
 			}
-		}
-		return (
-			<div
-				{...row.getRowProps({ style })}
-				onClick={onClick}
-				className={`row ${selectedClass} ${evenOddClass}`}
-			>
-				{row.cells.map(cell => (
-					<div {...cell.getCellProps()}>{cell.render('Cell')}</div>
-				))}
-			</div>
-		)
-	}, [rows, selectedId])
+			return (
+				<div
+					{...row.getRowProps({ style })}
+					onClick={onClick}
+					className={`row ${selectedClass} ${evenOddClass}`}
+				>
+					{row.cells.map(cell => (
+						<div {...cell.getCellProps()}>{cell.render('Cell')}</div>
+					))}
+				</div>
+			)
+		},
+		[rows, selectedId]
+	)
 
 	return (
 		<div className={`repository--data-grid ${onSelect ? 'selectable' : ''}`} {...getTableProps()}>

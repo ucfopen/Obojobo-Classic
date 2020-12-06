@@ -35,16 +35,11 @@ export default function Header({ userName }) {
 					</button>
 				</div>
 			</div>
-			{aboutVisible
-				? <ModalAboutObojoboNext
-					onClose={hideAbout}
-					/>
-				: null
-			}
+			{aboutVisible ? <ModalAboutObojoboNext onClose={hideAbout} /> : null}
 		</div>
 	)
 }
 
 Header.propTypes = {
-	userName: PropTypes.string.isRequired,
+	userName: PropTypes.string.isRequired
 }

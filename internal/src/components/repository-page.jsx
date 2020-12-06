@@ -2,10 +2,7 @@ import './repository-page.scss'
 
 import React from 'react'
 import { useQuery, useQueryCache } from 'react-query'
-import {
-	apiGetCurrentUser,
-	apiVerifySession
-} from '../util/api'
+import { apiGetCurrentUser, apiVerifySession } from '../util/api'
 import MyInstances from './my-instances'
 import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
@@ -31,7 +28,7 @@ const RepositoryPage = () => {
 	)
 
 	// load current user
-	const { isError: qUserIsError, data: currentUser, error: qUserError } = useQuery(
+	const { data: currentUser, error: qUserError } = useQuery(
 		'apiGetCurrentUser',
 		apiGetCurrentUser,
 		{
@@ -41,14 +38,14 @@ const RepositoryPage = () => {
 		}
 	)
 
-	const theError = qSessionError || qUserError  || null
-	if(!displayError && theError){
+	const theError = qSessionError || qUserError || null
+	if (!displayError && theError) {
 		setDisplayError(theError)
 	}
 
 	// disable the session checker
 	// if interval isn't disabled and there is an error OR the user isn't logged in
-	if(sessionInterval && (displayError || qSessionData === false)){
+	if (sessionInterval && (displayError || qSessionData === false)) {
 		setSessionInterval(false)
 	}
 
@@ -61,10 +58,7 @@ const RepositoryPage = () => {
 			<main>
 				<div className="wrapper">
 					<MyInstances onSelect={setInstance} />
-					<InstanceSection
-						instance={instance}
-						currentUser={currentUser}
-					/>
+					<InstanceSection instance={instance} currentUser={currentUser} />
 				</div>
 			</main>
 		</div>

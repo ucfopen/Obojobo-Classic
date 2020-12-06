@@ -17,13 +17,29 @@ const DataGridAssessmentScores = ({
 	onClickSetAdditionalAttempt,
 	onClickScoreDetails
 }) => {
-
-	const columns = React.useMemo(() => [
-		{ accessor: 'user', Header: 'User' },
-		{ accessor: 'score', Header: 'Score', Cell: DataGridStudentScoreCell, onClick: onClickScoreDetails},
-		{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: DataGridTimestampCellWithSeconds },
-		{ accessor: 'numAttemptsTaken', Header: 'Attempts', Cell: DataGridAttemptsCell, onClick: onClickSetAdditionalAttempt }
-	], [onClickSetAdditionalAttempt, onClickScoreDetails])
+	const columns = React.useMemo(
+		() => [
+			{ accessor: 'user', Header: 'User' },
+			{
+				accessor: 'score',
+				Header: 'Score',
+				Cell: DataGridStudentScoreCell,
+				onClick: onClickScoreDetails
+			},
+			{
+				accessor: 'lastSubmitted',
+				Header: 'Last Submitted',
+				Cell: DataGridTimestampCellWithSeconds
+			},
+			{
+				accessor: 'numAttemptsTaken',
+				Header: 'Attempts',
+				Cell: DataGridAttemptsCell,
+				onClick: onClickSetAdditionalAttempt
+			}
+		],
+		[onClickSetAdditionalAttempt, onClickScoreDetails]
+	)
 
 	const height = React.useMemo(() => {
 		const rowHeight = 58
@@ -33,12 +49,8 @@ const DataGridAssessmentScores = ({
 	}, [data])
 
 	return (
-		<div className="repository--data-grid-assessment-scores" style={{height: `${height}px`}}>
-			<DataGrid
-				data={data}
-				idColumn='userID'
-				columns={columns}
-			/>
+		<div className="repository--data-grid-assessment-scores" style={{ height: `${height}px` }}>
+			<DataGrid data={data} idColumn="userID" columns={columns} />
 		</div>
 	)
 }

@@ -6,7 +6,7 @@ import DataGridInstances from './data-grid-instances'
 import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 import { useQuery, queryCache } from 'react-query'
-import {apiGetInstances} from '../util/api'
+import { apiGetInstances } from '../util/api'
 
 const getFilteredInstances = (instances, search) => {
 	if (!instances) return null
@@ -26,17 +26,20 @@ const getFilteredInstances = (instances, search) => {
 export default function MyInstances({ onSelect }) {
 	const [search, setSearch] = useState('')
 	const [_selectedInstance, _setSelectedInstance] = React.useState(null)
-	const setSelectedInstance = React.useCallback(instance => {
-		_setSelectedInstance(instance)
-		onSelect(instance)
-	}, [onSelect])
+	const setSelectedInstance = React.useCallback(
+		instance => {
+			_setSelectedInstance(instance)
+			onSelect(instance)
+		},
+		[onSelect]
+	)
 
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
 	}, [])
 
 	// load instances
-	const { data, error, isFetching } = useQuery(['getInstances'], apiGetInstances, {
+	const { data, isFetching } = useQuery(['getInstances'], apiGetInstances, {
 		cacheTime: Infinity,
 		initialStale: true,
 		staleTime: Infinity,
@@ -47,16 +50,18 @@ export default function MyInstances({ onSelect }) {
 	// referencing an object from the old results.  This forces the update
 	// to the new selected instance data
 	React.useEffect(() => {
-		if(!data || !_selectedInstance) return
-		if(data.indexOf(_selectedInstance) == -1){
+		if (!data || !_selectedInstance) return
+		if (data.indexOf(_selectedInstance) === -1) {
 			const newInstance = data.find(i => i.instID === _selectedInstance.instID)
 			_setSelectedInstance(newInstance)
 		}
 	}, [data, _selectedInstance])
 
-
 	const instances = isFetching ? null : data
-	const filteredInstances = React.useMemo(() => getFilteredInstances(instances, search), [instances, search])
+	const filteredInstances = React.useMemo(() => getFilteredInstances(instances, search), [
+		instances,
+		search
+	])
 
 	return (
 		<div className="repository--my-instances">
@@ -85,5 +90,5 @@ MyInstances.propTypes = {
 		})
 	),
 	_selectedInstanceIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired,
+	onSelect: PropTypes.func.isRequired
 }

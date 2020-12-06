@@ -72,7 +72,10 @@
 	&.is-disabled {
 		&,
 		&:hover {
-			background: linear-gradient(darken($color-button-bg-disabled, 10%), $color-button-bg-disabled);
+			background: linear-gradient(
+				darken($color-button-bg-disabled, 10%),
+				$color-button-bg-disabled
+			);
 		}
 	}
 }

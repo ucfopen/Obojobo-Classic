@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 
 /* useToggleState
 
@@ -31,13 +31,17 @@ You can set the  initial state and settings : [isOn, disable, enable, options] =
 
 */
 
-export default function useToggleState(initialVisible = false, initialSettings = null){
-	const [state, setState] = useState({enabled: initialVisible, settings: initialSettings})
+export default function useToggleState(initialVisible = false, initialSettings = null) {
+	const [state, setState] = React.useState({ enabled: initialVisible, settings: initialSettings })
 
 	const [disableFn, enableFn] = React.useMemo(() => {
 		return [
-			() => {setState({enabled: false, settings: null})},
-			(...settings) => {setState({enabled: true, settings})}
+			() => {
+				setState({ enabled: false, settings: null })
+			},
+			(...settings) => {
+				setState({ enabled: true, settings })
+			}
 		]
 	}, [])
 

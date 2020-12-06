@@ -21,14 +21,15 @@ const handleErrors = async resp => {
 const fetchGet = url => fetch(url, fetchOptions()).then(handleErrors)
 
 export const apiVerifySession = () => fetchGet('/api/json.php/loRepository.getSessionValid')
-export const apiGetCurrentUser = () => fetchGet('/api/json.php/loRepository.getUser').then(user => {
-	// normalize the data we're getting back
-	const castToInt = ['createTime', 'lastLogin', 'userID']
-	castToInt.forEach(key => {
-		user[key] = parseInt(user[key], 10)
+export const apiGetCurrentUser = () =>
+	fetchGet('/api/json.php/loRepository.getUser').then(user => {
+		// normalize the data we're getting back
+		const castToInt = ['createTime', 'lastLogin', 'userID']
+		castToInt.forEach(key => {
+			user[key] = parseInt(user[key], 10)
+		})
+		return user
 	})
-	return user
-})
 export const apiGetInstances = () =>
 	fetchGet('/api/json.php/loRepository.getInstances').then(instances => {
 		// normalize the data we're getting back
@@ -47,7 +48,7 @@ export const apiGetInstances = () =>
 				i[key] = parseInt(i[key], 10)
 			})
 			i.allowScoreImport = i.allowScoreImport === '1'
-			i.externalLink = i.externalLink != null
+			i.externalLink = i.externalLink !== null
 		})
 		return instances
 	})
@@ -69,12 +70,12 @@ export const apiGetLO = (r, loID) =>
 		lo.pGroup.rand = lo.pGroup.rand === '1'
 		lo.createTime = parseInt(lo.createTime, 10)
 		lo.allowScoreImport = lo.allowScoreImport === '1'
-		lo.externalLink = lo.externalLink != null
+		lo.externalLink = lo.externalLink !== null
 		lo.aGroup.kids.forEach(k => {
 			k.questionID = parseInt(k.questionID, 10)
-			if(k.items){
+			if (k.items) {
 				k.items.forEach(i => {
-					if(i.media){
+					if (i.media) {
 						i.media.forEach(m => {
 							m.mediaID = parseInt(m.mediaID, 10)
 							m.auth = parseInt(m.auth, 10)
@@ -88,18 +89,18 @@ export const apiGetLO = (r, loID) =>
 				})
 			}
 		})
-		// lo.pGroup.kids.forEach(k => {
-		// 	k.questionID = parseInt(k.questionID, 10)
-		// })
-console.log({lo})
 		return lo
 	})
 
 export const getUsersMatchingSearch = (r, search) =>
-	fetchGet(`/api/json.php/loRepository.getUsersMatchingSearch/${encodeURIComponent(search)}`).then(users => {
-		users.forEach(u => {u.userID = parseInt(u.userID, 10)})
-		return users
-	})
+	fetchGet(`/api/json.php/loRepository.getUsersMatchingSearch/${encodeURIComponent(search)}`).then(
+		users => {
+			users.forEach(u => {
+				u.userID = parseInt(u.userID, 10)
+			})
+			return users
+		}
+	)
 
 export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
@@ -168,7 +169,9 @@ export const apiGetInstanceTrackingData = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
 export const apiGetUserNames = (r, ...userIDs) =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`).then(users => {
-		users.forEach(u => {u.userID = parseInt(u.userID, 10)})
+		users.forEach(u => {
+			u.userID = parseInt(u.userID, 10)
+		})
 		return users
 	})
 export const apiGetInstancePerms = (r, instID) =>

@@ -161,7 +161,7 @@ export default function AssessmentScoresSummary(props) {
 												className="vx-bar"
 											/>
 										)
-								})
+								  })
 								: null}
 							<AxisBottom
 								scale={xScale}

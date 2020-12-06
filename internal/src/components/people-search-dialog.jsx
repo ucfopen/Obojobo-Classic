@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { useMutation, useQuery, useQueryCache } from 'react-query'
 import SearchField from './search-field'
 import Button from './button'
-import PeopleListItem  from './people-list-item'
+import PeopleListItem from './people-list-item'
 import {
 	getUsersMatchingSearch,
 	apiAddUsersToInstance,
@@ -17,13 +17,19 @@ import LoadingIndicator from './loading-indicator'
 let updateSearchStringIntervalID
 const DEBOUNCE_INTERVAL_MS = 250
 
-export default function PeopleSearchDialog({instID, usersWithAccess, currentUserId, onClose, instanceName}){
+export default function PeopleSearchDialog({
+	instID,
+	usersWithAccess,
+	currentUserId,
+	onClose,
+	instanceName
+}) {
 	const queryCache = useQueryCache()
 	const [searchString, setSearchString] = React.useState('')
 	const [apiSearchString, setAPISearchString] = React.useState('')
 	const [isAdding, setIsAdding] = React.useState(false)
 
-	const { isError, data, error, isFetching } = useQuery(
+	const { data, isFetching } = useQuery(
 		['getUsersMatchingSearch', apiSearchString],
 		getUsersMatchingSearch,
 		{
@@ -38,50 +44,54 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 	const [mutateAddUsersToInstance] = useMutation(apiAddUsersToInstance)
 	const [mutateRemoveUsersFromInstance] = useMutation(apiRemoveUsersFromInstance)
 
-	const onClickAdd = React.useCallback(async user => {
-		try {
-			const resp = await mutateAddUsersToInstance(
-				{ userIDs: [user.id], instID },
-				{ throwOnError: true }
-			)
-			queryCache.invalidateQueries(['getInstancePerms', instID])
+	const onClickAdd = React.useCallback(
+		async user => {
+			try {
+				const resp = await mutateAddUsersToInstance(
+					{ userIDs: [user.id], instID },
+					{ throwOnError: true }
+				)
+				queryCache.invalidateQueries(['getInstancePerms', instID])
 
-			return resp
-		} catch (e) {
-			console.error('Error setting extra attempts')
-			console.error(e)
-		}
-	}, [instID])
+				return resp
+			} catch (e) {
+				console.error('Error setting extra attempts') // eslint-disable-line no-console
+				console.error(e) // eslint-disable-line no-console
+			}
+		},
+		[instID]
+	)
 
-	const onClickRevoke = React.useCallback(async user => {
-		if (user.id === currentUserId) {
-			if (
-				!confirm(
+	const onClickRevoke = React.useCallback(
+		async user => {
+			if (user.id === currentUserId) {
+				// eslint-disable-next-line no-alert
+				const revoke = window.confirm(
 					'Are you sure you want to revoke your own access? This instance will no longer show up in your instance list.'
 				)
-			) {
-				return
+				if (!revoke) return
 			}
-		}
-		try {
-			const resp = await mutateRemoveUsersFromInstance(
-				{ userIDs: [user.id], instID },
-				{ throwOnError: true }
-			)
-			queryCache.invalidateQueries(['getInstancePerms', instID])
 
-			return resp
-		} catch (e) {
-			console.error('Error setting extra attempts')
-			console.error(e)
-		}
-	}, [instID])
+			try {
+				const resp = await mutateRemoveUsersFromInstance(
+					{ userIDs: [user.id], instID },
+					{ throwOnError: true }
+				)
+				queryCache.invalidateQueries(['getInstancePerms', instID])
+
+				return resp
+			} catch (e) {
+				console.error('Error setting extra attempts') // eslint-disable-line no-console
+				console.error(e) // eslint-disable-line no-console
+			}
+		},
+		[instID]
+	)
 
 	const people = React.useMemo(() => {
-		if(!data) return []
+		if (!data) return []
 		return data.map(user => ({
 			id: user.userID,
-			avatarUrl: '/assets/images/user-circle.svg',
 			firstName: user.first,
 			lastName: user.last,
 			username: 'User #' + user.userID
@@ -90,7 +100,6 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 
 	const usersWithAccess2 = usersWithAccess.map(user => ({
 		id: user.userID,
-		avatarUrl: '/assets/images/user-circle.svg',
 		firstName: user.userName.first,
 		lastName: user.userName.last,
 		username: 'User #' + user.userID
@@ -99,11 +108,7 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 	const userIDsWithAccess = usersWithAccess.map(user => user.userID).concat(currentUserId)
 
 	return (
-		<RepositoryModal
-			className="peopleSearch"
-			instanceName={instanceName}
-			onCloseModal={onClose}
-			>
+		<RepositoryModal className="peopleSearch" instanceName={instanceName} onCloseModal={onClose}>
 			<div className="people-search-dialog">
 				<div className="wrapper">
 					<h1 className="title">Users with access</h1>
@@ -152,7 +157,10 @@ export default function PeopleSearchDialog({instID, usersWithAccess, currentUser
 									const isUserAlreadyAManager = userIDsWithAccess.indexOf(p.id) > -1
 
 									return (
-										<div key={p.id} className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}>
+										<div
+											key={p.id}
+											className={isUserAlreadyAManager ? 'is-not-enabled' : 'is-enabled'}
+										>
 											<PeopleListItem isMe={p.id === currentUserId} {...p}>
 												{isUserAlreadyAManager ? (
 													<span className="already-has-access">
@@ -190,7 +198,6 @@ PeopleSearchDialog.propTypes = {
 	people: PropTypes.arrayOf(
 		PropTypes.shape({
 			id: PropTypes.number.isRequired,
-			avatarUrl: PropTypes.string,
 			firstName: PropTypes.string,
 			lastName: PropTypes.string,
 			username: PropTypes.string

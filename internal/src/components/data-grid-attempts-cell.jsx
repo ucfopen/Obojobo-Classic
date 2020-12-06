@@ -2,11 +2,15 @@ import './data-grid-attempts-cell.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DataGridAttemptsCell({value, row, column}) {
-	const {attemptCount, additional, isAttemptInProgress, userID} = row.original
+export default function DataGridAttemptsCell({ value, row, column }) {
+	const { attemptCount, additional, isAttemptInProgress, userID } = row.original
 	const { onClick } = column
-	const onAddClick = React.useCallback(() => {onClick(userID, additional+1)}, [onClick, userID, additional])
-	const onRemoveClick = React.useCallback(() => {onClick(userID, additional-1)}, [onClick, userID, additional])
+	const onAddClick = React.useCallback(() => {
+		onClick(userID, additional + 1)
+	}, [onClick, userID, additional])
+	const onRemoveClick = React.useCallback(() => {
+		onClick(userID, additional - 1)
+	}, [onClick, userID, additional])
 
 	return (
 		<div className="data-grid-attempts-cell">
@@ -15,9 +19,7 @@ export default function DataGridAttemptsCell({value, row, column}) {
 				{isAttemptInProgress ? <small className="attempts--in-progress">In progress</small> : null}
 			</p>
 			<div className="controls">
-				{additional > 0 ? (
-					<button onClick={onRemoveClick}>-</button>
-				) : null}
+				{additional > 0 ? <button onClick={onRemoveClick}>-</button> : null}
 				<button onClick={onAddClick}>+</button>
 			</div>
 		</div>

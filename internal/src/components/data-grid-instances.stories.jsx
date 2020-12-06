@@ -21,9 +21,7 @@ export default {
 	}
 }
 
-const Template = args => (
-	<DataGridInstances {...args} />
-)
+const Template = args => <DataGridInstances {...args} />
 
 export const Loading = Template.bind({})
 Loading.args = {
@@ -82,19 +80,19 @@ Data.args = {
 	]
 }
 
-const now = Date.now()/1000
+const now = Date.now() / 1000
 const getRandomInt = max => Math.floor(Math.random() * Math.floor(max))
-const generateRow = (index) =>  ({
+const generateRow = index => ({
 	isSelected: false,
-	instID: index+'',
-	loID: getRandomInt(1500000)+'',
-	userID: getRandomInt(5000)+'',
+	instID: index + '',
+	loID: getRandomInt(1500000) + '',
+	userID: getRandomInt(5000) + '',
 	userName: 'Zachary A Berry',
 	name: 'Conducting a Literature Review For College Students ' + getRandomInt(600),
 	courseID: 'the_id_of_a_course' + getRandomInt(600),
-	createTime: getRandomInt(now)+'',
-	startTime: getRandomInt(now)+'',
-	endTime: getRandomInt(now)+'',
+	createTime: getRandomInt(now) + '',
+	startTime: getRandomInt(now) + '',
+	endTime: getRandomInt(now) + '',
 	attemptCount: '1',
 	scoreMethod: 'h',
 	allowScoreImport: '1',
@@ -109,7 +107,7 @@ const generateRow = (index) =>  ({
 		read: 0,
 		userID: -1,
 		write: 0,
-		_explicitType: "obo\\perms\\Permissions"
+		_explicitType: 'obo\\perms\\Permissions'
 	},
 	courseData: { type: 'none' },
 	externalLink: null,
@@ -120,13 +118,13 @@ const generateRow = (index) =>  ({
 const generateData = howMany => {
 	const data = []
 	const firstRow = generateRow(0)
-	firstRow.name = "------------------- FIRST row --------------"
+	firstRow.name = '------------------- FIRST row --------------'
 	data.push(firstRow)
-	for(let i = 1; i < howMany; i++){
+	for (let i = 1; i < howMany; i++) {
 		data.push(generateRow(i))
 	}
 	const lastRow = generateRow(howMany)
-	lastRow.name = "z ------------------- LAST row -------------- z"
+	lastRow.name = 'z ------------------- LAST row -------------- z'
 	data.push(lastRow)
 	return data
 }
