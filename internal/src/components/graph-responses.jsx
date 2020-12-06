@@ -81,7 +81,8 @@ export default function GraphResponses({ data, width, height }) {
 										className={d.isCorrect ? 'is-correct' : 'is-not-correct'}
 									/>
 								)
-						  })}
+						  }) // eslint-disable-line no-mixed-spaces-and-tabs
+					}
 					<AxisBottom
 						scale={xScale}
 						label="Answer Choice"

@@ -161,7 +161,7 @@ export default function AssessmentScoresSummary(props) {
 												className="vx-bar"
 											/>
 										)
-								  })
+								  }) // eslint-disable-line no-mixed-spaces-and-tabs
 								: null}
 							<AxisBottom
 								scale={xScale}
