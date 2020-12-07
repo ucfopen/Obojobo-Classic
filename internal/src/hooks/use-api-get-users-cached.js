@@ -1,11 +1,7 @@
 import React from 'react'
 import { useQuery } from 'react-query'
 import { apiGetUserNames } from '../util/api'
-
-// @TODO duplicated elsewhere
-const getUserString = n => {
-	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
-}
+import getUserString from '../util/get-user-string'
 
 // hook used to load / cache users
 // provide it with userIDs you need
