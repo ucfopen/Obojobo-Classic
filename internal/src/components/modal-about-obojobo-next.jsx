@@ -15,8 +15,6 @@ export default function ModalAboutObojoboNext({ onClose }) {
 					changes expand the items below.
 				</p>
 
-				<h1>Flash is going away</h1>
-
 				<details>
 					<summary>What&apos;s changed?</summary>
 					<p>
@@ -48,19 +46,15 @@ export default function ModalAboutObojoboNext({ onClose }) {
 					<p>
 						Moving forward to 2021 and beyond with the retirement of Flash, the creation of Obojobo
 						modules has been disabled. Additionally the My Objects and Media sections have been
-						removed. However, we&apos;ve been hard at work at a ground-up rewrite of the next
-						iteration of Obojobo called <b>Obojobo Next</b> which is now available campus wide at
-						UCF. Likewise, Obojobo will continue to be available but is being renamed to{' '}
-						<b>Obojobo Classic</b>.
-					</p>
-
-					<p>
-						If you&apos;ve authored your own content in Obojobo or have been interested in doing so,
-						we highly recommend you check it out!
+						removed.
 					</p>
 				</details>
 
-				<h1>Obojobo Next is coming</h1>
+				<p className="about-obo-next">
+					We&apos;ve been hard at work at a ground-up rewrite of the next iteration of Obojobo
+					called <b>Obojobo Next</b> which is now available campus wide at UCF. Likewise, Obojobo
+					will continue to be available but is being renamed to <b>Obojobo Classic</b>.
+				</p>
 
 				<details>
 					<summary>What&apos;s different with Obojobo Next?</summary>
@@ -74,9 +68,9 @@ export default function ModalAboutObojoboNext({ onClose }) {
 					</p>
 
 					<p>
-						UCF is actively developing Obojobo Next, with new features being added monthly. For a
-						complete detailed list of the differences between Obojobo Next and Obojobo Classic check
-						out this page with a comparison chart.
+						UCF is actively developing Obojobo Next, with new features being added monthly. If
+						you&apos;ve authored your own content in Obojobo or have been interested in doing so, we
+						highly recommend you check it out!
 					</p>
 				</details>
 
