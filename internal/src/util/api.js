@@ -223,3 +223,5 @@ export const apiGetResponsesForInstance = async (key, { instID }) => {
 
 	return addData
 }
+export const apiDeleteInstance = ({ instID }) =>
+	fetchGet(`/api/json.php/loRepository.removeInstance/${instID}`)

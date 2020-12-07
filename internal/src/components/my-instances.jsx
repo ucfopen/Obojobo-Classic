@@ -50,7 +50,12 @@ export default function MyInstances({ onSelect }) {
 	// referencing an object from the old results.  This forces the update
 	// to the new selected instance data
 	React.useEffect(() => {
-		if (!data || !_selectedInstance) return
+		if (!data || !_selectedInstance) {
+			// _setSelectedInstance(null)
+			onSelect(null)
+			return
+		}
+
 		if (data.indexOf(_selectedInstance) === -1) {
 			const newInstance = data.find(i => i.instID === _selectedInstance.instID)
 			_setSelectedInstance(newInstance)

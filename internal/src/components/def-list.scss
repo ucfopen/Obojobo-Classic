@@ -21,6 +21,8 @@
 
 		.value {
 			flex: 1;
+			max-height: 7em;
+			overflow: auto;
 		}
 	}
 }

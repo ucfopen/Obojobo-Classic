@@ -102,20 +102,19 @@ export default function QuestionScoreDetails(props) {
 	}
 
 	// Calculates mean.
-	for (let i = 0; i < dataForGraph.length; i++) {
-		sum +=
-			questionType === MC || questionType === QA ? dataForGraph[i].value : dataForGraph[i].score
+	for (let i = 0; i < responses.length; i++) {
+		sum += responses[i].score
 	}
-	mean = sum / dataForGraph.length
+	mean = sum / responses.length
 
 	const getStdDev = () => {
-		if (responses.length === 0) {
+		if (responses.length < 2) {
 			return '--'
 		}
 
 		let numerator = 0
 		for (let i = 0; i < responses.length; i++) {
-			const diff = dataForGraph[responses[i].response.charCodeAt(0) - 65].value - mean
+			const diff = responses[i].score - mean
 			numerator += Math.pow(diff, 2)
 		}
 

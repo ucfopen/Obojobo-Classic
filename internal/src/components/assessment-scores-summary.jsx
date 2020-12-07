@@ -37,17 +37,17 @@ export default function AssessmentScoresSummary(props) {
 
 	// Processes data for this component's graph once this component mounts.
 	let sum = 0,
-		lowestScore = 100,
-		highestScore = 0
+		lowestScore = Infinity,
+		highestScore = -Infinity
 	const scores = props.scores
 
 	for (let i = 0; i < scores.length; i++) {
 		// Edge case:
 		if (scores[i] === 100) {
 			data[9].value++
-			continue
+		} else {
+			data[Math.floor(scores[i] / 10)].value++
 		}
-		data[Math.floor(scores[i] / 10)].value++
 
 		// To calculate the mean.
 		sum += scores[i]
@@ -84,7 +84,7 @@ export default function AssessmentScoresSummary(props) {
 				scores.length > 0
 					? Math.sqrt(numerator / scores.length)
 							.toFixed(2)
-							.toString() + '%'
+							.toString()
 					: '--'
 		},
 		{

@@ -12,7 +12,7 @@ import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
 import { ModalAboutLOWithAPI } from './modal-about-lo'
 import ModalInstanceDetails from './modal-instance-details'
-import { apiEditInstance, apiGetInstancePerms } from '../util/api'
+import { apiDeleteInstance, apiEditInstance, apiGetInstancePerms } from '../util/api'
 import { useQuery, useMutation, useQueryCache } from 'react-query'
 import PeopleSearchDialog from './people-search-dialog'
 import useToggleState from '../hooks/use-toggle-state'
@@ -85,6 +85,7 @@ export default function InstanceSection({ instance, currentUser }) {
 	const [editVisible, hideEdit, showEdit] = useToggleState()
 
 	const [mutateInstance] = useMutation(apiEditInstance)
+	const [deleteInstance] = useMutation(apiDeleteInstance)
 	const onClickPreviewWithUrl = React.useCallback(() => {
 		window.open(`/preview/${instance.loID}`, '_blank')
 	}, [instance])
@@ -118,6 +119,25 @@ export default function InstanceSection({ instance, currentUser }) {
 		},
 		[instance, hideEdit]
 	)
+
+	const onClickDeleteInstance = React.useCallback(async () => {
+		if (
+			//eslint-disable-next-line no-alert
+			!window.confirm("Are you sure you want to delete this instance? This action can't be undone!")
+		) {
+			return
+		}
+
+		try {
+			await deleteInstance(instance, { throwOnError: true })
+
+			queryCache.setQueryData(['getInstances'], null)
+			queryCache.refetchQueries(['getInstances'], { exact: true })
+		} catch (error) {
+			console.error('Error deleting instance') // eslint-disable-line no-console
+			console.error(error) // eslint-disable-line no-console
+		}
+	})
 
 	const detailItems = React.useMemo(() => {
 		if (!instance) return []
@@ -206,6 +226,10 @@ export default function InstanceSection({ instance, currentUser }) {
 			</div>
 
 			<AssessmentScoresSection instance={instance} />
+
+			<SectionHeader label="Other options" />
+
+			<Button onClick={onClickDeleteInstance} type="text" text="Delete Instance" />
 
 			{aboutVisible ? (
 				<ModalAboutLOWithAPI

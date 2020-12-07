@@ -10,7 +10,7 @@ import { useQuery } from 'react-query'
 import { apiGetLOMeta } from '../util/api'
 import RepositoryModal from './repository-modal'
 
-export function ModalAboutLOWithAPI({ onClose, loID }) {
+export function ModalAboutLOWithAPI({ instanceName, onClose, loID }) {
 	const { isError, data, isFetching } = useQuery(['getLoMeta', loID], apiGetLOMeta, {
 		initialStale: true,
 		staleTime: Infinity
@@ -18,7 +18,7 @@ export function ModalAboutLOWithAPI({ onClose, loID }) {
 
 	const props = React.useMemo(() => {
 		if (isFetching || isError) return {}
-		const { learnTime, languageID, notes, summary, objective } = data
+		const { learnTime, languageID, notes, summary, objective, title } = data
 		const { contentSize, practiceSize, assessmentSize } = summary
 		return {
 			learnTime,
@@ -27,17 +27,19 @@ export function ModalAboutLOWithAPI({ onClose, loID }) {
 			practiceSize,
 			assessmentSize,
 			notes,
-			objective
+			objective,
+			title
 		}
 	}, [onClose, loID, data, isFetching])
 
 	if (isFetching) return null
 	if (isError) return <div>Error Loading Data</div>
-	return <ModalAboutLO {...props} onClose={onClose} />
+	return <ModalAboutLO instanceName={instanceName} {...props} onClose={onClose} />
 }
 
 export default function ModalAboutLO(props) {
 	const items = [
+		{ label: 'Title', value: props.title },
 		{ label: 'Learn Time', value: props.learnTime.toString() },
 		{ label: 'Language', value: props.languageID === 1 ? 'English' : '' },
 		{ label: 'Content Pages', value: props.contentSize.toString() },
