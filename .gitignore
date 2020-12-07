@@ -57,3 +57,5 @@ internal/wordpress-core/
 wp/*
 
 node_modules
+
+assets/dist/*

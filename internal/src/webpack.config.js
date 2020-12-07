@@ -1,7 +1,7 @@
 const glob = require('glob')
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-// const ManifestPlugin = require('webpack-manifest-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // const WatchIgnorePlugin = require('webpack/lib/WatchIgnorePlugin')
 
@@ -152,8 +152,8 @@ module.exports =
 				// 	path.join(__dirname, 'server', 'public', 'compiled', 'manifest.json')
 				// ]),
 				new CleanWebpackPlugin(), // clear the dist folder before build
-				new MiniCssExtractPlugin({ filename: `${filename}.css` })
-				// new ManifestPlugin({ publicPath: '/static/' })
+				new MiniCssExtractPlugin({ filename: `${filename}.css` }),
+				new ManifestPlugin({ publicPath: '/assets/dist/' }),
 			],
 			resolve: {
 				extensions: ['.js', '.jsx']
