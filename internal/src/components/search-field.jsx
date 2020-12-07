@@ -3,16 +3,31 @@ import PropTypes from 'prop-types'
 
 import './search-field.scss'
 
-export default function SearchField(props) {
+export default function SearchField({ value, onChange, placeholder, focusOnMount }) {
+	const inputEl = React.useRef(null)
+
+	const handleChange = React.useCallback(
+		e => {
+			if (onChange) onChange(e.target.value)
+		},
+		[onChange]
+	)
+
+	React.useEffect(() => {
+		if (focusOnMount === true) inputEl.current.focus()
+	}, [])
+
 	return (
-		<div className="repository--search-field">
+		<div className={'repository--search-field ' + (value ? 'is-not-empty' : 'is-empty')}>
 			<i className="magnifier-icon"></i>
 			<input
+				ref={inputEl}
 				className="search-field"
-				type="text"
-				placeholder={props.placeholder}
-				value={props.value}
-				onChange={event => props.onChange(event.target.value)}
+				type="search"
+				name="search"
+				placeholder={placeholder}
+				value={value}
+				onChange={handleChange}
 			/>
 		</div>
 	)
@@ -25,5 +40,6 @@ SearchField.defaultProps = {
 SearchField.propTypes = {
 	value: PropTypes.string,
 	placeholder: PropTypes.string.isRequired,
-	onChange: PropTypes.func.isRequired
+	onChange: PropTypes.func.isRequired,
+	focusOnMount: PropTypes.bool
 }

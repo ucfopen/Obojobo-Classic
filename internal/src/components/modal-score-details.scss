@@ -1,0 +1,110 @@
+@import 'includes';
+
+// $color-modal-bg: #f7f7f7;
+
+.repository--modal.scoreDetails {
+	width: calc(100% - 2em);
+
+	.modal-content {
+		padding: 0;
+	}
+}
+
+.modal-score-details {
+	$color-hover: #e6edf6;
+	$color-selected: #ccdaeb;
+
+	display: flex;
+	background-color: $color-bg2;
+	height: 90vh;
+
+	.left-pane {
+		flex: 1.1;
+		padding: 1em;
+		padding-right: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.modal-title {
+		margin-bottom: 2em;
+
+		h3 {
+			font-weight: bold;
+		}
+
+		p {
+			margin: 0.5em 0 0 0;
+		}
+	}
+
+	.attempt-row {
+		text-align: center;
+		cursor: pointer;
+		padding: 1em;
+		background: $color-bg;
+
+		&:hover {
+			background: $color-hover;
+		}
+
+		&.is-selected,
+		&:hover.is-selected {
+			background: $color-selected;
+		}
+
+		h4 {
+			font-weight: bold;
+		}
+
+		span {
+			font-size: 0.8em;
+		}
+	}
+
+	.student-scores {
+		background-color: $color-bg;
+		overflow: auto;
+		height: 100%;
+
+		th:first-child,
+		th:last-child,
+		td:first-child,
+		td:last-child {
+			border-left: none;
+			border-right: none;
+		}
+	}
+
+	.radio-group {
+		display: inline;
+		margin-left: 0.5em;
+
+		input {
+			margin: 0 0.5em;
+		}
+
+		label {
+			margin-right: 0.5em;
+		}
+	}
+
+	.right-pane {
+		flex: 2;
+		margin: 1em;
+		padding: 1em;
+		background-color: $color-bg;
+		border-radius: $dimension-rounded-radius;
+		position: relative;
+		overflow: auto;
+
+		hr {
+			margin: 2em 0;
+		}
+
+		.instructions {
+			position: absolute;
+			top: 8.2em;
+		}
+	}
+}

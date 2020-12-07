@@ -1,8 +1,7 @@
-$default-font: 'Lato', arial;
-$label-text-color: #6b6b6b;
+@import './includes';
 
-.def-list {
-	font-family: $default-font;
+.repository--def-list {
+	font-family: $font-default;
 
 	.row {
 		display: flex;
@@ -16,7 +15,8 @@ $label-text-color: #6b6b6b;
 		.label {
 			flex: 0.4;
 			margin-right: 1em;
-			color: $label-text-color;
+			color: $color-text-minor;
+			white-space: nowrap;
 		}
 
 		.value {

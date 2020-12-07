@@ -7,46 +7,50 @@ import DataGridStudentScoreCell from './data-grid-student-score-cell'
 import PropTypes from 'prop-types'
 import DataGridAttemptsCell from './data-grid-attempts-cell'
 
-const getTimestampCell = ({ value }) => (
-	<DataGridTimestampCell value={value} display="horizontal" showSeconds={true} />
+const DataGridTimestampCellWithSeconds = props => (
+	<DataGridTimestampCell {...props} display="horizontal" showSeconds={true} />
 )
-
-const getStudentScoreCell = ({ value }) => <DataGridStudentScoreCell {...value} />
 
 const DataGridAssessmentScores = ({
 	data,
-	selectedIndex,
-	onSelect,
-	onClickAddAdditionalAttempt,
-	onClickRemoveAdditionalAttempt
+	rowCount,
+	onClickSetAdditionalAttempt,
+	onClickScoreDetails
 }) => {
-	const getDataGridAttemptsCell = ({ value, row }) => {
-		return (
-			<DataGridAttemptsCell
-				{...value}
-				onClickAddAdditionalAttempt={() => onClickAddAdditionalAttempt(row.index)}
-				onClickRemoveAdditionalAttempt={() => onClickRemoveAdditionalAttempt(row.index)}
-			/>
-		)
-	}
+	const columns = React.useMemo(
+		() => [
+			{ accessor: 'user', Header: 'User' },
+			{
+				accessor: 'score',
+				Header: 'Score',
+				Cell: DataGridStudentScoreCell,
+				onClick: onClickScoreDetails
+			},
+			{
+				accessor: 'lastSubmitted',
+				Header: 'Last Submitted',
+				Cell: DataGridTimestampCellWithSeconds
+			},
+			{
+				accessor: 'numAttemptsTaken',
+				Header: 'Attempts',
+				Cell: DataGridAttemptsCell,
+				onClick: onClickSetAdditionalAttempt
+			}
+		],
+		[onClickSetAdditionalAttempt, onClickScoreDetails]
+	)
+
+	const height = React.useMemo(() => {
+		const rowHeight = 58
+		const min = 3
+		const max = 25
+		return Math.min(Math.max(rowCount + 1, min), max) * rowHeight
+	}, [data])
 
 	return (
-		<div className="repository--data-grid-assessment-scores">
-			<DataGrid
-				data={data}
-				columns={[
-					{ accessor: 'user', Header: 'User' },
-					{ accessor: 'score', Header: 'Score', Cell: getStudentScoreCell },
-					{ accessor: 'lastSubmitted', Header: 'Last Submitted', Cell: getTimestampCell },
-					{
-						accessor: 'attempts',
-						Header: 'Attempts',
-						Cell: getDataGridAttemptsCell
-					}
-				]}
-				selectedIndex={selectedIndex}
-				onSelect={onSelect}
-			/>
+		<div className="repository--data-grid-assessment-scores" style={{ height: `${height}px` }}>
+			<DataGrid data={data} idColumn="userID" columns={columns} />
 		</div>
 	)
 }
@@ -55,23 +59,18 @@ DataGridAssessmentScores.propTypes = {
 	data: PropTypes.arrayOf(
 		PropTypes.shape({
 			user: PropTypes.string.isRequired,
-			score: PropTypes.shape({
-				value: PropTypes.oneOfType([null, PropTypes.number]),
-				isScoreImported: PropTypes.bool
-			}).isRequired,
-			lastSubmitted: PropTypes.oneOfType([null, PropTypes.string]).isRequired,
-			attempts: PropTypes.shape({
-				numAttemptsTaken: PropTypes.number.isRequired,
-				numAdditionalAttemptsAdded: PropTypes.number.isRequired,
-				numAttempts: PropTypes.number.isRequired,
-				isAttemptInProgress: PropTypes.bool
-			})
+			userID: PropTypes.number.isRequired,
+			score: PropTypes.number.isRequired,
+			isScoreImported: PropTypes.bool.isRequired,
+			lastSubmitted: PropTypes.number,
+			numAttemptsTaken: PropTypes.number.isRequired,
+			additional: PropTypes.number.isRequired,
+			attemptCount: PropTypes.number.isRequired,
+			isAttemptInProgress: PropTypes.bool
 		})
 	),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
-	onSelect: PropTypes.func.isRequired,
-	onClickAddAdditionalAttempt: PropTypes.func.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired
+	onClickSetAdditionalAttempt: PropTypes.func.isRequired,
+	onClickScoreDetails: PropTypes.func.isRequired
 }
 
 export default DataGridAssessmentScores

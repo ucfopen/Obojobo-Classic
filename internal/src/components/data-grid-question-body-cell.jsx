@@ -15,11 +15,11 @@ const renderMediaItem = ({ title, itemType }) => {
 		case 'flv':
 			return 'Video: ' + title
 
-		case 'mp3':
-			return 'Audio: ' + title
-
 		case 'kogneato':
 			return 'Materia: ' + title
+
+		case 'youTube':
+			return 'YouTube: ' + title
 	}
 }
 
@@ -49,11 +49,11 @@ export default function DataGridQuestionBodyCell({ items }) {
 		case 2:
 			return (
 				<div className="repository--data-grid-question-body-cell is-multiple-items">
-					<div className="row">
+					<div className="item-row">
 						<span className="label">L:</span>
 						{renderItem(items[0])}
 					</div>
-					<div className="row">
+					<div className="item-row">
 						<span className="label">R:</span>
 						{renderItem(items[1])}
 					</div>
@@ -70,7 +70,7 @@ DataGridQuestionBodyCell.propTypes = {
 			media: PropTypes.arrayOf(
 				PropTypes.shape({
 					title: PropTypes.string,
-					itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3'])
+					itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube'])
 				})
 			)
 		})

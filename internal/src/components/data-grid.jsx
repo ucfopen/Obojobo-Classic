@@ -1,83 +1,142 @@
 /* eslint-disable react/jsx-key */
 
 import React from 'react'
-import { useTable, useSortBy } from 'react-table'
+import { useTable, useSortBy, useFlexLayout } from 'react-table'
 import PropTypes from 'prop-types'
 import CaretUp from '../../../assets/images/viewer/caret-up.svg'
 import CaretDown from '../../../assets/images/viewer/caret-down.svg'
+import { FixedSizeList } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
 
 import './data-grid.scss'
 import LoadingIndicator from './loading-indicator'
 
-const DataGrid = ({ data, columns, selectedIndex, onSelect }) => {
+const defaultColumn = () => ({
+	// When using the useFlexLayout:
+	minWidth: 30, // minWidth is only used as a limit for resizing
+	width: 150, // width is used for both the flex-basis and flex-grow
+	maxWidth: 200 // maxWidth is only used as a limit for resizing
+})
+
+const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
+	const rowHeight = 58
 	const isLoading = data === null
+	const [selectedId, setSelectedId] = React.useState(null)
+	const getRowId = React.useCallback(
+		(row, relIndex, parent) => {
+			// if row[idColumn] exists, use it
+			// otherwise fall back on the default query-table function
+			return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
+		},
+		[idColumn]
+	)
+
+	// reset selected if the id isnt in the data
+	React.useEffect(() => {
+		if (!data) return
+		const containsSelected = data.find(i => getRowId(i) === selectedId)
+		if (!containsSelected) setSelectedId(null)
+	}, [data])
 
 	// setup react-table
 	const instanceTable = useTable(
 		{
+			defaultColumn,
 			columns,
-			data: data || []
+			data: data || [],
+			getRowId,
+			autoResetSortBy: false // https://github.com/tannerlinsley/react-table/issues/2369#issuecomment-644481605
 		},
-		useSortBy
+		sortable ? useSortBy : null,
+		useFlexLayout
 	)
 
 	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = instanceTable
 
+	const RenderRow = React.useCallback(
+		({ index, style }) => {
+			const row = rows[index]
+			prepareRow(row)
+
+			const selectedClass = row.id === selectedId ? 'selected' : ''
+			const evenOddClass = index % 2 ? 'odd' : ''
+			const onClick = () => {
+				if (onSelect) {
+					setSelectedId(row.id)
+					onSelect(row.original)
+				}
+			}
+			return (
+				<div
+					{...row.getRowProps({ style })}
+					onClick={onClick}
+					className={`row ${selectedClass} ${evenOddClass}`}
+				>
+					{row.cells.map(cell => (
+						<div {...cell.getCellProps()}>{cell.render('Cell')}</div>
+					))}
+				</div>
+			)
+		},
+		[rows, selectedId]
+	)
+
 	return (
-		<table {...getTableProps()} className={`repository--data-grid ${onSelect ? 'selectable' : ''}`}>
-			<thead>
+		<div className={`repository--data-grid ${onSelect ? 'selectable' : ''}`} {...getTableProps()}>
+			<div className="data-grid-head">
 				{headerGroups.map(headerGroup => (
-					<tr {...headerGroup.getHeaderGroupProps()}>
+					<div className="row" {...headerGroup.getHeaderGroupProps()}>
 						{headerGroup.headers.map(column => (
-							<th {...column.getHeaderProps(!isLoading ? column.getSortByToggleProps() : {})}>
+							<div
+								{...column.getHeaderProps(
+									sortable && !isLoading ? column.getSortByToggleProps() : {}
+								)}
+							>
 								{column.render('Header')}
 								{column.isSorted && column.isSortedDesc ? <CaretUp /> : null}
 								{column.isSorted && !column.isSortedDesc ? <CaretDown /> : null}
-							</th>
+							</div>
 						))}
-					</tr>
+					</div>
 				))}
-			</thead>
-			<tbody {...getTableBodyProps()}>
+			</div>
+			<div className="data-grid-body" {...getTableBodyProps()}>
 				{isLoading || !rows.length ? (
-					<tr>
-						<td className="no-data" colSpan={columns.length}>
-							{isLoading ? <LoadingIndicator isLoading={true} /> : 'No data'}
-						</td>
-					</tr>
+					<div className="no-data">
+						{isLoading ? <LoadingIndicator isLoading={true} /> : 'No data'}
+					</div>
 				) : (
-					rows.map(row => {
-						prepareRow(row)
-
-						const className = row.index === selectedIndex ? 'selected' : ''
-						const onClick = () => {
-							if (!onSelect) return
-							onSelect(row.index)
-						}
-						return (
-							<tr {...row.getRowProps()} onClick={onClick} className={className}>
-								{row.cells.map(cell => (
-									<td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-								))}
-							</tr>
-						)
-					})
+					<AutoSizer>
+						{({ height, width }) => (
+							<FixedSizeList
+								height={height}
+								itemCount={rows.length}
+								itemSize={rowHeight}
+								width={width}
+							>
+								{RenderRow}
+							</FixedSizeList>
+						)}
+					</AutoSizer>
 				)}
-			</tbody>
-		</table>
+			</div>
+		</div>
 	)
 }
 
 DataGrid.defaultProps = {
 	data: null,
-	columns: []
+	columns: [],
+	sortable: true
 }
 
 DataGrid.propTypes = {
-	data: PropTypes.oneOfType([null, PropTypes.arrayOf(PropTypes.object)]),
+	data: PropTypes.arrayOf(PropTypes.object),
 	columns: PropTypes.arrayOf(PropTypes.object),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
-	onSelect: PropTypes.func.isRequired
+	sortable: PropTypes.bool,
+	selectedRow: PropTypes.arrayOf(PropTypes.object),
+	onSelect: PropTypes.func,
+	idColumn: PropTypes.string
 }
 
 export default DataGrid

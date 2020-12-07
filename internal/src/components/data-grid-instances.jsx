@@ -1,34 +1,33 @@
 import React from 'react'
 import DataGrid from './data-grid'
-import DataGridTimestampCell from './data-grid-timestamp-cell'
+import DataGridDateCell from './data-grid-date-cell'
+import TitleCourseCell from './data-grid-title-course-cell'
 import PropTypes from 'prop-types'
 
 const columns = [
-	{ accessor: 'name', Header: 'Title' },
-	{ accessor: 'courseID', Header: 'Course' },
-	{ accessor: 'startTime', Header: 'Start', Cell: DataGridTimestampCell },
-	{ accessor: 'endTime', Header: 'End', Cell: DataGridTimestampCell }
+	{ accessor: 'name', Header: 'Title & Course', Cell: TitleCourseCell, width: 240 },
+	{ accessor: 'startTime', Header: 'Open', Cell: DataGridDateCell, width: 80 },
+	{ accessor: 'endTime', Header: 'Close', Cell: DataGridDateCell, width: 80 }
 ]
 
-const DataGridInstances = ({ data, selectedIndex, onSelect }) => (
-	<div className="repository--data-grid-instances">
-		<DataGrid data={data} columns={columns} selectedIndex={selectedIndex} onSelect={onSelect} />
-	</div>
-)
+const DataGridInstances = ({ data, onSelect }) => {
+	return (
+		<div className="repository--data-grid-instances" style={{ width: '402px', height: '90vh' }}>
+			<DataGrid idColumn="instID" data={data} columns={columns} onSelect={onSelect} />
+		</div>
+	)
+}
 
 DataGridInstances.propTypes = {
-	data: PropTypes.oneOfType([
-		null,
-		PropTypes.arrayOf(
-			PropTypes.shape({
-				name: PropTypes.string.isRequired,
-				courseID: PropTypes.string.isRequired,
-				startTime: PropTypes.string.isRequired,
-				endTime: PropTypes.string.isRequired
-			})
-		)
-	]),
-	selectedIndex: PropTypes.oneOfType([null, PropTypes.number]),
+	data: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string.isRequired,
+			courseID: PropTypes.string.isRequired,
+			startTime: PropTypes.number.isRequired,
+			endTime: PropTypes.number.isRequired
+		})
+	),
+	selectedIndex: PropTypes.number,
 	onSelect: PropTypes.func.isRequired
 }
 

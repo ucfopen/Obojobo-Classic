@@ -13,6 +13,10 @@
 	}
 
 	span {
-		padding: 0 1em;
+		padding: 0 0.4em;
+
+		&:last-child {
+			padding-right: 0.2;
+		}
 	}
 }

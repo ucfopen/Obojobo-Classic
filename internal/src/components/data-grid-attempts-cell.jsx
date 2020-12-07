@@ -2,41 +2,41 @@ import './data-grid-attempts-cell.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function DataGridAttemptsCell(props) {
-	const {
-		numAttemptsTaken,
-		numAttempts,
-		numAdditionalAttemptsAdded,
-		isAttemptInProgress,
-		onClickAddAdditionalAttempt,
-		onClickRemoveAdditionalAttempt
-	} = props
+export default function DataGridAttemptsCell({ value, row, column }) {
+	const { attemptCount, additional, isAttemptInProgress, userID } = row.original
+	const { onClick } = column
+	const onAddClick = React.useCallback(() => {
+		onClick(userID, additional + 1)
+	}, [onClick, userID, additional])
+	const onRemoveClick = React.useCallback(() => {
+		onClick(userID, additional - 1)
+	}, [onClick, userID, additional])
 
 	return (
 		<div className="data-grid-attempts-cell">
 			<p className="attempts">
-				{numAttemptsTaken} of {numAttempts + numAdditionalAttemptsAdded}
+				{value} of {attemptCount + additional}
 				{isAttemptInProgress ? <small className="attempts--in-progress">In progress</small> : null}
 			</p>
 			<div className="controls">
-				{numAdditionalAttemptsAdded > 0 ? (
-					<button onClick={onClickRemoveAdditionalAttempt}>-</button>
-				) : null}
-				<button onClick={onClickAddAdditionalAttempt}>+</button>
+				{additional > 0 ? <button onClick={onRemoveClick}>-</button> : null}
+				<button onClick={onAddClick}>+</button>
 			</div>
 		</div>
 	)
 }
 
-DataGridAttemptsCell.defaultProps = {
-	isAttemptInProgress: false
-}
-
 DataGridAttemptsCell.propTypes = {
-	numAttemptsTaken: PropTypes.number.isRequired,
-	numAdditionalAttemptsAdded: PropTypes.number.isRequired,
-	numAttempts: PropTypes.number.isRequired,
-	isAttemptInProgress: PropTypes.bool.isRequired,
-	onClickRemoveAdditionalAttempt: PropTypes.func.isRequired,
-	onClickAddAdditionalAttempt: PropTypes.func.isRequired
+	value: PropTypes.number.isRequired,
+	row: PropTypes.shape({
+		original: PropTypes.shape({
+			additional: PropTypes.number,
+			attemptCount: PropTypes.number.isRequired,
+			isAttemptInProgress: PropTypes.bool.isRequired,
+			userID: PropTypes.number.isRequired
+		})
+	}),
+	column: PropTypes.shape({
+		onClick: PropTypes.func.isRequired
+	})
 }

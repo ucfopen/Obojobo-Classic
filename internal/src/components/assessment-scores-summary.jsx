@@ -24,14 +24,14 @@ const tickLabelPropsHoriz = () => ({
 export default function AssessmentScoresSummary(props) {
 	const data = [
 		{ label: '0-9', value: 0 },
-		{ label: '10-19', value: 0 },
-		{ label: '20-29', value: 0 },
-		{ label: '30-39', value: 0 },
-		{ label: '40-49', value: 0 },
-		{ label: '50-59', value: 0 },
-		{ label: '60-69', value: 0 },
-		{ label: '70-79', value: 0 },
-		{ label: '80-89', value: 0 },
+		{ label: '10s', value: 0 },
+		{ label: '20s', value: 0 },
+		{ label: '30s', value: 0 },
+		{ label: '40s', value: 0 },
+		{ label: '50s', value: 0 },
+		{ label: '60s', value: 0 },
+		{ label: '70s', value: 0 },
+		{ label: '80s', value: 0 },
 		{ label: '90-100', value: 0 }
 	]
 
@@ -40,6 +40,7 @@ export default function AssessmentScoresSummary(props) {
 		lowestScore = 100,
 		highestScore = 0
 	const scores = props.scores
+
 	for (let i = 0; i < scores.length; i++) {
 		// Edge case:
 		if (scores[i] === 100) {
@@ -70,24 +71,30 @@ export default function AssessmentScoresSummary(props) {
 
 	const items = [
 		{
+			label: 'Scores',
+			value: scores?.length || '--'
+		},
+		{
 			label: 'Mean',
-			value: mean.toFixed(2)
+			value: scores.length > 0 ? mean.toFixed(2) : '--'
 		},
 		{
 			label: 'Std Dev',
 			value:
-				Math.sqrt(numerator / scores.length)
-					.toFixed(2)
-					.toString() + '%'
+				scores.length > 0
+					? Math.sqrt(numerator / scores.length)
+							.toFixed(2)
+							.toString() + '%'
+					: '--'
 		},
 		{
 			label: 'Score Range',
-			value: lowestScore.toString() + '-' + highestScore.toString() + '%'
+			value: scores.length > 0 ? lowestScore.toString() + '-' + highestScore.toString() + '%' : '--'
 		}
 	]
 
 	// Graph configurations
-	const width = 600
+	const width = 500
 	const height = 350
 
 	// Bounds
@@ -112,7 +119,7 @@ export default function AssessmentScoresSummary(props) {
 		<div className="assessment-scores-summary">
 			<header>
 				<p>Summary</p>
-				<RefreshButton />
+				<RefreshButton onClick={props.onClickRefresh} />
 			</header>
 
 			<div className="scores-summary">
@@ -140,20 +147,22 @@ export default function AssessmentScoresSummary(props) {
 								labelProps={{}}
 								tickLabelProps={tickLabelPropsLeft}
 							/>
-							{data.map(d => {
-								const barWidth = xScale.bandwidth()
-								const barHeight = yMax - yScale(d.value)
-								return (
-									<Bar
-										key={`bar-${d.label}`}
-										x={xScale(d.label)}
-										y={yMax - barHeight}
-										width={barWidth}
-										height={barHeight}
-										className="vx-bar"
-									/>
-								)
-							})}
+							{scores.length > 0
+								? data.map(d => {
+										const barWidth = xScale.bandwidth()
+										const barHeight = yMax - yScale(d.value)
+										return (
+											<Bar
+												key={`bar-${d.label}`}
+												x={xScale(d.label)}
+												y={yMax - barHeight}
+												width={barWidth}
+												height={barHeight}
+												className="vx-bar"
+											/>
+										)
+								  }) // eslint-disable-line no-mixed-spaces-and-tabs
+								: null}
 							<AxisBottom
 								scale={xScale}
 								label="Assessment Score %"
@@ -174,5 +183,6 @@ export default function AssessmentScoresSummary(props) {
 }
 
 AssessmentScoresSummary.propTypes = {
-	scores: PropTypes.arrayOf(PropTypes.number).isRequired
+	scores: PropTypes.arrayOf(PropTypes.number).isRequired,
+	onClickRefresh: PropTypes.func.isRequired
 }

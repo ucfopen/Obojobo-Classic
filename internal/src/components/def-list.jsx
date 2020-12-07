@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 
 export default function DefList(props) {
 	return (
-		<div className="def-list">
-			{props.items.map(item => (
-				<div className="row" key={item.label}>
+		<div className="repository--def-list">
+			{props.items.map((item, index) => (
+				<div className="row" key={item.label || `i-${index}`}>
 					<p className="label">{item.label}</p>
 					<p className="value">{item.value}</p>
 				</div>
@@ -19,6 +19,9 @@ DefList.defaultProps = {}
 
 DefList.propTypes = {
 	items: PropTypes.arrayOf(
-		PropTypes.shape({ label: PropTypes.string, value: PropTypes.string.isRequired })
+		PropTypes.shape({
+			label: PropTypes.string,
+			value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+		})
 	)
 }

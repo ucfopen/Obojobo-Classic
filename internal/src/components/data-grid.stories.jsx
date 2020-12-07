@@ -24,10 +24,15 @@ export default {
 	}
 }
 
-const Template = args => <DataGrid {...args} />
+const Template = args => (
+	<div style={{ width: '100%', height: '90vh' }}>
+		<DataGrid {...args} />
+	</div>
+)
 
 export const Loading = Template.bind({})
 Loading.args = {
+	idColumn: 'userID',
 	columns: [
 		{ accessor: 'userID', Header: 'User ID' },
 		{ accessor: 'itemID', Header: 'Question ID' },
@@ -38,6 +43,7 @@ Loading.args = {
 
 export const NoData = Template.bind({})
 NoData.args = {
+	idColumn: 'userID',
 	isLoading: false,
 	columns: [
 		{ accessor: 'userID', Header: 'User ID' },
@@ -47,36 +53,30 @@ NoData.args = {
 	data: []
 }
 
+const generateData = howMany => {
+	const getRandomInt = max => Math.floor(Math.random() * Math.floor(max))
+	const generateRow = index => ({
+		userID: index * 100,
+		itemID: getRandomInt(500),
+		score: getRandomInt(100)
+	})
+	const data = []
+	for (let i = 1; i < howMany; i++) {
+		data.push(generateRow(i))
+	}
+	return data
+}
+
 export const Data = Template.bind({})
 Data.args = {
+	idColumn: 'userID',
 	isLoading: false,
 	columns: [
 		{ accessor: 'userID', Header: 'User ID' },
 		{ accessor: 'itemID', Header: 'Question ID' },
 		{ accessor: 'score', Header: 'Score' }
 	],
-	data: [
-		{
-			userID: 1,
-			itemID: 1,
-			score: 0
-		},
-		{
-			userID: 2,
-			itemID: 443,
-			score: 99
-		},
-		{
-			userID: 3,
-			itemID: 13,
-			score: 100
-		},
-		{
-			userID: 2,
-			itemID: 33434,
-			score: 12
-		}
-	]
+	data: generateData(500)
 }
 
 // export const Objects = Template.bind({})

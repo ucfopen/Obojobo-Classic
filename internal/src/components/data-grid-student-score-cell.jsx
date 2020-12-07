@@ -4,14 +4,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from './button'
 
-export default function DataGridStudentScoreCell({ value, isScoreImported }) {
+export default function DataGridStudentScoreCell({ value, row, column }) {
+	const { onClick } = column
+
+	const click = React.useCallback(() => {
+		onClick(row.original.user, row.original.userID)
+	}, [row, onClick])
+
 	return (
 		<div className="data-grid-student-score-cell">
-			<span className="data-grid-student-score-cell--score">{value !== null ? value : '--'}</span>
-			{isScoreImported ? (
+			<span className="data-grid-student-score-cell--score">{`${Math.round(value)}%` ?? '--'}</span>
+			{row.original.isScoreImported ? (
 				<span className="data-grid-student-score-cell--imported-text">(Imported)</span>
 			) : (
-				<Button type="text-bold" text="Details..." />
+				<Button type="text-bold" text="Details..." onClick={click} />
 			)}
 		</div>
 	)
@@ -22,6 +28,7 @@ DataGridStudentScoreCell.defaultProps = {
 }
 
 DataGridStudentScoreCell.propTypes = {
-	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired,
-	isScoreImported: PropTypes.bool.isRequired
+	value: PropTypes.number,
+	row: PropTypes.object,
+	column: PropTypes.object
 }

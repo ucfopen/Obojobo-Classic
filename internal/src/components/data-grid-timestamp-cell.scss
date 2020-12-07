@@ -5,11 +5,9 @@
 		opacity: 0.65;
 	}
 
-	&.is-display-horizontal {
-		.day::after {
-			content: ' at ';
-			opacity: 0.65;
-		}
+	&.is-display-horizontal .day::after {
+		content: ' at ';
+		opacity: 0.65;
 	}
 
 	&.is-display-vertical {

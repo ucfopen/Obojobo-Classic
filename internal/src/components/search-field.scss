@@ -1,6 +1,8 @@
 @import './includes';
 
 .repository--search-field {
+	$color-highlight-text: white;
+
 	position: relative;
 
 	> .magnifier-icon {
@@ -21,5 +23,28 @@
 		border: 1px solid $color-shadow;
 		padding: 0.4em 0.4em 0.4em 2em;
 		width: 15em;
+
+		&::-webkit-search-cancel-button {
+			// @TODO replace with a visible x icon
+		}
+	}
+
+	&.is-not-empty {
+		> .search-field {
+			border-color: $color-action;
+			background-color: $color-action;
+			color: $color-highlight-text;
+
+			&:-webkit-autofill {
+				-webkit-text-fill-color: $color-highlight-text;
+				-webkit-box-shadow: 0 0 0 1000px $color-action inset;
+			}
+		}
+	}
+
+	&.is-empty > .search-field:active,
+	&.is-empty > .search-field:hover,
+	&.is-empty > .search-field:focus {
+		border-color: $color-action;
 	}
 }

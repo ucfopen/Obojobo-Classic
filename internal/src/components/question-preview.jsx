@@ -6,17 +6,17 @@ import FlashHTML from './flash-html'
 import MediaView from './media-view'
 
 const renderQuestionBody = items => {
-	return items.map(item => {
+	return items.map((item, index) => {
 		switch (item.component) {
 			case 'TextArea':
 				return (
-					<div className="text-area">
+					<div key={index} className="text-area">
 						<FlashHTML value={item.data} />
 					</div>
 				)
 
 			case 'MediaView':
-				return <MediaView media={item.media[0]} />
+				return <MediaView key={index} media={item.media[0]} />
 		}
 
 		return null
@@ -115,20 +115,20 @@ const renderQuestionAnswers = ({ itemType, answers }, response = null) => {
 	}
 }
 
-export default function QuestionPreview({ question, response }) {
+export default function QuestionPreview({ questionNumber, altNumber, question, score, response }) {
 	return (
-		<div className={`repository--question-preview is-type-${question.itemType}`}>
+		<section className={`repository--question-preview is-type-${question.itemType}`}>
+			<h1>
+				Question {questionNumber}
+				{altNumber > 1 ? ` (Alt ${String.fromCharCode(altNumber + 64)})` : ''}
+			</h1>
+			<div className="student-score">
+				Student&apos;s Question Score: <b>{score}%</b>
+			</div>
 			{question.itemType === 'Media' ? (
-				<React.Fragment>
-					<div className="question-body">
-						<MediaView media={question.items[0].media[0]} />
-					</div>
-					{response ? (
-						<div className="student-score">
-							Recorded Score: <b>{response}</b>
-						</div>
-					) : null}
-				</React.Fragment>
+				<div className="question-body">
+					<MediaView media={question.items[0].media[0]} />
+				</div>
 			) : (
 				<React.Fragment>
 					<div
@@ -141,7 +141,7 @@ export default function QuestionPreview({ question, response }) {
 					<div className="question-answers">{renderQuestionAnswers(question, response)}</div>
 				</React.Fragment>
 			)}
-		</div>
+		</section>
 	)
 }
 
@@ -150,6 +150,8 @@ QuestionPreview.defaultProps = {
 }
 
 QuestionPreview.propTypes = {
+	questionNumber: PropTypes.number.isRequired,
+	altNumber: PropTypes.number.isRequired,
 	question: PropTypes.shape({
 		itemType: PropTypes.oneOf(['MC', 'QA', 'Media']),
 		answers: PropTypes.arrayOf(
@@ -167,7 +169,7 @@ QuestionPreview.propTypes = {
 					PropTypes.shape({
 						mediaID: PropTypes.number,
 						title: PropTypes.string,
-						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'mp3']),
+						itemType: PropTypes.oneOf(['pic', 'kogneato', 'swf', 'flv', 'youTube']),
 						descText: PropTypes.string,
 						width: PropTypes.number,
 						height: PropTypes.number
@@ -176,5 +178,6 @@ QuestionPreview.propTypes = {
 			})
 		)
 	}).isRequired,
-	response: PropTypes.oneOfType([null, PropTypes.string])
+	score: PropTypes.number,
+	response: PropTypes.string
 }

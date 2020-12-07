@@ -2,53 +2,44 @@ import './header.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import ModalAboutObojoboNext from './modal-about-obojobo-next'
+import { apiLogout } from '../util/api'
+import useToggleState from '../hooks/use-toggle-state'
 
-import ObojoboLogo from '../../../assets/images/viewer/obojobo-logo.svg'
+export default function Header({ userName }) {
+	const [aboutVisible, hideAbout, showAbout] = useToggleState()
 
-export default function Header({
-	userName,
-	onClickAboutOrBannerLink,
-	onClickCloseBanner,
-	onClickLogOut
-}) {
+	const onClickLogOut = React.useCallback(async () => {
+		await apiLogout()
+		window.location.reload(false)
+	}, [])
+
 	return (
 		<div className="obo-header">
-			<div className="obo-header--left-side">
-				<img className="obo-classic-logo" src={ObojoboLogo} />
+			<div className="wrapper">
+				<div className="obo-header--left-side">
+					<img className="obo-classic-logo" src={'./assets/images/viewer/obojobo-logo.svg'} />
+				</div>
 
-				<button className="header-btn" onClick={e => onClickAboutOrBannerLink(e)}>
-					About
-				</button>
-			</div>
+				<div className="banner-header">
+					<span>What&apos;s different?</span>
+					<button className="banner-header--modal-button" onClick={showAbout}>
+						Click here to find out about the new look and our new version
+					</button>
+				</div>
 
-			<div className="banner-header">
-				<span>What&apos;s different?</span>
-				<button className="banner-header--modal-button" onClick={e => onClickAboutOrBannerLink(e)}>
-					Click here to find out about the new look and our new version
-				</button>
-				<button className="banner-header--close-button" onClick={onClickCloseBanner}>
-					&#10005;
-				</button>
+				<div className="obo-header--right-side">
+					<p>{userName}</p>
+					<button className="header-btn" onClick={onClickLogOut}>
+						Logout
+					</button>
+				</div>
 			</div>
-
-			<div className="obo-header--right-side">
-				<p>{userName}</p>
-				<button className="header-btn" onClick={e => onClickLogOut(e)}>
-					Logout
-				</button>
-			</div>
+			{aboutVisible ? <ModalAboutObojoboNext onClose={hideAbout} /> : null}
 		</div>
 	)
 }
 
-Header.defaultProps = {
-	isShowingBanner: true
-}
-
 Header.propTypes = {
-	isShowingBanner: PropTypes.bool,
-	userName: PropTypes.string.isRequired,
-	onClickAboutOrBannerLink: PropTypes.func.isRequired,
-	onClickLogOut: PropTypes.func.isRequired,
-	onClickCloseBanner: PropTypes.func.isRequired
+	userName: PropTypes.string.isRequired
 }

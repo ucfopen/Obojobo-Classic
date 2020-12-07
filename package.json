@@ -56,9 +56,12 @@
     "dayjs": "^1.9.4",
     "humanize-duration": "^3.24.0",
     "obojobo-lib-utils": "^11.1.0",
+    "react-modal": "^3.11.2",
     "react-query": "^2.23.1",
     "react-query-devtools": "^2.6.0",
-    "react-table": "^7.6.0"
+    "react-table": "^7.6.0",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-window": "^1.8.6"
   },
   "scripts": {
     "storybook": "start-storybook -p 6006",

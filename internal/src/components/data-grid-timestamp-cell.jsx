@@ -18,7 +18,7 @@ const formatAMPM = (date, showSeconds) => {
 }
 
 const DataGridTimestampCell = ({ value: timestamp, display, showSeconds }) => {
-	if (timestamp === null) {
+	if (!timestamp || timestamp === '0') {
 		return <div className={`repository--date-time-cell is-display-blank`}>--</div>
 	}
 
@@ -49,7 +49,7 @@ DataGridTimestampCell.defaultProps = {
 
 DataGridTimestampCell.propTypes = {
 	display: PropTypes.oneOf(['horizontal', 'vertical']),
-	value: PropTypes.oneOfType([null, PropTypes.number]).isRequired,
+	value: PropTypes.number,
 	showSeconds: PropTypes.bool.isRequired
 }
 

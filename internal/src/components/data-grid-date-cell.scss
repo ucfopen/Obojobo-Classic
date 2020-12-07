@@ -1,0 +1,13 @@
+.repository--date-time-cell {
+	text-align: left;
+
+	.year {
+		display: block;
+		font-size: 0.9em;
+		opacity: 0.65;
+	}
+
+	&.is-display-blank {
+		opacity: 0.65;
+	}
+}

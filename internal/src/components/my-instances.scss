@@ -2,13 +2,23 @@
 	display: flex;
 	flex-direction: column;
 
+	> h1 {
+		margin-bottom: 1em;
+		font-size: 1.25em;
+	}
+
 	> .filter {
 		display: flex;
 		align-items: center;
 		margin-bottom: 0.5em;
+		gap: 1em;
 
 		> .repository--search-field {
 			flex-grow: 1;
+
+			> .search-field {
+				width: 100%;
+			}
 		}
 	}
 
