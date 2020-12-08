@@ -159,7 +159,7 @@ export default function InstanceSection({ instance, currentUser }) {
 			{ label: 'Scoring Method', value: getScoringMethodText(instance.scoreMethod) },
 			{
 				label: 'Score Import',
-				value: instance.allowScoreImport === '1' ? 'Enabled' : 'Disabled'
+				value: instance.allowScoreImport ? 'Enabled' : 'Disabled'
 			}
 		]
 	}, [instance, editVisible]) // editVisible helps to update after the edit dialog closes
@@ -171,6 +171,7 @@ export default function InstanceSection({ instance, currentUser }) {
 			</div>
 		)
 	}
+
 	return (
 		<div className="repository--instance-section is-not-empty">
 			<div className="header">
