@@ -77,7 +77,8 @@ export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, lo
 	React.useMemo(() => {
 		if (isUserFetching || isUserError) return
 		usersToLoad.forEach(userID => {
-			submitQuestionLogsByUserID[userID].userName = users[userID].userString
+			// when revisiting it may take a re-render for users to be populated
+			if (users[userID]) submitQuestionLogsByUserID[userID].userName = users[userID].userString
 		})
 	}, [users, submitQuestionLogsByUserID])
 
