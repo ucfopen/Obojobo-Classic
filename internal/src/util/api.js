@@ -36,13 +36,13 @@ export const apiGetInstances = () =>
 		const castToInt = [
 			'createTime',
 			'attemptCount',
-			'allowScoreImport',
 			'startTime',
 			'endTime',
 			'attemptCount',
 			'userID',
 			'instID'
 		]
+
 		instances.forEach(i => {
 			castToInt.forEach(key => {
 				i[key] = parseInt(i[key], 10)
@@ -184,7 +184,7 @@ export const apiEditInstance = ({
 	endTime,
 	attemptCount,
 	scoreMethod,
-	isImportAllowed
+	allowScoreImport
 }) => {
 	name = encodeURIComponent(name)
 	instID = encodeURIComponent(instID)
@@ -193,10 +193,10 @@ export const apiEditInstance = ({
 	endTime = encodeURIComponent(endTime)
 	attemptCount = encodeURIComponent(attemptCount)
 	scoreMethod = encodeURIComponent(scoreMethod)
-	isImportAllowed = isImportAllowed ? '1' : '0'
+	allowScoreImport = allowScoreImport ? '1' : '0'
 
 	return fetchGet(
-		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${isImportAllowed}`
+		`/api/json.php/loRepository.editInstance/${name}/${instID}/${courseID}/${startTime}/${endTime}/${attemptCount}/${scoreMethod}/${allowScoreImport}`
 	)
 }
 export const apiAddUsersToInstance = ({ instID, userIDs }) =>
