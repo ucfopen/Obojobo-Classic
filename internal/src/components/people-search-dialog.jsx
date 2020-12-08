@@ -94,7 +94,7 @@ export default function PeopleSearchDialog({
 			id: user.userID,
 			firstName: user.first,
 			lastName: user.last,
-			username: 'User #' + user.userID
+			username: user.login
 		}))
 	}, [data])
 
@@ -102,7 +102,7 @@ export default function PeopleSearchDialog({
 		id: user.userID,
 		firstName: user.userName.first,
 		lastName: user.userName.last,
-		username: 'User #' + user.userID
+		username: user.userName.login
 	}))
 
 	const userIDsWithAccess = usersWithAccess.map(user => user.userID).concat(currentUserId)
