@@ -7,6 +7,7 @@ import MyInstances from './my-instances'
 import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
+import getUserString from '../util/get-user-string'
 
 const RepositoryPage = () => {
 	useQueryCache()
@@ -38,6 +39,11 @@ const RepositoryPage = () => {
 		}
 	)
 
+	const userName = React.useMemo(() => {
+		if (!currentUser) return null
+		return getUserString(currentUser)
+	}, [currentUser])
+
 	const theError = qSessionError || qUserError || null
 	if (!displayError && theError) {
 		setDisplayError(theError)
@@ -54,7 +60,7 @@ const RepositoryPage = () => {
 	if (!currentUser) return <LoadingIndicator isLoading={true} />
 	return (
 		<div id="repository" className="repository">
-			<Header userName={currentUser.login} />
+			<Header userName={userName} />
 			<main>
 				<div className="wrapper">
 					<MyInstances onSelect={setInstance} />

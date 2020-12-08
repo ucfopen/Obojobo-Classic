@@ -13,6 +13,7 @@ import { apiGetScoresForInstance, apiEditExtraAttempts } from '../util/api'
 import { ModalScoreDetailsWithAPI } from './modal-score-details'
 import useToggleState from '../hooks/use-toggle-state'
 import { ModalScoresByQuestionWithAPI } from './modal-scores-by-question'
+import getUserString from '../util/get-user-string'
 
 const noOp = () => {}
 
@@ -32,9 +33,6 @@ const getFinalScoreFromAttemptScores = (scores, scoreMethod) => {
 	}
 
 	return 0
-}
-const getUserString = n => {
-	return `${n.last || 'unknown'}, ${n.first || 'name'}${n.mi ? ' ' + n.mi + '.' : ''}`
 }
 
 export default function AssessmentScoresSection({ instance }) {
