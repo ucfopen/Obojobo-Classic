@@ -74,7 +74,7 @@ export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, lo
 	)
 
 	// populate userNames in the logs
-	React.useEffect(() => {
+	React.useMemo(() => {
 		if (isUserFetching || isUserError) return
 		usersToLoad.forEach(userID => {
 			submitQuestionLogsByUserID[userID].userName = users[userID].userString
@@ -89,10 +89,11 @@ export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, lo
 		enabled: submitQuestionLogsByUserID
 	})
 
-	const ready = !isFetching && !isLOFetching && loData && data
+	const ready = !isFetching && !isUserFetching && !isLOFetching && loData && data
 
 	if (!ready) return <div>Loading</div>
 	if (isError) return <div>Error Loading Data</div>
+
 	return (
 		<ModalScoresByQuestion
 			instanceName={instanceName}
