@@ -10,6 +10,13 @@
 		height: 25em;
 		margin-bottom: 1em;
 
+		//stylelint-disable-next-line unit-blacklist
+		@media only screen and (max-width: 1300px) {
+			flex-direction: column-reverse;
+			height: 45em;
+			align-items: center;
+		}
+
 		> .left-sidebar {
 			width: 40%;
 

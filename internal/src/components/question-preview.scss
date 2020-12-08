@@ -3,6 +3,10 @@
 .repository--question-preview {
 	$color-partially-correct: lighten($color-correct, 0.2);
 
+	background: $color-bg2;
+	border-radius: $dimension-rounded-radius;
+	padding: 1em;
+
 	h1 {
 		margin-bottom: 1.5em;
 	}
@@ -72,6 +76,7 @@
 				> .answer-body {
 					font-family: $font-text;
 					flex-grow: 1;
+					width: 100%;
 
 					> div > p:first-child {
 						margin-top: 0;
