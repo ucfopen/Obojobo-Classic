@@ -122,9 +122,11 @@ export default function QuestionPreview({ questionNumber, altNumber, question, s
 				Question {questionNumber}
 				{altNumber > 1 ? ` (Alt ${String.fromCharCode(altNumber + 64)})` : ''}
 			</h1>
-			<div className="student-score">
-				Student&apos;s Question Score: <b>{score}%</b>
-			</div>
+			{typeof score !== 'undefined' ? (
+				<div className="student-score">
+					Student&apos;s Question Score: <b>{score}%</b>
+				</div>
+			) : null}
 			{question.itemType === 'Media' ? (
 				<div className="question-body">
 					<MediaView media={question.items[0].media[0]} />

@@ -137,6 +137,7 @@ export default function ModalInstanceDetails(props) {
 						<span className="title">Attempts:</span>
 						<div className="flex-container">
 							<input
+								className="attempts-input"
 								type="number"
 								value={attemptCount}
 								min="1"
