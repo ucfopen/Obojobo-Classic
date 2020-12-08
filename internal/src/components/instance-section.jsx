@@ -162,7 +162,7 @@ export default function InstanceSection({ instance, currentUser }) {
 				value: instance.allowScoreImport === '1' ? 'Enabled' : 'Disabled'
 			}
 		]
-	}, [instance])
+	}, [instance, editVisible]) // editVisible helps to update after the edit dialog closes
 
 	if (!instance) {
 		return (
