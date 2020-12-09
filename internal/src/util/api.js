@@ -186,9 +186,9 @@ export const apiEditInstance = ({
 	scoreMethod,
 	allowScoreImport
 }) => {
-	name = encodeURIComponent(name)
+	name = encodeURIComponent(name) || 'Unnamed Instance' // can't be an empty string due to api restrictions
 	instID = encodeURIComponent(instID)
-	courseID = encodeURIComponent(courseID)
+	courseID = encodeURIComponent(courseID) || '%20' // can't be an empty string due to api restrictions
 	startTime = encodeURIComponent(startTime)
 	endTime = encodeURIComponent(endTime)
 	attemptCount = encodeURIComponent(attemptCount)
