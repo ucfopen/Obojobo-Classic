@@ -123,8 +123,12 @@ function createNewPlainInstance()
 
 	// create special instance
 	$API = \obo\API::getInstance();
+	$startTime = time();
+	$endTime = new DateTime("+1 year");
+	$endTime = $endTime->getTimestamp();
+
 	//$name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true
-	$selectedInstId = $API->createInstance($instanceName, $selectedLoId, '', 0, 0, $attempts, $scoreMethod, $allowScoreImport);
+	$selectedInstId = $API->createInstance($instanceName, $selectedLoId, '', $startTime, $endTime, $attempts, $scoreMethod, $allowScoreImport);
 	if ($selectedInstId instanceof \rocketD\util\Error || !is_int($selectedInstId))
 	{
 		echo(false);
