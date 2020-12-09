@@ -7,6 +7,9 @@ import RefreshButton from './refresh-button'
 import SearchField from './search-field'
 import { useQuery, queryCache } from 'react-query'
 import { apiGetInstances } from '../util/api'
+import Button from './button'
+import useToggleState from '../hooks/use-toggle-state'
+import RepositoryModal from './repository-modal'
 
 const getFilteredInstances = (instances, search) => {
 	if (!instances) return null
@@ -26,6 +29,7 @@ const getFilteredInstances = (instances, search) => {
 export default function MyInstances({ onSelect }) {
 	const [search, setSearch] = useState('')
 	const [_selectedInstance, _setSelectedInstance] = React.useState(null)
+	const [pickerVisible, hidePicker, showPicker] = useToggleState()
 	const setSelectedInstance = React.useCallback(
 		instance => {
 			_setSelectedInstance(instance)
@@ -36,6 +40,19 @@ export default function MyInstances({ onSelect }) {
 
 	const reloadInstances = React.useCallback(() => {
 		queryCache.invalidateQueries('getInstances')
+	}, [])
+
+	// new instance listener
+	React.useEffect(() => {
+		const onNewInstance = (event) => {
+			if (event.origin !== window.location.origin) return
+			if (event?.data?.source === 'obojobo'){
+				hidePicker()
+				reloadInstances()
+			}
+		}
+		window.addEventListener('message', onNewInstance, false)
+		return () => {window.removeEventListener('message', onNewInstance)} // cleanup function
 	}, [])
 
 	// load instances
@@ -71,6 +88,7 @@ export default function MyInstances({ onSelect }) {
 	return (
 		<div className="repository--my-instances">
 			<h1>My Instances</h1>
+			<Button onClick={showPicker} type="small" text="New Instance" />
 			<div className="filter">
 				<SearchField
 					placeholder="Search by title, course or id"
@@ -80,6 +98,17 @@ export default function MyInstances({ onSelect }) {
 				<RefreshButton onClick={reloadInstances} />
 			</div>
 			<DataGridInstances data={filteredInstances} onSelect={setSelectedInstance} />
+			{pickerVisible ? (
+				<RepositoryModal
+					className="instanceDetails"
+					instanceName="Create an Instance"
+					onCloseModal={hidePicker}
+				>
+					<div className="modal-new-instance">
+						<iframe src="/lti/picker.php?repository=1"></iframe>
+					</div>
+				</RepositoryModal>
+			) : null}
 		</div>
 	)
 }

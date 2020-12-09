@@ -26,3 +26,12 @@
 		flex-grow: 1;
 	}
 }
+
+.modal-new-instance{
+	iframe{
+		height: 900px;
+		width: 750px;
+		border: none;
+		margin: -1em -1em 1em -1em;
+	}
+}

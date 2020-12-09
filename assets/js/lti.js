@@ -362,7 +362,13 @@ obo.lti = function()
 		$('.progress-container').find('span').html('Success!');
 		$('.progressbar').progressbar('value', 100);
 		setTimeout(function() {
-			window.location = ltiUrl;
+			if(__ltiToken === 'repository'){
+				window.parent.postMessage({source: 'obojobo', status: 'ok'}, '*');
+			}
+			else
+			{
+				window.location = ltiUrl;
+			}
 		}, 1000);
 	}
 
