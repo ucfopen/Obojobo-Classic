@@ -4,11 +4,32 @@ require_once(dirname(__FILE__).'/../internal/app.php');
 // Route the requests according to arguments sent
 if (isset($_POST['selectedLoId']))
 {
-	createNewExternallyLinkedInstance();
+	if($_POST['ltiInstanceToken'] === 'repository'){
+		createNewPlainInstance();
+	}
+	else
+	{
+		createNewExternallyLinkedInstance();
+	}
+
+}
+elseif(isset($_GET['repository']))
+{
+	renderPickerForRepository();
 }
 else
 {
 	beginPickerSession();
+}
+
+function renderPickerForRepository()
+{
+	$smarty = \rocketD\util\Template::getInstance();
+	$smarty->assign('ltiToken', 'repository');
+	$smarty->assign('returnUrl', '/');
+	$smarty->assign('webUrl', \AppCfg::URL_WEB);
+	$response = $smarty->fetch(\AppCfg::DIR_BASE . \AppCfg::DIR_TEMPLATES . 'lti-picker.tpl');
+	echo $response;
 }
 
 function beginPickerSession()
@@ -90,6 +111,31 @@ function createNewExternallyLinkedInstance()
 		//@TODO - what happens here if instanceData is false?
 		echo(json_encode(createResponse(true, getInstanceData($selectedInstId))));
 	}
+}
+
+function createNewPlainInstance()
+{
+	$selectedLoId     = $_POST['selectedLoId'];
+	$instanceName     = $_POST['instanceName'];
+	$attempts         = $_POST['attempts'];
+	$scoreMethod      = $_POST['scoreMethod'];
+	$allowScoreImport = $_POST['allowScoreImport'] === 'true';
+
+	// create special instance
+	$API = \obo\API::getInstance();
+	$startTime = time();
+	$endTime = new DateTime("+1 year");
+	$endTime = $endTime->getTimestamp();
+
+	//$name, $loID, $course, $startTime, $endTime, $attemptCount, $scoreMethod = 'h', $allowScoreImport = true
+	$selectedInstId = $API->createInstance($instanceName, $selectedLoId, '', $startTime, $endTime, $attempts, $scoreMethod, $allowScoreImport);
+	if ($selectedInstId instanceof \rocketD\util\Error || !is_int($selectedInstId))
+	{
+		echo(false);
+		return;
+	}
+
+	echo(json_encode(createResponse(true, getInstanceData($selectedInstId))));
 }
 
 function getInstanceData($instID)

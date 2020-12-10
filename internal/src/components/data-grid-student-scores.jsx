@@ -2,7 +2,7 @@ import './data-grid-student-scores.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import DataGrid from './data-grid'
+import { DataGridWithInternalState } from './data-grid'
 import DataGridScoreCell from './data-grid-score-cell'
 import DataGridQuestionBodyCell from './data-grid-question-body-cell'
 import DataGridQuestionNumberCell from './data-grid-question-number-cell'
@@ -39,7 +39,7 @@ const getColumns = showAttemptColumn => {
 const DataGridStudentScores = ({ data, selectedIndex, onSelect, showAttemptColumn }) => {
 	return (
 		<div className="repository--data-grid-student-scores" style={{ width: '100%', height: '100%' }}>
-			<DataGrid
+			<DataGridWithInternalState
 				data={data}
 				columns={getColumns(showAttemptColumn)}
 				selectedIndex={selectedIndex}

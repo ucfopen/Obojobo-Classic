@@ -57,6 +57,7 @@ export default function ModalInstanceDetails(props) {
 							<input
 								type="text"
 								value={name}
+								placeholder="Unnamed Instance"
 								onChange={e => {
 									setName(e.target.value)
 								}}
