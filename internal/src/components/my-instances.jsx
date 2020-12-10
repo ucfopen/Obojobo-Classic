@@ -10,6 +10,7 @@ import { apiGetInstances } from '../util/api'
 import Button from './button'
 import useToggleState from '../hooks/use-toggle-state'
 import RepositoryModal from './repository-modal'
+import { InstanceContext } from '../util/instance-context'
 
 const getFilteredInstances = (instances, search) => {
 	if (!instances) return null
@@ -26,33 +27,36 @@ const getFilteredInstances = (instances, search) => {
 	})
 }
 
-export default function MyInstances({ onSelect }) {
+export default function MyInstances() {
+	const { instance, setInstance } = React.useContext(InstanceContext)
 	const [search, setSearch] = useState('')
-	const [_selectedInstance, _setSelectedInstance] = React.useState(null)
 	const [pickerVisible, hidePicker, showPicker] = useToggleState()
-	const setSelectedInstance = React.useCallback(
-		instance => {
-			_setSelectedInstance(instance)
-			onSelect(instance)
-		},
-		[onSelect]
-	)
+	const [pendingSelection, setPendingSelection] = React.useState(null)
 
-	const reloadInstances = React.useCallback(() => {
-		queryCache.invalidateQueries('getInstances')
+	const newInstanceCreated = React.useCallback(instID => {
+		setPendingSelection(parseInt(instID, 10))
+		setInstance(null) // clears right pane of possibly currently selected item
+		reloadInstances()
+		hidePicker()
 	}, [])
 
-	// new instance listener
+	const reloadInstances = React.useCallback(() => {
+		queryCache.setQueryData(['getInstances'], null)
+		queryCache.refetchQueries(['getInstances'], { exact: true })
+	}, [])
+
+	// new instance created listener
 	React.useEffect(() => {
-		const onNewInstance = (event) => {
+		const onNewInstance = event => {
 			if (event.origin !== window.location.origin) return
-			if (event?.data?.source === 'obojobo'){
-				hidePicker()
-				reloadInstances()
+			if (event?.data?.source === 'obojobo') {
+				newInstanceCreated(event.data.instID)
 			}
 		}
 		window.addEventListener('message', onNewInstance, false)
-		return () => {window.removeEventListener('message', onNewInstance)} // cleanup function
+		return () => {
+			window.removeEventListener('message', onNewInstance)
+		} // cleanup function
 	}, [])
 
 	// load instances
@@ -67,17 +71,21 @@ export default function MyInstances({ onSelect }) {
 	// referencing an object from the old results.  This forces the update
 	// to the new selected instance data
 	React.useEffect(() => {
-		if (!data || !_selectedInstance) {
-			// _setSelectedInstance(null)
-			onSelect(null)
-			return
-		}
+		if (!data) return
 
-		if (data.indexOf(_selectedInstance) === -1) {
-			const newInstance = data.find(i => i.instID === _selectedInstance.instID)
-			_setSelectedInstance(newInstance)
+		if (pendingSelection !== null) {
+			const newInstance = data.find(i => i.instID === pendingSelection)
+			// must test if it's found, data may not yet contain the pending selection
+			if (newInstance) {
+				setPendingSelection(null) // we've found the instance to select, so remove it
+				setInstance(newInstance)
+			}
+		} else if (instance && data.indexOf(instance) === -1) {
+			const reselectedInstance = data.find(i => i.instID === instance.instID)
+			// must test if it's found, data may not yet contain the previous selection
+			if (reselectedInstance) setInstance(reselectedInstance)
 		}
-	}, [data, _selectedInstance])
+	}, [data, instance])
 
 	const instances = isFetching ? null : data
 	const filteredInstances = React.useMemo(() => getFilteredInstances(instances, search), [
@@ -97,7 +105,8 @@ export default function MyInstances({ onSelect }) {
 				/>
 				<RefreshButton onClick={reloadInstances} />
 			</div>
-			<DataGridInstances data={filteredInstances} onSelect={setSelectedInstance} />
+			<DataGridInstances data={filteredInstances} onSelect={setInstance} instance={instance} />
+
 			{pickerVisible ? (
 				<RepositoryModal
 					className="instanceDetails"
@@ -122,7 +131,5 @@ MyInstances.propTypes = {
 			startTime: PropTypes.number.isRequired,
 			endTime: PropTypes.number.isRequired
 		})
-	),
-	_selectedInstanceIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired
+	)
 }

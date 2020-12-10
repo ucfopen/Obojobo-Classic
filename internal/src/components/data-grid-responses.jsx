@@ -2,7 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import DataGrid from './data-grid'
+import { DataGridWithInternalState } from './data-grid'
 import DataGridTimestampCell from './data-grid-timestamp-cell'
 
 const columns = [
@@ -14,7 +14,7 @@ const columns = [
 
 export default function DataGridResponses({ responses, selectedIndex, onSelect }) {
 	return (
-		<DataGrid
+		<DataGridWithInternalState
 			data={responses}
 			columns={columns}
 			selectedIndex={selectedIndex}

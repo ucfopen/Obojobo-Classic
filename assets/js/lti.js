@@ -31,6 +31,7 @@ obo.lti = function()
 	var $search = $('#search');
 
 	var ltiUrl = null;
+	var createdInstID = null;
 
 	// disable logs by defualt
 	debug.setLevel(0);
@@ -363,7 +364,7 @@ obo.lti = function()
 		$('.progressbar').progressbar('value', 100);
 		setTimeout(function() {
 			if(__ltiToken === 'repository'){
-				window.parent.postMessage({source: 'obojobo', status: 'ok'}, '*');
+				window.parent.postMessage({source: 'obojobo', status: 'ok', instID: createdInstID}, '*');
 			}
 			else
 			{
@@ -380,13 +381,11 @@ obo.lti = function()
 		{
 			window.__previousResponse = response;
 			$('.selected-instance-title').html(window.__previousResponse.body.name);
-			//gotoSection('success');
 
-			//@TODO: Don't get this here
-			var instID = response.body.instID;
+			createdInstID = response.body.instID;
 			if(typeof __returnUrl !== 'undefined' && __returnUrl !== null && __returnUrl !== '')
 			{
-				var widgetURL = __webUrl + 'view/' + instID;
+				var widgetURL = __webUrl + 'view/' + createdInstID;
 				var pendingCreateInstanceSuccessResponse = ltiUrl === 'pending';
 				ltiUrl = __returnUrl + '?embed_type=basic_lti&url=' + encodeURI(widgetURL);
 				if(pendingCreateInstanceSuccessResponse)

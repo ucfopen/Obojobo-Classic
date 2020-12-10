@@ -8,12 +8,13 @@ import LoadingIndicator from './loading-indicator'
 import InstanceSection from './instance-section'
 import Header from './header'
 import getUserString from '../util/get-user-string'
+import { InstanceContext } from '../util/instance-context'
 
 const RepositoryPage = () => {
 	useQueryCache()
+	const [instance, setInstance] = React.useState(null)
 	const [sessionInterval, setSessionInterval] = React.useState(15000)
 	const [displayError, setDisplayError] = React.useState(false)
-	const [instance, setInstance] = React.useState(null)
 
 	const { data: qSessionData, error: qSessionError } = useQuery(
 		'apiVerifySession',
@@ -49,6 +50,14 @@ const RepositoryPage = () => {
 		setDisplayError(theError)
 	}
 
+	const state = React.useMemo(
+		() => ({
+			instance,
+			setInstance
+		}),
+		[instance]
+	)
+
 	// disable the session checker
 	// if interval isn't disabled and there is an error OR the user isn't logged in
 	if (sessionInterval && (displayError || qSessionData === false)) {
@@ -59,15 +68,19 @@ const RepositoryPage = () => {
 	if (qSessionData === false) return <span>Not Logged in</span>
 	if (!currentUser) return <LoadingIndicator isLoading={true} />
 	return (
-		<div id="repository" className="repository">
-			<Header userName={userName} />
-			<main>
-				<div className="wrapper">
-					<MyInstances onSelect={setInstance} />
-					<InstanceSection instance={instance} currentUser={currentUser} />
-				</div>
-			</main>
-		</div>
+		<InstanceContext.Provider value={state}>
+			<div id="repository" className="repository">
+				<Header userName={userName} />
+				<main>
+					<div className="wrapper">
+						<MyInstances />
+						<InstanceContext.Consumer>
+							{({ instance }) => <InstanceSection instance={instance} currentUser={currentUser} />}
+						</InstanceContext.Consumer>
+					</div>
+				</main>
+			</div>
+		</InstanceContext.Provider>
 	)
 }
 

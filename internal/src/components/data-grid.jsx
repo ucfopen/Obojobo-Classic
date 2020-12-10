@@ -18,9 +18,7 @@ const defaultColumn = () => ({
 	maxWidth: 200 // maxWidth is only used as a limit for resizing
 })
 
-const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
-	const rowHeight = 58
-	const isLoading = data === null
+export function DataGridWithInternalState({ data, columns, sortable, idColumn, onSelect }) {
 	const [selectedId, setSelectedId] = React.useState(null)
 	const getRowId = React.useCallback(
 		(row, relIndex, parent) => {
@@ -30,13 +28,41 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 		},
 		[idColumn]
 	)
-
 	// reset selected if the id isnt in the data
 	React.useEffect(() => {
 		if (!data) return
 		const containsSelected = data.find(i => getRowId(i) === selectedId)
 		if (!containsSelected) setSelectedId(null)
 	}, [data])
+
+	const _onSelect = React.useCallback((selectedData, row) => {
+		setSelectedId(row.id)
+		onSelect(selectedData, row)
+	}, [])
+
+	return (
+		<DataGrid
+			data={data}
+			columns={columns}
+			sortable={sortable}
+			idColumn={idColumn}
+			onSelect={_onSelect}
+			selectedId={selectedId}
+		/>
+	)
+}
+
+export default function DataGrid({ data, columns, sortable, idColumn, onSelect, selectedId }) {
+	const rowHeight = 58
+	const isLoading = data === null
+	const getRowId = React.useCallback(
+		(row, relIndex, parent) => {
+			// if row[idColumn] exists, use it
+			// otherwise fall back on the default query-table function
+			return row[idColumn] ?? (parent ? [parent.id, relIndex].join('.') : relIndex)
+		},
+		[idColumn]
+	)
 
 	// setup react-table
 	const instanceTable = useTable(
@@ -62,8 +88,7 @@ const DataGrid = ({ data, columns, sortable, idColumn, onSelect }) => {
 			const evenOddClass = index % 2 ? 'odd' : ''
 			const onClick = () => {
 				if (onSelect) {
-					setSelectedId(row.id)
-					onSelect(row.original)
+					onSelect(row.original, row)
 				}
 			}
 			return (
@@ -138,5 +163,3 @@ DataGrid.propTypes = {
 	onSelect: PropTypes.func,
 	idColumn: PropTypes.string
 }
-
-export default DataGrid

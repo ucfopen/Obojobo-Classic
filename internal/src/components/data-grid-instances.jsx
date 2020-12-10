@@ -10,10 +10,16 @@ const columns = [
 	{ accessor: 'endTime', Header: 'Close', Cell: DataGridDateCell, width: 80 }
 ]
 
-const DataGridInstances = ({ data, onSelect }) => {
+const DataGridInstances = ({ data, onSelect, instance }) => {
 	return (
 		<div className="repository--data-grid-instances" style={{ width: '402px', height: '90vh' }}>
-			<DataGrid idColumn="instID" data={data} columns={columns} onSelect={onSelect} />
+			<DataGrid
+				idColumn="instID"
+				data={data}
+				columns={columns}
+				onSelect={onSelect}
+				selectedId={instance?.instID}
+			/>
 		</div>
 	)
 }
