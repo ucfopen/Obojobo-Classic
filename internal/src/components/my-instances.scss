@@ -2,9 +2,21 @@
 	display: flex;
 	flex-direction: column;
 
-	> h1 {
-		margin-bottom: 1em;
-		font-size: 1.25em;
+	> .header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 0.5em;
+
+		> h1 {
+			margin-bottom: 1em;
+			font-size: 1.25em;
+			display: inline-block;
+		}
+
+		> .repository--button {
+			display: inline-block;
+		}
 	}
 
 	> .filter {
@@ -27,11 +39,13 @@
 	}
 }
 
-.modal-new-instance{
-	iframe{
-		height: 900px;
-		width: 750px;
+.modal-new-instance {
+	iframe {
+		height: 80vh;
+		width: 90vw;
 		border: none;
 		margin: -1em -1em 1em -1em;
+		min-width: 540px; // stylelint-disable-line unit-blacklist
+		max-width: 1120px; // stylelint-disable-line unit-blacklist
 	}
 }

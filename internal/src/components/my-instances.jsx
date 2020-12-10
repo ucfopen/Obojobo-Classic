@@ -95,8 +95,10 @@ export default function MyInstances() {
 
 	return (
 		<div className="repository--my-instances">
-			<h1>My Instances</h1>
-			<Button onClick={showPicker} type="small" text="New Instance" />
+			<div className="header">
+				<h1>My Instances</h1>
+				<Button onClick={showPicker} type="small" text="+ New Instance" />
+			</div>
 			<div className="filter">
 				<SearchField
 					placeholder="Search by title, course or id"
