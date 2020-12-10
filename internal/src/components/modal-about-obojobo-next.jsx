@@ -27,8 +27,10 @@ export default function ModalAboutObojoboNext({ onClose }) {
 				<details>
 					<summary>Where&apos;s the Info-lit and the other public library modules?</summary>
 					<p>
-						The Public Library section is no longer accessible from the repository, but you can
-						still create these modules via an external tool assignment in Canvas / Webcourses.{' '}
+						There are 2 ways to create instances of modules. The popular option is to create a
+						Canvas assignment or module page and select external tool (supports automatic scores
+						sync). The other option is to use the new instance button here and copy/paste the link
+						(no automatic sync, download scores in csv format).{' '}
 						<a
 							target="_blank"
 							rel="noreferrer"
