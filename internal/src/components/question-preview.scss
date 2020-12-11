@@ -1,0 +1,142 @@
+@import './includes';
+
+.repository--question-preview {
+	$color-partially-correct: lighten($color-correct, 0.2);
+
+	background: $color-bg2;
+	border-radius: $dimension-rounded-radius;
+	padding: 1em;
+
+	h1 {
+		margin-bottom: 1.5em;
+	}
+
+	.student-score {
+		margin-bottom: 1em;
+	}
+
+	.question-body {
+		display: flex;
+
+		> * {
+			flex-basis: 100%;
+		}
+
+		&.is-split-question {
+			> *:first-child {
+				margin-right: 0.5em;
+			}
+
+			> *:last-child {
+				margin-left: 0.5em;
+
+				.pic {
+					float: right;
+				}
+			}
+		}
+
+		margin-bottom: 1em;
+
+		.text-area > div > p:first-child {
+			margin-top: 0;
+		}
+
+		.text-area > div > p:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.mc-answers {
+		list-style-type: none;
+		padding: 0;
+
+		.students-response {
+			font-size: 0.8em;
+		}
+
+		.answer-choice {
+			.answer-choice-item {
+				display: flex;
+				position: relative;
+				border-radius: $dimension-rounded-radius;
+				padding: 0.5rem;
+
+				> .icon {
+					width: 2.2rem;
+					font-size: 1.5em;
+				}
+
+				> .answer-label {
+					width: 1.5rem;
+					font-weight: bold;
+					font-size: 1.1em;
+				}
+
+				> .answer-body {
+					font-family: $font-text;
+					flex-grow: 1;
+					width: 100%;
+
+					> div > p:first-child {
+						margin-top: 0;
+					}
+
+					> div > p:last-child {
+						margin-bottom: 0;
+					}
+				}
+			}
+
+			&.is-weight-correct {
+				.icon {
+					color: $color-correct;
+					margin-top: -0.2em;
+				}
+			}
+
+			&.is-weight-partially-correct {
+				.icon {
+					color: $color-partially-correct;
+					font-weight: bold;
+					font-size: 0.8em;
+					padding-top: 0.15em;
+				}
+			}
+
+			&.is-weight-incorrect {
+				.icon {
+					color: $color-incorrect;
+					margin-top: -0.2em;
+				}
+			}
+		}
+
+		.answer-choice.is-student-response {
+			&.is-weight-correct {
+				.answer-choice-item {
+					background: transparentize($color-correct, 0.75);
+				}
+			}
+
+			&.is-weight-partially-correct {
+				.answer-choice-item {
+					background: transparentize($color-correct, 0.9);
+				}
+			}
+
+			&.is-weight-incorrect {
+				.answer-choice-item {
+					background: transparentize($color-incorrect, 0.75);
+				}
+			}
+		}
+	}
+
+	.qa-answers {
+		.student-response-container,
+		.correct-answers-list {
+			margin-top: 1em;
+		}
+	}
+}

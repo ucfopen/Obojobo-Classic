@@ -1,0 +1,22 @@
+@import './includes';
+
+.form-date-time {
+	&.is-null {
+		opacity: 0.5;
+	}
+
+	input {
+		border: 1px solid $color-shadow;
+		border-radius: $dimension-rounded-radius;
+		padding: 0.4em;
+		font-family: $font-monospace;
+	}
+
+	span {
+		padding: 0 0.4em;
+
+		&:last-child {
+			padding-right: 0.2;
+		}
+	}
+}

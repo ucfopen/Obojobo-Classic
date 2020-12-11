@@ -10,6 +10,7 @@ class API extends \rocketD\db\DBEnabled
 		parent::__construct();
 	}
 
+
 	/**
 	 * Verifies that the user has a current session and generates a new SESSID for them
 	 * @return (bool) true if user is logged in, false if not
@@ -133,6 +134,10 @@ class API extends \rocketD\db\DBEnabled
 
 	public function getUserNames($userIDs)
 	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
 		if($this->getSessionValid())
 		{
 			$UM = \rocketD\auth\AuthManager::getInstance();
@@ -227,12 +232,15 @@ class API extends \rocketD\db\DBEnabled
 		}
 	}
 
-	public function getUsersMatchingUsername($searchString)
+	public function getUsersMatchingSearch($searchString)
 	{
+		$searchString = rawurldecode($searchString);
 		if($this->getSessionValid())
 		{
+			$roleMan = \obo\perms\RoleManager::getInstance();
+			if(!$roleMan->isLibraryUser()) return \rocketD\util\Error::getError(1);
 			$UM = \rocketD\auth\AuthManager::getInstance();
-			$result = $UM->getUsersMatchingUsername($searchString);
+			$result = $UM->getUsersMatchingSearch($searchString);
 		}
 		else
 		{
@@ -619,6 +627,12 @@ class API extends \rocketD\db\DBEnabled
 	 */
 	public function editInstance($name, $instID, $course, $startTime, $endTime, $attemptCount, $scoreMethod, $allowScoreImport, $removeExternalLink = false)
 	{
+		// @TODO: For now these are added to work with the GET api.
+		// @TODO: Find a better solution here
+		$name = rawurldecode($name);
+		$course = rawurldecode($course);
+		$allowScoreImport = (bool)$allowScoreImport;
+
 		if($this->getSessionValid())
 		{
 			$this->DBM->startTransaction();
@@ -758,6 +772,42 @@ class API extends \rocketD\db\DBEnabled
 		return $result;
 	}
 
+	public function addUsersToInstance($instID, $userIDs)
+	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
+		$permObjects = [];
+		foreach($userIDs as $userID)
+		{
+			$permObjects[] = (object) [
+				'userID' => $userID,
+				'perm' => '20'
+			];
+		}
+
+		return $this->editUsersPerms($permObjects, $instID, \cfg_core_Perm::TYPE_INSTANCE);
+	}
+
+	public function removeUsersFromInstance($instID, $userIDs)
+	{
+		if(is_string($userIDs)) {
+			$userIDs = explode(',', $userIDs);
+		}
+
+		$permObjects = [];
+		foreach($userIDs as $userID)
+		{
+			$permObjects[] = (object) [
+				'userID' => $userID,
+				'perm' => '20'
+			];
+		}
+
+		return $this->editUsersPerms([], $instID, \cfg_core_Perm::TYPE_INSTANCE, $permObjects);
+	}
+
 	public function editUsersPerms($permObjects, $itemID = 0, $itemType = 'l', $removePerms = 0)
 	{
 		if( ! \obo\util\Validator::isPosInt($itemID))
@@ -793,6 +843,7 @@ class API extends \rocketD\db\DBEnabled
 				default:
 					if( ! \obo\util\Validator::isItemType($itemType))
 					{
+
 						return \rocketD\util\Error::getError(2);
 					}
 
@@ -821,6 +872,10 @@ class API extends \rocketD\db\DBEnabled
 
 	public function removeUsersPerms($users, $itemID, $itemType)
 	{
+		if(is_string($users)) {
+			$users = explode(',', $users);
+		}
+
 		if(!\obo\util\Validator::isUserArray($users) || !\obo\util\Validator::isPosInt($itemID) || !\obo\util\Validator::isItemType($itemType))
 		{
 			return \rocketD\util\Error::getError(2);

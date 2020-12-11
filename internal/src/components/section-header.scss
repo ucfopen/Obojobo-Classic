@@ -1,0 +1,11 @@
+$text-color: white;
+$font-family: 'Lato', arial;
+
+.repository--section-header {
+	background-image: linear-gradient(#626985, #424b6b);
+	color: $text-color;
+	border-radius: 5px;
+	font-family: $font-family;
+	padding: 0.4em 0.8em;
+	box-shadow: 0 2px 2px #b1b1b1;
+}

@@ -1,0 +1,48 @@
+@import 'includes';
+
+$border-color: #b6b6b6;
+$border-outer-color: transparent lighten($border-color, 10%) transparent transparent;
+$border-inner-color: transparent #ffffff transparent transparent;
+$font-color: #757575;
+
+.instructions-flag {
+	padding-left: 1em;
+
+	.label {
+		font-family: $font-default;
+		font-weight: bold;
+		color: $font-color;
+		position: relative;
+		margin: 0;
+		line-height: 1.9em;
+		border: 1px solid $border-color;
+		border-radius: 0 $dimension-rounded-radius $dimension-rounded-radius 0;
+		border-left: none;
+		padding: 0 1.3em 0 0.8em;
+		display: inline-block;
+
+		&::after,
+		&::before {
+			content: '';
+			width: 0;
+			height: 0;
+			right: 100%;
+			position: absolute;
+			border-style: solid;
+		}
+
+		&::after {
+			z-index: 1;
+			top: -1px; // stylelint-disable-line
+			border-width: 1.02em;
+			border-color: $border-outer-color;
+		}
+
+		&::before {
+			z-index: 2;
+			top: 1px; // stylelint-disable-line
+			border-width: 0.9em;
+			border-color: $border-inner-color;
+		}
+	}
+}

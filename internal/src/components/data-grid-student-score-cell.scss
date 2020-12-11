@@ -1,0 +1,12 @@
+@import './includes';
+
+.data-grid-student-score-cell {
+	.data-grid-student-score-cell--score {
+		float: left;
+		width: 3em;
+	}
+
+	.data-grid-student-score-cell--imported-text {
+		color: $color-unchosen-correct;
+	}
+}

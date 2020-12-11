@@ -1,0 +1,21 @@
+@import './includes';
+
+.repository--data-grid-question-body-cell {
+	.item-row {
+		white-space: nowrap;
+	}
+
+	.label {
+		font-family: $font-monospace;
+		margin-right: 0.25em;
+	}
+
+	.text-area {
+		display: inline-block;
+
+		* {
+			display: inline-block;
+			margin: 0;
+		}
+	}
+}

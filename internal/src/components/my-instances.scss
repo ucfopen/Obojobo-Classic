@@ -1,0 +1,51 @@
+.repository--my-instances {
+	display: flex;
+	flex-direction: column;
+
+	> .header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 0.5em;
+
+		> h1 {
+			margin-bottom: 1em;
+			font-size: 1.25em;
+			display: inline-block;
+		}
+
+		> .repository--button {
+			display: inline-block;
+		}
+	}
+
+	> .filter {
+		display: flex;
+		align-items: center;
+		margin-bottom: 0.5em;
+		gap: 1em;
+
+		> .repository--search-field {
+			flex-grow: 1;
+
+			> .search-field {
+				width: 100%;
+			}
+		}
+	}
+
+	> .repository--data-grid-instances {
+		flex-grow: 1;
+	}
+}
+
+.modal-new-instance {
+	iframe {
+		height: 80vh;
+		width: 90vw;
+		border: none;
+		margin: -1em -1em 1em -1em;
+		min-width: 540px; // stylelint-disable-line unit-blacklist
+		max-width: 1120px; // stylelint-disable-line unit-blacklist
+	}
+}

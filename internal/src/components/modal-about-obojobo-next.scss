@@ -1,0 +1,29 @@
+.repository--modal-about-obojobo-next {
+	text-align: center;
+
+	> p {
+		text-align: left;
+		margin-top: 0;
+		margin-bottom: 2em;
+	}
+
+	> details {
+		text-align: left;
+		margin-bottom: 1em;
+
+		> summary {
+			cursor: pointer;
+			font-weight: bold;
+		}
+	}
+
+	> .repository--button {
+		margin-top: 2em;
+		margin-bottom: 1em;
+		display: inline-block;
+	}
+
+	.about-obo-next {
+		margin-top: 2em;
+	}
+}

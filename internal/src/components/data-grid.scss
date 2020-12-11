@@ -1,0 +1,113 @@
+@import './includes';
+
+.repository--data-grid {
+	// @TODO: Move some of these colors to a global includes file
+	$color-row: #f2f2f2;
+	$color-hover: #e6edf6;
+	$color-hover-light: lighten($color-hover, 5%);
+	$color-selected: #ccdaeb;
+	$color-no-data: #cccccc;
+	$color-header: #f2eef5;
+	$color-header-hover: darken($color-header, 8%);
+	$color-border: #e2e2e2;
+	$header-height: 2.5em;
+
+	padding: 0;
+	margin: 0;
+	font-family: $font-default;
+	font-size: 11pt;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	border: 1px solid $color-border;
+
+	.row {
+		display: flex;
+		width: 100%;
+		justify-content: space-around;
+	}
+
+	.data-grid-head {
+		background-color: $color-header;
+
+		.row > div {
+			flex-shrink: 0;
+			text-align: left;
+			border: 1px solid $color-border;
+			padding: 0.6em 0.4em;
+			height: $header-height;
+
+			svg {
+				margin: 0 0.1em;
+				position: absolute;
+				opacity: 0.5;
+			}
+		}
+	}
+
+	.data-grid-body {
+		height: calc(100% - #{$header-height});
+		width: 100%;
+
+		.row {
+			&.odd {
+				background-color: $color-row;
+			}
+
+			&.selected {
+				background-color: $color-selected;
+			}
+
+			&.no-data {
+				text-align: center;
+				color: $color-no-data;
+			}
+
+			&:hover {
+				background-color: $color-hover-light;
+			}
+
+			> div {
+				text-align: left;
+				flex-shrink: 0;
+				padding: 0.6em 0.4em;
+				border: 1px solid $color-border;
+				overflow: hidden;
+			}
+		}
+
+		.cell {
+			overflow: hidden;
+		}
+
+		.no-data {
+			border: none;
+			margin: 0 auto;
+			width: 5em;
+			margin-top: 2em;
+			text-align: center;
+		}
+	}
+
+	&.sortable .data-grid-head .row > div {
+		cursor: pointer;
+
+		&:hover {
+			background-color: $color-header-hover;
+		}
+	}
+
+	&.selectable .data-grid-body {
+		.row {
+			cursor: pointer;
+		}
+
+		.row:hover {
+			background-color: $color-hover;
+		}
+
+		.row.selected:hover {
+			background-color: $color-selected;
+		}
+	}
+}

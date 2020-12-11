@@ -1,0 +1,25 @@
+@import './_includes.scss';
+
+.modal-about-learning-object {
+	text-align: center;
+
+	> .repository--def-list {
+		text-align: left;
+		margin-bottom: 1em;
+	}
+
+	> .flash-html-container {
+		text-align: left;
+		margin-bottom: 2em;
+	}
+
+	> .repository--section-header {
+		margin-bottom: 1em;
+		text-align: left;
+	}
+
+	> .repository--button {
+		margin-bottom: 1em;
+		display: inline-block;
+	}
+}

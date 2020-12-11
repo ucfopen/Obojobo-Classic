@@ -1,0 +1,50 @@
+@import './includes';
+
+.repository--search-field {
+	$color-highlight-text: white;
+
+	position: relative;
+
+	> .magnifier-icon {
+		background-image: url('../../../assets/images/viewer/magnifier-icon.svg');
+		background-repeat: no-repeat;
+		display: inline-block;
+		width: 1em;
+		height: 1em;
+		position: absolute;
+		left: 0.7em;
+		top: 0.5em;
+	}
+
+	> .search-field {
+		font-family: $font-default;
+		border-radius: 3em;
+		color: $color-text;
+		border: 1px solid $color-shadow;
+		padding: 0.4em 0.4em 0.4em 2em;
+		width: 15em;
+
+		&::-webkit-search-cancel-button {
+			// @TODO replace with a visible x icon
+		}
+	}
+
+	&.is-not-empty {
+		> .search-field {
+			border-color: $color-action;
+			background-color: $color-action;
+			color: $color-highlight-text;
+
+			&:-webkit-autofill {
+				-webkit-text-fill-color: $color-highlight-text;
+				-webkit-box-shadow: 0 0 0 1000px $color-action inset;
+			}
+		}
+	}
+
+	&.is-empty > .search-field:active,
+	&.is-empty > .search-field:hover,
+	&.is-empty > .search-field:focus {
+		border-color: $color-action;
+	}
+}

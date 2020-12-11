@@ -1,0 +1,56 @@
+@import './includes';
+
+.repository--media-view {
+	> * {
+		border: 1px solid $color-shadow;
+		border-radius: $dimension-rounded-radius;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+	}
+
+	.deprecation-notice {
+		background: $color-bg2;
+		border-radius: $dimension-rounded-radius;
+		padding: 1em;
+		width: 20em;
+		font-size: 0.8em;
+		text-align: center;
+	}
+
+	.pic {
+		max-height: 600px;
+		max-width: 100%;
+	}
+
+	.swf,
+	.flv {
+		padding: 1em;
+
+		.about {
+			margin-bottom: 1em;
+		}
+	}
+
+	.kogneato {
+		padding: 1em;
+
+		img {
+			margin-bottom: 0.3em;
+		}
+
+		span {
+			margin-bottom: 1em;
+		}
+
+		a {
+			font-size: 0.8em;
+		}
+	}
+
+	.download-link {
+		display: block;
+		margin-top: 1em;
+	}
+}

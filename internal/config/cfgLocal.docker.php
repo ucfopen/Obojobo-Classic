@@ -3,9 +3,11 @@ require_once('cfg.php'); // default config
 
 class AppCfg extends AppCfgDefault
 {
+	const IS_DEV_DOCKER = true;
+
 	// --- DIRECTORYS & PATHS ---
 	const DIR_BASE = '/var/www/html/'; // Define Base Directory [ full path EX:  /www/obobjobo/ ]
-	const URL_WEB = 'http://127.0.0.1/'; // Define the web directory for the base of GS [root inclusive at starting slash: http://obojobo.com/]
+	const URL_WEB = 'https://127.0.0.1:8080/'; // Define the web directory for the base of GS [root inclusive at starting slash: http://obojobo.com/]
 
 	// --- Main App DB Connection ---
 	const DB_HOST = 'mysql';

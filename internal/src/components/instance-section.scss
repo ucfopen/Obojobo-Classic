@@ -1,0 +1,118 @@
+@import './includes';
+
+.repository--instance-section {
+	hr {
+		height: 1px; //stylelint-disable-line unit-blacklist
+		border: none;
+		background: $color-shadow;
+		margin-bottom: 1em;
+	}
+
+	> .repository--section-header {
+		margin-bottom: 0.5em;
+	}
+
+	> .instructions-flag {
+		margin-top: 4.5em;
+	}
+
+	> .header {
+		display: flex;
+		align-items: baseline;
+		margin-bottom: 1em;
+
+		> .main-info {
+			flex-grow: 1;
+			margin-right: 1em;
+
+			> h1 {
+				margin-bottom: 0.2em;
+			}
+
+			> h2 {
+				color: $color-text-minor;
+				font-size: 0.9em;
+				font-weight: normal;
+				margin-bottom: 1em;
+			}
+		}
+
+		> .repository--button {
+			margin-right: 1em;
+			white-space: nowrap;
+		}
+
+		> .repository--button:last-child {
+			margin-right: 0;
+		}
+	}
+
+	> .link {
+		margin-bottom: 3em;
+
+		> h3 {
+			font-weight: bold;
+			margin-bottom: 0.3em;
+		}
+
+		> .container {
+			display: flex;
+			align-items: center;
+
+			> input {
+				font-family: $font-monospace;
+				border: 1px solid $color-shadow;
+				border-radius: $dimension-rounded-radius;
+				font-size: 0.8em;
+				padding: 0.5em 0.6em;
+				min-width: 28em;
+				margin-right: 1em;
+			}
+		}
+	}
+
+	> .details {
+		margin-bottom: 3em;
+
+		> .repository--def-list {
+			margin-bottom: 1em;
+		}
+	}
+
+	> .ownership {
+		margin-bottom: 3em;
+
+		> span {
+			display: block;
+			margin-bottom: 1em;
+		}
+	}
+
+	> .scores-by-question {
+		> h4 {
+			margin-bottom: 1em;
+		}
+	}
+
+	> .repository--assessment-scores-section {
+		margin-bottom: 2em;
+	}
+
+	// > .scores-by-student {
+	// 	margin-bottom: 3em;
+
+	// 	> .header {
+	// 		display: flex;
+	// 		align-items: center;
+	// 		margin-bottom: 0.5em;
+
+	// 		> h4 {
+	// 			flex-grow: 1;
+	// 		}
+	// 	}
+
+	// 	> .repository--data-grid {
+	// 		margin-bottom: 1em;
+	// 	}
+	// }
+}

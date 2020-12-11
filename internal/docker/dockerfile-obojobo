@@ -2,19 +2,21 @@ FROM php:7.4-fpm-alpine
 MAINTAINER UCF/Open_
 
 ARG PHP_EXT="bcmath gd xml mysqli"
-ARG PECL="mcrypt-1.0.3"
+ARG PECL="mcrypt-1.0.3 oauth"
 ARG PHP_EXT_ENABLE="memcache mcrypt"
 ARG PHP_MEMCACHED_VERSION="4.0.5.2"
 ARG COMPOSER_VERSION="1.10.0"
 ARG COMPOSER_INSTALLER_URL="https://raw.githubusercontent.com/composer/getcomposer.org/d2c7283f9a7df2db2ab64097a047aae780b8f6b7/web/installer"
 ARG COMPOSER_INSTALLER_SHA="e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a"
 
-# os packages needed for php extensions
-ARG BUILD_PACKAGES="autoconf bash build-base cyrus-sasl-dev freetype git libjpeg-turbo-dev libmemcached-dev libpng-dev libxml2-dev libmcrypt-dev"
-ARG PURGE_PACKAGES="autoconf build-base cyrus-sasl-dev freetype libjpeg-turbo-dev"
+# os packages to keep in the final image
+ARG SYSTEM_PACKAGES="bash pcre cyrus-sasl git libmemcached-dev libxml2-dev freetype libpng libjpeg-turbo libmcrypt"
+# os packages to add for building, but remove from the final image
+ARG TEMP_PACKAGES="autoconf pcre-dev build-base cyrus-sasl-dev freetype-dev libpng-dev libjpeg-turbo-dev libmcrypt-dev"
+# directories to rm from the final image
 ARG PURGE_FILES="/var/lib/apt/lists/* /usr/src/php /usr/include /usr/local/include /usr/share/doc /usr/share/doc-base /var/www/html/php-memcached"
 
-RUN apk add --no-cache $BUILD_PACKAGES \
+RUN apk add --no-cache $SYSTEM_PACKAGES $TEMP_PACKAGES \
 	# ======== PHP CONFIGURE GD
 	&& docker-php-ext-configure gd --with-jpeg=/usr/include \
 	# ======== PECL INSTALL
@@ -36,7 +38,7 @@ RUN apk add --no-cache $BUILD_PACKAGES \
 	&& php composer-setup.php --install-dir=/usr/local/bin --filename=composer --version=$COMPOSER_VERSION \
 	&& rm -f composer-setup.php \
 	# ======== CLEANUP
-	&& apk del $PURGE_PACKAGES \
+	&& apk del $TEMP_PACKAGES \
 	&& rm -rf $PURGE_FILES
 
 # hack to let php write to the shared disk with boot2docker shares

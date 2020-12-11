@@ -339,7 +339,7 @@ class AuthManager extends \rocketD\db\DBEnabled
 		if($userID != 0)
 		{
 			$this->defaultDBM();
-			$q = $this->DBM->querySafe("SELECT ".\cfg_core_User::FIRST.", ".\cfg_core_User::LAST.", ".\cfg_core_User::MIDDLE." FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
+			$q = $this->DBM->querySafe("SELECT ". \cfg_core_User::LOGIN . ", ".\cfg_core_User::FIRST.", ".\cfg_core_User::LAST.", ".\cfg_core_User::MIDDLE." FROM ".\cfg_core_User::TABLE." WHERE ".\cfg_core_User::ID."='?' LIMIT 1", $userID);
 			$r = $this->DBM->fetch_assoc($q);
 			return $r;
 		}
@@ -490,19 +490,23 @@ class AuthManager extends \rocketD\db\DBEnabled
 		return $allUsers;
 	}
 
-	public function getUsersMatchingUsername($searchString)
+	public function getUsersMatchingSearch($searchString)
 	{
-		/*select * from obo_users where lower(concat_ws(' ',first,last)) like '%jag%'*/
+		$name = preg_replace('/\s+/', '', $searchString); // remove spaces
+		$query = "SELECT ". \cfg_core_User::LOGIN . ", ". \cfg_core_User::ID . ", ". \cfg_core_User::FIRST . ", ". \cfg_core_User::LAST . ", ". \cfg_core_User::EMAIL . " FROM ".\cfg_core_User::TABLE
+		." WHERE REPLACE(CONCAT(".\cfg_core_User::FIRST.", ".\cfg_core_User::LAST."), ' ', '') LIKE '?'
+			OR ". \cfg_core_User::LOGIN . " = '?'
+			OR ". \cfg_core_User::EMAIL . " LIKE '?'
+			LIMIT 50";
+
 		$this->defaultDBM();
 		$users = array();
-		$q = $this->DBM->querySafe("SELECT ". \cfg_core_User::ID . " FROM ".\cfg_core_User::TABLE." WHERE LOWER(CONCAT_WS(' ',".\cfg_core_User::FIRST.",".\cfg_core_User::LAST.")) LIKE '?'", $searchString."%");
+		$q = $this->DBM->querySafe($query, "%$name%", $name, "$name%");
 		while($r = $this->DBM->fetch_obj($q))
 		{
-			if($newUser = $this->fetchUserByID($r->{\cfg_core_User::ID}))
-			{
-				$users[] = $newUser;
-			}
+			$users[] = $r;
 		}
+
 		return $users;
 	}
 

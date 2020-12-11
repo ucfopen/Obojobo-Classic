@@ -1,0 +1,72 @@
+@import '_includes.scss';
+
+.modal-scores-by-question {
+	font-family: $font-default;
+	display: flex;
+	background-color: $color-bg2;
+	padding: 0.8em;
+
+	> .scores-by-question--left-sidebar {
+		display: flex;
+		flex-direction: column;
+		margin-right: 1em;
+
+		> h2 {
+			font-weight: bolder;
+			color: $color-text;
+			margin-bottom: 0.6em;
+		}
+
+		> .wrapper {
+			background: $color-bg;
+			border: 1px solid $color-shadow;
+			flex: 1;
+			overflow: auto;
+
+			> .repository--data-grid-student-scores {
+				height: 100%;
+
+				thead th {
+					border-top: none;
+				}
+
+				th:first-child,
+				td:first-child {
+					border-left: none;
+				}
+
+				th:last-child,
+				td:last-child {
+					border-right: none;
+				}
+			}
+		}
+	}
+
+	> .score-details-right-content {
+		flex: 1;
+		background: $color-bg;
+		border-radius: $dimension-rounded-radius;
+		overflow: auto;
+	}
+}
+
+.repository--modal.scoresByQuestion {
+	width: calc(100% - 2em);
+	height: calc(100% - 2em);
+	max-width: 85em;
+
+	> div {
+		height: calc(100% - 4em);
+
+		> .modal-content {
+			padding: 0;
+			height: 100%;
+
+			> .modal-scores-by-question {
+				height: 100%;
+				border-radius: $dimension-rounded-radius;
+			}
+		}
+	}
+}

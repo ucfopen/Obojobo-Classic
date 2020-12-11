@@ -1,0 +1,18 @@
+@import './includes';
+
+.data-grid-score-cell {
+	color: $color-text-minor;
+
+	[class*='score-'] {
+		color: $color-partially-correct;
+	}
+
+	.score-100 {
+		color: $color-correct;
+		font-weight: bold;
+	}
+
+	.score-0 {
+		color: $color-incorrect;
+	}
+}

@@ -1,0 +1,106 @@
+@import './includes';
+
+html {
+	background: $color-bg2 !important; // Where is #FFFFFF coming from?
+	overflow: auto !important; //Where is overflow:hidden coming from?
+}
+
+body {
+	background: $color-bg2;
+	height: auto !important; //Where is height 100% coming from?
+}
+
+#react-app {
+	height: 100%;
+
+	> .repository--loading-indicator {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+}
+
+.repository {
+	font-size: 12pt;
+	// display: flex;
+	// flex-direction: column;
+	height: 100%;
+
+	> .obo-header {
+		height: 4em;
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		z-index: 1;
+		border-bottom: 1px solid $color-bg2;
+	}
+
+	> main {
+		padding-left: 1em;
+		padding-right: 1em;
+		margin-top: 4em;
+		height: calc(100vh - 4em);
+		overflow: auto;
+		box-sizing: border-box;
+		// flex-grow: 1;
+		// height: 100%;
+		// display: flex;
+		// background: $color-bg2;
+
+		> .wrapper {
+			max-width: 80em;
+			margin: 0 auto;
+			position: relative;
+
+			> .repository--my-instances {
+				// margin: 1em;
+				// margin-right: 0;
+				// min-width: 25em;
+				position: sticky;
+				left: 0;
+				width: 25em;
+				bottom: 0;
+				top: 0;
+				padding-top: 1em;
+				// padding: 1em;
+				box-sizing: border-box;
+				height: 0;
+				height: calc(100vh - 5em);
+
+				> .repository--data-grid-instances {
+					border: 1px solid #dedede;
+					background: $color-bg;
+					overflow: auto;
+
+					td:first-child,
+					th:first-child {
+						border-left: none;
+					}
+
+					td:last-child,
+					th:last-child {
+						border-right: none;
+					}
+
+					tr:first-child > th {
+						border-top: none;
+					}
+				}
+			}
+
+			> .repository--instance-section {
+				background: $color-bg;
+				width: calc(100% - 26em);
+				margin: 1em;
+				margin-left: 26em;
+				padding: 1.5em;
+				box-sizing: border-box;
+				border-radius: $dimension-rounded-radius;
+				min-height: calc(100vh - 6em);
+				margin-top: calc(-100vh + 6em);
+			}
+		}
+	}
+}

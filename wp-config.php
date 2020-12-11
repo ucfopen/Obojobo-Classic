@@ -102,3 +102,9 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+
+// when docker is used and the request is coming from webpack, don't redirect to siteurl
+if (AppCfg::IS_DEV_DOCKER === true &&  $_SERVER['HTTP_X_USE_WEBPACK'] === 'true')
+{
+	remove_filter('template_redirect','redirect_canonical');
+}

@@ -1,0 +1,81 @@
+@import './includes';
+
+.obo-header {
+	$color-banner-text: lighten($color-banner, 60%);
+
+	> .wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 1em;
+		box-sizing: border-box;
+		height: 4em;
+		max-width: 82.5em;
+		width: 100%;
+		margin: 0 auto;
+
+		> .obo-header--left-side {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			> .obo-classic-logo {
+				width: 8em;
+				margin-right: 0.5em;
+			}
+		}
+
+		> .banner-header {
+			background-color: $color-banner;
+			border-radius: 1.75em;
+			height: 1.75em;
+			padding: 0.4em 1em;
+			color: $color-banner-text;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-family: $font-default;
+			font-size: 0.8em;
+
+			> button {
+				border: none;
+				background: transparent;
+				color: $color-bg;
+				font-family: $font-default;
+				font-size: 1em;
+
+				&:hover {
+					cursor: pointer;
+					opacity: 0.8;
+				}
+			}
+
+			> .banner-header--modal-button {
+				font-weight: bold;
+				text-decoration: underline;
+				margin: 0 0.4em;
+			}
+		}
+
+		> .obo-header--right-side {
+			text-align: right;
+
+			> p {
+				margin: 0.2em 0;
+			}
+		}
+	}
+}
+
+.header-btn {
+	color: $color-obojobo-blue;
+	text-decoration: underline;
+	border: none;
+	background: transparent;
+	margin: 0;
+
+	&:hover {
+		cursor: pointer;
+		opacity: 0.8;
+	}
+}
