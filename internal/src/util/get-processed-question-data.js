@@ -1,4 +1,5 @@
 export default aGroup => {
+	if (!aGroup.kids) return {}
 	// first run through all the the questions and total up the alternates
 	// AND normalize questionIndex to always indicate the question index
 	// because groups w/o alternates use 0 as their questionIndex

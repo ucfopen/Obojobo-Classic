@@ -53,9 +53,8 @@ export default function QuestionScoreDetails(props) {
 
 		// Processes the necessary data for the 'GraphResponses' component.
 		for (let i = 0; i < responses.length; i++) {
-			const currAnswerChoice = responses[i].response.charCodeAt(0) - 65
-
-			dataForGraph[currAnswerChoice].value++
+			// add to answer count
+			dataForGraph[responses[i].answerIndex].value++
 
 			// To find the number of correct answers.
 			if (responses[i].score === 100) {
@@ -65,7 +64,7 @@ export default function QuestionScoreDetails(props) {
 			// To find which answer is the correct one.
 			if (!foundCorrectAnswer) {
 				if (responses[i].score === 100) {
-					dataForGraph[currAnswerChoice].isCorrect = true
+					dataForGraph[responses[i].answerIndex].isCorrect = true
 					foundCorrectAnswer = true
 				}
 			}

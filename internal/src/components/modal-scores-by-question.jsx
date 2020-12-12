@@ -6,164 +6,113 @@ import QuestionScoreDetails from './question-score-details'
 import DataGridStudentScores from './data-grid-student-scores'
 import getProcessedQuestionData from '../util/get-processed-question-data'
 import { useQuery } from 'react-query'
-import { apiGetLO, apiGetInstanceTrackingData } from '../util/api'
-import useApiGetUsersCached from '../hooks/use-api-get-users-cached'
+import { apiGetLO, apiGetResponsesForInstance, apiGetScoresForInstance } from '../util/api'
 import RepositoryModal from './repository-modal'
 
-const getSubmitQuestionLogsForAssessment = logs => {
-	let foundAssessmentSubmitQuestionLogs = false
-	let responsesByQuestionID = {}
-	let foundLogs = []
-
-	logs.forEach(log => {
-		if (log.itemType === 'SectionChanged' && log.valueA === '3') {
-			foundAssessmentSubmitQuestionLogs = true
-		} else if (
-			(log.itemType === 'SectionChanged' && log.valueA !== '3') ||
-			log.itemType === 'EndAttempt'
-		) {
-			foundLogs = foundLogs.concat(Object.values(responsesByQuestionID))
-			foundAssessmentSubmitQuestionLogs = false
-			responsesByQuestionID = {}
-		}
-
-		if (foundAssessmentSubmitQuestionLogs && log.itemType === 'SubmitQuestion') {
-			responsesByQuestionID[log.valueA] = log
-		}
-	})
-
-	return foundLogs
-}
-
 export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, loID }) {
-	const { isError, data, isFetching } = useQuery(
-		['getInstanceTrackingData', instID],
-		apiGetInstanceTrackingData,
-		{
-			initialStale: true,
-			staleTime: Infinity
-		}
-	)
-
-	// process tracking data
-	const submitQuestionLogsByUserID = React.useMemo(() => {
-		if (isFetching || isError || !data) return {}
-		const result = {}
-		data.visitLog.forEach(visit => {
-			const { userID, logs } = visit
-			// first encounter, create object
-			if (!result[userID]) {
-				result[userID] = {
-					userName: `User #${userID}`,
-					logs: []
-				}
-			}
-
-			const submitLogs = getSubmitQuestionLogsForAssessment(logs)
-			result[userID].logs = result[userID].logs.concat(submitLogs)
-		})
-		return result
-	}, [data])
-
-	// load user data
-	const usersToLoad = React.useMemo(() => Object.keys(submitQuestionLogsByUserID), [
-		submitQuestionLogsByUserID
-	])
-	const { users, isError: isUserError, isFetching: isUserFetching } = useApiGetUsersCached(
-		usersToLoad
-	)
-
-	// populate userNames in the logs
-	React.useMemo(() => {
-		if (isUserFetching || isUserError) return
-		usersToLoad.forEach(userID => {
-			// when revisiting it may take a re-render for users to be populated
-			if (users[userID]) submitQuestionLogsByUserID[userID].userName = users[userID].userString
-		})
-	}, [users, submitQuestionLogsByUserID])
-
-	// load lo
 	const { data: loData, isFetching: isLOFetching } = useQuery(['getLO', loID], apiGetLO, {
 		initialStale: true,
 		staleTime: Infinity,
-		initialData: null,
-		enabled: submitQuestionLogsByUserID
+		initialData: null
 	})
 
-	const ready = !isFetching && !isUserFetching && !isLOFetching && loData && data
+	const { isError, data: responseData, isFetching } = useQuery(
+		['apiGetResponsesForInstance', instID],
+		apiGetResponsesForInstance,
+		{
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: null
+		}
+	)
+
+	// this will already be cached client side, lets use this data set to get the user names
+	const { data: instanceScores, isFetching: instanceScoresIsFetching } = useQuery(
+		['getScoresForInstance', instID],
+		apiGetScoresForInstance,
+		{
+			initialStale: true,
+			staleTime: Infinity,
+			initialData: []
+		}
+	)
+
+	const questionData = React.useMemo(() => {
+		if (
+			isLOFetching ||
+			isFetching ||
+			instanceScoresIsFetching ||
+			isError ||
+			!responseData ||
+			!loData
+		) {
+			return []
+		}
+
+		// extract user name data from instanceScores
+		const userMap = {}
+		instanceScores.forEach(s => {
+			userMap[s.userID] = s
+		})
+
+		// create an answer map where the key is the answer id
+		const byAnswer = {}
+		responseData.forEach(ans => {
+			const ansId = ans.answer
+			if (!byAnswer[ansId]) {
+				byAnswer[ansId] = []
+			}
+			byAnswer[ansId].push(ans)
+		})
+
+		// loop over questions
+		const aGroup = loData.aGroup
+		const questions = Object.values(getProcessedQuestionData(aGroup))
+		questions.forEach(q => {
+			q.id = q.originalQuestion.questionID
+			q.score = null
+			q.responses = []
+			const scores = []
+
+			// loop through answers of this question
+			for (const i in q.originalQuestion.answers) {
+				const a = q.originalQuestion.answers[i]
+				const answerIndex = parseInt(i, 10)
+				const answerLetter = String.fromCharCode(answerIndex + 65)
+				if (byAnswer[a.answerID]) {
+					const answerLogs = byAnswer[a.answerID]
+					// total up scores
+					// add answerIndex to each answer
+
+					answerLogs.forEach(a => {
+						a.answerIndex = answerIndex
+						a.answerLetter = answerLetter
+						a.userName = userMap[a.userID]?.userName || `Student ${a.userID}`
+						a.response = answerLetter
+						scores.push(parseFloat(a.score))
+					})
+					// average score
+					q.responses.push(...answerLogs)
+				}
+			}
+			if (scores.length) {
+				q.score = scores.reduce((total, s) => total + s, 0) / scores.length
+			}
+		})
+
+		return questions
+	}, [responseData, loData, instanceScores])
+
+	const ready = !isFetching && !isLOFetching && !instanceScoresIsFetching && loData && responseData
 
 	if (!ready) return <div>Loading</div>
 	if (isError) return <div>Error Loading Data</div>
 
-	return (
-		<ModalScoresByQuestion
-			instanceName={instanceName}
-			submitQuestionLogsByUser={submitQuestionLogsByUserID}
-			aGroup={loData?.aGroup || {}}
-			onClose={onClose}
-		/>
-	)
+	return <ModalScoresByQuestion instanceName={instanceName} data={questionData} onClose={onClose} />
 }
 
-const getScoreDataByQuestionID = submitQuestionLogsByUser => {
-	const logDataByQuestionID = {}
-
-	for (const userID in submitQuestionLogsByUser) {
-		const submitQuestionLogsForUser = submitQuestionLogsByUser[userID]
-		submitQuestionLogsForUser.logs.forEach(log => {
-			if (!logDataByQuestionID[log.valueA]) {
-				logDataByQuestionID[log.valueA] = {
-					logs: [],
-					totalScore: 0,
-					answers: []
-				}
-			}
-
-			const logByQuestion = logDataByQuestionID[log.valueA]
-
-			logByQuestion.logs.push(log)
-			logByQuestion.totalScore += parseFloat(log.score)
-			logByQuestion.answers.push({
-				userName: submitQuestionLogsForUser.userName,
-				response:
-					log.answerIndex === '?' ? log.valueB : String.fromCharCode(log.answerIndex - 1 + 65),
-				score: parseInt(log.score, 10),
-				time: parseInt(log.createTime, 10)
-			})
-		})
-	}
-
-	return logDataByQuestionID
-}
-
-export default function ModalScoresByQuestion({
-	aGroup,
-	submitQuestionLogsByUser,
-	instanceName,
-	onClose
-}) {
+export default function ModalScoresByQuestion({ data, instanceName, onClose }) {
 	const [selectedItem, setSelectedItem] = React.useState()
-	const questionsByID = React.useMemo(() => getProcessedQuestionData(aGroup), [aGroup])
-
-	const scoreDataByQuestionID = React.useMemo(
-		() => getScoreDataByQuestionID(submitQuestionLogsByUser),
-		[submitQuestionLogsByUser]
-	)
-
-	const data = React.useMemo(() => {
-		return aGroup.kids.map(q => {
-			const scoreData = scoreDataByQuestionID[q.questionID]
-
-			return {
-				...questionsByID[q.questionID],
-				responses: scoreData ? scoreData.answers : [],
-				score:
-					!scoreData || scoreData.answers.length === 0
-						? null
-						: scoreData.totalScore / scoreData.answers.length
-			}
-		})
-	}, [aGroup, submitQuestionLogsByUser])
 
 	return (
 		<RepositoryModal

@@ -1,3 +1,5 @@
+import getUserString from './get-user-string'
+
 const fetchOptions = () => ({
 	headers: {
 		pragma: 'no-cache',
@@ -106,10 +108,11 @@ export const apiGetScoresForInstance = (r, instID) =>
 	fetchGet(`/api/json.php/loRepository.getScoresForInstance/${instID}`).then(scoresByUser => {
 		// normalize the data we're getting back
 		const castToInt = ['attemptID', 'linkedAttempt', 'score', 'submitDate']
-		scoresByUser.forEach(u => {
-			u.additional = parseInt(u.additional, 10)
-			u.userID = parseInt(u.userID, 10)
-			u.attempts.forEach(a => {
+		scoresByUser.forEach(s => {
+			s.userName = getUserString(s.user)
+			s.additional = parseInt(s.additional, 10)
+			s.userID = parseInt(s.userID, 10)
+			s.attempts.forEach(a => {
 				castToInt.forEach(key => {
 					a[key] = parseInt(a[key], 10)
 				})
@@ -165,8 +168,6 @@ export const apiGetVisitTrackingData = (r, userID, instID) =>
 		})
 		return data
 	})
-export const apiGetInstanceTrackingData = (r, instID) =>
-	fetchGet(`/api/json.php/loRepository.getInstanceTrackingData/${instID}`)
 export const apiGetUserNames = (r, ...userIDs) =>
 	fetchGet(`/api/json.php/loRepository.getUserNames/${userIDs.join(',')}`).then(users => {
 		users.forEach(u => {
@@ -203,21 +204,28 @@ export const apiAddUsersToInstance = ({ instID, userIDs }) =>
 	fetchGet(`/api/json.php/loRepository.addUsersToInstance/${instID}/${userIDs.join(',')}`)
 export const apiRemoveUsersFromInstance = ({ instID, userIDs }) =>
 	fetchGet(`/api/json.php/loRepository.removeUsersFromInstance/${instID}/${userIDs.join(',')}`)
-export const apiGetResponsesForInstance = async (key, { instID }) => {
+
+export const apiGetResponsesForInstance = async (r, instID) => {
 	if (!instID) return []
 
-	const perPage = /* 10000 */ 1
+	const perPage = 10000
 	const addData = []
 	let allLoaded = false
 	let page = 0
+	const castToInt = ['answerID', 'createTime', 'itemID', 'score', 'userID']
 
 	while (!allLoaded) {
 		const offset = page * perPage
 		const data = await fetchGet(
 			`/api/json.php/loRepository.getResponsesForInstance/${instID}/${offset}/${perPage}`
 		)
+		data.forEach(d => {
+			castToInt.forEach(key => {
+				d[key] = parseInt(d[key], 10)
+			})
+		})
 		page = page + 1
-		addData.push(...data)
+		addData.push(...data) // faster than array.concat!
 		if (data.length < perPage) allLoaded = true
 	}
 
