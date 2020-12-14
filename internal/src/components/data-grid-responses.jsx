@@ -9,7 +9,7 @@ const columns = [
 	{ accessor: 'userName', Header: 'Student' },
 	{ accessor: 'response', Header: 'Response' },
 	{ accessor: 'score', Header: 'Score' },
-	{ accessor: 'time', Header: 'Time', Cell: DataGridTimestampCell }
+	{ accessor: 'createTime', Header: 'Time', Cell: DataGridTimestampCell }
 ]
 
 export default function DataGridResponses({ responses, selectedIndex, onSelect }) {
@@ -32,6 +32,5 @@ DataGridResponses.propTypes = {
 			time: PropTypes.number
 		})
 	),
-	selectedIndex: PropTypes.number,
-	onSelect: PropTypes.func.isRequired
+	selectedIndex: PropTypes.number
 }

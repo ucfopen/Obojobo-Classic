@@ -53,19 +53,19 @@ export default function QuestionScoreDetails(props) {
 
 		// Processes the necessary data for the 'GraphResponses' component.
 		for (let i = 0; i < responses.length; i++) {
-			const currAnswerChoice = responses[i].response.charCodeAt(0) - 65
-
-			dataForGraph[currAnswerChoice].value++
+			const r = responses[i]
+			// add to answer count
+			dataForGraph[r.answerIndex].value++
 
 			// To find the number of correct answers.
-			if (responses[i].score === 100) {
+			if (r.score === 100) {
 				numCorrectAnswers++
 			}
 
 			// To find which answer is the correct one.
 			if (!foundCorrectAnswer) {
-				if (responses[i].score === 100) {
-					dataForGraph[currAnswerChoice].isCorrect = true
+				if (r.score === 100) {
+					dataForGraph[r.answerIndex].isCorrect = true
 					foundCorrectAnswer = true
 				}
 			}
@@ -81,7 +81,8 @@ export default function QuestionScoreDetails(props) {
 	if (questionType === QA || questionType === MEDIA) {
 		// Processes the necessary data for the 'GraphResponses' component.
 		for (let i = 0; i < responses.length; i++) {
-			if (responses[i].score === 100) {
+			const r = responses[i]
+			if (r.score === 100) {
 				numCorrectAnswers++
 				dataForGraph[1].value++
 			} else {
@@ -89,14 +90,10 @@ export default function QuestionScoreDetails(props) {
 			}
 
 			if (!foundCorrectAnswer) {
-				if (responses[i].score === 100) {
+				if (r.score === 100) {
 					dataForGraph[1].isCorrect = true
 					foundCorrectAnswer = true
 				}
-			}
-
-			if (questionType === MEDIA) {
-				dataForGraph[i].score = responses[i].score
 			}
 		}
 	}
@@ -128,7 +125,7 @@ export default function QuestionScoreDetails(props) {
 			return '--'
 		}
 
-		return (numCorrectAnswers / responses.length) * 100 + '%'
+		return parseFloat((numCorrectAnswers / responses.length) * 100).toFixed(2) + '%'
 	}
 
 	const getFormattedNumberOfResponses = () => {

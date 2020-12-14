@@ -53,48 +53,17 @@ export default function ModalAboutObojoboNext({ onClose }) {
 				</details>
 
 				<p className="about-obo-next">
-					We&apos;ve been hard at work at a ground-up rewrite of the next iteration of Obojobo
-					called <b>Obojobo Next</b> which is now available campus wide at UCF. Likewise, Obojobo
-					will continue to be available but is being renamed to <b>Obojobo Classic</b>.
+					<b>Obojobo Next</b> is here! We&apos;re hard at work on the a huge ground-up redesign.
+					<br />{' '}
+					<a
+						href="https://github.com/ucfopen/Obojobo/wiki/Obojobo-Classic-To-Obojobo-Next-Transition"
+						target="obojobo-transition"
+					>
+						Learn more about the transition on our Wiki.
+					</a>
 				</p>
 
-				<details>
-					<summary>What&apos;s different with Obojobo Next?</summary>
-
-					<p>
-						Obojobo Next is the next iteration of Obojobo. Modules are now less restrictive and
-						content can flow across multiple pages with practice questions in-line with the content.
-						Authoring modules in Obojobo Next has been streamlined and now editing is more like
-						typing up a Word document. Assessments are now optional and have more scoring options,
-						allowing you to assign a passing threshold score (among other options).
-					</p>
-
-					<p>
-						UCF is actively developing Obojobo Next, with new features being added monthly. If
-						you&apos;ve authored your own content in Obojobo or have been interested in doing so, we
-						highly recommend you check it out!
-					</p>
-				</details>
-
-				<details>
-					<summary>Can I use Obojobo Next now?</summary>
-
-					<p>
-						Yes - it&apos;s now available campus wide. Both Obojobo Next and Obojobo Classic will
-						coexist simultaneously.
-					</p>
-				</details>
-
-				<details>
-					<summary>Will modules created in Obojobo Classic work in Obojobo Next?</summary>
-
-					<p>
-						No - the two systems are separate and modules can&apos;t automatically convert between
-						the two systems.
-					</p>
-				</details>
-
-				<Button text="Close" type="text" onClick={onClose} />
+				<Button text="Close" type="small" onClick={onClose} />
 			</div>
 		</RepositoryModal>
 	)
