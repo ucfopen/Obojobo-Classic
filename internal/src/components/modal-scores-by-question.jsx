@@ -57,12 +57,18 @@ export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, lo
 
 		// create an answer map where the key is the answer id
 		const byAnswer = {}
+		const byQuestion = {}
 		responseData.forEach(ans => {
-			const ansId = ans.answer
-			if (!byAnswer[ansId]) {
-				byAnswer[ansId] = []
+			const aID = ans.answer
+			const qID = ans.itemID
+			if (!byAnswer[aID]) {
+				byAnswer[aID] = []
 			}
-			byAnswer[ansId].push(ans)
+			if (!byQuestion[qID]) {
+				byQuestion[qID] = []
+			}
+			byAnswer[aID].push(ans)
+			byQuestion[qID].push(ans)
 		})
 
 		// loop over questions
@@ -74,32 +80,48 @@ export function ModalScoresByQuestionWithAPI({ onClose, instanceName, instID, lo
 			q.responses = []
 			const scores = []
 
-			// loop through answers of this question
-			for (const i in q.originalQuestion.answers) {
-				const a = q.originalQuestion.answers[i]
-				const answerIndex = parseInt(i, 10)
-				const answerLetter = String.fromCharCode(answerIndex + 65)
-				if (byAnswer[a.answerID]) {
-					const answerLogs = byAnswer[a.answerID]
-					// total up scores
-					// add answerIndex to each answer
+			switch (q.type) {
+				case 'MC':
+					// loop through answers of this question
+					for (const i in q.originalQuestion.answers) {
+						const a = q.originalQuestion.answers[i]
+						const answerIndex = parseInt(i, 10)
+						const answerLetter = String.fromCharCode(answerIndex + 65)
+						if (byAnswer[a.answerID]) {
+							const answerLogs = byAnswer[a.answerID] || []
+							// total up scores
+							// add answerIndex to each answer
 
-					answerLogs.forEach(a => {
-						a.answerIndex = answerIndex
-						a.answerLetter = answerLetter
-						a.userName = userMap[a.userID]?.userName || `Student ${a.userID}`
-						a.response = answerLetter
-						scores.push(parseFloat(a.score))
-					})
-					// average score
-					q.responses.push(...answerLogs)
-				}
+							answerLogs.forEach(a => {
+								a.answerIndex = answerIndex
+								a.answerLetter = answerLetter
+								a.userName = userMap[a.userID]?.userName || `Student ${a.userID}`
+								a.response = answerLetter
+								scores.push(parseFloat(a.score))
+							})
+							q.responses.push(...answerLogs)
+						}
+					}
+					break
+
+				case 'QA':
+				case 'Media':
+					{
+						const answerLogs = byQuestion[q.id] || []
+						answerLogs.forEach(a => {
+							a.userName = userMap[a.userID]?.userName || `Student ${a.userID}`
+							a.response = a.answer
+							scores.push(parseFloat(a.score))
+						})
+						q.responses.push(...answerLogs)
+					}
+					break
 			}
+
 			if (scores.length) {
 				q.score = scores.reduce((total, s) => total + s, 0) / scores.length
 			}
 		})
-
 		return questions
 	}, [responseData, loData, instanceScores])
 
