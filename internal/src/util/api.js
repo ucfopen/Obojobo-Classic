@@ -93,7 +93,7 @@ export const apiGetLO = (r, loID) =>
 			if (k.answers) {
 				k.answers.forEach(a => {
 					a.userID = parseInt(a.userID, 10)
-					a.weight = parseInt(a.userID, 10)
+					a.weight = parseInt(a.weight, 10)
 				})
 			}
 		})
