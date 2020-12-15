@@ -47,7 +47,7 @@ module.exports =
 					]
 				},
 				stats: { children: false, modules: false },
-				openPage: 'repository2.php',
+				openPage: 'repository',
 				open: true,
 				proxy: {
 					// proxy everything back into docker
@@ -153,7 +153,7 @@ module.exports =
 				// ]),
 				new CleanWebpackPlugin(), // clear the dist folder before build
 				new MiniCssExtractPlugin({ filename: `${filename}.css` }),
-				new ManifestPlugin({ publicPath: '/assets/dist/' }),
+				new ManifestPlugin({ publicPath: '/assets/dist/' })
 			],
 			resolve: {
 				extensions: ['.js', '.jsx']
