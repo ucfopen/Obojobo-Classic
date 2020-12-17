@@ -52,6 +52,21 @@ export default function ModalAboutObojoboNext({ onClose }) {
 					</p>
 				</details>
 
+				<details>
+					<summary>The retired Flash repository</summary>
+
+					<p>
+						Again, Adobe and the browsers will have completely retired Flash by 2021.  However, if you need
+						access to the legacy Flash based repository,{' '}
+						<a
+							href="/repository-flash.php"
+							target="obojobo-repository"
+						>
+							it's still available here
+						</a>
+					</p>
+				</details>
+
 				<p className="about-obo-next">
 					<b>Obojobo Next</b> is here! We&apos;re hard at work on the a huge ground-up redesign.
 					<br />{' '}
