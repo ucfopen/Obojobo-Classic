@@ -5,7 +5,7 @@ require('internal/includes/login.php');
 // redirect to repository
 if ($loggedIn)
 {
-	header("Location: /repository2.php");
+	header("Location: /repository.php");
 	exit;
 }
 
