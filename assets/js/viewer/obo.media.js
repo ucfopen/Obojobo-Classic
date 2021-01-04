@@ -141,11 +141,11 @@ obo.media = function()
 				var youtubeURL = $placeholder.attr('data-youtube-id');
 				var params = getParams();
 				params.allowScriptAccess = "always";
-				$placeholder.append('<iframe width="' + $placeholder.width() + '" height="' + $placeholder.height() + '" src="https://www.youtube.com/embed/' + youtubeURL + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
+				$placeholder.append('<iframe width="' + $placeholder.width() + '" height="' + $placeholder.height() + '" src="https://www.youtube-nocookie.com/embed/' + youtubeURL + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
 			});
 		}
 	};
-	
+
 	var youtubeizeIFrame = function()
 	{
 		if(AUTOLOAD_FLASH)
