@@ -682,9 +682,11 @@ obo.view = function()
 	
 	var buildPage = function(section, index)
 	{
-		// @TODO captivateSwitch
-		// $('#swap-cap').hide();
-		
+		// Remove any No-Flash installed overlays
+		while($('#swf-alt-text').length > 0) {
+			$('#swf-alt-text').remove()
+		}
+
 		switch(section)
 		{
 			case 'overview':
