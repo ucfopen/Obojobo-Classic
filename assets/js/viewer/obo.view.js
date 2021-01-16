@@ -684,7 +684,8 @@ obo.view = function()
 	{
 		// Remove any No-Flash installed overlays
 		while($('#swf-alt-text').length > 0) {
-			$('#swf-alt-text').remove()
+			var $figure = $('#swf-alt-text').parents('figure.media-item')
+			if($figure.length) $figure.remove()
 		}
 
 		switch(section)
