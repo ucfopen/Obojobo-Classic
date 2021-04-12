@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f9798e1e8df51fb99e24a4f6b06fd74",
+    "content-hash": "61bd049b5347580ffe84207ceb8a2113",
     "packages": [
         {
             "name": "composer/installers",
@@ -185,39 +185,38 @@
         },
         {
             "name": "intervention/httpauth",
-            "version": "3.0.3",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/httpauth.git",
-                "reference": "7742aa013e1a72f94379cb6623286f06fa1ea5f7"
+                "reference": "3d67894b28b9ff3887fb9e4474c6b81ca5614543"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/httpauth/zipball/7742aa013e1a72f94379cb6623286f06fa1ea5f7",
-                "reference": "7742aa013e1a72f94379cb6623286f06fa1ea5f7",
+                "url": "https://api.github.com/repos/Intervention/httpauth/zipball/3d67894b28b9ff3887fb9e4474c6b81ca5614543",
+                "reference": "3d67894b28b9ff3887fb9e4474c6b81ca5614543",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.3|^8.0"
+                "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "^0.12.11",
-                "phpunit/phpunit": "^9.0"
+                "phpunit/phpunit": "~4.0"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "Intervention\\HttpAuth\\Laravel\\HttpAuthServiceProvider"
+                        "Intervention\\Httpauth\\HttpauthServiceProvider"
                     ],
                     "aliases": {
-                        "HttpAuth": "Intervention\\HttpAuth\\Laravel\\Facades\\HttpAuth"
+                        "Httpauth": "Intervention\\Httpauth\\Facades\\Httpauth"
                     }
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Intervention\\HttpAuth\\": "src/"
+                    "Intervention\\Httpauth\\": "src/Intervention/Httpauth"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -228,7 +227,7 @@
                 {
                     "name": "Oliver Vogel",
                     "email": "oliver@olivervogel.com",
-                    "homepage": "https://olivervogel.com/"
+                    "homepage": "http://olivervogel.com/"
                 }
             ],
             "description": "HTTP authentication (Basic & Digest) including ServiceProviders for easy Laravel integration",
@@ -238,7 +237,7 @@
                 "http",
                 "laravel"
             ],
-            "time": "2021-01-22T15:08:35+00:00"
+            "time": "2019-09-09T11:59:51+00:00"
         },
         {
             "name": "johnpbloch/wordpress",
@@ -1052,15 +1051,15 @@
         },
         {
             "name": "wpackagist-plugin/w3-total-cache",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/w3-total-cache/",
-                "reference": "tags/2.1.1"
+                "reference": "tags/2.1.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.2.1.1.zip"
+                "url": "https://downloads.wordpress.org/plugin/w3-total-cache.2.1.2.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
