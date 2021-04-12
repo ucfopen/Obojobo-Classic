@@ -59,7 +59,8 @@ $min_allowDebugFlag = false;
  * will have to load extra code to guess. Some examples below:
  */
 //$min_cachePath = 'c:\\WINDOWS\\Temp';
-$min_cachePath = \AppCfg::DIR_BASE.'internal/templates/compiled/';
+// $min_cachePath = \AppCfg::DIR_BASE.'internal/templates/compiled/';
+$min_cachePath = '/tmp';
 //$min_cachePath = preg_replace('/^\\d+;/', '', session_save_path());
 
 
