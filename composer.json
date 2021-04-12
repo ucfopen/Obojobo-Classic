@@ -34,7 +34,7 @@
         "wpackagist-plugin/table-of-contents-plus": ">=2002",
         "wpackagist-plugin/page-list": ">=5.2",
         "wpackagist-plugin/w3-total-cache": ">=2.1.1",
-        "mrclay/minify": "2.3.0",
+        "mrclay/minify": "3.0.11",
         "eher/oauth": "1.0.7",
         "silexlabs/amfphp": "2.2.2"
     },
